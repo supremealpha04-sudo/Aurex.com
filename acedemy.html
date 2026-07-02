@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurex Academy | Learn Graphic Design</title>
+<meta name="description" content="Aurex Academy - Community for graphic designers. Learn, share resources, and grow your skills.">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#6366f1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{--primary:#6366f1;--primary-dark:#4f46e5;--primary-light:#818cf8;--secondary:#ec4899;--accent:#06b6d4;--success:#10b981;--warning:#f59e0b;--error:#ef4444;--gold:#fbbf24;--bg-primary:#0f0f1a;--bg-secondary:#1a1a2e;--bg-card:#16162a;--bg-glass:rgba(22,22,42,0.85);--text-primary:#f8fafc;--text-secondary:#94a3b8;--text-muted:#64748b;--border:rgba(255,255,255,0.08);--border-hover:rgba(99,102,241,0.4);--shadow-md:0 8px 32px rgba(0,0,0,0.4);--shadow-lg:0 16px 48px rgba(0,0,0,0.5);--shadow-glow:0 0 40px rgba(99,102,241,0.3);--radius-md:16px;--radius-lg:24px;--radius-xl:32px;--transition-base:0.4s cubic-bezier(0.4,0,0.2,1);--font-heading:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif;--bottom-nav-height:70px}
+body.light-mode{--bg-primary:#f8fafc;--bg-secondary:#f1f5f9;--bg-card:#ffffff;--bg-glass:rgba(255,255,255,0.85);--text-primary:#0f172a;--text-secondary:#475569;--text-muted:#94a3b8;--border:rgba(0,0,0,0.08);--shadow-md:0 8px 32px rgba(0,0,0,0.1);--shadow-lg:0 16px 48px rgba(0,0,0,0.12);--shadow-glow:0 0 40px rgba(99,102,241,0.2)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font-body);background-color:var(--bg-primary);color:var(--text-primary);line-height:1.6;overflow-x:hidden;transition:background-color var(--transition-base),color var(--transition-base);-webkit-font-smoothing:antialiased;padding-bottom:var(--bottom-nav-height)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg-primary)}
+::-webkit-scrollbar-thumb{background:var(--primary);border-radius:3px}
+h1,h2,h3,h4,h5,h6{font-family:var(--font-heading);font-weight:700;line-height:1.2;color:var(--text-primary)}
+.text-gradient{background:linear-gradient(135deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradientShift 6s ease infinite}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.container{max-width:1280px;margin:0 auto;padding:0 24px;width:100%}
+.section-padding{padding:80px 0}
+
+.loading-screen{position:fixed;inset:0;background:var(--bg-primary);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.8s ease,visibility 0.8s ease}
+.loading-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.loading-logo{font-family:var(--font-heading);font-size:3rem;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:pulse 2s ease-in-out infinite}
+.loading-subtitle{color:var(--text-muted);font-size:0.9rem;margin-top:8px}
+.loading-bar-container{width:220px;height:4px;background:var(--border);border-radius:4px;margin-top:24px;overflow:hidden}
+.loading-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));border-radius:4px;animation:loadingProgress 2.5s cubic-bezier(0.4,0,0.2,1) forwards}
+@keyframes loadingProgress{0%{width:0%}30%{width:40%}60%{width:70%}100%{width:100%}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.8;transform:scale(0.97)}}
+
+.auth-overlay{position:fixed;inset:0;background:var(--bg-primary);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-overlay.hidden{display:none}
+.auth-container{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);max-width:480px;width:100%;padding:48px;position:relative;overflow:hidden}
+.auth-container::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent))}
+.auth-logo{text-align:center;margin-bottom:32px}
+.auth-logo img{width:64px;height:64px;border-radius:16px;object-fit:cover;border:2px solid var(--primary);margin-bottom:16px}
+.auth-logo h2{font-size:1.5rem;margin-bottom:4px}
+.auth-logo p{color:var(--text-secondary);font-size:0.9rem}
+.auth-tabs{display:flex;gap:8px;margin-bottom:24px;background:var(--bg-secondary);border-radius:12px;padding:4px}
+.auth-tab{flex:1;padding:10px;border:none;background:transparent;color:var(--text-secondary);font-family:var(--font-heading);font-weight:600;font-size:0.9rem;border-radius:8px;cursor:pointer;transition:0.2s}
+.auth-tab.active{background:var(--bg-card);color:var(--primary);box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.auth-form{display:none}
+.auth-form.active{display:block}
+.form-group{margin-bottom:20px}
+.form-label{display:block;margin-bottom:6px;font-weight:500;font-size:0.85rem;color:var(--text-primary)}
+.form-control{width:100%;padding:12px 16px;background:var(--bg-secondary);border:2px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;transition:0.2s}
+.form-control:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(99,102,241,0.1)}
+.form-control::placeholder{color:var(--text-muted)}
+select.form-control{cursor:pointer}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;font-family:var(--font-heading);font-weight:600;font-size:0.95rem;border:none;border-radius:50px;cursor:pointer;text-decoration:none;transition:var(--transition-base);width:100%;position:relative;overflow:hidden;box-shadow:0 4px 15px rgba(99,102,241,0.3)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(99,102,241,0.4)}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;background:transparent;color:var(--text-primary);font-family:var(--font-heading);font-weight:600;font-size:0.95rem;border:2px solid var(--border);border-radius:50px;cursor:pointer;text-decoration:none;transition:var(--transition-base);width:100%}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-3px)}
+.btn-gold{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;background:linear-gradient(135deg,var(--gold),#f59e0b);color:#1a1a2e;font-family:var(--font-heading);font-weight:700;font-size:0.95rem;border:none;border-radius:50px;cursor:pointer;text-decoration:none;transition:var(--transition-base);width:100%;box-shadow:0 4px 15px rgba(251,191,36,0.3)}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(251,191,36,0.4)}
+.auth-divider{display:flex;align-items:center;gap:16px;margin:24px 0;color:var(--text-muted);font-size:0.85rem}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-footer{text-align:center;margin-top:20px;font-size:0.85rem;color:var(--text-secondary)}
+.auth-footer a{color:var(--primary);text-decoration:none;font-weight:600;cursor:pointer}
+.auth-footer a:hover{text-decoration:underline}
+.premium-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(245,158,11,0.1));border:1px solid rgba(251,191,36,0.3);border-radius:50px;font-size:0.75rem;font-weight:700;color:var(--gold);margin-left:8px}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);z-index:100000;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.3s ease}
+.modal-overlay.active{display:flex;opacity:1}
+.modal-content{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);max-width:500px;width:100%;max-height:90vh;overflow-y:auto;transform:scale(0.9);transition:transform 0.3s ease}
+.modal-overlay.active .modal-content{transform:scale(1)}
+.modal-header{padding:24px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:1.2rem}
+.modal-close{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;transition:0.2s}
+.modal-close:hover{background:var(--error);color:white;border-color:var(--error)}
+.modal-body{padding:24px 32px}
+.modal-footer{padding:20px 32px;border-top:1px solid var(--border);display:flex;gap:12px}
+.payment-details{background:var(--bg-secondary);border-radius:var(--radius-md);padding:20px;margin-bottom:20px}
+.payment-details h4{font-size:0.9rem;margin-bottom:12px;color:var(--primary-light)}
+.payment-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.9rem}
+.payment-row:last-child{border-bottom:none}
+.payment-row span:first-child{color:var(--text-secondary)}
+.payment-row span:last-child{font-weight:600;color:var(--text-primary)}
+.payment-row.total{padding-top:12px;margin-top:8px;border-top:2px solid var(--primary)}
+.payment-row.total span:last-child{color:var(--gold);font-size:1.1rem}
+.bank-details{background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(236,72,153,0.05));border:1px solid var(--border-hover);border-radius:var(--radius-md);padding:20px;margin-bottom:20px}
+.bank-details h4{font-size:0.9rem;margin-bottom:12px;color:var(--primary-light);display:flex;align-items:center;gap:8px}
+.bank-detail-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;font-size:0.9rem}
+.bank-detail-row span:first-child{color:var(--text-secondary)}
+.bank-detail-row span:last-child{font-weight:600;color:var(--text-primary);font-family:monospace}
+.copy-btn{padding:4px 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:0.75rem;cursor:pointer;transition:0.2s}
+.copy-btn:hover{background:var(--primary);color:white;border-color:var(--primary)}
+
+.header{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--bg-glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:var(--transition-base)}
+.header.scrolled{box-shadow:var(--shadow-md)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0;height:64px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-img{width:40px;height:40px;border-radius:10px;object-fit:cover;border:2px solid var(--primary)}
+.logo-text{font-family:var(--font-heading);font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nav-right{display:flex;align-items:center;gap:12px}
+.user-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);cursor:pointer;transition:0.2s}
+.user-avatar:hover{transform:scale(1.1);box-shadow:var(--shadow-glow)}
+.theme-toggle{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;transition:0.2s}
+.theme-toggle:hover{border-color:var(--primary);color:var(--primary)}
+.logout-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:0.2s}
+.logout-btn:hover{background:var(--error);color:white;border-color:var(--error)}
+
+.main-content{padding-top:64px;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+
+.home-hero{padding:60px 0 40px;text-align:center;background:radial-gradient(ellipse at top,rgba(99,102,241,0.1),transparent 60%)}
+.home-hero h1{font-size:clamp(1.8rem,4vw,3rem);margin-bottom:12px}
+.home-hero p{color:var(--text-secondary);max-width:600px;margin:0 auto 32px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:48px}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;text-align:center;transition:var(--transition-base)}
+.stat-card:hover{transform:translateY(-4px);border-color:var(--border-hover);box-shadow:var(--shadow-md)}
+.stat-card i{font-size:2rem;color:var(--primary);margin-bottom:12px}
+.stat-card h3{font-size:2rem;margin-bottom:4px}
+.stat-card p{color:var(--text-secondary);font-size:0.9rem}
+.section-title-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.section-title-bar h2{font-size:1.3rem}
+.view-all{color:var(--primary);text-decoration:none;font-weight:600;font-size:0.9rem;display:flex;align-items:center;gap:6px;transition:0.2s}
+.view-all:hover{gap:10px}
+.resources-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:48px}
+.resource-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition-base);position:relative}
+.resource-card:hover{transform:translateY(-6px);border-color:var(--border-hover);box-shadow:var(--shadow-lg)}
+.resource-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary));transform:scaleX(0);transform-origin:left;transition:transform 0.6s ease}
+.resource-card:hover::before{transform:scaleX(1)}
+.resource-thumb{width:100%;aspect-ratio:16/10;object-fit:cover}
+.resource-info{padding:20px}
+.resource-type{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);border-radius:50px;font-size:0.7rem;font-weight:600;color:var(--primary-light);text-transform:uppercase;margin-bottom:8px}
+.resource-title{font-size:1rem;margin-bottom:6px}
+.resource-price{font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:12px}
+.resource-price .original{text-decoration:line-through;color:var(--text-muted);font-size:0.85rem;margin-left:8px}
+.resource-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;border-radius:50px;font-family:var(--font-heading);font-weight:600;font-size:0.85rem;cursor:pointer;transition:0.2s}
+.resource-btn:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(99,102,241,0.3)}
+.resource-btn:disabled{opacity:0.5;cursor:not-allowed}
+.premium-lock{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:0.9rem}
+.premium-only-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(245,158,11,0.1));border:1px solid rgba(251,191,36,0.3);border-radius:50px;font-size:0.7rem;font-weight:700;color:var(--gold);margin-bottom:8px}
+
+.class-container{display:grid;grid-template-columns:1fr 320px;gap:24px;height:calc(100vh - 140px)}
+.chat-area{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);display:flex;flex-direction:column;overflow:hidden}
+.chat-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.chat-header h3{font-size:1rem;display:flex;align-items:center;gap:8px}
+.online-indicator{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text-muted)}
+.online-dot{width:8px;height:8px;background:var(--success);border-radius:50%;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.message{max-width:75%;padding:12px 16px;border-radius:16px;font-size:0.9rem;line-height:1.5;position:relative}
+.message.sent{align-self:flex-end;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border-bottom-right-radius:4px}
+.message.received{align-self:flex-start;background:var(--bg-secondary);color:var(--text-primary);border-bottom-left-radius:4px}
+.message-time{font-size:0.7rem;opacity:0.7;margin-top:4px;display:block}
+.message-author{font-size:0.75rem;font-weight:600;color:var(--primary-light);margin-bottom:4px}
+.message-image{max-width:200px;border-radius:8px;margin-top:8px;cursor:pointer}
+.message-file{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,0.1);border-radius:8px;margin-top:8px;text-decoration:none;color:inherit}
+.message-file i{font-size:1.5rem}
+.chat-input-area{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end}
+.chat-input{flex:1;padding:12px 16px;background:var(--bg-secondary);border:2px solid var(--border);border-radius:50px;color:var(--text-primary);font-family:var(--font-body);font-size:0.9rem;resize:none;min-height:44px;max-height:120px}
+.chat-input:focus{outline:none;border-color:var(--primary)}
+.chat-action-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:0.2s;flex-shrink:0}
+.chat-action-btn:hover{background:var(--primary);color:white;border-color:var(--primary)}
+.chat-action-btn.send{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border-color:transparent}
+.chat-action-btn.send:hover{box-shadow:0 4px 15px rgba(99,102,241,0.3)}
+
+.tools-sidebar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column}
+.tools-header{padding:16px 20px;border-bottom:1px solid var(--border)}
+.tools-header h3{font-size:1rem;display:flex;align-items:center;gap:8px}
+.tools-list{flex:1;overflow-y:auto;padding:12px}
+.tool-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-md);transition:0.2s;margin-bottom:8px;text-decoration:none;color:inherit}
+.tool-item:hover{background:var(--bg-secondary)}
+.tool-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(236,72,153,0.1));display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--primary);flex-shrink:0}
+.tool-info{flex:1;min-width:0}
+.tool-info h4{font-size:0.9rem;margin-bottom:2px}
+.tool-info p{font-size:0.75rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tool-download{padding:6px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:50px;font-size:0.75rem;font-weight:600;color:var(--primary);text-decoration:none;transition:0.2s;flex-shrink:0}
+.tool-download:hover{background:var(--primary);color:white;border-color:var(--primary)}
+
+.resources-filter{display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+.resources-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
+.resource-card-full{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition-base);position:relative}
+.resource-card-full:hover{transform:translateY(-6px);border-color:var(--border-hover);box-shadow:var(--shadow-lg)}
+.resource-card-full .resource-thumb{width:100%;aspect-ratio:16/10;object-fit:cover}
+.resource-card-full .resource-body{padding:20px}
+.resource-card-full .resource-title{font-size:1.1rem;margin-bottom:8px}
+.resource-card-full .resource-desc{color:var(--text-secondary);font-size:0.85rem;line-height:1.6;margin-bottom:16px}
+.resource-card-full .resource-meta{display:flex;align-items:center;justify-content:space-between;padding-top:16px;border-top:1px solid var(--border)}
+.resource-card-full .resource-price-tag{font-size:1.2rem;font-weight:700;color:var(--gold)}
+.resource-card-full .resource-price-tag.free{color:var(--success)}
+
+.profile-header{background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(236,72,153,0.05));border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;margin-bottom:32px;display:flex;align-items:center;gap:32px;position:relative}
+.profile-avatar-wrapper{position:relative}
+.profile-avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid var(--primary);box-shadow:var(--shadow-glow)}
+.profile-avatar-edit{position:absolute;bottom:0;right:0;width:36px;height:36px;border-radius:50%;background:var(--primary);color:white;border:3px solid var(--bg-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.8rem;transition:0.2s}
+.profile-avatar-edit:hover{transform:scale(1.1)}
+.profile-info{flex:1}
+.profile-name{font-size:1.8rem;margin-bottom:4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.profile-role{color:var(--text-secondary);font-size:1rem;margin-bottom:12px}
+.profile-badges{display:flex;gap:8px;flex-wrap:wrap}
+.profile-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:50px;font-size:0.8rem;font-weight:600}
+.profile-badge.premium{background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(245,158,11,0.1));border:1px solid rgba(251,191,36,0.3);color:var(--gold)}
+.profile-badge.free{background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);color:var(--primary-light)}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.profile-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px}
+.profile-card h3{font-size:1.1rem;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.profile-field{margin-bottom:16px}
+.profile-field label{display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em}
+.profile-field .value{font-size:1rem;color:var(--text-primary);font-weight:500}
+.profile-field .value.editable{display:flex;align-items:center;gap:8px}
+.profile-field .value.editable input{flex:1;padding:8px 12px;background:var(--bg-secondary);border:2px solid var(--border);border-radius:8px;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem}
+.profile-field .value.editable input:focus{outline:none;border-color:var(--primary)}
+.profile-field .value.editable input:disabled{background:var(--bg-card);opacity:0.6;cursor:not-allowed}
+.edit-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.75rem;transition:0.2s}
+.edit-btn:hover{background:var(--primary);color:white;border-color:var(--primary)}
+.edit-btn.save{background:var(--success);color:white;border-color:var(--success)}
+.edit-btn.delete{background:var(--error);color:white;border-color:var(--error)}
+.profile-actions{display:flex;gap:12px;margin-top:24px}
+.supreme-contact{background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(6,182,212,0.05));border:1px solid var(--border-hover);border-radius:var(--radius-lg);padding:24px;margin-top:24px;text-align:center}
+.supreme-contact h4{font-size:1rem;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+.supreme-contact p{color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px}
+.supreme-contact .btn-primary{width:auto;display:inline-flex;padding:12px 28px}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:999;background:var(--bg-glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:center;align-items:center;height:var(--bottom-nav-height);padding:0 16px;transition:var(--transition-base)}
+.bottom-nav-inner{display:flex;gap:8px;max-width:500px;width:100%;justify-content:space-around}
+.bottom-nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 16px;background:transparent;border:none;border-radius:var(--radius-md);color:var(--text-secondary);font-family:var(--font-heading);font-weight:600;font-size:0.7rem;text-decoration:none;cursor:pointer;transition:0.2s;flex:1;max-width:120px;position:relative}
+.bottom-nav-btn i{font-size:1.3rem;transition:0.2s}
+.bottom-nav-btn:hover{color:var(--primary);background:rgba(99,102,241,0.1)}
+.bottom-nav-btn:hover i{transform:translateY(-2px)}
+.bottom-nav-btn.active{color:var(--primary);background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(236,72,153,0.1))}
+.bottom-nav-btn.active i{transform:translateY(-2px)}
+.bottom-nav-btn .badge{position:absolute;top:4px;right:20px;width:18px;height:18px;border-radius:50%;background:var(--error);color:white;font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+.toast-container{position:fixed;top:80px;right:20px;z-index:10001;display:flex;flex-direction:column;gap:10px}
+.toast{padding:14px 20px;border-radius:var(--radius-md);color:white;font-weight:500;font-size:0.9rem;transform:translateX(120%);opacity:0;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);max-width:320px;backdrop-filter:blur(10px);display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-lg)}
+.toast.show{transform:translateX(0);opacity:1}
+.toast-success{background:rgba(16,185,129,0.95)}
+.toast-error{background:rgba(239,68,68,0.95)}
+.toast-warning{background:rgba(245,158,11,0.95)}
+.toast-info{background:rgba(99,102,241,0.95)}
+
+.filter-btn{padding:10px 24px;background:var(--bg-card);border:1px solid var(--border);border-radius:50px;color:var(--text-secondary);font-family:var(--font-heading);font-weight:600;font-size:0.9rem;cursor:pointer;transition:var(--transition-base)}
+.filter-btn:hover,.filter-btn.active{background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;border-color:transparent;transform:translateY(-2px);box-shadow:var(--shadow-glow)}
+
+@media(max-width:1024px){.class-container{grid-template-columns:1fr;height:auto}.tools-sidebar{max-height:300px}.profile-grid{grid-template-columns:1fr}.profile-header{flex-direction:column;text-align:center}}
+@media(max-width:768px){.auth-container{padding:32px 24px}.stats-grid{grid-template-columns:repeat(2,1fr)}.section-padding{padding:60px 0}.resources-grid{grid-template-columns:1fr}.chat-messages{max-height:400px}}
+@media(max-width:480px){.container{padding:0 16px}.bottom-nav-btn{padding:6px 8px;font-size:0.65rem}.bottom-nav-btn i{font-size:1.1rem}.profile-avatar{width:80px;height:80px}.profile-name{font-size:1.3rem}.modal-content{max-height:95vh;border-radius:var(--radius-lg)}.modal-header,.modal-body,.modal-footer{padding-left:20px;padding-right:20px}}
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="loading-screen" id="loadingScreen">
+<div class="loading-logo">Aurex Academy</div>
+<div class="loading-subtitle">Loading Creative Community...</div>
+<div class="loading-bar-container"><div class="loading-bar-fill"></div></div>
+</div>
+
+<div class="auth-overlay" id="authOverlay">
+<div class="auth-container">
+<div class="auth-logo">
+<img src="https://aurex-design.vercel.app/IMG-20260403-WA0021(1).jpg" alt="Aurex Academy">
+<h2>Welcome to Aurex Academy</h2>
+<p>Join our community of graphic designers</p>
+</div>
+<div class="auth-tabs">
+<button class="auth-tab active" data-tab="login">Sign In</button>
+<button class="auth-tab" data-tab="register">Create Account</button>
+</div>
+<form class="auth-form active" id="loginForm">
+<div class="form-group">
+<label class="form-label"><i class="fas fa-envelope" style="margin-right:6px;"></i>Email Address</label>
+<input type="email" class="form-control" id="loginEmail" placeholder="you@example.com" required>
+</div>
+<div class="form-group">
+<label class="form-label"><i class="fas fa-lock" style="margin-right:6px;"></i>Password</label>
+<input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
+</div>
+<button type="submit" class="btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+<div class="auth-footer">Don't have an account? <a onclick="switchTab('register')">Create one</a></div>
+</form>
+<form class="auth-form" id="registerForm">
+<div class="form-group">
+<label class="form-label"><i class="fas fa-user" style="margin-right:6px;"></i>Full Name</label>
+<input type="text" class="form-control" id="regName" placeholder="John Doe" required>
+</div>
+<div class="form-group">
+<label class="form-label"><i class="fas fa-envelope" style="margin-right:6px;"></i>Email Address</label>
+<input type="email" class="form-control" id="regEmail" placeholder="you@example.com" required>
+</div>
+<div class="form-group">
+<label class="form-label"><i class="fas fa-birthday-cake" style="margin-right:6px;"></i>Age Range</label>
+<select class="form-control" id="regAge" required>
+<option value="">Select age range</option>
+<option value="13-17">13 - 17</option>
+<option value="18-24">18 - 24</option>
+<option value="25-34">25 - 34</option>
+<option value="35-44">35 - 44</option>
+<option value="45+">45+</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label"><i class="fas fa-lock" style="margin-right:6px;"></i>Password</label>
+<input type="password" class="form-control" id="regPassword" placeholder="Create a password (min 6 chars)" required minlength="6">
+</div>
+<div class="form-group">
+<label class="form-label"><i class="fas fa-crown" style="margin-right:6px;"></i>Account Type</label>
+<select class="form-control" id="regType" required>
+<option value="free">Free Account (₦0)</option>
+<option value="premium">Premium Account (₦13,500)</option>
+</select>
+</div>
+<button type="submit" class="btn-primary" id="registerBtn"><i class="fas fa-user-plus"></i> Create Account</button>
+<div class="auth-divider"><span>or</span></div>
+<button type="button" class="btn-gold" id="upgradeLaterBtn" style="display:none;"><i class="fas fa-crown"></i> Upgrade to Premium</button>
+<div class="auth-footer">Already have an account? <a onclick="switchTab('login')">Sign in</a></div>
+</form>
+</div>
+</div>
+
+<div class="modal-overlay" id="paymentModal">
+<div class="modal-content">
+<div class="modal-header">
+<h3><i class="fas fa-crown" style="color:var(--gold);margin-right:8px;"></i>Premium Subscription</h3>
+<button class="modal-close" id="paymentModalClose"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div class="payment-details">
+<h4><i class="fas fa-receipt"></i> Subscription Details</h4>
+<div class="payment-row"><span>Plan</span><span>Premium (3 Months)</span></div>
+<div class="payment-row"><span>Duration</span><span>90 Days</span></div>
+<div class="payment-row"><span>Access</span><span>100% Resources + Academy</span></div>
+<div class="payment-row total"><span>Total Amount</span><span id="paymentAmount">₦15,000</span></div>
+</div>
+<div class="bank-details">
+<h4><i class="fas fa-university"></i> Bank Transfer Details</h4>
+<div class="bank-detail-row"><span>Account Number</span><div style="display:flex;align-items:center;gap:8px;"><span id="bankAccount">8028741731</span><button class="copy-btn" onclick="copyToClipboard('8028741731')"><i class="fas fa-copy"></i></button></div></div>
+<div class="bank-detail-row"><span>Account Name</span><span>Mustapha Iman Oniyangi</span></div>
+<div class="bank-detail-row"><span>Bank</span><span>Moniepoint</span></div>
+<div class="bank-detail-row"><span>Payment Tag</span><span style="color:var(--gold);font-weight:700;">Premium Sub</span></div>
+</div>
+<p style="color:var(--text-secondary);font-size:0.85rem;line-height:1.6;margin-bottom:16px;">
+<i class="fas fa-info-circle" style="color:var(--primary);margin-right:6px;"></i>
+After making the transfer, click "Payment Completed" below. You will be redirected to WhatsApp to confirm your payment with a screenshot.
+</p>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="cancelPayment"><i class="fas fa-times"></i> Cancel</button>
+<button class="btn-gold" id="paymentCompleteBtn"><i class="fas fa-check"></i> Payment Completed</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="resourcePurchaseModal">
+<div class="modal-content">
+<div class="modal-header">
+<h3><i class="fas fa-shopping-cart" style="color:var(--primary);margin-right:8px;"></i>Purchase Resource</h3>
+<button class="modal-close" id="resourceModalClose"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body" id="resourcePurchaseBody"></div>
+<div class="modal-footer">
+<button class="btn-secondary" id="cancelResourcePurchase"><i class="fas fa-times"></i> Cancel</button>
+<button class="btn-gold" id="resourcePaymentBtn"><i class="fas fa-credit-card"></i> Proceed to Payment</button>
+</div>
+</div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div id="appContent" style="display:none;">
+<header class="header" id="header">
+<div class="container">
+<nav class="nav">
+<a href="#" class="logo" onclick="return false;">
+<img src="https://aurex-design.vercel.app/IMG-20260403-WA0021(1).jpg" alt="Aurex Academy" class="logo-img">
+<span class="logo-text">Aurex Academy</span>
+</a>
+<div class="nav-right">
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><i class="fas fa-sun" id="themeIcon"></i></button>
+<img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Profile" class="user-avatar" id="headerAvatar" onclick="navigateTo('profile')">
+<button class="logout-btn" id="logoutBtn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+</div>
+</nav>
+</div>
+</header>
+
+<div class="main-content">
+<!-- HOME PAGE -->
+<div class="page active" id="pageHome">
+<div class="home-hero">
+<div class="container">
+<h1>Welcome to <span class="text-gradient">Aurex Academy</span></h1>
+<p>Your creative community for learning graphic design, sharing resources, and connecting with fellow designers.</p>
+</div>
+</div>
+<div class="container section-padding" style="padding-top:0;">
+<div class="stats-grid">
+<div class="stat-card"><i class="fas fa-users"></i><h3 id="statMembers">1,240</h3><p>Community Members</p></div>
+<div class="stat-card"><i class="fas fa-book"></i><h3 id="statResources">350+</h3><p>Design Resources</p></div>
+<div class="stat-card"><i class="fas fa-graduation-cap"></i><h3 id="statClasses">48</h3><p>Live Classes Held</p></div>
+<div class="stat-card"><i class="fas fa-download"></i><h3 id="statDownloads">8.5K</h3><p>Resources Downloaded</p></div>
+</div>
+<div class="section-title-bar">
+<h2><i class="fas fa-fire" style="color:var(--secondary);margin-right:8px;"></i>Trending Resources</h2>
+<a href="#" class="view-all" onclick="navigateTo('resources');return false;">View All <i class="fas fa-arrow-right"></i></a>
+</div>
+<div class="resources-preview" id="trendingResources"></div>
+<div class="section-title-bar">
+<h2><i class="fas fa-crown" style="color:var(--gold);margin-right:8px;"></i>Premium Resources</h2>
+<a href="#" class="view-all" onclick="navigateTo('resources');return false;">View All <i class="fas fa-arrow-right"></i></a>
+</div>
+<div class="resources-preview" id="premiumResourcesPreview"></div>
+</div>
+</div>
+
+<!-- CLASS PAGE -->
+<div class="page" id="pageClass">
+<div class="container section-padding" style="padding-top:20px;">
+<div class="class-container">
+<div class="chat-area">
+<div class="chat-header">
+<h3><i class="fas fa-comments" style="color:var(--primary);"></i> Aurex 009 Class</h3>
+<div class="online-indicator"><span class="online-dot"></span><span id="onlineCount">12 online</span></div>
+</div>
+<div class="chat-messages" id="chatMessages">
+<div class="message received">
+<div class="message-author"><i class="fas fa-user-circle"></i> Mustapha Oniyangi (Instructor)</div>
+Welcome to Aurex 009 Class! Feel free to ask questions, share your work, and collaborate with fellow designers.
+<span class="message-time">Today, 10:00 AM</span>
+</div>
+<div class="message received">
+<div class="message-author"><i class="fas fa-user-circle"></i> Mustapha Oniyangi (Instructor)</div>
+Today's topic: Advanced Typography Techniques. Make sure you have Adobe Illustrator installed!
+<span class="message-time">Today, 10:05 AM</span>
+</div>
+</div>
+<div class="chat-input-area">
+<input type="file" id="fileInput" style="display:none;" accept="image/*,.pdf,.doc,.docx,.zip,.rar">
+<button class="chat-action-btn" id="attachBtn" title="Attach file"><i class="fas fa-paperclip"></i></button>
+<textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="1"></textarea>
+<button class="chat-action-btn send" id="sendBtn" title="Send message"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+<div class="tools-sidebar">
+<div class="tools-header">
+<h3><i class="fas fa-toolbox" style="color:var(--primary);"></i> Helpful Tools</h3>
+</div>
+<div class="tools-list" id="toolsList">
+<a href="https://play.google.com/store/apps/details?id=com.adobe.reader" target="_blank" class="tool-item">
+<div class="tool-icon"><i class="fas fa-file-pdf"></i></div>
+<div class="tool-info"><h4>Adobe Acrobat</h4><p>PDF Reader & Editor</p></div>
+<span class="tool-download"><i class="fas fa-download"></i></span>
+</a>
+<a href="https://play.google.com/store/apps/details?id=com.adobe.psmobile" target="_blank" class="tool-item">
+<div class="tool-icon"><i class="fas fa-image"></i></div>
+<div class="tool-info"><h4>Photoshop Express</h4><p>Photo Editor</p></div>
+<span class="tool-download"><i class="fas fa-download"></i></span>
+</a>
+<a href="https://play.google.com/store/apps/details?id=com.canva.editor" target="_blank" class="tool-item">
+<div class="tool-icon"><i class="fas fa-palette"></i></div>
+<div class="tool-info"><h4>Canva</h4><p>Design & Video</p></div>
+<span class="tool-download"><i class="fas fa-download"></i></span>
+</a>
+<a href="https://play.google.com/store/apps/details?id=com.pixlr.express" target="_blank" class="tool-item">
+<div class="tool-icon"><i class="fas fa-magic"></i></div>
+<div class="tool-info"><h4>Pixlr</h4><p>Photo Editor</p></div>
+<span class="tool-download"><i class="fas fa-download"></i></span>
+</a>
+<a href="https://play.google.com/store/apps/details?id=com.adobe.spark.post" target="_blank" class="tool-item">
+<div class="tool-icon"><i class="fas fa-share-alt"></i></div>
+<div class="tool-info"><h4>Adobe Express</h4><p>Social Graphics</p></div>
+<span class="tool-download"><i class="fas fa-download"></i></span>
+</a>
+<a href="https://play.google.com/store/apps/details?id=com.vsco.cam" target="_blank" class="tool-item">
+<div class="tool-icon"><i class="fas fa-camera"></i></div>
+<div class="tool-info"><h4>VSCO</h4><p>Photo & Video Editor</p></div>
+<span class="tool-download"><i class="fas fa-download"></i></span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RESOURCES PAGE -->
+<div class="page" id="pageResources">
+<div class="container section-padding" style="padding-top:20px;">
+<div style="text-align:center;margin-bottom:40px;">
+<h1 style="font-size:clamp(1.5rem,4vw,2.5rem);margin-bottom:12px;">Design <span class="text-gradient">Resources</span></h1>
+<p style="color:var(--text-secondary);max-width:500px;margin:0 auto;">Browse and download premium graphic design resources curated by Aurex Designs.</p>
+</div>
+<div class="resources-filter" id="resourcesFilter">
+<button class="filter-btn active" data-filter="all"><i class="fas fa-th"></i> All</button>
+<button class="filter-btn" data-filter="free"><i class="fas fa-gift"></i> Free</button>
+<button class="filter-btn" data-filter="premium"><i class="fas fa-crown"></i> Premium</button>
+<button class="filter-btn" data-filter="fonts"><i class="fas fa-font"></i> Fonts</button>
+<button class="filter-btn" data-filter="templates"><i class="fas fa-layer-group"></i> Templates</button>
+<button class="filter-btn" data-filter="mockups"><i class="fas fa-cube"></i> Mockups</button>
+<button class="filter-btn" data-filter="brushes"><i class="fas fa-paint-brush"></i> Brushes</button>
+</div>
+<div class="resources-grid" id="resourcesGrid"></div>
+</div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div class="page" id="pageProfile">
+<div class="container section-padding" style="padding-top:20px;">
+<div class="profile-header">
+<div class="profile-avatar-wrapper">
+<img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff&size=200" alt="Profile" class="profile-avatar" id="profileAvatar">
+<label class="profile-avatar-edit" for="avatarInput" title="Change avatar"><i class="fas fa-camera"></i></label>
+<input type="file" id="avatarInput" accept="image/*" style="display:none;">
+</div>
+<div class="profile-info">
+<h2 class="profile-name" id="profileName">Loading... <span class="profile-badge free" id="profileBadge">Free Member</span></h2>
+<p class="profile-role" id="profileRole">Graphic Designer</p>
+<div class="profile-badges">
+<span class="profile-badge" style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);color:var(--primary-light);"><i class="fas fa-envelope"></i> <span id="profileEmail">user@example.com</span></span>
+<span class="profile-badge" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);"><i class="fas fa-birthday-cake"></i> <span id="profileAge">18-24</span></span>
+</div>
+</div>
+</div>
+<div class="profile-grid">
+<div class="profile-card">
+<h3><i class="fas fa-user" style="color:var(--primary);"></i> Personal Information</h3>
+<div class="profile-field"><label>Full Name</label><div class="value"><span id="fieldName">Loading...</span></div></div>
+<div class="profile-field"><label>Age Range</label><div class="value"><span id="fieldAge">Loading...</span></div></div>
+<div class="profile-field"><label>Email</label><div class="value"><span id="fieldEmail">Loading...</span></div></div>
+</div>
+<div class="profile-card">
+<h3><i class="fas fa-globe" style="color:var(--accent);"></i> Online Presence</h3>
+<div class="profile-field"><label>Portfolio Website</label><div class="value editable"><input type="url" id="fieldPortfolio" placeholder="https://yourportfolio.com" disabled><button class="edit-btn" data-field="portfolio"><i class="fas fa-pen"></i></button></div></div>
+<div class="profile-field"><label>Facebook</label><div class="value editable"><input type="url" id="fieldFacebook" placeholder="https://facebook.com/yourname" disabled><button class="edit-btn" data-field="facebook"><i class="fas fa-pen"></i></button></div></div>
+<div class="profile-field"><label>Twitter / X</label><div class="value editable"><input type="url" id="fieldTwitter" placeholder="https://x.com/yourname" disabled><button class="edit-btn" data-field="twitter"><i class="fas fa-pen"></i></button></div></div>
+<div class="profile-field"><label>Instagram</label><div class="value editable"><input type="url" id="fieldInstagram" placeholder="https://instagram.com/yourname" disabled><button class="edit-btn" data-field="instagram"><i class="fas fa-pen"></i></button></div></div>
+<div class="profile-field"><label>WhatsApp</label><div class="value editable"><input type="tel" id="fieldWhatsApp" placeholder="+234XXXXXXXXXX" disabled><button class="edit-btn" data-field="whatsapp"><i class="fas fa-pen"></i></button></div></div>
+<div class="profile-actions">
+<button class="btn-primary" id="saveProfileBtn" style="width:auto;padding:10px 24px;"><i class="fas fa-save"></i> Save Changes</button>
+<button class="btn-secondary" id="cancelEditBtn" style="width:auto;padding:10px 24px;"><i class="fas fa-times"></i> Cancel</button>
+</div>
+</div>
+</div>
+<div class="supreme-contact">
+<h4><i class="fas fa-code" style="color:var(--primary);"></i> Need a Website?</h4>
+<p>Contact SupremeAmer for professional website development, web apps, and digital solutions.</p>
+<a href="https://wa.me/2347031924052?text=Hello%20SupremeAmer,%20I%20need%20a%20website" target="_blank" class="btn-primary"><i class="fab fa-whatsapp"></i> Contact SupremeAmer on WhatsApp</a>
+</div>
+</div>
+</div>
+</div>
+
+<nav class="bottom-nav">
+<div class="bottom-nav-inner">
+<button class="bottom-nav-btn active" data-page="home" onclick="navigateTo('home')"><i class="fas fa-home"></i><span>Home</span></button>
+<button class="bottom-nav-btn" data-page="class" onclick="navigateTo('class')"><i class="fas fa-chalkboard-teacher"></i><span>Class</span></button>
+<button class="bottom-nav-btn" data-page="resources" onclick="navigateTo('resources')"><i class="fas fa-download"></i><span>Resources</span></button>
+<button class="bottom-nav-btn" data-page="profile" onclick="navigateTo('profile')"><i class="fas fa-user"></i><span>Profile</span></button>
+</div>
+</nav>
+</div>
+
+<script>
+// ============================================
+// AUREX ACADEMY - COMPLETE APPLICATION
+// ============================================
+(function(){
+'use strict';
+
+// Supabase Config - REPLACE WITH YOUR CREDENTIALS
+const SUPABASE_URL='YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY='YOUR_SUPABASE_ANON_KEY';
+let supabase=null;
+try{if(window.supabase&&SUPABASE_URL!=='YOUR_SUPABASE_URL'){supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);}}catch(e){console.log('Supabase not configured');}
+
+// Current user state
+let currentUser=null;
+let userProfile=null;
+let isPremium=false;
+
+// Toast
+function showToast(message,type){
+type=type||'success';
+var container=document.getElementById('toastContainer');
+if(!container)return;
+var toast=document.createElement('div');
+toast.className='toast toast-'+type;
+var icons={success:'<i class="fas fa-check-circle"></i>',error:'<i class="fas fa-times-circle"></i>',warning:'<i class="fas fa-exclamation-triangle"></i>',info:'<i class="fas fa-info-circle"></i>'};
+toast.innerHTML=(icons[type]||icons.success)+' '+message;
+container.appendChild(toast);
+toast.offsetHeight;
+requestAnimationFrame(function(){toast.classList.add('show');});
+setTimeout(function(){toast.classList.remove('show');setTimeout(function(){if(toast.parentNode)toast.parentNode.removeChild(toast);},400);},3000);
+}
+
+// Copy to clipboard
+window.copyToClipboard=function(text){
+navigator.clipboard.writeText(text).then(function(){showToast('Copied to clipboard!','success');}).catch(function(){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Copied to clipboard!','success');});
+};
+
+// Tab switching
+window.switchTab=function(tab){
+document.querySelectorAll('.auth-tab').forEach(function(t){t.classList.remove('active');});
+document.querySelectorAll('.auth-form').forEach(function(f){f.classList.remove('active');});
+document.querySelector('.auth-tab[data-tab="'+tab+'"]').classList.add('active');
+document.getElementById(tab+'Form').classList.add('active');
+};
+
+// Auth Tabs
+(function(){
+document.querySelectorAll('.auth-tab').forEach(function(tab){
+tab.addEventListener('click',function(){switchTab(this.dataset.tab);});
+});
+})();
+
+// Check auth state
+function checkAuth(){
+var storedUser=localStorage.getItem('aurex_user');
+if(storedUser){
+try{
+currentUser=JSON.parse(storedUser);
+userProfile=JSON.parse(localStorage.getItem('aurex_profile')||'{}');
+isPremium=userProfile.account_type==='premium'&&userProfile.premium_approved===true;
+showApp();
+updateProfileUI();
+return true;
+}catch(e){localStorage.removeItem('aurex_user');localStorage.removeItem('aurex_profile');}
+}
+return false;
+}
+
+// Show app
+function showApp(){
+document.getElementById('authOverlay').classList.add('hidden');
+document.getElementById('appContent').style.display='block';
+loadResources();
+}
+
+// Login
+(function(){
+var form=document.getElementById('loginForm');
+if(!form)return;
+form.addEventListener('submit',function(e){
+e.preventDefault();
+var email=document.getElementById('loginEmail').value;
+var password=document.getElementById('loginPassword').value;
+var btn=document.getElementById('loginBtn');
+btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Signing in...';
+
+// Supabase auth
+if(supabase){
+supabase.auth.signInWithPassword({email:email,password:password}).then(function(result){
+if(result.error){showToast(result.error.message,'error');btn.disabled=false;btn.innerHTML='<i class="fas fa-sign-in-alt"></i> Sign In';return;}
+currentUser=result.data.user;
+fetchUserProfile(currentUser.id).then(function(profile){
+userProfile=profile;
+localStorage.setItem('aurex_user',JSON.stringify(currentUser));
+localStorage.setItem('aurex_profile',JSON.stringify(profile));
+isPremium=profile.account_type==='premium'&&profile.premium_approved===true;
+showApp();updateProfileUI();showToast('Welcome back!','success');
+});
+}).catch(function(){fallbackLogin(email,password,btn);});
+}else{
+fallbackLogin(email,password,btn);
+}
+});
+})();
+
+function fallbackLogin(email,password,btn){
+// Demo login for preview
+setTimeout(function(){
+currentUser={id:'demo-'+Date.now(),email:email};
+userProfile={name:email.split('@')[0],email:email,age_range:'18-24',account_type:'free',premium_approved:false,portfolio_url:'',facebook_url:'',twitter_url:'',instagram_url:'',whatsapp:''};
+localStorage.setItem('aurex_user',JSON.stringify(currentUser));
+localStorage.setItem('aurex_profile',JSON.stringify(userProfile));
+isPremium=false;
+showApp();updateProfileUI();showToast('Welcome to Aurex Academy!','success');
+btn.disabled=false;btn.innerHTML='<i class="fas fa-sign-in-alt"></i> Sign In';
+},1500);
+}
+
+// Fetch user profile from Supabase
+async function fetchUserProfile(userId){
+if(!supabase)return userProfile;
+try{
+var{data,error}=await supabase.from('profiles').select('*').eq('id',userId).single();
+if(!error&&data)return data;
+}catch(e){}
+return userProfile;
+}
+
+// Register
+(function(){
+var form=document.getElementById('registerForm');
+if(!form)return;
+form.addEventListener('submit',function(e){
+e.preventDefault();
+var name=document.getElementById('regName').value;
+var email=document.getElementById('regEmail').value;
+var age=document.getElementById('regAge').value;
+var password=document.getElementById('regPassword').value;
+var type=document.getElementById('regType').value;
+var btn=document.getElementById('registerBtn');
+btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Creating account...';
+
+if(supabase){
+supabase.auth.signUp({email:email,password:password,options:{data:{full_name:name}}}).then(function(result){
+if(result.error){showToast(result.error.message,'error');btn.disabled=false;btn.innerHTML='<i class="fas fa-user-plus"></i> Create Account';return;}
+currentUser=result.data.user;
+userProfile={id:currentUser.id,name:name,email:email,age_range:age,account_type:type,premium_approved:false,premium_pending:type==='premium',portfolio_url:'',facebook_url:'',twitter_url:'',instagram_url:'',whatsapp:''};
+
+// Save profile to Supabase
+supabase.from('profiles').insert([userProfile]).then(function(){
+localStorage.setItem('aurex_user',JSON.stringify(currentUser));
+localStorage.setItem('aurex_profile',JSON.stringify(userProfile));
+
+if(type==='premium'){
+showPaymentModal(13500,'new');
+btn.disabled=false;btn.innerHTML='<i class="fas fa-user-plus"></i> Create Account';
+}else{
+showApp();updateProfileUI();showToast('Account created successfully!','success');
+btn.disabled=false;btn.innerHTML='<i class="fas fa-user-plus"></i> Create Account';
+}
+});
+}).catch(function(){fallbackRegister(name,email,age,password,type,btn);});
+}else{
+fallbackRegister(name,email,age,password,type,btn);
+}
+});
+})();
+
+function fallbackRegister(name,email,age,password,type,btn){
+setTimeout(function(){
+currentUser={id:'demo-'+Date.now(),email:email};
+userProfile={id:currentUser.id,name:name,email:email,age_range:age,account_type:type,premium_approved:false,premium_pending:type==='premium',portfolio_url:'',facebook_url:'',twitter_url:'',instagram_url:'',whatsapp:''};
+localStorage.setItem('aurex_user',JSON.stringify(currentUser));
+localStorage.setItem('aurex_profile',JSON.stringify(userProfile));
+
+if(type==='premium'){
+showPaymentModal(13500,'new');
+btn.disabled=false;btn.innerHTML='<i class="fas fa-user-plus"></i> Create Account';
+}else{
+showApp();updateProfileUI();showToast('Account created! Welcome to Aurex Academy!','success');
+btn.disabled=false;btn.innerHTML='<i class="fas fa-user-plus"></i> Create Account';
+}
+},1500);
+}
+
+// Payment Modal
+function showPaymentModal(amount,type){
+var modal=document.getElementById('paymentModal');
+var amountEl=document.getElementById('paymentAmount');
+amountEl.textContent='₦'+amount.toLocaleString();
+modal.classList.add('active');
+document.body.style.overflow='hidden';
+
+// Store payment context
+window.paymentContext={amount:amount,type:type};
+}
+
+(function(){
+var closeBtn=document.getElementById('paymentModalClose');
+var cancelBtn=document.getElementById('cancelPayment');
+var completeBtn=document.getElementById('paymentCompleteBtn');
+var modal=document.getElementById('paymentModal');
+
+if(closeBtn)closeBtn.addEventListener('click',function(){modal.classList.remove('active');document.body.style.overflow='';});
+if(cancelBtn)cancelBtn.addEventListener('click',function(){modal.classList.remove('active');document.body.style.overflow='';});
+if(completeBtn)completeBtn.addEventListener('click',function(){
+var ctx=window.paymentContext||{};
+var msg='Hello! I have completed my payment for Aurex Academy Premium Subscription.\n\n';
+msg+='Amount: ₦'+ctx.amount+'\n';
+msg+='Payment Tag: Premium Sub\n';
+msg+='Email: '+(userProfile?userProfile.email:'')+'\n\n';
+msg+='Please find attached the payment screenshot for verification.';
+window.open('https://wa.me/2349127161200?text='+encodeURIComponent(msg),'_blank');
+showToast('Redirecting to WhatsApp for payment confirmation...','info');
+modal.classList.remove('active');
+document.body.style.overflow='';
+
+// Mark as pending
+if(userProfile){
+userProfile.premium_pending=true;
+localStorage.setItem('aurex_profile',JSON.stringify(userProfile));
+}
+});
+})();
+
+// Theme
+(function(){
+var toggle=document.getElementById('themeToggle');
+var icon=document.getElementById('themeIcon');
+if(!toggle||!icon)return;
+var savedTheme=localStorage.getItem('aurex_theme');
+if(savedTheme==='light'){document.body.classList.add('light-mode');icon.className='fas fa-moon';}
+toggle.addEventListener('click',function(){
+document.body.classList.toggle('light-mode');
+var isLight=document.body.classList.contains('light-mode');
+localStorage.setItem('aurex_theme',isLight?'light':'dark');
+icon.className=isLight?'fas fa-moon':'fas fa-sun';
+showToast((isLight?'Light':'Dark')+' mode activated','info');
+});
+})();
+
+// Navigation
+window.navigateTo=function(page){
+document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+document.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
+document.getElementById('page'+page.charAt(0).toUpperCase()+page.slice(1)).classList.add('active');
+var btn=document.querySelector('.bottom-nav-btn[data-page="'+page+'"]');
+if(btn)btn.classList.add('active');
+window.scrollTo({top:0,behavior:'smooth'});
+};
+
+// Logout
+(function(){
+var btn=document.getElementById('logoutBtn');
+if(!btn)return;
+btn.addEventListener('click',function(){
+if(confirm('Are you sure you want to logout?')){
+localStorage.removeItem('aurex_user');
+localStorage.removeItem('aurex_profile');
+currentUser=null;userProfile=null;isPremium=false;
+location.reload();
+}
+});
+})();
+
+// Update Profile UI
+function updateProfileUI(){
+if(!userProfile)return;
+
+// Header
+var headerAvatar=document.getElementById('headerAvatar');
+if(headerAvatar)headerAvatar.src='https://ui-avatars.com/api/?name='+encodeURIComponent(userProfile.name||'User')+'&background=6366f1&color=fff&size=200';
+
+// Profile page
+var pName=document.getElementById('profileName');
+var pBadge=document.getElementById('profileBadge');
+var pEmail=document.getElementById('profileEmail');
+var pAge=document.getElementById('profileAge');
+var pRole=document.getElementById('profileRole');
+
+if(pName)pName.innerHTML=(userProfile.name||'User')+' '+(isPremium?'<span class="profile-badge premium"><i class="fas fa-crown"></i> Premium</span>':'<span class="profile-badge free"><i class="fas fa-user"></i> Free Member</span>');
+if(pBadge)pBadge.style.display='none';
+if(pEmail)pEmail.textContent=userProfile.email||'';
+if(pAge)pAge.textContent=userProfile.age_range||'';
+if(pRole)pRole.textContent=isPremium?'Premium Designer':'Aspiring Designer';
+
+// Fields
+var fName=document.getElementById('fieldName');
+var fAge=document.getElementById('fieldAge');
+var fEmail=document.getElementById('fieldEmail');
+var fPortfolio=document.getElementById('fieldPortfolio');
+var fFacebook=document.getElementById('fieldFacebook');
+var fTwitter=document.getElementById('fieldTwitter');
+var fInstagram=document.getElementById('fieldInstagram');
+var fWhatsApp=document.getElementById('fieldWhatsApp');
+
+if(fName)fName.textContent=userProfile.name||'Not set';
+if(fAge)fAge.textContent=userProfile.age_range||'Not set';
+if(fEmail)fEmail.textContent=userProfile.email||'Not set';
+if(fPortfolio)fPortfolio.value=userProfile.portfolio_url||'';
+if(fFacebook)fFacebook.value=userProfile.facebook_url||'';
+if(fTwitter)fTwitter.value=userProfile.twitter_url||'';
+if(fInstagram)fInstagram.value=userProfile.instagram_url||'';
+if(fWhatsApp)fWhatsApp.value=userProfile.whatsapp||'';
+
+// Profile avatar
+var pAvatar=document.getElementById('profileAvatar');
+if(pAvatar)pAvatar.src='https://ui-avatars.com/api/?name='+encodeURIComponent(userProfile.name||'User')+'&background=6366f1&color=fff&size=200';
+}
+
+// Profile Edit
+(function(){
+var editBtns=document.querySelectorAll('.edit-btn');
+var saveBtn=document.getElementById('saveProfileBtn');
+var cancelBtn=document.getElementById('cancelEditBtn');
+
+editBtns.forEach(function(btn){
+btn.addEventListener('click',function(){
+var field=this.dataset.field;
+var input=document.getElementById('field'+field.charAt(0).toUpperCase()+field.slice(1));
+if(!input)return;
+
+if(input.disabled){
+input.disabled=false;
+input.focus();
+this.innerHTML='<i class="fas fa-save"></i>';
+this.classList.add('save');
+}else{
+input.disabled=true;
+this.innerHTML='<i class="fas fa-pen"></i>';
+this.classList.remove('save');
+// Save to profile
+if(userProfile){
+userProfile[field+'_url']=input.value;
+if(field==='whatsapp')userProfile.whatsapp=input.value;
+localStorage.setItem('aurex_profile',JSON.stringify(userProfile));
+showToast(field.charAt(0).toUpperCase()+field.slice(1)+' updated!','success');
+}
+}
+});
+});
+
+if(saveBtn)saveBtn.addEventListener('click',function(){
+if(!userProfile)return;
+userProfile.portfolio_url=document.getElementById('fieldPortfolio').value;
+userProfile.facebook_url=document.getElementById('fieldFacebook').value;
+userProfile.twitter_url=document.getElementById('fieldTwitter').value;
+userProfile.instagram_url=document.getElementById('fieldInstagram').value;
+userProfile.whatsapp=document.getElementById('fieldWhatsApp').value;
+localStorage.setItem('aurex_profile',JSON.stringify(userProfile));
+
+// Disable all inputs
+document.querySelectorAll('.profile-field input').forEach(function(inp){inp.disabled=true;});
+document.querySelectorAll('.edit-btn').forEach(function(btn){btn.innerHTML='<i class="fas fa-pen"></i>';btn.classList.remove('save');});
+showToast('Profile saved successfully!','success');
+});
+
+if(cancelBtn)cancelBtn.addEventListener('click',function(){
+updateProfileUI();
+document.querySelectorAll('.profile-field input').forEach(function(inp){inp.disabled=true;});
+document.querySelectorAll('.edit-btn').forEach(function(btn){btn.innerHTML='<i class="fas fa-pen"></i>';btn.classList.remove('save');});
+});
+})();
+
+// Avatar upload
+(function(){
+var input=document.getElementById('avatarInput');
+if(!input)return;
+input.addEventListener('change',function(e){
+var file=e.target.files[0];
+if(!file)return;
+var reader=new FileReader();
+reader.onload=function(evt){
+var pAvatar=document.getElementById('profileAvatar');
+var hAvatar=document.getElementById('headerAvatar');
+if(pAvatar)pAvatar.src=evt.target.result;
+if(hAvatar)hAvatar.src=evt.target.result;
+showToast('Profile picture updated!','success');
+};
+reader.readAsDataURL(file);
+});
+})();
+
+// Resources Data
+var allResources=[
+{id:1,title:'Pro Brush Pack Vol.1',description:'50+ professional Photoshop brushes for digital painting and illustration.',type:'brushes',price:0,access:'free',thumbnail:'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=250&fit=crop'},
+{id:2,title:'Modern Logo Templates',description:'20 editable logo templates in AI and PSD formats.',type:'templates',price:2500,access:'premium',thumbnail:'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=250&fit=crop'},
+{id:3,title:'Minimalist Font Collection',description:'10 premium minimalist fonts for branding and web design.',type:'fonts',price:0,access:'free',thumbnail:'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=400&h=250&fit=crop'},
+{id:4,title:'3D Mockup Bundle',description:'30 realistic 3D mockups for packaging and product design.',type:'mockups',price:5000,access:'premium',thumbnail:'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=400&h=250&fit=crop'},
+{id:5,title:'Social Media Kit',description:'100+ Instagram and Facebook post templates.',type:'templates',price:1500,access:'free',thumbnail:'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=250&fit=crop'},
+{id:6,title:'Watercolor Brush Set',description:'25 watercolor effect brushes for Procreate and Photoshop.',type:'brushes',price:3500,access:'premium',thumbnail:'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&h=250&fit=crop'},
+{id:7,title:'Business Card Templates',description:'15 professional business card designs.',type:'templates',price:0,access:'free',thumbnail:'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&h=250&fit=crop'},
+{id:8,title:'Premium Icon Pack',description:'500+ vector icons in multiple styles.',type:'templates',price:4000,access:'premium',thumbnail:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop'},
+];
+
+function loadResources(){
+var trending=allResources.filter(function(r){return r.access==='free';}).slice(0,3);
+var premium=allResources.filter(function(r){return r.access==='premium';}).slice(0,3);
+renderResourceCards('trendingResources',trending);
+renderResourceCards('premiumResourcesPreview',premium);
+renderAllResources('all');
+}
+
+function renderResourceCards(containerId,resources){
+var container=document.getElementById(containerId);
+if(!container)return;
+container.innerHTML=resources.map(function(r){
+var isLocked=r.access==='premium'&&!isPremium;
+return '<div class="resource-card">'+
+(isLocked?'<div class="premium-lock"><i class="fas fa-lock"></i></div>':'')+
+'<img src="'+r.thumbnail+'" alt="'+r.title+'" class="resource-thumb" loading="lazy">'+
+'<div class="resource-info">'+
+'<span class="resource-type">'+r.type+'</span>'+
+'<h4 class="resource-title">'+r.title+'</h4>'+
+'<div class="resource-price">'+(r.price===0?'FREE':'₦'+r.price.toLocaleString())+(r.access==='premium'?' <span style="font-size:0.7rem;color:var(--gold);"><i class="fas fa-crown"></i> Premium</span>':'')+'</div>'+
+'<button class="resource-btn" '+(isLocked?'disabled':'')+' onclick="handleResourceAction('+r.id+')">'+(isLocked?'<i class="fas fa-lock"></i> Premium Only':(r.price===0?'<i class="fas fa-download"></i> Download':'<i class="fas fa-shopping-cart"></i> Buy Now'))+'</button>'+
+'</div></div>';
+}).join('');
+}
+
+function renderAllResources(filter){
+var container=document.getElementById('resourcesGrid');
+if(!container)return;
+var filtered=filter==='all'?allResources:allResources.filter(function(r){return filter==='free'?r.access==='free':filter==='premium'?r.access==='premium':r.type===filter;});
+container.innerHTML=filtered.map(function(r){
+var isLocked=r.access==='premium'&&!isPremium;
+return '<div class="resource-card-full">'+
+(isLocked?'<div class="premium-lock"><i class="fas fa-lock"></i></div>':'')+
+'<img src="'+r.thumbnail+'" alt="'+r.title+'" class="resource-thumb" loading="lazy">'+
+'<div class="resource-body">'+
+'<span class="resource-type">'+r.type+'</span>'+
+'<h4 class="resource-title">'+r.title+'</h4>'+
+'<p class="resource-desc">'+r.description+'</p>'+
+'<div class="resource-meta">'+
+'<span class="resource-price-tag '+(r.price===0?'free':'')+'">'+(r.price===0?'FREE':'₦'+r.price.toLocaleString())+'</span>'+
+'<button class="resource-btn" style="width:auto;padding:8px 20px;" '+(isLocked?'disabled':'')+' onclick="handleResourceAction('+r.id+')">'+(isLocked?'<i class="fas fa-lock"></i> Locked':(r.price===0?'<i class="fas fa-download"></i> Download':'<i class="fas fa-shopping-cart"></i> Buy'))+'</button>'+
+'</div></div></div>';
+}).join('');
+}
+
+// Resource filter
+(function(){
+document.querySelectorAll('#resourcesFilter .filter-btn').forEach(function(btn){
+btn.addEventListener('click',function(){
+document.querySelectorAll('#resourcesFilter .filter-btn').forEach(function(b){b.classList.remove('active');});
+this.classList.add('active');
+renderAllResources(this.dataset.filter);
+});
+});
+})();
+
+// Handle resource action
+window.handleResourceAction=function(resourceId){
+var resource=allResources.find(function(r){return r.id===resourceId;});
+if(!resource)return;
+
+if(resource.price===0&&resource.access==='free'){
+showToast('Starting download...','success');
+// Trigger download
+return;
+}
+
+if(resource.access==='premium'&&!isPremium){
+showToast('Upgrade to Premium to access this resource!','warning');
+showPaymentModal(15000,'upgrade');
+return;
+}
+
+// Paid resource - show purchase modal
+var modal=document.getElementById('resourcePurchaseModal');
+var body=document.getElementById('resourcePurchaseBody');
+body.innerHTML='<div style="text-align:center;padding:20px;">'+
+'<img src="'+resource.thumbnail+'" style="width:100%;max-width:300px;border-radius:12px;margin-bottom:20px;" alt="'+resource.title+'">'+
+'<h4 style="font-size:1.2rem;margin-bottom:8px;">'+resource.title+'</h4>'+
+'<p style="color:var(--text-secondary);margin-bottom:16px;">'+resource.description+'</p>'+
+'<div class="payment-details">'+
+'<div class="payment-row"><span>Resource</span><span>'+resource.title+'</span></div>'+
+'<div class="payment-row"><span>Type</span><span>'+resource.type+'</span></div>'+
+'<div class="payment-row total"><span>Price</span><span>₦'+resource.price.toLocaleString()+'</span></div>'+
+'</div>'+
+'<div class="bank-details">'+
+'<h4><i class="fas fa-university"></i> Payment Details</h4>'+
+'<div class="bank-detail-row"><span>Account Number</span><div style="display:flex;align-items:center;gap:8px;"><span>8028741731</span><button class="copy-btn" onclick="copyToClipboard('8028741731')"><i class="fas fa-copy"></i></button></div></div>'+
+'<div class="bank-detail-row"><span>Account Name</span><span>Mustapha Iman Oniyangi</span></div>'+
+'<div class="bank-detail-row"><span>Bank</span><span>Moniepoint</span></div>'+
+'</div>'+
+'<p style="color:var(--text-secondary);font-size:0.85rem;">After payment, click "Proceed" to confirm via WhatsApp with your payment screenshot.</p>'+
+'</div>';
+
+window.currentResourcePurchase=resource;
+modal.classList.add('active');
+document.body.style.overflow='hidden';
+};
+
+// Resource purchase modal
+(function(){
+var closeBtn=document.getElementById('resourceModalClose');
+var cancelBtn=document.getElementById('cancelResourcePurchase');
+var proceedBtn=document.getElementById('resourcePaymentBtn');
+var modal=document.getElementById('resourcePurchaseModal');
+
+if(closeBtn)closeBtn.addEventListener('click',function(){modal.classList.remove('active');document.body.style.overflow='';});
+if(cancelBtn)cancelBtn.addEventListener('click',function(){modal.classList.remove('active');document.body.style.overflow='';});
+if(proceedBtn)proceedBtn.addEventListener('click',function(){
+var resource=window.currentResourcePurchase;
+if(!resource)return;
+var msg='Hello! I want to purchase a resource from Aurex Academy.\n\n';
+msg+='Resource: '+resource.title+'\n';
+msg+='Price: ₦'+resource.price.toLocaleString()+'\n';
+msg+='Email: '+(userProfile?userProfile.email:'')+'\n\n';
+msg+='Please find attached my payment screenshot.';
+window.open('https://wa.me/2349127161200?text='+encodeURIComponent(msg),'_blank');
+showToast('Redirecting to WhatsApp...','info');
+modal.classList.remove('active');
+document.body.style.overflow='';
+});
+})();
+
+// Chat functionality
+(function(){
+var chatInput=document.getElementById('chatInput');
+var sendBtn=document.getElementById('sendBtn');
+var attachBtn=document.getElementById('attachBtn');
+var fileInput=document.getElementById('fileInput');
+var chatMessages=document.getElementById('chatMessages');
+
+if(!chatInput||!sendBtn||!chatMessages)return;
+
+function sendMessage(){
+var text=chatInput.value.trim();
+if(!text)return;
+
+var msgDiv=document.createElement('div');
+msgDiv.className='message sent';
+msgDiv.innerHTML=text+'<span class="message-time">Just now</span>';
+chatMessages.appendChild(msgDiv);
+chatMessages.scrollTop=chatMessages.scrollHeight;
+chatInput.value='';
+chatInput.style.height='auto';
+}
+
+sendBtn.addEventListener('click',sendMessage);
+chatInput.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+chatInput.addEventListener('input',function(){this.style.height='auto';this.style.height=this.scrollHeight+'px';});
+
+attachBtn.addEventListener('click',function(){fileInput.click();});
+fileInput.addEventListener('change',function(e){
+var file=e.target.files[0];
+if(!file)return;
+
+var msgDiv=document.createElement('div');
+msgDiv.className='message sent';
+
+if(file.type.startsWith('image/')){
+var reader=new FileReader();
+reader.onload=function(evt){
+msgDiv.innerHTML='<img src="'+evt.target.result+'" class="message-image" alt="Shared image"><span class="message-time">Just now</span>';
+chatMessages.appendChild(msgDiv);
+chatMessages.scrollTop=chatMessages.scrollHeight;
+};
+reader.readAsDataURL(file);
+}else{
+msgDiv.innerHTML='<a href="#" class="message-file"><i class="fas fa-file"></i><div><strong>'+file.name+'</strong><br><span style="font-size:0.75rem;">'+(file.size/1024).toFixed(1)+' KB</span></div></a><span class="message-time">Just now</span>';
+chatMessages.appendChild(msgDiv);
+chatMessages.scrollTop=chatMessages.scrollHeight;
+}
+fileInput.value='';
+});
+})();
+
+// Header scroll
+(function(){
+var header=document.getElementById('header');
+if(!header)return;
+window.addEventListener('scroll',function(){if(window.scrollY>50)header.classList.add('scrolled');else header.classList.remove('scrolled');});
+})();
+
+// Loading screen
+window.addEventListener('load',function(){
+setTimeout(function(){
+var loadingScreen=document.getElementById('loadingScreen');
+if(loadingScreen)loadingScreen.classList.add('hidden');
+},2500);
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded',function(){
+checkAuth();
+});
+
+// Online/Offline
+window.addEventListener('online',function(){showToast('Back online!','success');});
+window.addEventListener('offline',function(){showToast('You are offline','warning');});
+
+})();
+</script>
+</body>
+</html>
