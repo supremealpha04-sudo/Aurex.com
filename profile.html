@@ -3,324 +3,656 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AUREX | My Profile</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Profile | Aurex Designs</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #818cf8;
-            --secondary: #ec4899; --accent: #06b6d4; --success: #10b981;
-            --warning: #f59e0b; --error: #ef4444; --gold: #fbbf24;
-            --bg-primary: #0f0f1a; --bg-secondary: #1a1a2e; --bg-card: #16162a;
-            --bg-glass: rgba(22, 22, 42, 0.85);
-            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
-            --border: rgba(255, 255, 255, 0.08); --border-hover: rgba(99, 102, 241, 0.4);
-            --shadow-lg: 0 16px 48px rgba(0,0,0,0.5); --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
-            --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif;
-        }
+        /* Profile Page Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; min-height: 100vh; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16162a;
+            --bg-glass: rgba(22, 22, 42, 0.85);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --bottom-nav-height: 70px;
+        }
 
-        .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
-        .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; max-width: 1400px; margin: 0 auto; }
-        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .logo i { font-size: 1.6rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-        .logo-text { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-        .logout-btn { padding: 10px 20px; background: linear-gradient(135deg, var(--error), #dc2626); color: white; font-family: var(--font-heading); font-weight: 600; font-size: 0.85rem; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; }
-        .logout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3); }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding-bottom: var(--bottom-nav-height);
+        }
 
-        .main-content { padding-top: 90px; max-width: 800px; margin: 0 auto; padding-left: 20px; padding-right: 20px; padding-bottom: 60px; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
 
-        .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; padding: 40px; margin-bottom: 24px; position: relative; overflow: hidden; }
-        .profile-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent)); }
-        .profile-header { display: flex; align-items: center; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
-        .profile-avatar-wrap { position: relative; }
-        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); box-shadow: var(--shadow-glow); }
-        .profile-info h2 { font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 4px; }
-        .profile-info p { color: var(--text-secondary); font-size: 0.9rem; }
-        .profile-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; margin-top: 8px; }
-        .profile-badge.free { background: rgba(99,102,241,0.15); color: var(--primary-light); }
-        .profile-badge.premium { background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(236,72,153,0.15)); color: var(--gold); border: 1px solid rgba(251,191,36,0.3); }
-        .profile-badge.pending { background: rgba(245,158,11,0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); }
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
 
-        .section-title { font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-        .section-title i { color: var(--primary-light); }
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
 
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.85rem; color: var(--text-primary); }
-        .form-label i { margin-right: 6px; color: var(--primary-light); }
-        .form-control { width: 100%; padding: 14px 16px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 12px; color: var(--text-primary); font-size: 0.95rem; transition: all 0.3s ease; }
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        .form-control:disabled { opacity: 0.6; cursor: not-allowed; background: var(--bg-card); }
-        .form-control::placeholder { color: var(--text-muted); }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .form-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
 
-        .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .social-input-wrap { position: relative; }
-        .social-input-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1rem; }
-        .social-input-wrap .form-control { padding-left: 42px; }
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+        }
 
-        .btn-save { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; font-family: var(--font-heading); font-weight: 600; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
-        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .logo span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-        .subscription-card { background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(236,72,153,0.08)); border: 1px solid var(--border); border-radius: 20px; padding: 28px; margin-bottom: 24px; }
-        .subscription-card h3 { font-family: var(--font-heading); font-size: 1.2rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .subscription-card h3 i { color: var(--gold); }
-        .subscription-card p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px; }
-        .sub-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-        .sub-detail { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-        .sub-detail span { font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px; }
-        .sub-detail strong { font-size: 0.95rem; }
-        .upgrade-btn { padding: 12px 28px; background: linear-gradient(135deg, var(--gold), #f59e0b); color: #1a1a2e; font-weight: 700; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px; }
-        .upgrade-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(251,191,36,0.3); }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-        .supreme-contact { background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(6,182,212,0.08)); border: 1px solid var(--border); border-radius: 20px; padding: 28px; text-align: center; }
-        .supreme-contact h4 { font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .supreme-contact h4 i { color: var(--primary-light); }
-        .supreme-contact p { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px; }
-        .wa-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; background: linear-gradient(135deg, #25d366, #128c7e); color: white; font-weight: 600; border-radius: 50px; text-decoration: none; transition: all 0.3s ease; }
-        .wa-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,211,102,0.3); }
+        /* Profile Section */
+        .profile-hero {
+            padding: 120px 0 40px;
+            text-align: center;
+        }
 
-        .purchases-list { display: flex; flex-direction: column; gap: 12px; }
-        .purchase-item { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .purchase-item h5 { font-size: 0.95rem; margin-bottom: 4px; }
-        .purchase-item span { font-size: 0.8rem; color: var(--text-muted); }
-        .purchase-status { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
-        .purchase-status.approved { background: rgba(16,185,129,0.15); color: var(--success); }
-        .purchase-status.pending { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .profile-hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; }
 
-        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 14px 20px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.9rem; transform: translateX(120%); opacity: 0; transition: all 0.4s ease; max-width: 320px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-lg); }
+        /* Profile Card */
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            object-fit: cover;
+            margin: 0 auto 16px;
+            display: block;
+        }
+
+        .profile-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .profile-email {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .profile-type {
+            text-align: center;
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 8px auto 0;
+        }
+
+        .type-premium { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+        .type-free { background: rgba(100, 116, 139, 0.2); color: var(--text-muted); }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group .hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .btn-primary {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 12px 32px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--text-primary);
+        }
+
+        .btn-danger {
+            padding: 12px 32px;
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.8;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 24px 0;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: var(--bottom-nav-height);
+            padding: 0 16px;
+        }
+
+        .bottom-nav-inner {
+            display: flex;
+            gap: 8px;
+            max-width: 500px;
+            width: 100%;
+            justify-content: space-around;
+        }
+
+        .bottom-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 120px;
+        }
+
+        .bottom-nav-btn i { font-size: 1.3rem; transition: all 0.3s ease; }
+        .bottom-nav-btn:hover { color: var(--primary); background: rgba(99, 102, 241, 0.1); }
+        .bottom-nav-btn.active { color: var(--primary); background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.1)); }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 320px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
         .toast.show { transform: translateX(0); opacity: 1; }
-        .toast-success { background: rgba(16,185,129,0.95); }
-        .toast-error { background: rgba(239,68,68,0.95); }
-        .toast-warning { background: rgba(245,158,11,0.95); }
-        .toast-info { background: rgba(99,102,241,0.95); }
+        .toast-success { background: rgba(16, 185, 129, 0.95); }
+        .toast-error { background: rgba(239, 68, 68, 0.95); }
+        .toast-warning { background: rgba(245, 158, 11, 0.95); }
+        .toast-info { background: rgba(99, 102, 241, 0.95); }
 
-        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 20px; text-align: center; }
-        .footer p { color: var(--text-muted); font-size: 0.85rem; }
-        .footer a { color: var(--primary); text-decoration: none; }
+        /* Supreme Alpha Contact */
+        .supreme-contact {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
 
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .social-grid { grid-template-columns: 1fr; } .sub-details { grid-template-columns: 1fr; } .profile-header { text-align: center; justify-content: center; } }
+        .supreme-contact a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .supreme-contact a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .profile-card { padding: 24px; }
+            .container { padding: 0 16px; }
+            .form-actions { flex-direction: column; }
+            .form-actions button { width: 100%; justify-content: center; }
+        }
     </style>
 </head>
 <body>
+
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Header -->
     <header class="header">
         <nav class="nav">
-            <a href="academy.html" class="logo"><i class="fas fa-cube"></i><span class="logo-text">AUREX</span></a>
-            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            <a href="index.html" class="logo">
+                <img src="IMG-20260403-WA0021(1).jpg" alt="Aurex Designs">
+                <span>Aurex Designs</span>
+            </a>
+            <button onclick="logout()" style="padding: 8px 16px; background: var(--error); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </nav>
     </header>
 
-    <main class="main-content">
-        <div class="profile-card">
-            <div class="profile-header">
-                <div class="profile-avatar-wrap"><img src="" alt="Profile" class="profile-avatar" id="profileAvatar"></div>
-                <div class="profile-info">
-                    <h2 id="profileName">Loading...</h2>
-                    <p id="profileEmail">loading@email.com</p>
-                    <span class="profile-badge free" id="profileBadge"><i class="fas fa-user"></i> Free Account</span>
-                </div>
+    <main>
+        <section class="profile-hero">
+            <div class="container">
+                <h1>👤 <span class="text-gradient">My Profile</span></h1>
             </div>
-        </div>
+        </section>
 
-        <div class="subscription-card" id="subscriptionCard">
-            <h3><i class="fas fa-crown"></i> Subscription</h3>
-            <p id="subStatus">You are on the Free plan. Upgrade to Premium for full access.</p>
-            <div class="sub-details" id="subDetails"></div>
-            <button class="upgrade-btn" id="upgradeBtn" onclick="window.location.href='academy.html?payment=premium'"><i class="fas fa-crown"></i> Upgrade to Premium</button>
-        </div>
+        <div class="container">
+            <!-- Profile Card -->
+            <div class="profile-card" id="profileCard">
+                <img id="profileAvatar" class="profile-avatar" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Profile">
+                <h2 id="profileName" class="profile-name">User</h2>
+                <p id="profileEmail" class="profile-email">user@example.com</p>
+                <div style="text-align: center;">
+                    <span id="profileType" class="profile-type type-free">FREE</span>
+                </div>
+                <p id="profileStatus" style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Subscription: Inactive</p>
+            </div>
 
-        <div class="profile-card">
-            <h3 class="section-title"><i class="fas fa-user-edit"></i> Edit Profile</h3>
-            <form id="profileForm" onsubmit="saveProfile(event)">
-                <div class="form-row">
+            <!-- Edit Profile Form -->
+            <div class="profile-card">
+                <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 16px;">✏️ Edit Profile</h3>
+                <form id="profileForm">
                     <div class="form-group">
-                        <label class="form-label"><i class="fas fa-user"></i> Full Name</label>
-                        <input type="text" class="form-control" id="pfName" disabled>
-                        <p class="form-hint"><i class="fas fa-lock"></i> Cannot be changed</p>
+                        <label><i class="fas fa-user"></i> Full Name</label>
+                        <input type="text" id="editName" placeholder="Your full name">
+                        <div class="hint">Cannot be changed after set</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" class="form-control" id="pfEmail" disabled>
-                        <p class="form-hint"><i class="fas fa-lock"></i> Cannot be changed</p>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label"><i class="fas fa-birthday-cake"></i> Age Range</label>
-                        <input type="text" class="form-control" id="pfAge" disabled>
-                        <p class="form-hint"><i class="fas fa-lock"></i> Cannot be changed</p>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="fas fa-image"></i> Profile Image URL</label>
-                        <input type="url" class="form-control" id="pfImage" disabled>
-                        <p class="form-hint"><i class="fas fa-lock"></i> Cannot be changed</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label"><i class="fas fa-link"></i> Portfolio Website</label>
-                    <input type="url" class="form-control" id="pfPortfolio" placeholder="https://yourportfolio.com">
-                </div>
-                <div class="form-group">
-                    <label class="section-title"><i class="fas fa-share-alt"></i> Social Media Handles</label>
-                    <div class="social-grid">
-                        <div class="social-input-wrap"><i class="fab fa-instagram"></i><input type="text" class="form-control" id="pfInstagram" placeholder="@username"></div>
-                        <div class="social-input-wrap"><i class="fab fa-x-twitter"></i><input type="text" class="form-control" id="pfTwitter" placeholder="@username"></div>
-                        <div class="social-input-wrap"><i class="fab fa-facebook-f"></i><input type="text" class="form-control" id="pfFacebook" placeholder="username"></div>
-                        <div class="social-input-wrap"><i class="fab fa-behance"></i><input type="text" class="form-control" id="pfBehance" placeholder="username"></div>
-                    </div>
-                </div>
-                <button type="submit" class="btn-save" id="saveBtn"><i class="fas fa-save"></i> Save Changes</button>
-            </form>
-        </div>
 
-        <div class="profile-card" id="purchasesCard" style="display:none">
-            <h3 class="section-title"><i class="fas fa-shopping-bag"></i> My Purchases</h3>
-            <div class="purchases-list" id="purchasesList"></div>
-        </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-alt"></i> Age Range</label>
+                        <input type="text" id="editAge" placeholder="e.g., 18-24, 25-34, 35-44">
+                    </div>
 
-        <div class="supreme-contact">
-            <h4><i class="fas fa-code"></i> Need a Website?</h4>
-            <p>Contact SupremeAmer for professional web development services. We build stunning websites for businesses, portfolios, e-commerce, and more.</p>
-            <a href="https://wa.me/2347031924052?text=Hi%20SupremeAmer,%20I%20need%20a%20website" target="_blank" class="wa-btn"><i class="fab fa-whatsapp"></i> Contact on WhatsApp: 07031924052</a>
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Profile Image URL</label>
+                        <input type="text" id="editImage" placeholder="https://example.com/avatar.jpg">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-link"></i> Portfolio Website</label>
+                        <input type="text" id="editPortfolio" placeholder="https://yourportfolio.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-share-alt"></i> Social Media (JSON format)</label>
+                        <input type="text" id="editSocial" placeholder='{"twitter":"username","instagram":"username"}'>
+                        <div class="hint">Example: {"twitter":"yourhandle","instagram":"yourhandle"}</div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                        <button type="button" class="btn-danger" onclick="deleteAccount()"><i class="fas fa-trash"></i> Delete Account</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Supreme Alpha Contact -->
+            <div class="supreme-contact">
+                <p style="color: var(--text-secondary);">
+                    <i class="fas fa-code" style="color: var(--primary);"></i> 
+                    Need a website? Contact Supreme-Alpha on 
+                    <a href="https://wa.me/2347031924052" target="_blank">
+                        <i class="fab fa-whatsapp"></i> WhatsApp: 07031924052
+                    </a>
+                </p>
+            </div>
         </div>
     </main>
 
-    <footer class="footer"><p> AUREX Design Studio. Crafted with <i class="fas fa-heart" style="color:var(--error)"></i> by <a href="https://supreme-amerweb.vercel.app">SupremeAmer</a></p></footer>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <a href="index.html" class="bottom-nav-btn"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="projects.html" class="bottom-nav-btn"><i class="fas fa-folder-open"></i><span>Projects</span></a>
+            <a href="academy.html" class="bottom-nav-btn"><i class="fas fa-graduation-cap"></i><span>Academy</span></a>
+            <a href="profile.html" class="bottom-nav-btn active"><i class="fas fa-user"></i><span>Profile</span></a>
+        </div>
+    </nav>
 
-<script>
-const SUPABASE_URL = 'https://your-project.supabase.co';
-const SUPABASE_ANON_KEY = 'your-anon-key-here';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ============================================
+        // USER PROFILE
+        // ============================================
 
-let currentUser = null, userProfile = null;
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function showToast(message, type) {
-    type = type || 'success';
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = 'toast toast-' + type;
-    const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
-    toast.innerHTML = '<i class="fas ' + icons[type] + '"></i> ' + message;
-    container.appendChild(toast);
-    toast.offsetHeight;
-    requestAnimationFrame(() => toast.classList.add('show'));
-    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
-}
+        let currentUser = null;
+        let userProfile = null;
 
-async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { window.location.href = 'auth.html'; return; }
-    currentUser = session.user;
-    await loadProfile();
-}
+        // ============================================
+        // TOAST SYSTEM
+        // ============================================
+        function showToast(message, type) {
+            type = type || 'success';
+            const icons = {
+                success: '<i class="fas fa-check-circle"></i>',
+                error: '<i class="fas fa-times-circle"></i>',
+                warning: '<i class="fas fa-exclamation-triangle"></i>',
+                info: '<i class="fas fa-info-circle"></i>'
+            };
 
-async function loadProfile() {
-    try {
-        const { data, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-        if (error) throw error;
-        userProfile = data;
-    } catch (err) {
-        userProfile = { full_name: currentUser.user_metadata?.full_name || 'Designer', email: currentUser.email, age_range: currentUser.user_metadata?.age_range || '18-24', user_type: 'free', subscription_status: 'inactive', profile_image: null, portfolio_weblink: '', social_media_handles: {}, subscription_start_date: null, subscription_end_date: null };
-    }
-    updateUI();
-    loadPurchases();
-}
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `${icons[type] || icons.success} ${message}`;
+            container.appendChild(toast);
 
-function updateUI() {
-    if (!userProfile) return;
-    const name = userProfile.full_name || 'Designer';
-    const isPremium = userProfile.user_type === 'premium';
-    const isActive = userProfile.subscription_status === 'active';
-    const isPending = userProfile.subscription_status === 'pending';
+            requestAnimationFrame(() => toast.classList.add('show'));
 
-    document.getElementById('profileName').textContent = name;
-    document.getElementById('profileEmail').textContent = userProfile.email;
-    const avatarUrl = userProfile.profile_image || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + userProfile.email;
-    document.getElementById('profileAvatar').src = avatarUrl;
-
-    const badge = document.getElementById('profileBadge');
-    if (isActive) { badge.className = 'profile-badge premium'; badge.innerHTML = '<i class="fas fa-crown"></i> Premium Active'; }
-    else if (isPending) { badge.className = 'profile-badge pending'; badge.innerHTML = '<i class="fas fa-clock"></i> Pending Approval'; }
-    else { badge.className = 'profile-badge free'; badge.innerHTML = '<i class="fas fa-user"></i> Free Account'; }
-
-    document.getElementById('pfName').value = userProfile.full_name || '';
-    document.getElementById('pfEmail').value = userProfile.email || '';
-    document.getElementById('pfAge').value = userProfile.age_range || '';
-    document.getElementById('pfImage').value = userProfile.profile_image || '';
-    document.getElementById('pfPortfolio').value = userProfile.portfolio_weblink || '';
-    const social = userProfile.social_media_handles || {};
-    document.getElementById('pfInstagram').value = social.instagram || '';
-    document.getElementById('pfTwitter').value = social.twitter || '';
-    document.getElementById('pfFacebook').value = social.facebook || '';
-    document.getElementById('pfBehance').value = social.behance || '';
-
-    const subCard = document.getElementById('subscriptionCard');
-    const subStatus = document.getElementById('subStatus');
-    const subDetails = document.getElementById('subDetails');
-    const upgradeBtn = document.getElementById('upgradeBtn');
-
-    if (isActive) {
-        subStatus.textContent = 'You have full Premium access to all Aurex Academy content.';
-        subDetails.innerHTML = `<div class="sub-detail"><span>Plan</span><strong>Premium</strong></div><div class="sub-detail"><span>Started</span><strong>${new Date(userProfile.subscription_start_date).toLocaleDateString()}</strong></div><div class="sub-detail"><span>Expires</span><strong>${new Date(userProfile.subscription_end_date).toLocaleDateString()}</strong></div><div class="sub-detail"><span>Status</span><strong style="color:var(--success)">Active</strong></div>`;
-        upgradeBtn.style.display = 'none';
-    } else if (isPending) {
-        subStatus.textContent = 'Your Premium payment is pending admin approval. You will be notified once approved.';
-        subDetails.innerHTML = `<div class="sub-detail"><span>Plan</span><strong>Premium</strong></div><div class="sub-detail"><span>Status</span><strong style="color:var(--warning)">Pending Approval</strong></div>`;
-        upgradeBtn.style.display = 'none';
-    } else {
-        subStatus.textContent = 'You are on the Free plan. Access Aurex 009 classes and free resources. Upgrade for full access.';
-        subDetails.innerHTML = `<div class="sub-detail"><span>Plan</span><strong>Free</strong></div><div class="sub-detail"><span>Classes</span><strong>Aurex 009 Only</strong></div><div class="sub-detail"><span>Resources</span><strong>Free Only</strong></div><div class="sub-detail"><span>Price</span><strong style="color:var(--success)">N15,000 / 3 months</strong></div>`;
-        upgradeBtn.style.display = 'inline-flex';
-    }
-}
-
-async function loadPurchases() {
-    try {
-        const { data, error } = await supabase.from('resource_purchases').select('*, resources(title)').eq('user_id', currentUser.id).order('purchased_at', { ascending: false });
-        if (error) throw error;
-        if (data && data.length > 0) {
-            document.getElementById('purchasesCard').style.display = 'block';
-            document.getElementById('purchasesList').innerHTML = data.map(p => `<div class="purchase-item"><div><h5>${p.resources?.title || 'Resource'}</h5><span>N${p.price_paid.toLocaleString()} - ${new Date(p.purchased_at).toLocaleDateString()}</span></div><span class="purchase-status ${p.status}">${p.status}</span></div>`).join('');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 400);
+            }, 3000);
         }
-    } catch (e) { /* silent */ }
-}
 
-async function saveProfile(e) {
-    e.preventDefault();
-    const btn = document.getElementById('saveBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    try {
-        const updates = {
-            portfolio_weblink: document.getElementById('pfPortfolio').value,
-            social_media_handles: {
-                instagram: document.getElementById('pfInstagram').value,
-                twitter: document.getElementById('pfTwitter').value,
-                facebook: document.getElementById('pfFacebook').value,
-                behance: document.getElementById('pfBehance').value
+        // ============================================
+        // CHECK AUTH
+        // ============================================
+        async function checkAuth() {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            if (!session) {
+                showToast('Please sign in', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'auth.html';
+                }, 1500);
+                return false;
             }
-        };
-        const { error } = await supabase.from('profiles').update(updates).eq('id', currentUser.id);
-        if (error) throw error;
-        showToast('Profile updated successfully!', 'success');
-    } catch (err) { showToast('Profile updated!', 'success'); }
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
-}
 
-async function logout() { await supabase.auth.signOut(); window.location.href = 'auth.html'; }
+            currentUser = session.user;
+            await loadProfile();
+            return true;
+        }
 
-document.addEventListener('DOMContentLoaded', checkAuth);
-</script>
+        // ============================================
+        // LOAD PROFILE
+        // ============================================
+        async function loadProfile() {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('auth_id', currentUser.id)
+                    .single();
+
+                if (error) throw error;
+
+                userProfile = data;
+                updateUI();
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showToast('Error loading profile', 'error');
+            }
+        }
+
+        // ============================================
+        // UPDATE UI
+        // ============================================
+        function updateUI() {
+            if (!userProfile) return;
+
+            document.getElementById('profileName').textContent = userProfile.full_name || 'User';
+            document.getElementById('profileEmail').textContent = userProfile.email || 'No email';
+            document.getElementById('profileAvatar').src = userProfile.profile_image || 
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'User')}&background=6366f1&color=fff`;
+
+            // Type badge
+            const typeBadge = document.getElementById('profileType');
+            if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') {
+                typeBadge.textContent = '⭐ PREMIUM';
+                typeBadge.className = 'profile-type type-premium';
+                document.getElementById('profileStatus').textContent = 'Subscription: Active ✅';
+            } else {
+                typeBadge.textContent = '🆓 FREE';
+                typeBadge.className = 'profile-type type-free';
+                document.getElementById('profileStatus').textContent = 'Subscription: Inactive';
+            }
+
+            // Fill form fields
+            document.getElementById('editName').value = userProfile.full_name || '';
+            document.getElementById('editAge').value = userProfile.age_range || '';
+            document.getElementById('editImage').value = userProfile.profile_image || '';
+            document.getElementById('editPortfolio').value = userProfile.portfolio_website || '';
+            document.getElementById('editSocial').value = userProfile.social_media ? 
+                JSON.stringify(userProfile.social_media) : '{}';
+        }
+
+        // ============================================
+        // UPDATE PROFILE
+        // ============================================
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get social media as JSON
+            let socialMedia = {};
+            try {
+                socialMedia = JSON.parse(document.getElementById('editSocial').value);
+            } catch (e) {
+                showToast('Invalid social media JSON format', 'error');
+                return;
+            }
+
+            const updates = {
+                age_range: document.getElementById('editAge').value,
+                profile_image: document.getElementById('editImage').value,
+                portfolio_website: document.getElementById('editPortfolio').value,
+                social_media: socialMedia,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .update(updates)
+                    .eq('id', userProfile.id);
+
+                if (error) throw error;
+
+                showToast('Profile updated successfully!', 'success');
+                await loadProfile();
+
+            } catch (error) {
+                showToast('Error updating profile: ' + error.message, 'error');
+            }
+        });
+
+        // ============================================
+        // DELETE ACCOUNT
+        // ============================================
+        async function deleteAccount() {
+            if (!confirm('Are you sure you want to delete your account? This action cannot be undone!')) return;
+            if (!confirm('All your data will be permanently removed. Continue?')) return;
+
+            try {
+                // Delete from users table (cascade will handle related data)
+                const { error } = await supabase
+                    .from('users')
+                    .delete()
+                    .eq('id', userProfile.id);
+
+                if (error) throw error;
+
+                // Sign out
+                await supabase.auth.signOut();
+                showToast('Account deleted successfully', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+
+            } catch (error) {
+                showToast('Error deleting account: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = 'auth.html';
+        }
+
+        // ============================================
+        // INITIALIZE
+        // ============================================
+        checkAuth();
+    </script>
 </body>
 </html>
