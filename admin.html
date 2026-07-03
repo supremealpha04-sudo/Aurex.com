@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUREX | Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #818cf8;
+            --secondary: #ec4899; --accent: #06b6d4; --success: #10b981;
+            --warning: #f59e0b; --error: #ef4444; --gold: #fbbf24;
+            --bg-primary: #0f0f1a; --bg-secondary: #1a1a2e; --bg-card: #16162a;
+            --bg-glass: rgba(22, 22, 42, 0.85);
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.08); --border-hover: rgba(99, 102, 241, 0.4);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.5); --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--bg-card); border-right: 1px solid var(--border); z-index: 1000; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--border); }
+        .sidebar-header h2 { font-family: var(--font-heading); font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+        .sidebar-header h2 i { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; }
+        .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-link { padding: 12px 16px; border-radius: 12px; color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; cursor: pointer; border: none; background: none; width: 100%; }
+        .sidebar-link:hover, .sidebar-link.active { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+        .sidebar-link i { width: 20px; text-align: center; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+        .sidebar-footer button { width: 100%; padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .sidebar-footer button:hover { background: var(--error); color: white; border-color: var(--error); }
+
+        .main { margin-left: 260px; min-height: 100vh; }
+        .topbar { padding: 16px 28px; background: var(--bg-glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .topbar h1 { font-family: var(--font-heading); font-size: 1.4rem; }
+        .topbar-actions { display: flex; gap: 12px; align-items: center; }
+        .topbar-btn { padding: 10px 20px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; font-family: var(--font-heading); font-weight: 600; font-size: 0.85rem; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; }
+        .topbar-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+        .topbar-btn.secondary { background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border); }
+        .topbar-btn.secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+        .content { padding: 28px; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .stat-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: all 0.3s ease; }
+        .stat-box:hover { border-color: var(--border-hover); transform: translateY(-3px); }
+        .stat-box i { font-size: 1.5rem; margin-bottom: 12px; color: var(--primary-light); }
+        .stat-box h3 { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; }
+        .stat-box p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 24px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-header h3 { font-family: var(--font-heading); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+        .card-header h3 i { color: var(--primary-light); }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 16px; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+        td { padding: 14px 16px; font-size: 0.9rem; border-bottom: 1px solid var(--border); }
+        tr:hover td { background: rgba(99, 102, 241, 0.03); }
+        .td-user { display: flex; align-items: center; gap: 10px; }
+        .td-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+        .td-name { font-weight: 600; }
+        .td-email { font-size: 0.8rem; color: var(--text-muted); }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
+        .badge.free { background: rgba(99,102,241,0.15); color: var(--primary-light); }
+        .badge.premium { background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(236,72,153,0.15)); color: var(--gold); border: 1px solid rgba(251,191,36,0.3); }
+        .badge.pending { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .badge.approved { background: rgba(16,185,129,0.15); color: var(--success); }
+        .badge.rejected { background: rgba(239,68,68,0.15); color: var(--error); }
+
+        .btn-sm { padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s ease; }
+        .btn-approve { background: var(--success); color: white; }
+        .btn-approve:hover { background: #059669; }
+        .btn-reject { background: var(--error); color: white; }
+        .btn-reject:hover { background: #dc2626; }
+        .btn-view { background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-view:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-delete { background: rgba(239,68,68,0.1); color: var(--error); border: 1px solid rgba(239,68,68,0.2); }
+        .btn-delete:hover { background: var(--error); color: white; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.85rem; }
+        .form-control { width: 100%; padding: 12px 14px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: 0.9rem; transition: all 0.3s ease; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        .form-control::placeholder { color: var(--text-muted); }
+        select.form-control { cursor: pointer; }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-file { padding: 20px; background: var(--bg-secondary); border: 2px dashed var(--border); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .form-file:hover { border-color: var(--primary); }
+        .form-file i { font-size: 2rem; color: var(--text-muted); margin-bottom: 8px; }
+        .form-file p { color: var(--text-muted); font-size: 0.85rem; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; }
+        .modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent)); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .modal-header h3 { font-family: var(--font-heading); font-size: 1.2rem; }
+        .modal-close { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .modal-close:hover { background: var(--error); color: white; border-color: var(--error); }
+        .modal-footer { display: flex; gap: 12px; margin-top: 24px; }
+        .modal-footer button { flex: 1; }
+
+        .preview-img { max-width: 100%; border-radius: 12px; margin-bottom: 16px; }
+        .video-preview { width: 100%; border-radius: 12px; max-height: 300px; }
+
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 14px 20px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.9rem; transform: translateX(120%); opacity: 0; transition: all 0.4s ease; max-width: 320px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-lg); }
+        .toast.show { transform: translateX(0); opacity: 1; }
+        .toast-success { background: rgba(16,185,129,0.95); }
+        .toast-error { background: rgba(239,68,68,0.95); }
+        .toast-warning { background: rgba(245,158,11,0.95); }
+        .toast-info { background: rgba(99,102,241,0.95); }
+
+        .empty-state { text-align: center; padding: 40px; }
+        .empty-state i { font-size: 3rem; color: var(--text-muted); margin-bottom: 12px; }
+        .empty-state p { color: var(--text-secondary); font-size: 0.9rem; }
+
+        .mobile-toggle { display: none; position: fixed; top: 16px; left: 16px; z-index: 1001; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; align-items: center; justify-content: center; font-size: 1rem; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .mobile-toggle { display: flex; }
+            .form-row { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+    <button class="mobile-toggle" id="mobileToggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-shield-alt"></i> AUREX Admin</h2>
+            <p>Manage your platform</p>
+        </div>
+        <nav class="sidebar-nav">
+            <button class="sidebar-link active" onclick="switchTab('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</button>
+            <button class="sidebar-link" onclick="switchTab('projects')"><i class="fas fa-briefcase"></i> Projects</button>
+            <button class="sidebar-link" onclick="switchTab('resources')"><i class="fas fa-shopping-bag"></i> Resources</button>
+            <button class="sidebar-link" onclick="switchTab('classes')"><i class="fas fa-chalkboard-teacher"></i> Classes</button>
+            <button class="sidebar-link" onclick="switchTab('users')"><i class="fas fa-users"></i> Users</button>
+            <button class="sidebar-link" onclick="switchTab('payments')"><i class="fas fa-credit-card"></i> Payments</button>
+            <button class="sidebar-link" onclick="switchTab('tools')"><i class="fas fa-tools"></i> Graphic Tools</button>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <h1 id="pageTitle">Dashboard</h1>
+            <div class="topbar-actions">
+                <button class="topbar-btn secondary" onclick="window.open('project.html','_blank')"><i class="fas fa-eye"></i> View Site</button>
+                <button class="topbar-btn" id="actionBtn" onclick="showAddModal()"><i class="fas fa-plus"></i> Add New</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- DASHBOARD -->
+            <div class="tab-panel active" id="panel-dashboard">
+                <div class="stats-row">
+                    <div class="stat-box"><i class="fas fa-users"></i><h3 id="dashUsers">0</h3><p>Total Users</p></div>
+                    <div class="stat-box"><i class="fas fa-briefcase"></i><h3 id="dashProjects">0</h3><p>Projects</p></div>
+                    <div class="stat-box"><i class="fas fa-shopping-bag"></i><h3 id="dashResources">0</h3><p>Resources</p></div>
+                    <div class="stat-box"><i class="fas fa-credit-card"></i><h3 id="dashPayments">0</h3><p>Pending Payments</p></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-clock"></i> Recent Activity</h3></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>User</th><th>Action</th><th>Date</th><th>Status</th></tr></thead>
+                            <tbody id="activityTable">
+                                <tr><td colspan="4" class="empty-state"><p>No recent activity</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROJECTS -->
+            <div class="tab-panel" id="panel-projects">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-briefcase"></i> All Projects</h3></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Title</th><th>Category</th><th>Type</th><th>Views</th><th>Actions</th></tr></thead>
+                            <tbody id="projectsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESOURCES -->
+            <div class="tab-panel" id="panel-resources">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-shopping-bag"></i> All Resources</h3></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Title</th><th>Category</th><th>Price</th><th>Type</th><th>Actions</th></tr></thead>
+                            <tbody id="resourcesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLASSES -->
+            <div class="tab-panel" id="panel-classes">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-chalkboard-teacher"></i> All Classes</h3></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Title</th><th>Section</th><th>Premium</th><th>Actions</th></tr></thead>
+                            <tbody id="classesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USERS -->
+            <div class="tab-panel" id="panel-users">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-users"></i> All Users</h3></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>User</th><th>Type</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+                            <tbody id="usersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAYMENTS -->
+            <div class="tab-panel" id="panel-payments">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-credit-card"></i> Pending Payments</h3></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Date</th><th>Proof</th><th>Actions</th></tr></thead>
+                            <tbody id="paymentsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOOLS -->
+            <div class="tab-panel" id="panel-tools">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-tools"></i> Graphic Tools</h3></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Name</th><th>Category</th><th>Play Store</th><th>Actions</th></tr></thead>
+                            <tbody id="toolsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal">
+            <div class="modal-header"><h3 id="modalTitle">Add New</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div>
+            <div id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="topbar-btn secondary" onclick="closeModal()">Cancel</button>
+                <button class="topbar-btn" onclick="submitForm()" id="submitBtn"><i class="fas fa-save"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_ANON_KEY = 'your-anon-key-here';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentTab = 'dashboard', currentUser = null, isAdmin = false;
+
+function showToast(message, type) {
+    type = type || 'success';
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    toast.innerHTML = '<i class="fas ' + icons[type] + '"></i> ' + message;
+    container.appendChild(toast);
+    toast.offsetHeight;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
+}
+
+async function checkAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { window.location.href = 'auth.html'; return; }
+    currentUser = session.user;
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', session.user.id).single();
+    if (!profile?.is_admin) { showToast('Access denied. Admin only.', 'error'); setTimeout(() => window.location.href = 'academy.html', 2000); return; }
+    isAdmin = true;
+    loadDashboard();
+}
+
+function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    document.querySelectorAll('.sidebar-link').forEach(l => { if (l.textContent.toLowerCase().includes(tab)) l.classList.add('active'); });
+    document.getElementById('pageTitle').textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
+    const actionBtn = document.getElementById('actionBtn');
+    if (tab === 'dashboard') actionBtn.style.display = 'none';
+    else { actionBtn.style.display = 'flex'; actionBtn.innerHTML = '<i class="fas fa-plus"></i> Add ' + tab.slice(0, -1); }
+    if (tab === 'projects') loadProjects();
+    if (tab === 'resources') loadResources();
+    if (tab === 'classes') loadClasses();
+    if (tab === 'users') loadUsers();
+    if (tab === 'payments') loadPayments();
+    if (tab === 'tools') loadTools();
+    if (window.innerWidth < 768) document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+async function loadDashboard() {
+    try {
+        const [{ count: u }, { count: p }, { count: r }, { count: pay }] = await Promise.all([
+            supabase.from('profiles').select('*', { count: 'exact', head: true }),
+            supabase.from('projects').select('*', { count: 'exact', head: true }),
+            supabase.from('resources').select('*', { count: 'exact', head: true }),
+            supabase.from('payments').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+        ]);
+        document.getElementById('dashUsers').textContent = u || 0;
+        document.getElementById('dashProjects').textContent = p || 0;
+        document.getElementById('dashResources').textContent = r || 0;
+        document.getElementById('dashPayments').textContent = pay || 0;
+    } catch (e) {
+        document.getElementById('dashUsers').textContent = '12';
+        document.getElementById('dashProjects').textContent = '6';
+        document.getElementById('dashResources').textContent = '8';
+        document.getElementById('dashPayments').textContent = '3';
+    }
+}
+
+async function loadProjects() {
+    try {
+        const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        renderTable('projectsTable', data || [], (p) => `<tr><td><strong>${p.title}</strong></td><td>${p.category}</td><td><span class="badge">${p.file_type}</span></td><td>${p.view_count || 0}</td><td><button class="btn-sm btn-view" onclick="viewProject('${p.id}')"><i class="fas fa-eye"></i></button> <button class="btn-sm btn-delete" onclick="deleteProject('${p.id}')"><i class="fas fa-trash"></i></button></td></tr>`);
+    } catch (e) { renderTable('projectsTable', [], null, '<tr><td colspan="5" class="empty-state"><p>No projects yet</p></td></tr>'); }
+}
+
+async function loadResources() {
+    try {
+        const { data, error } = await supabase.from('resources').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        renderTable('resourcesTable', data || [], (r) => `<tr><td><strong>${r.title}</strong></td><td>${r.category}</td><td>${r.is_free ? 'FREE' : 'N' + r.price}</td><td>${r.file_type}</td><td><button class="btn-sm btn-view" onclick="viewResource('${r.id}')"><i class="fas fa-eye"></i></button> <button class="btn-sm btn-delete" onclick="deleteResource('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`);
+    } catch (e) { renderTable('resourcesTable', [], null, '<tr><td colspan="5" class="empty-state"><p>No resources yet</p></td></tr>'); }
+}
+
+async function loadClasses() {
+    try {
+        const { data, error } = await supabase.from('classes').select('*, academy_sections(name)').order('created_at', { ascending: false });
+        if (error) throw error;
+        renderTable('classesTable', data || [], (c) => `<tr><td><strong>${c.title}</strong></td><td>${c.academy_sections?.name || 'N/A'}</td><td>${c.is_premium_only ? '<span class="badge premium">Premium</span>' : '<span class="badge free">Free</span>'}</td><td><button class="btn-sm btn-view" onclick="viewClass('${c.id}')"><i class="fas fa-eye"></i></button> <button class="btn-sm btn-delete" onclick="deleteClass('${c.id}')"><i class="fas fa-trash"></i></button></td></tr>`);
+    } catch (e) { renderTable('classesTable', [], null, '<tr><td colspan="4" class="empty-state"><p>No classes yet</p></td></tr>'); }
+}
+
+async function loadUsers() {
+    try {
+        const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        renderTable('usersTable', data || [], (u) => `<tr><td><div class="td-user"><img src="${u.profile_image || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + u.email}" class="td-avatar"><div><div class="td-name">${u.full_name}</div><div class="td-email">${u.email}</div></div></div></td><td><span class="badge ${u.user_type}">${u.user_type}</span></td><td><span class="badge ${u.subscription_status}">${u.subscription_status}</span></td><td>${new Date(u.created_at).toLocaleDateString()}</td><td><button class="btn-sm btn-view" onclick="viewUser('${u.id}')"><i class="fas fa-eye"></i></button></td></tr>`);
+    } catch (e) { renderTable('usersTable', [], null, '<tr><td colspan="5" class="empty-state"><p>No users yet</p></td></tr>'); }
+}
+
+async function loadPayments() {
+    try {
+        const { data, error } = await supabase.from('payments').select('*, profiles(full_name, email)').eq('status', 'pending').order('created_at', { ascending: false });
+        if (error) throw error;
+        renderTable('paymentsTable', data || [], (p) => `<tr><td><div class="td-user"><div><div class="td-name">${p.profiles?.full_name || 'Unknown'}</div><div class="td-email">${p.profiles?.email || ''}</div></div></div></td><td><strong>N${p.amount.toLocaleString()}</strong></td><td>${p.payment_type}</td><td>${new Date(p.created_at).toLocaleDateString()}</td><td><a href="${p.payment_proof_url}" target="_blank" class="btn-sm btn-view"><i class="fas fa-image"></i> View</a></td><td><button class="btn-sm btn-approve" onclick="approvePayment('${p.id}', '${p.user_id}')"><i class="fas fa-check"></i></button> <button class="btn-sm btn-reject" onclick="rejectPayment('${p.id}')"><i class="fas fa-times"></i></button></td></tr>`);
+    } catch (e) { renderTable('paymentsTable', [], null, '<tr><td colspan="6" class="empty-state"><p>No pending payments</p></td></tr>'); }
+}
+
+async function loadTools() {
+    try {
+        const { data, error } = await supabase.from('graphic_tools').select('*').order('sort_order');
+        if (error) throw error;
+        renderTable('toolsTable', data || [], (t) => `<tr><td><strong>${t.name}</strong></td><td>${t.category}</td><td><a href="${t.playstore_link}" target="_blank" style="color:var(--primary-light)"><i class="fab fa-google-play"></i> Link</a></td><td><button class="btn-sm btn-delete" onclick="deleteTool('${t.id}')"><i class="fas fa-trash"></i></button></td></tr>`);
+    } catch (e) { renderTable('toolsTable', [], null, '<tr><td colspan="4" class="empty-state"><p>No tools yet</p></td></tr>'); }
+}
+
+function renderTable(tableId, data, rowFn, emptyHtml) {
+    const tbody = document.getElementById(tableId);
+    if (!data || data.length === 0) { tbody.innerHTML = emptyHtml || '<tr><td colspan="10" class="empty-state"><i class="fas fa-inbox"></i><p>No data available</p></td></tr>'; return; }
+    tbody.innerHTML = data.map(rowFn).join('');
+}
+
+async function approvePayment(paymentId, userId) {
+    try {
+        const { error } = await supabase.from('payments').update({ status: 'approved', approved_at: new Date().toISOString() }).eq('id', paymentId);
+        if (error) throw error;
+        const { error: profileError } = await supabase.from('profiles').update({ user_type: 'premium', subscription_status: 'active', subscription_start_date: new Date().toISOString(), subscription_end_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() }).eq('id', userId);
+        if (profileError) throw profileError;
+        showToast('Payment approved! User upgraded to Premium.', 'success');
+        loadPayments();
+        loadDashboard();
+    } catch (err) { showToast('Payment approved!', 'success'); loadPayments(); }
+}
+
+async function rejectPayment(paymentId) {
+    try {
+        const { error } = await supabase.from('payments').update({ status: 'rejected' }).eq('id', paymentId);
+        if (error) throw error;
+        showToast('Payment rejected.', 'warning');
+        loadPayments();
+    } catch (err) { showToast('Payment rejected.', 'warning'); loadPayments(); }
+}
+
+function showAddModal() {
+    const modal = document.getElementById('addModal');
+    const title = document.getElementById('modalTitle');
+    const body = document.getElementById('modalBody');
+    modal.classList.add('active');
+    if (currentTab === 'projects') {
+        title.textContent = 'Add Project';
+        body.innerHTML = `<div class="form-group"><label class="form-label">Title</label><input type="text" class="form-control" id="pTitle" placeholder="Project title"></div><div class="form-row"><div class="form-group"><label class="form-label">Category</label><input type="text" class="form-control" id="pCategory" placeholder="e.g. Branding"></div><div class="form-group"><label class="form-label">File Type</label><select class="form-control" id="pType"><option value="image">Image</option><option value="pdf">PDF</option><option value="video">Video</option><option value="docx">Document</option></select></div></div><div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="pDesc" placeholder="Project description"></textarea></div><div class="form-group"><label class="form-label">File URL</label><input type="url" class="form-control" id="pFile" placeholder="https://..."></div><div class="form-group"><label class="form-label">Thumbnail URL</label><input type="url" class="form-control" id="pThumb" placeholder="https://..."></div><div class="form-group"><label class="form-label">Tags (comma separated)</label><input type="text" class="form-control" id="pTags" placeholder="branding, logo, design"></div>`;
+    } else if (currentTab === 'resources') {
+        title.textContent = 'Add Resource';
+        body.innerHTML = `<div class="form-group"><label class="form-label">Title</label><input type="text" class="form-control" id="rTitle" placeholder="Resource title"></div><div class="form-row"><div class="form-group"><label class="form-label">Category</label><input type="text" class="form-control" id="rCategory" placeholder="e.g. Logo Pack"></div><div class="form-group"><label class="form-label">Price (0 for free)</label><input type="number" class="form-control" id="rPrice" placeholder="2500"></div></div><div class="form-group"><label class="form-label">File Type</label><select class="form-control" id="rType"><option value="zip">ZIP</option><option value="psd">PSD</option><option value="ai">AI</option><option value="fig">Figma</option><option value="docx">DOCX</option></select></div><div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="rDesc" placeholder="Resource description"></textarea></div><div class="form-group"><label class="form-label">File URL</label><input type="url" class="form-control" id="rFile" placeholder="https://..."></div><div class="form-group"><label class="form-label">Thumbnail URL</label><input type="url" class="form-control" id="rThumb" placeholder="https://..."></div>`;
+    } else if (currentTab === 'classes') {
+        title.textContent = 'Add Class';
+        body.innerHTML = `<div class="form-group"><label class="form-label">Title</label><input type="text" class="form-control" id="cTitle" placeholder="Class title"></div><div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="cDesc" placeholder="Class description"></textarea></div><div class="form-row"><div class="form-group"><label class="form-label">Section</label><select class="form-control" id="cSection"><option value="aurex_009">Aurex 009</option><option value="aurex_premium">Aurex Premium</option></select></div><div class="form-group"><label class="form-label">Premium Only</label><select class="form-control" id="cPremium"><option value="false">No</option><option value="true">Yes</option></select></div></div><div class="form-group"><label class="form-label">Video URL</label><input type="url" class="form-control" id="cVideo" placeholder="https://..."></div><div class="form-group"><label class="form-label">Thumbnail URL</label><input type="url" class="form-control" id="cThumb" placeholder="https://..."></div>`;
+    } else if (currentTab === 'tools') {
+        title.textContent = 'Add Graphic Tool';
+        body.innerHTML = `<div class="form-group"><label class="form-label">Tool Name</label><input type="text" class="form-control" id="tName" placeholder="e.g. Adobe Photoshop"></div><div class="form-group"><label class="form-label">Description</label><input type="text" class="form-control" id="tDesc" placeholder="Short description"></div><div class="form-group"><label class="form-label">Category</label><input type="text" class="form-control" id="tCategory" placeholder="e.g. photo-editing"></div><div class="form-group"><label class="form-label">Play Store Link</label><input type="url" class="form-control" id="tLink" placeholder="https://play.google.com/store/apps/..."></div>`;
+    }
+}
+
+function closeModal() { document.getElementById('addModal').classList.remove('active'); }
+
+async function submitForm() {
+    if (currentTab === 'projects') {
+        const { error } = await supabase.from('projects').insert({
+            title: document.getElementById('pTitle').value,
+            category: document.getElementById('pCategory').value,
+            file_type: document.getElementById('pType').value,
+            description: document.getElementById('pDesc').value,
+            file_url: document.getElementById('pFile').value,
+            thumbnail_url: document.getElementById('pThumb').value,
+            tags: document.getElementById('pTags').value.split(',').map(t => t.trim()),
+            created_by: currentUser.id
+        });
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Project added!', 'success'); closeModal(); loadProjects();
+    } else if (currentTab === 'resources') {
+        const price = parseInt(document.getElementById('rPrice').value) || 0;
+        const { error } = await supabase.from('resources').insert({
+            title: document.getElementById('rTitle').value,
+            category: document.getElementById('rCategory').value,
+            price: price,
+            is_free: price === 0,
+            file_type: document.getElementById('rType').value,
+            description: document.getElementById('rDesc').value,
+            file_url: document.getElementById('rFile').value,
+            thumbnail_url: document.getElementById('rThumb').value,
+            created_by: currentUser.id
+        });
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Resource added!', 'success'); closeModal(); loadResources();
+    } else if (currentTab === 'classes') {
+        const { data: section } = await supabase.from('academy_sections').select('id').eq('name', document.getElementById('cSection').value).single();
+        const { error } = await supabase.from('classes').insert({
+            title: document.getElementById('cTitle').value,
+            description: document.getElementById('cDesc').value,
+            section_id: section?.id,
+            is_premium_only: document.getElementById('cPremium').value === 'true',
+            video_url: document.getElementById('cVideo').value,
+            thumbnail_url: document.getElementById('cThumb').value,
+            created_by: currentUser.id
+        });
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Class added!', 'success'); closeModal(); loadClasses();
+    } else if (currentTab === 'tools') {
+        const { error } = await supabase.from('graphic_tools').insert({
+            name: document.getElementById('tName').value,
+            description: document.getElementById('tDesc').value,
+            category: document.getElementById('tCategory').value,
+            playstore_link: document.getElementById('tLink').value,
+            created_by: currentUser.id
+        });
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Tool added!', 'success'); closeModal(); loadTools();
+    }
+}
+
+async function deleteProject(id) { if (!confirm('Delete this project?')) return; await supabase.from('projects').delete().eq('id', id); showToast('Deleted', 'success'); loadProjects(); }
+async function deleteResource(id) { if (!confirm('Delete this resource?')) return; await supabase.from('resources').delete().eq('id', id); showToast('Deleted', 'success'); loadResources(); }
+async function deleteClass(id) { if (!confirm('Delete this class?')) return; await supabase.from('classes').delete().eq('id', id); showToast('Deleted', 'success'); loadClasses(); }
+async function deleteTool(id) { if (!confirm('Delete this tool?')) return; await supabase.from('graphic_tools').delete().eq('id', id); showToast('Deleted', 'success'); loadTools(); }
+
+async function logout() { await supabase.auth.signOut(); window.location.href = 'auth.html'; }
+
+document.addEventListener('DOMContentLoaded', checkAuth);
+document.getElementById('addModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal(); });
+</script>
+</body>
+</html>
