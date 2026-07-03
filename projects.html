@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects | Aurex Designs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Projects Page Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16162a;
+            --bg-glass: rgba(22, 22, 42, 0.85);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --bottom-nav-height: 70px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding-bottom: var(--bottom-nav-height);
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+        }
+
+        .logo span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Hero */
+        .projects-hero {
+            padding: 120px 0 40px;
+            text-align: center;
+        }
+
+        .projects-hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .projects-hero p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 24px 0 32px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Project Grid */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            padding: 20px 0;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .project-card .image {
+            width: 100%;
+            aspect-ratio: 16/10;
+            object-fit: cover;
+            display: block;
+        }
+
+        .project-card .info {
+            padding: 20px;
+        }
+
+        .project-card .info h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .project-card .info .category {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .project-card .info .desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .project-card .info .tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .project-card .info .tags span {
+            padding: 2px 10px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: var(--bottom-nav-height);
+            padding: 0 16px;
+        }
+
+        .bottom-nav-inner {
+            display: flex;
+            gap: 8px;
+            max-width: 500px;
+            width: 100%;
+            justify-content: space-around;
+        }
+
+        .bottom-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 120px;
+        }
+
+        .bottom-nav-btn i { font-size: 1.3rem; transition: all 0.3s ease; }
+        .bottom-nav-btn:hover { color: var(--primary); background: rgba(99, 102, 241, 0.1); }
+        .bottom-nav-btn.active { color: var(--primary); background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.1)); }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 320px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast.show { transform: translateX(0); opacity: 1; }
+        .toast-success { background: rgba(16, 185, 129, 0.95); }
+        .toast-error { background: rgba(239, 68, 68, 0.95); }
+        .toast-warning { background: rgba(245, 158, 11, 0.95); }
+        .toast-info { background: rgba(99, 102, 241, 0.95); }
+
+        @media (max-width: 768px) {
+            .project-grid { grid-template-columns: 1fr; }
+            .projects-hero h1 { font-size: 2rem; }
+            .container { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <img src="IMG-20260403-WA0021(1).jpg" alt="Aurex Designs">
+                <span>Aurex Designs</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button onclick="window.location.href='academy.html'" style="padding: 8px 16px; background: var(--primary); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+                    <i class="fas fa-graduation-cap"></i> Academy
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="projects-hero">
+            <div class="container">
+                <h1>🎨 <span class="text-gradient">Project Showroom</span></h1>
+                <p>Explore our creative projects and design portfolio</p>
+            </div>
+        </section>
+
+        <div class="container">
+            <!-- Filters -->
+            <div class="filters" id="filterContainer">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="branding">Branding</button>
+                <button class="filter-btn" data-filter="uiux">UI/UX</button>
+                <button class="filter-btn" data-filter="illustration">Illustration</button>
+                <button class="filter-btn" data-filter="print">Print</button>
+                <button class="filter-btn" data-filter="motion">Motion</button>
+                <button class="filter-btn" data-filter="packaging">Packaging</button>
+            </div>
+
+            <!-- Project Grid -->
+            <div class="project-grid" id="projectGrid">
+                <!-- Projects loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <a href="index.html" class="bottom-nav-btn"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="projects.html" class="bottom-nav-btn active"><i class="fas fa-folder-open"></i><span>Projects</span></a>
+            <a href="academy.html" class="bottom-nav-btn"><i class="fas fa-graduation-cap"></i><span>Academy</span></a>
+            <a href="profile.html" class="bottom-nav-btn"><i class="fas fa-user"></i><span>Profile</span></a>
+        </div>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ============================================
+        // PROJECT SHOWROOM
+        // ============================================
+
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let allProjects = [];
+        let currentFilter = 'all';
+
+        // ============================================
+        // TOAST SYSTEM
+        // ============================================
+        function showToast(message, type) {
+            type = type || 'success';
+            const icons = {
+                success: '<i class="fas fa-check-circle"></i>',
+                error: '<i class="fas fa-times-circle"></i>',
+                warning: '<i class="fas fa-exclamation-triangle"></i>',
+                info: '<i class="fas fa-info-circle"></i>'
+            };
+
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `${icons[type] || icons.success} ${message}`;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.add('show'));
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 400);
+            }, 3000);
+        }
+
+        // ============================================
+        // LOAD PROJECTS
+        // ============================================
+        async function loadProjects() {
+            try {
+                const { data, error } = await supabase
+                    .from('projects')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allProjects = data;
+                renderProjects(data);
+
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                showToast('Error loading projects', 'error');
+            }
+        }
+
+        // ============================================
+        // RENDER PROJECTS
+        // ============================================
+        function renderProjects(projects) {
+            const grid = document.getElementById('projectGrid');
+            
+            if (!projects || projects.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: span 3; text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 16px;"></i>
+                        <p>No projects found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = projects.map(project => `
+                <div class="project-card" data-category="${project.category}">
+                    ${project.image_url ? 
+                        `<img src="${project.image_url}" alt="${project.title}" class="image" loading="lazy">` :
+                        `<div style="width: 100%; aspect-ratio: 16/10; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                            <i class="fas fa-image" style="font-size: 2rem;"></i>
+                        </div>`
+                    }
+                    <div class="info">
+                        <span class="category">${project.category || 'Uncategorized'}</span>
+                        <h3>${project.title}</h3>
+                        <p class="desc">${project.description || 'No description available'}</p>
+                        ${project.tags && project.tags.length > 0 ? `
+                            <div class="tags">
+                                ${project.tags.map(tag => `<span>#${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================
+        // FILTER PROJECTS
+        // ============================================
+        function filterProjects(category) {
+            currentFilter = category;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === category);
+            });
+
+            if (category === 'all') {
+                renderProjects(allProjects);
+            } else {
+                const filtered = allProjects.filter(p => 
+                    p.category && p.category.toLowerCase() === category.toLowerCase()
+                );
+                renderProjects(filtered);
+            }
+        }
+
+        // ============================================
+        // FILTER BUTTON EVENTS
+        // ============================================
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterProjects(this.dataset.filter);
+            });
+        });
+
+        // ============================================
+        // INITIALIZE
+        // ============================================
+        loadProjects();
+    </script>
+</body>
+</html>
