@@ -9,7 +9,7 @@
     <style>
         /* ===== AUTH PAGE STYLES ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
@@ -243,10 +243,72 @@
             color: var(--primary);
             text-decoration: none;
             font-weight: 600;
+            cursor: pointer;
         }
 
         .auth-footer a:hover {
             text-decoration: underline;
+        }
+
+        /* Payment Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 420px;
+            width: 100%;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 16px;
+        }
+
+        .payment-details {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .payment-details p {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .payment-details strong {
+            color: var(--primary);
+        }
+
+        .payment-note {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
         }
 
         /* Toast */
@@ -292,17 +354,43 @@
             }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
 
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal">
+            <h3><i class="fas fa-credit-card" style="color: var(--primary);"></i> Complete Your Payment</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">Your premium account is created! Complete payment to activate all features.</p>
+
+            <div class="payment-details">
+                <p><strong>Amount:</strong> ₦13,500</p>
+                <p><strong>Bank:</strong> Moniepoint</p>
+                <p><strong>Account Name:</strong> Mustapha Iman Oniyangi</p>
+                <p><strong>Account Number:</strong> 8028741731</p>
+                <div class="payment-note">
+                    After payment, click the button below to send your payment screenshot via WhatsApp for verification.
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="completePayment()" style="margin-top: 16px;">
+                <i class="fab fa-whatsapp"></i> Send Payment Proof via WhatsApp
+            </button>
+            <button class="btn-google" onclick="closePaymentModal()" style="margin-top: 12px;">
+                I'll Pay Later
+            </button>
+        </div>
+    </div>
+
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
                 <div class="auth-logo">
-                    <img src="IMG-20260403-WA0021(1).jpg" alt="Aurex Designs">
+                    <img src="https://ui-avatars.com/api/?name=Aurex&background=6366f1&color=fff&size=128" alt="Aurex Designs">
                     <span>Aurex Designs</span>
                 </div>
                 <h1>Welcome Back</h1>
@@ -336,7 +424,7 @@
                 </button>
 
                 <div class="auth-footer">
-                    Don't have an account? <a href="#" id="switchToRegister">Sign Up</a>
+                    Don't have an account? <a id="switchToRegister">Sign Up</a>
                 </div>
             </form>
 
@@ -372,7 +460,7 @@
                 </button>
 
                 <div class="auth-footer">
-                    Already have an account? <a href="#" id="switchToLogin">Sign In</a>
+                    Already have an account? <a id="switchToLogin">Sign In</a>
                 </div>
             </form>
         </div>
@@ -381,12 +469,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // ============================================
-        // AUTHENTICATION SYSTEM
+        // SUPABASE CONFIGURATION
         // ============================================
-
+        // TODO: Replace these with your actual Supabase credentials
         const SUPABASE_URL = 'YOUR_SUPABASE_URL';
         const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Initialize Supabase client (fixed naming conflict)
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // DOM Elements
         const loginForm = document.getElementById('loginForm');
@@ -396,36 +487,7 @@
         const googleLoginBtn = document.getElementById('googleLoginBtn');
         const googleRegisterBtn = document.getElementById('googleRegisterBtn');
         const toastContainer = document.getElementById('toastContainer');
-
-        // Tab Switching
-        const tabs = document.querySelectorAll('.auth-tab');
-        const forms = document.querySelectorAll('.auth-form');
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                const target = this.dataset.tab;
-                tabs.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                forms.forEach(f => f.classList.remove('active'));
-                document.getElementById(target + 'Form').classList.add('active');
-            });
-        });
-
-        document.getElementById('switchToRegister').addEventListener('click', (e) => {
-            e.preventDefault();
-            tabs[0].classList.remove('active');
-            tabs[1].classList.add('active');
-            forms.forEach(f => f.classList.remove('active'));
-            document.getElementById('registerForm').classList.add('active');
-        });
-
-        document.getElementById('switchToLogin').addEventListener('click', (e) => {
-            e.preventDefault();
-            tabs[1].classList.remove('active');
-            tabs[0].classList.add('active');
-            forms.forEach(f => f.classList.remove('active'));
-            document.getElementById('loginForm').classList.add('active');
-        });
+        const paymentModal = document.getElementById('paymentModal');
 
         // ============================================
         // TOAST SYSTEM
@@ -455,6 +517,31 @@
         }
 
         // ============================================
+        // TAB SWITCHING
+        // ============================================
+        const tabs = document.querySelectorAll('.auth-tab');
+        const forms = document.querySelectorAll('.auth-form');
+
+        function switchTab(target) {
+            tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === target));
+            forms.forEach(f => f.classList.toggle('active', f.id === target + 'Form'));
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        document.getElementById('switchToRegister').addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab('register');
+        });
+
+        document.getElementById('switchToLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab('login');
+        });
+
+        // ============================================
         // LOADING STATE
         // ============================================
         function setLoading(button, loading) {
@@ -463,13 +550,10 @@
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
             } else {
                 button.disabled = false;
-                const icon = button.querySelector('i');
-                if (icon) {
-                    const text = button.textContent;
-                    button.innerHTML = text.includes('Sign In') ? 
-                        '<i class="fas fa-sign-in-alt"></i> Sign In' :
-                        '<i class="fas fa-user-plus"></i> Create Account';
-                }
+                const isLogin = button.id === 'loginBtn';
+                button.innerHTML = isLogin 
+                    ? '<i class="fas fa-sign-in-alt"></i> Sign In'
+                    : '<i class="fas fa-user-plus"></i> Create Account';
             }
         }
 
@@ -489,7 +573,7 @@
             setLoading(loginBtn, true);
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email,
                     password
                 });
@@ -530,8 +614,8 @@
             setLoading(registerBtn, true);
 
             try {
-                // Sign up user
-                const { data, error } = await supabase.auth.signUp({
+                // Sign up user with Supabase Auth
+                const { data, error } = await supabaseClient.auth.signUp({
                     email,
                     password,
                     options: {
@@ -544,12 +628,29 @@
 
                 if (error) throw error;
 
+                const userId = data.user.id;
+
+                // Create user profile in users table
+                const { error: profileError } = await supabaseClient
+                    .from('users')
+                    .insert({
+                        auth_id: userId,
+                        email: email,
+                        full_name: name,
+                        user_type: userType,
+                        subscription_status: userType === 'premium' ? 'pending' : 'inactive'
+                    });
+
+                if (profileError) {
+                    console.error('Profile creation error:', profileError);
+                }
+
                 // If premium, create subscription payment record
                 if (userType === 'premium') {
-                    const { error: subError } = await supabase
+                    const { error: subError } = await supabaseClient
                         .from('subscription_payments')
                         .insert({
-                            user_id: data.user.id,
+                            user_id: userId,
                             amount: 13500,
                             payment_type: 'new_premium',
                             payment_status: 'pending'
@@ -557,36 +658,21 @@
 
                     if (subError) console.error('Subscription record error:', subError);
 
-                    showToast('Premium account created! Please complete payment to activate.', 'info');
-                    
-                    // Show payment instructions
-                    const paymentInfo = `
-                        <div style="background: var(--bg-secondary); padding: 16px; border-radius: 12px; margin: 16px 0;">
-                            <p><strong>Payment Instructions:</strong></p>
-                            <p>Bank: Moniepoint</p>
-                            <p>Account Name: Mustapha Iman Oniyangi</p>
-                            <p>Account Number: 8028741731</p>
-                            <p>Amount: ₦13,500</p>
-                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
-                                After payment, click "Complete Payment" and upload your screenshot.
-                            </p>
-                            <button onclick="completePayment()" class="btn-primary" style="margin-top: 12px;">
-                                <i class="fas fa-check"></i> Complete Payment
-                            </button>
-                        </div>
-                    `;
+                    setLoading(registerBtn, false);
+                    showToast('Account created! Complete payment to activate premium.', 'info');
 
-                    // Show in modal or toast
-                    showToast('Check your email to verify, then complete payment.', 'info');
+                    // Show payment modal
+                    setTimeout(() => {
+                        paymentModal.classList.add('active');
+                    }, 500);
                 } else {
-                    showToast('Account created successfully! Please check your email to verify.', 'success');
+                    setLoading(registerBtn, false);
+                    showToast('Account created! Please check your email to verify.', 'success');
+
+                    setTimeout(() => {
+                        window.location.href = 'academy.html';
+                    }, 2000);
                 }
-
-                setLoading(registerBtn, false);
-
-                setTimeout(() => {
-                    window.location.href = 'academy.html';
-                }, 2000);
 
             } catch (error) {
                 showToast(error.message || 'Registration failed. Please try again.', 'error');
@@ -599,7 +685,7 @@
         // ============================================
         async function handleGoogleAuth() {
             try {
-                const { data, error } = await supabase.auth.signInWithOAuth({
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
                         redirectTo: window.location.origin + '/academy.html'
@@ -620,7 +706,7 @@
         // ============================================
         window.completePayment = function() {
             const message = encodeURIComponent(
-                'Payment Completed!\n\n' +
+                'Payment Completed! ✅\n\n' +
                 'Account Name: Mustapha Iman Oniyangi\n' +
                 'Account Number: 8028741731\n' +
                 'Bank: Moniepoint\n' +
@@ -632,13 +718,23 @@
             showToast('Redirecting to WhatsApp...', 'info');
         };
 
+        window.closePaymentModal = function() {
+            paymentModal.classList.remove('active');
+            window.location.href = 'academy.html';
+        };
+
         // ============================================
-        // CHECK AUTH STATUS
+        // CHECK AUTH STATUS (redirect if already logged in)
         // ============================================
         async function checkAuthStatus() {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            if (session) {
-                window.location.href = 'academy.html';
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) throw error;
+                if (session) {
+                    window.location.href = 'academy.html';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
             }
         }
 
