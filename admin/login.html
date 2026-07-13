@@ -1,117 +1,380 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aurex Admin | Login</title>
-<meta name="theme-color" content="#6366f1">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<style>
-:root{--primary:#6366f1;--primary-dark:#4f46e5;--secondary:#ec4899;--accent:#06b6d4;--success:#10b981;--error:#ef4444;--bg-primary:#0f0f1a;--bg-secondary:#1a1a2e;--bg-card:#16162a;--text-primary:#f8fafc;--text-secondary:#94a3b8;--text-muted:#64748b;--border:rgba(255,255,255,0.08);--radius-lg:24px;--font-heading:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at top,rgba(99,102,241,0.15),transparent 60%),radial-gradient(ellipse at bottom right,rgba(236,72,153,0.1),transparent 50%)}
-.login-container{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);max-width:420px;width:100%;padding:48px;position:relative;overflow:hidden}
-.login-container::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent))}
-.login-logo{text-align:center;margin-bottom:32px}
-.login-logo img{width:64px;height:64px;border-radius:16px;object-fit:cover;border:2px solid var(--primary);margin-bottom:16px}
-.login-logo h2{font-family:var(--font-heading);font-size:1.5rem;margin-bottom:4px}
-.login-logo p{color:var(--text-secondary);font-size:0.9rem}
-.form-group{margin-bottom:20px}
-.form-label{display:block;margin-bottom:6px;font-weight:500;font-size:0.85rem}
-.form-control{width:100%;padding:12px 16px;background:var(--bg-secondary);border:2px solid var(--border);border-radius:16px;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;transition:0.2s}
-.form-control:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(99,102,241,0.1)}
-.form-control::placeholder{color:var(--text-muted)}
-.btn-primary{width:100%;padding:14px 32px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;font-family:var(--font-heading);font-weight:600;font-size:0.95rem;border:none;border-radius:50px;cursor:pointer;transition:0.3s}
-.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(99,102,241,0.4)}
-.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
-.error-msg{color:var(--error);font-size:0.85rem;margin-top:8px;text-align:center;display:none}
-.back-link{display:block;text-align:center;margin-top:20px;color:var(--text-secondary);text-decoration:none;font-size:0.9rem;transition:0.2s}
-.back-link:hover{color:var(--primary)}
-</style>
-<base target="_blank">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - Aurex Designs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s ease;
+            color: white;
+        }
+        .input-field:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+            outline: none;
+        }
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error-message {
+            animation: shake 0.5s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-<div class="login-container">
-<div class="login-logo">
-<img src="https://aurex-design.vercel.app/IMG-20260403-WA0021(1).jpg" alt="Aurex Designs">
-<h2>Admin Portal</h2>
-<p>Aurex Designs Management</p>
-</div>
-<form id="adminLoginForm">
-<div class="form-group">
-<label class="form-label"><i class="fas fa-envelope" style="margin-right:6px;"></i>Admin Email</label>
-<input type="email" class="form-control" id="adminEmail" placeholder="admin@aurex.com" required>
-</div>
-<div class="form-group">
-<label class="form-label"><i class="fas fa-lock" style="margin-right:6px;"></i>Password</label>
-<input type="password" class="form-control" id="adminPassword" placeholder="Enter admin password" required>
-</div>
-<button type="submit" class="btn-primary" id="loginBtn"><i class="fas fa-shield-alt" style="margin-right:8px;"></i>Access Admin Panel</button>
-<div class="error-msg" id="errorMsg"><i class="fas fa-exclamation-circle"></i> Invalid credentials</div>
-</form>
-<a href="../index.html" class="back-link"><i class="fas fa-arrow-left" style="margin-right:6px;"></i>Back to Website</a>
-</div>
 
-<script>
-(function(){
-'use strict';
-const SUPABASE_URL='https://alkiqshnscudgqymtwli.supabase.co';
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
-let supabase=null;
-try{if(window.supabase&&SUPABASE_URL!=='YOUR_SUPABASE_URL'){supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);}}catch(e){}
-const ADMIN_EMAILS=['admin@aurex.com','mustapha@aurex.com','aurexdesigns5@gmail.com'];
-document.getElementById('adminLoginForm').addEventListener('submit',function(e){
-e.preventDefault();
-var email=document.getElementById('adminEmail').value;
-var password=document.getElementById('adminPassword').value;
-var btn=document.getElementById('loginBtn');
-var errorMsg=document.getElementById('errorMsg');
-btn.disabled=true;
-btn.innerHTML='<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Authenticating...';
-if(!ADMIN_EMAILS.includes(email.toLowerCase())){
-errorMsg.textContent='Unauthorized email address';
-errorMsg.style.display='block';
-btn.disabled=false;
-btn.innerHTML='<i class="fas fa-shield-alt" style="margin-right:8px;"></i>Access Admin Panel';
-return;
-}
-if(supabase){
-supabase.auth.signInWithPassword({email:email,password:password}).then(function(result){
-if(result.error){
-errorMsg.textContent=result.error.message;
-errorMsg.style.display='block';
-btn.disabled=false;
-btn.innerHTML='<i class="fas fa-shield-alt" style="margin-right:8px;"></i>Access Admin Panel';
-return;
-}
-localStorage.setItem('aurex_admin',JSON.stringify(result.data.user));
-window.location.href='dashboard.html';
-}).catch(function(){
-if(password.length<6){
-errorMsg.textContent='Invalid password';
-errorMsg.style.display='block';
-btn.disabled=false;
-btn.innerHTML='<i class="fas fa-shield-alt" style="margin-right:8px;"></i>Access Admin Panel';
-return;
-}
-localStorage.setItem('aurex_admin',JSON.stringify({id:'admin-'+Date.now(),email:email}));
-window.location.href='dashboard.html';
-});
-}else{
-if(password.length<6){
-errorMsg.textContent='Invalid password';
-errorMsg.style.display='block';
-btn.disabled=false;
-btn.innerHTML='<i class="fas fa-shield-alt" style="margin-right:8px;"></i>Access Admin Panel';
-return;
-}
-localStorage.setItem('aurex_admin',JSON.stringify({id:'admin-demo',email:email}));
-setTimeout(function(){window.location.href='dashboard.html';},1000);
-}
-});
-})();
-</script>
+    <div class="w-full max-w-md px-4">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <div class="inline-block p-3 rounded-2xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 backdrop-blur-sm border border-purple-500/20 mb-4">
+                <i class="fas fa-crown text-4xl text-purple-400"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-white">Admin Panel</h1>
+            <p class="text-gray-400 mt-2">Sign in to manage Aurex Designs</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="glass rounded-2xl p-8 shadow-2xl">
+            <!-- Email Login Form -->
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-envelope mr-2"></i>Email Address
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-400"
+                        placeholder="admin@aurexdesigns.com"
+                        required
+                        value="Supremealpha04@gmail.com"
+                    />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-lock mr-2"></i>Password
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-400"
+                        placeholder="••••••••"
+                        required
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    id="loginBtn"
+                    class="btn-primary w-full py-3 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-3"
+                >
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Sign In</span>
+                </button>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="hidden bg-red-500/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm error-message">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span id="errorText">Invalid credentials</span>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-700/50"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-4 bg-transparent text-gray-500">or continue with</span>
+                </div>
+            </div>
+
+            <!-- Google Login -->
+            <button
+                id="googleBtn"
+                class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-all duration-300 flex items-center justify-center gap-3 border border-white/10"
+            >
+                <i class="fab fa-google text-xl text-red-400"></i>
+                <span>Sign in with Google</span>
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-6 text-gray-500 text-sm">
+            <p>Protected by <span class="text-purple-400">Aurex Designs</span> v2.0</p>
+            <p class="mt-1 text-xs text-gray-600">Authorized admins only</p>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SUPABASE CONFIGURATION
+        // Replace these with your actual Supabase credentials
+        // ============================================
+        const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================
+        // ADMIN EMAILS (hardcoded for extra security)
+        // ============================================
+        const ADMIN_EMAILS = [
+            'supremealpha04@gmail.com',
+            'aurexdesigns5@gmail.com'
+        ];
+
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const googleBtn = document.getElementById('googleBtn');
+
+        // Helper to show errors
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            setTimeout(() => {
+                errorMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Helper to hide errors
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+
+        // Set loading state
+        function setLoading(loading) {
+            if (loading) {
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<span class="spinner"></span> Signing in...';
+            } else {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Sign In</span>';
+            }
+        }
+
+        // Check if user is admin
+        async function checkAdminStatus(userId) {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('user_type, email')
+                    .eq('auth_id', userId)
+                    .single();
+
+                if (error) {
+                    // If user doesn't exist in users table yet, check if email is in admin list
+                    const { data: authData } = await supabase.auth.getUser();
+                    if (authData?.user?.email) {
+                        const email = authData.user.email.toLowerCase();
+                        if (ADMIN_EMAILS.includes(email)) {
+                            return { isAdmin: true, user: { user_type: 'admin', email: email } };
+                        }
+                    }
+                    throw error;
+                }
+
+                // Check if user type is admin OR if email is in admin list
+                if (data.user_type === 'admin' || ADMIN_EMAILS.includes(data.email?.toLowerCase())) {
+                    return { isAdmin: true, user: data };
+                }
+
+                return { isAdmin: false, user: data };
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                // Check if the email is in the admin list as a fallback
+                try {
+                    const { data: authData } = await supabase.auth.getUser();
+                    if (authData?.user?.email) {
+                        const email = authData.user.email.toLowerCase();
+                        if (ADMIN_EMAILS.includes(email)) {
+                            return { isAdmin: true, user: { user_type: 'admin', email: email } };
+                        }
+                    }
+                } catch (e) {
+                    console.error('Fallback check failed:', e);
+                }
+                return { isAdmin: false, user: null, error: error.message };
+            }
+        }
+
+        // Handle successful login
+        async function handleLoginSuccess(user) {
+            // Check if user is admin
+            const { isAdmin, user: userData, error } = await checkAdminStatus(user.id);
+
+            if (error) {
+                showError('Error verifying admin status. Please try again.');
+                setLoading(false);
+                return;
+            }
+
+            if (!isAdmin) {
+                // Sign out if not admin
+                await supabase.auth.signOut();
+                showError('Access denied. This panel is for administrators only.');
+                setLoading(false);
+                return;
+            }
+
+            // Success! Store user data and redirect
+            localStorage.setItem('admin_user', JSON.stringify({
+                id: user.id,
+                email: user.email,
+                user_type: userData?.user_type || 'admin'
+            }));
+
+            // Redirect to admin dashboard
+            window.location.href = 'dashboard.html';
+        }
+
+        // Handle login error
+        function handleLoginError(error) {
+            console.error('Login error:', error);
+            let message = 'Invalid email or password.';
+            if (error.message) {
+                message = error.message;
+            }
+            showError(message);
+            setLoading(false);
+        }
+
+        // Email/Password Login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+            setLoading(true);
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!email || !password) {
+                showError('Please enter both email and password.');
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                if (data.user) {
+                    await handleLoginSuccess(data.user);
+                } else {
+                    throw new Error('No user data returned');
+                }
+            } catch (error) {
+                handleLoginError(error);
+            }
+        });
+
+        // Google Login
+        googleBtn.addEventListener('click', async () => {
+            hideError();
+            setLoading(true);
+
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + '/admin/dashboard.html'
+                    }
+                });
+
+                if (error) throw error;
+
+                // The redirect will happen automatically
+                // But we'll handle the callback on the dashboard page
+
+            } catch (error) {
+                console.error('Google login error:', error);
+                showError('Failed to sign in with Google. Please try again.');
+                setLoading(false);
+            }
+        });
+
+        // Check if already logged in
+        async function checkExistingSession() {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) throw error;
+
+                if (session?.user) {
+                    // Check if user is admin
+                    const { isAdmin } = await checkAdminStatus(session.user.id);
+                    if (isAdmin) {
+                        // Redirect to dashboard
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        // Not admin, sign out
+                        await supabase.auth.signOut();
+                    }
+                }
+            } catch (error) {
+                console.error('Session check error:', error);
+            }
+        }
+
+        // Run session check on page load
+        checkExistingSession();
+    </script>
 </body>
 </html>
