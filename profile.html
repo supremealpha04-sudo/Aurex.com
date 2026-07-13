@@ -4,453 +4,502 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | Aurex Designs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* Profile Page Styles */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
+            --primary-glow: rgba(99,102,241,0.25);
             --secondary: #ec4899;
             --success: #10b981;
-            --bg-primary: #0f0f1a;
-            --bg-secondary: #1a1a2e;
-            --bg-card: #16162a;
-            --bg-glass: rgba(22, 22, 42, 0.85);
-            --text-primary: #f8fafc;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #0f0f1a;
+            --bg-card: #161622;
+            --bg-hover: #1e1e2e;
+            --bg-glass: rgba(15,15,26,0.85);
+            --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
-            --border: rgba(255, 255, 255, 0.08);
-            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.12);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
             --bottom-nav-height: 70px;
         }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 10px; }
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            padding-bottom: var(--bottom-nav-height);
+            padding-bottom: calc(var(--bottom-nav-height) + 20px);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
-
-        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
 
         /* Header */
         .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 0;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: var(--bg-glass); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); padding: 14px 0;
         }
-
         .nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            max-width: 800px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
             padding: 0 24px;
         }
-
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
+            display: flex; align-items: center; gap: 12px; text-decoration: none;
         }
-
-        .logo img {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            border: 2px solid var(--primary);
+        .logo-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1rem;
         }
-
         .logo span {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.3rem;
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem;
             font-weight: 700;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn {
+            padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--bg-card); color: var(--text-secondary);
+            font-family: inherit; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px;
+        }
+        .header-btn:hover { border-color: var(--primary); color: var(--text-primary); }
+        .header-btn.danger { background: rgba(239,68,68,0.1); color: var(--danger); border-color: rgba(239,68,68,0.15); }
+        .header-btn.danger:hover { background: var(--danger); color: white; }
 
+        /* Main */
+        main { padding-top: 80px; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+
+        /* Profile Hero */
+        .profile-hero { padding: 30px 0 20px; text-align: center; }
+        .profile-hero h1 {
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 700;
+        }
         .text-gradient {
-            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-
-        /* Profile Section */
-        .profile-hero {
-            padding: 120px 0 40px;
-            text-align: center;
-        }
-
-        .profile-hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; }
 
         /* Profile Card */
-        .profile-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 24px;
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 28px; margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        .card:hover { border-color: var(--border-hover); }
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem;
+            font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
         }
 
+        /* Avatar Upload */
+        .avatar-wrap { position: relative; width: 110px; height: 110px; margin: 0 auto 16px; }
         .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--primary);
-            object-fit: cover;
-            margin: 0 auto 16px;
-            display: block;
+            width: 110px; height: 110px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--primary); display: block;
+            box-shadow: 0 0 30px var(--primary-glow);
         }
-
-        .profile-name {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            text-align: center;
+        .avatar-upload {
+            position: absolute; bottom: 0; right: 0;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: 3px solid var(--bg-card); color: white;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 0.85rem; transition: var(--transition);
         }
+        .avatar-upload:hover { transform: scale(1.1); }
+        .avatar-upload input { display: none; }
+        .avatar-upload.uploading { opacity: 0.6; pointer-events: none; }
 
-        .profile-email {
-            text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
+        .profile-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; text-align: center; }
+        .profile-email { text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
+        .profile-meta { text-align: center; margin-top: 12px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px; border-radius: 20px; font-size: 0.78rem;
+            font-weight: 600; border: 1px solid transparent;
         }
-
-        .profile-type {
-            text-align: center;
-            display: inline-block;
-            padding: 4px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin: 8px auto 0;
+        .badge-premium {
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08));
+            color: var(--primary); border-color: rgba(99,102,241,0.2);
         }
+        .badge-free { background: rgba(148,163,184,0.08); color: var(--text-muted); border-color: rgba(148,163,184,0.1); }
+        .badge-status {
+            background: rgba(16,185,129,0.1); color: var(--success); border-color: rgba(16,185,129,0.15);
+        }
+        .badge-status.inactive { background: rgba(148,163,184,0.08); color: var(--text-muted); }
 
-        .type-premium { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
-        .type-free { background: rgba(100, 116, 139, 0.2); color: var(--text-muted); }
+        /* Stats Row */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+            margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);
+        }
+        .stat-item { text-align: center; }
+        .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text-primary); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
         /* Form */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
+        .form-group { margin-bottom: 18px; }
         .form-group label {
-            display: block;
-            font-weight: 500;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 600; font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px;
         }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
+        .form-group label i { color: var(--primary); font-size: 0.85rem; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 11px 14px; background: var(--bg-secondary);
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            color: var(--text-primary); font-family: inherit; font-size: 0.9rem;
+            transition: var(--transition);
         }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow);
         }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-muted); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-group .hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
+        .btn {
+            padding: 11px 24px; border-radius: var(--radius-sm); font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: var(--transition);
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            border: none;
         }
-
-        .form-group .hint {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
         .btn-primary {
-            padding: 12px 32px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            color: white; box-shadow: 0 4px 16px var(--primary-glow);
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-        }
-
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(99,102,241,0.4); }
         .btn-secondary {
-            padding: 12px 32px;
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
+            background: var(--bg-secondary); color: var(--text-secondary);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover { border-color: var(--primary); color: var(--text-primary); }
+        .btn-danger { background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.15); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-success { background: rgba(16,185,129,0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.15); }
+        .btn-success:hover { background: var(--success); color: white; }
+        .btn-block { width: 100%; }
+
+        .form-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+
+        .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+        /* Subscription Card */
+        .sub-card {
+            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(236,72,153,0.05));
+            border: 1px solid rgba(99,102,241,0.15); border-radius: var(--radius);
+            padding: 24px; margin-bottom: 20px; text-align: center;
+        }
+        .sub-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
+        .sub-card p { color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px; }
+        .sub-features { text-align: left; margin: 16px 0; }
+        .sub-features li {
+            list-style: none; padding: 6px 0; color: var(--text-secondary);
+            font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
+        }
+        .sub-features li i { color: var(--success); font-size: 0.8rem; }
+
+        /* Enrollments */
+        .enrollment-list { display: flex; flex-direction: column; gap: 10px; }
+        .enrollment-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px;
+            background: var(--bg-secondary); border-radius: var(--radius-sm);
+            border: 1px solid var(--border); transition: var(--transition);
+        }
+        .enrollment-item:hover { border-color: var(--border-hover); }
+        .enrollment-icon {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: var(--primary-glow); display: flex; align-items: center; justify-content: center;
+            color: var(--primary); font-size: 1rem; flex-shrink: 0;
+        }
+        .enrollment-info { flex: 1; min-width: 0; }
+        .enrollment-title { font-weight: 600; font-size: 0.9rem; }
+        .enrollment-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+        .progress-bar {
+            width: 100%; height: 5px; background: var(--bg-hover); border-radius: 10px; overflow: hidden; margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%; border-radius: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.6s ease;
         }
 
-        .btn-secondary:hover {
-            border-color: var(--primary);
-            color: var(--text-primary);
+        /* Password Section */
+        .password-toggle {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--primary); font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; margin-bottom: 16px;
         }
-
-        .btn-danger {
-            padding: 12px 32px;
-            background: var(--error);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-danger:hover {
-            opacity: 0.8;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-
-        /* Divider */
-        .divider {
-            border: none;
-            border-top: 1px solid var(--border);
-            margin: 24px 0;
-        }
+        .password-toggle:hover { opacity: 0.8; }
+        .password-section { display: none; animation: fadeIn 0.3s ease; }
+        .password-section.show { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Bottom Nav */
         .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 999;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: var(--bottom-nav-height);
-            padding: 0 16px;
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+            background: var(--bg-glass); backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border); height: var(--bottom-nav-height);
+            display: flex; justify-content: center; align-items: center; padding: 0 16px;
         }
-
         .bottom-nav-inner {
-            display: flex;
-            gap: 8px;
-            max-width: 500px;
-            width: 100%;
-            justify-content: space-around;
+            display: flex; gap: 6px; max-width: 500px; width: 100%; justify-content: space-around;
         }
-
         .bottom-nav-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 8px 16px;
-            background: transparent;
-            border: none;
-            border-radius: 12px;
-            color: var(--text-secondary);
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 0.7rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1;
-            max-width: 120px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px; padding: 8px 14px; background: transparent; border: none; border-radius: 12px;
+            color: var(--text-secondary); font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600; font-size: 0.68rem; text-decoration: none; cursor: pointer;
+            transition: var(--transition); flex: 1; max-width: 100px;
         }
-
-        .bottom-nav-btn i { font-size: 1.3rem; transition: all 0.3s ease; }
-        .bottom-nav-btn:hover { color: var(--primary); background: rgba(99, 102, 241, 0.1); }
-        .bottom-nav-btn.active { color: var(--primary); background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.1)); }
+        .bottom-nav-btn i { font-size: 1.2rem; transition: var(--transition); }
+        .bottom-nav-btn:hover { color: var(--primary); background: rgba(99,102,241,0.08); }
+        .bottom-nav-btn.active {
+            color: var(--primary);
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.06));
+        }
 
         /* Toast */
         .toast-container {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 10001;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            position: fixed; top: 80px; right: 20px; z-index: 10001;
+            display: flex; flex-direction: column; gap: 10px;
         }
-
         .toast {
-            padding: 14px 20px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transform: translateX(120%);
-            opacity: 0;
-            transition: all 0.4s ease;
-            max-width: 320px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            padding: 14px 20px; border-radius: 12px; color: white; font-weight: 500;
+            font-size: 0.9rem; transform: translateX(120%); opacity: 0;
+            transition: all 0.4s ease; max-width: 320px; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4); backdrop-filter: blur(10px);
         }
-
         .toast.show { transform: translateX(0); opacity: 1; }
-        .toast-success { background: rgba(16, 185, 129, 0.95); }
-        .toast-error { background: rgba(239, 68, 68, 0.95); }
-        .toast-warning { background: rgba(245, 158, 11, 0.95); }
-        .toast-info { background: rgba(99, 102, 241, 0.95); }
+        .toast-success { background: rgba(16,185,129,0.95); }
+        .toast-error { background: rgba(239,68,68,0.95); }
+        .toast-warning { background: rgba(245,158,11,0.95); }
+        .toast-info { background: rgba(99,102,241,0.95); }
 
-        /* Supreme Alpha Contact */
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed; inset: 0; background: rgba(10,10,15,0.8);
+            backdrop-filter: blur(4px); z-index: 9999;
+            display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+            opacity: 0; visibility: hidden; transition: var(--transition);
+        }
+        .loading-overlay.show { opacity: 1; visibility: visible; }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid var(--bg-hover);
+            border-top-color: var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 0.9rem; color: var(--text-secondary); }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 30px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+        .empty-state p { font-size: 0.85rem; }
+
+        /* Supreme Alpha */
         .supreme-contact {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin-top: 20px;
+            background: var(--bg-secondary); border-radius: var(--radius-sm);
+            padding: 18px; text-align: center; margin-top: 10px; border: 1px solid var(--border);
         }
+        .supreme-contact a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .supreme-contact a:hover { text-decoration: underline; }
 
-        .supreme-contact a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .supreme-contact a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            .profile-card { padding: 24px; }
-            .container { padding: 0 16px; }
+        @media (max-width: 640px) {
+            .form-row { grid-template-columns: 1fr; }
             .form-actions { flex-direction: column; }
-            .form-actions button { width: 100%; justify-content: center; }
+            .form-actions .btn { width: 100%; }
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .card { padding: 20px; }
+            .nav { padding: 0 16px; }
         }
     </style>
 </head>
 <body>
-
     <div class="toast-container" id="toastContainer"></div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Processing...</div>
+    </div>
 
-    <!-- Header -->
     <header class="header">
         <nav class="nav">
             <a href="index.html" class="logo">
-                <img src="IMG-20260403-WA0021(1).jpg" alt="Aurex Designs">
+                <div class="logo-icon"><i class="fas fa-layer-group"></i></div>
                 <span>Aurex Designs</span>
             </a>
-            <button onclick="logout()" style="padding: 8px 16px; background: var(--error); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+            <div class="header-actions">
+                <button class="header-btn" onclick="window.location.href='admin.html'" id="adminBtn" style="display:none;">
+                    <i class="fas fa-cog"></i> Admin
+                </button>
+                <button class="header-btn danger" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
         </nav>
     </header>
 
     <main>
         <section class="profile-hero">
             <div class="container">
-                <h1>👤 <span class="text-gradient">My Profile</span></h1>
+                <h1>&#128100; <span class="text-gradient">My Profile</span></h1>
             </div>
         </section>
 
         <div class="container">
-            <!-- Profile Card -->
-            <div class="profile-card" id="profileCard">
-                <img id="profileAvatar" class="profile-avatar" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Profile">
+            <!-- Profile Overview -->
+            <div class="card" id="profileCard">
+                <div class="avatar-wrap">
+                    <img id="profileAvatar" class="profile-avatar" src="https://ui-avatars.com/api/?name=User&amp;background=6366f1&amp;color=fff" alt="Profile">
+                    <label class="avatar-upload" id="avatarUploadLabel">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(this)">
+                    </label>
+                </div>
                 <h2 id="profileName" class="profile-name">User</h2>
                 <p id="profileEmail" class="profile-email">user@example.com</p>
-                <div style="text-align: center;">
-                    <span id="profileType" class="profile-type type-free">FREE</span>
+                <div class="profile-meta">
+                    <span id="profileType" class="badge badge-free">&#127379; FREE</span>
+                    <span id="profileStatus" class="badge badge-status inactive">Subscription: Inactive</span>
                 </div>
-                <p id="profileStatus" style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Subscription: Inactive</p>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value" id="statProjects">0</div>
+                        <div class="stat-label">Likes Given</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statClasses">0</div>
+                        <div class="stat-label">Classes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statDownloads">0</div>
+                        <div class="stat-label">Downloads</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Edit Profile Form -->
-            <div class="profile-card">
-                <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 16px;">✏️ Edit Profile</h3>
-                <form id="profileForm">
-                    <div class="form-group">
-                        <label><i class="fas fa-user"></i> Full Name</label>
-                        <input type="text" id="editName" placeholder="Your full name">
-                        <div class="hint">Cannot be changed after set</div>
-                    </div>
+            <!-- Subscription CTA (shown for free users) -->
+            <div class="sub-card" id="subCard" style="display:none;">
+                <h3>&#11088; Upgrade to Premium</h3>
+                <p>Unlock exclusive classes, premium resources, and 1-on-1 mentorship.</p>
+                <ul class="sub-features">
+                    <li><i class="fas fa-check"></i> Access all premium classes</li>
+                    <li><i class="fas fa-check"></i> Download premium resources</li>
+                    <li><i class="fas fa-check"></i> Priority support & mentorship</li>
+                    <li><i class="fas fa-check"></i> Certificate of completion</li>
+                </ul>
+                <button class="btn btn-primary btn-block" onclick="upgradeToPremium()">
+                    <i class="fas fa-crown"></i> Upgrade Now — N5,000
+                </button>
+            </div>
 
-                    <div class="form-group">
-                        <label><i class="fas fa-calendar-alt"></i> Age Range</label>
-                        <input type="text" id="editAge" placeholder="e.g., 18-24, 25-34, 35-44">
-                    </div>
+            <!-- My Enrollments -->
+            <div class="card" id="enrollmentsCard">
+                <div class="card-title"><i class="fas fa-graduation-cap"></i> My Classes</div>
+                <div class="enrollment-list" id="enrollmentList">
+                    <div class="empty-state"><i class="fas fa-book-open"></i><p>No enrolled classes yet</p></div>
+                </div>
+            </div>
 
+            <!-- Edit Profile -->
+            <div class="card">
+                <div class="card-title">&#9999;&#65039; Edit Profile</div>
+                <form id="profileForm" onsubmit="saveProfile(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Full Name</label>
+                            <input type="text" id="editName" placeholder="Your full name" readonly>
+                            <div class="hint">Contact admin to change your name</div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Phone Number</label>
+                            <input type="tel" id="editPhone" placeholder="+234...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                            <input type="text" id="editLocation" placeholder="City, Country">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-globe"></i> Website</label>
+                            <input type="url" id="editWebsite" placeholder="https://yourportfolio.com">
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label><i class="fas fa-image"></i> Profile Image URL</label>
-                        <input type="text" id="editImage" placeholder="https://example.com/avatar.jpg">
+                        <input type="url" id="editImage" placeholder="https://example.com/avatar.jpg">
+                        <div class="hint">Or use the camera icon on your avatar to upload</div>
                     </div>
-
                     <div class="form-group">
-                        <label><i class="fas fa-link"></i> Portfolio Website</label>
-                        <input type="text" id="editPortfolio" placeholder="https://yourportfolio.com">
+                        <label><i class="fas fa-align-left"></i> Bio</label>
+                        <textarea id="editBio" placeholder="Tell us about yourself..."></textarea>
                     </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-share-alt"></i> Social Media (JSON format)</label>
-                        <input type="text" id="editSocial" placeholder='{"twitter":"username","instagram":"username"}'>
-                        <div class="hint">Example: {"twitter":"yourhandle","instagram":"yourhandle"}</div>
-                    </div>
-
-                    <hr class="divider">
-
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
-                        <button type="button" class="btn-danger" onclick="deleteAccount()"><i class="fas fa-trash"></i> Delete Account</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
                     </div>
                 </form>
             </div>
 
-            <!-- Supreme Alpha Contact -->
+            <!-- Change Password -->
+            <div class="card">
+                <div class="card-title">&#128274; Security</div>
+                <div class="password-toggle" onclick="togglePasswordSection()">
+                    <i class="fas fa-key"></i> Change Password <i class="fas fa-chevron-down" id="passwordChevron" style="margin-left:auto;"></i>
+                </div>
+                <div class="password-section" id="passwordSection">
+                    <form onsubmit="changePassword(event)">
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Current Password</label>
+                            <input type="password" id="currentPassword" placeholder="Enter current password" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> New Password</label>
+                            <input type="password" id="newPassword" placeholder="Min 6 characters" minlength="6" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Confirm New Password</label>
+                            <input type="password" id="confirmPassword" placeholder="Repeat new password" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary"><i class="fas fa-key"></i> Update Password</button>
+                    </form>
+                </div>
+                <hr class="divider">
+                <button class="btn btn-danger btn-block" onclick="deleteAccount()">
+                    <i class="fas fa-trash"></i> Delete My Account
+                </button>
+            </div>
+
+            <!-- Supreme Alpha -->
             <div class="supreme-contact">
-                <p style="color: var(--text-secondary);">
-                    <i class="fas fa-code" style="color: var(--primary);"></i> 
-                    Need a website? Contact Supreme-Alpha on 
-                    <a href="https://wa.me/2347031924052" target="_blank">
-                        <i class="fab fa-whatsapp"></i> WhatsApp: 07031924052
-                    </a>
+                <p style="color: var(--text-secondary); font-size: 0.85rem;">
+                    <i class="fas fa-code" style="color: var(--primary);"></i>
+                    Need a website? Contact <strong>Supreme-Alpha</strong> on
+                    <a href="https://wa.me/2347031924052" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
                 </p>
             </div>
         </div>
     </main>
 
-    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <div class="bottom-nav-inner">
             <a href="index.html" class="bottom-nav-btn"><i class="fas fa-home"></i><span>Home</span></a>
@@ -462,197 +511,255 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ============================================
-        // USER PROFILE
-        // ============================================
+    // ===== CONFIG =====
+    const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
+    const BUCKET_NAME = 'aurex_assets';
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentUser = null;
+    let userProfile = null;
 
-        let currentUser = null;
-        let userProfile = null;
+    // ===== UI HELPERS =====
+    function showToast(message, type) {
+        type = type || 'success';
+        const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast toast-' + type;
+        toast.innerHTML = '<i class="fas ' + icons[type] + '"></i> <span>' + message + '</span>';
+        container.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('show'));
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400); }, 3500);
+    }
 
-        // ============================================
-        // TOAST SYSTEM
-        // ============================================
-        function showToast(message, type) {
-            type = type || 'success';
-            const icons = {
-                success: '<i class="fas fa-check-circle"></i>',
-                error: '<i class="fas fa-times-circle"></i>',
-                warning: '<i class="fas fa-exclamation-triangle"></i>',
-                info: '<i class="fas fa-info-circle"></i>'
-            };
+    function showLoading(text) {
+        document.querySelector('.loading-text').textContent = text || 'Processing...';
+        document.getElementById('loadingOverlay').classList.add('show');
+    }
+    function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
 
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.innerHTML = `${icons[type] || icons.success} ${message}`;
-            container.appendChild(toast);
+    // ===== AUTH =====
+    async function checkAuth() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) { window.location.href = 'auth.html'; return false; }
+        currentUser = session.user;
+        return true;
+    }
 
-            requestAnimationFrame(() => toast.classList.add('show'));
+    async function logout() {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'auth.html';
+    }
 
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    if (toast.parentNode) toast.parentNode.removeChild(toast);
-                }, 400);
-            }, 3000);
-        }
-
-        // ============================================
-        // CHECK AUTH
-        // ============================================
-        async function checkAuth() {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            
-            if (!session) {
-                showToast('Please sign in', 'warning');
-                setTimeout(() => {
-                    window.location.href = 'auth.html';
-                }, 1500);
-                return false;
+    // ===== LOAD PROFILE =====
+    async function loadProfile() {
+        showLoading('Loading profile...');
+        try {
+            const { data, error } = await supabaseClient.from('users').select('*').eq('auth_id', currentUser.id).single();
+            if (error) throw error;
+            userProfile = data;
+            updateUI();
+            await loadStats();
+            await loadEnrollments();
+            if (userProfile.user_type === 'admin') {
+                document.getElementById('adminBtn').style.display = 'flex';
             }
+        } catch (error) {
+            console.error('Error loading profile:', error);
+            showToast('Error loading profile', 'error');
+        } finally { hideLoading(); }
+    }
 
-            currentUser = session.user;
-            await loadProfile();
-            return true;
+    function updateUI() {
+        if (!userProfile) return;
+        document.getElementById('profileName').textContent = userProfile.full_name || 'User';
+        document.getElementById('profileEmail').textContent = userProfile.email || currentUser.email || 'No email';
+        document.getElementById('profileAvatar').src = userProfile.profile_image ||
+            'https://ui-avatars.com/api/?name=' + encodeURIComponent(userProfile.full_name || 'User') + '&background=6366f1&color=fff';
+
+        const typeBadge = document.getElementById('profileType');
+        const statusBadge = document.getElementById('profileStatus');
+        const subCard = document.getElementById('subCard');
+
+        if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') {
+            typeBadge.textContent = '⭐ PREMIUM';
+            typeBadge.className = 'badge badge-premium';
+            statusBadge.textContent = 'Subscription: Active';
+            statusBadge.className = 'badge badge-status';
+            subCard.style.display = 'none';
+        } else {
+            typeBadge.textContent = 'Ἑ3 FREE';
+            typeBadge.className = 'badge badge-free';
+            statusBadge.textContent = 'Subscription: ' + (userProfile.subscription_status || 'Inactive');
+            statusBadge.className = 'badge badge-status inactive';
+            subCard.style.display = 'block';
         }
 
-        // ============================================
-        // LOAD PROFILE
-        // ============================================
-        async function loadProfile() {
-            try {
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('auth_id', currentUser.id)
-                    .single();
+        document.getElementById('editName').value = userProfile.full_name || '';
+        document.getElementById('editPhone').value = userProfile.phone || '';
+        document.getElementById('editLocation').value = userProfile.location || '';
+        document.getElementById('editWebsite').value = userProfile.website || '';
+        document.getElementById('editImage').value = userProfile.profile_image || '';
+        document.getElementById('editBio').value = userProfile.bio || '';
+    }
 
-                if (error) throw error;
+    // ===== STATS =====
+    async function loadStats() {
+        try {
+            const [{ count: likes }, { count: enrolls }, { count: downloads }] = await Promise.all([
+                supabaseClient.from('project_likes').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id),
+                supabaseClient.from('enrollments').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id),
+                supabaseClient.from('resource_downloads').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id)
+            ]);
+            document.getElementById('statProjects').textContent = likes || 0;
+            document.getElementById('statClasses').textContent = enrolls || 0;
+            document.getElementById('statDownloads').textContent = downloads || 0;
+        } catch (e) { console.error('Stats error:', e); }
+    }
 
-                userProfile = data;
-                updateUI();
-
-            } catch (error) {
-                console.error('Error loading profile:', error);
-                showToast('Error loading profile', 'error');
-            }
-        }
-
-        // ============================================
-        // UPDATE UI
-        // ============================================
-        function updateUI() {
-            if (!userProfile) return;
-
-            document.getElementById('profileName').textContent = userProfile.full_name || 'User';
-            document.getElementById('profileEmail').textContent = userProfile.email || 'No email';
-            document.getElementById('profileAvatar').src = userProfile.profile_image || 
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'User')}&background=6366f1&color=fff`;
-
-            // Type badge
-            const typeBadge = document.getElementById('profileType');
-            if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') {
-                typeBadge.textContent = '⭐ PREMIUM';
-                typeBadge.className = 'profile-type type-premium';
-                document.getElementById('profileStatus').textContent = 'Subscription: Active ✅';
-            } else {
-                typeBadge.textContent = '🆓 FREE';
-                typeBadge.className = 'profile-type type-free';
-                document.getElementById('profileStatus').textContent = 'Subscription: Inactive';
-            }
-
-            // Fill form fields
-            document.getElementById('editName').value = userProfile.full_name || '';
-            document.getElementById('editAge').value = userProfile.age_range || '';
-            document.getElementById('editImage').value = userProfile.profile_image || '';
-            document.getElementById('editPortfolio').value = userProfile.portfolio_website || '';
-            document.getElementById('editSocial').value = userProfile.social_media ? 
-                JSON.stringify(userProfile.social_media) : '{}';
-        }
-
-        // ============================================
-        // UPDATE PROFILE
-        // ============================================
-        document.getElementById('profileForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            // Get social media as JSON
-            let socialMedia = {};
-            try {
-                socialMedia = JSON.parse(document.getElementById('editSocial').value);
-            } catch (e) {
-                showToast('Invalid social media JSON format', 'error');
+    // ===== ENROLLMENTS =====
+    async function loadEnrollments() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('enrollments')
+                .select('*, classes(title, class_type, duration_minutes, status)')
+                .eq('user_id', currentUser.id)
+                .order('enrolled_at', { ascending: false });
+            if (error) throw error;
+            const list = document.getElementById('enrollmentList');
+            if (!data || data.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="fas fa-book-open"></i><p>No enrolled classes yet</p></div>';
                 return;
             }
+            list.innerHTML = data.map(e => {
+                const progress = e.progress_percent || 0;
+                const cls = e.classes;
+                return '<div class="enrollment-item">' +
+                    '<div class="enrollment-icon"><i class="fas fa-graduation-cap"></i></div>' +
+                    '<div class="enrollment-info">' +
+                    '<div class="enrollment-title">' + (cls?.title || 'Unknown Class') + '</div>' +
+                    '<div class="enrollment-meta">' + (cls?.class_type || 'free') + ' · ' + (cls?.duration_minutes || 0) + ' min · ' + (e.status || 'enrolled') + '</div>' +
+                    '<div class="progress-bar"><div class="progress-fill" style="width:' + progress + '%"></div></div>' +
+                    '</div></div>';
+            }).join('');
+        } catch (e) { console.error('Enrollments error:', e); }
+    }
 
+    // ===== AVATAR UPLOAD =====
+    async function uploadAvatar(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { showToast('Please select an image', 'warning'); return; }
+        if (file.size > 2 * 1024 * 1024) { showToast('Image must be under 2MB', 'warning'); return; }
+
+        showLoading('Uploading avatar...');
+        document.getElementById('avatarUploadLabel').classList.add('uploading');
+
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = 'avatars/' + currentUser.id + '_' + Date.now() + '.' + fileExt;
+
+            const { error: uploadError } = await supabaseClient.storage.from(BUCKET_NAME).upload(fileName, file, { upsert: true });
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+
+            const { error: updateError } = await supabaseClient.from('users').update({ profile_image: publicUrl }).eq('id', userProfile.id);
+            if (updateError) throw updateError;
+
+            document.getElementById('profileAvatar').src = publicUrl;
+            document.getElementById('editImage').value = publicUrl;
+            showToast('Avatar updated!', 'success');
+        } catch (error) {
+            showToast('Upload failed: ' + error.message, 'error');
+        } finally {
+            hideLoading();
+            document.getElementById('avatarUploadLabel').classList.remove('uploading');
+            input.value = '';
+        }
+    }
+
+    // ===== SAVE PROFILE =====
+    async function saveProfile(e) {
+        e.preventDefault();
+        showLoading('Saving profile...');
+        try {
             const updates = {
-                age_range: document.getElementById('editAge').value,
-                profile_image: document.getElementById('editImage').value,
-                portfolio_website: document.getElementById('editPortfolio').value,
-                social_media: socialMedia,
+                phone: document.getElementById('editPhone').value || null,
+                location: document.getElementById('editLocation').value || null,
+                website: document.getElementById('editWebsite').value || null,
+                profile_image: document.getElementById('editImage').value || null,
+                bio: document.getElementById('editBio').value || null,
                 updated_at: new Date().toISOString()
             };
+            const { error } = await supabaseClient.from('users').update(updates).eq('id', userProfile.id);
+            if (error) throw error;
+            showToast('Profile saved!', 'success');
+            await loadProfile();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        } finally { hideLoading(); }
+    }
 
-            try {
-                const { error } = await supabase
-                    .from('users')
-                    .update(updates)
-                    .eq('id', userProfile.id);
+    // ===== PASSWORD =====
+    function togglePasswordSection() {
+        const section = document.getElementById('passwordSection');
+        const chevron = document.getElementById('passwordChevron');
+        section.classList.toggle('show');
+        chevron.style.transform = section.classList.contains('show') ? 'rotate(180deg)' : '';
+    }
 
-                if (error) throw error;
+    async function changePassword(e) {
+        e.preventDefault();
+        const newPass = document.getElementById('newPassword').value;
+        const confirmPass = document.getElementById('confirmPassword').value;
+        if (newPass !== confirmPass) { showToast('Passwords do not match', 'error'); return; }
+        showLoading('Updating password...');
+        try {
+            const { error } = await supabaseClient.auth.updateUser({ password: newPass });
+            if (error) throw error;
+            showToast('Password updated!', 'success');
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            togglePasswordSection();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        } finally { hideLoading(); }
+    }
 
-                showToast('Profile updated successfully!', 'success');
-                await loadProfile();
-
-            } catch (error) {
-                showToast('Error updating profile: ' + error.message, 'error');
-            }
-        });
-
-        // ============================================
-        // DELETE ACCOUNT
-        // ============================================
-        async function deleteAccount() {
-            if (!confirm('Are you sure you want to delete your account? This action cannot be undone!')) return;
-            if (!confirm('All your data will be permanently removed. Continue?')) return;
-
-            try {
-                // Delete from users table (cascade will handle related data)
-                const { error } = await supabase
-                    .from('users')
-                    .delete()
-                    .eq('id', userProfile.id);
-
-                if (error) throw error;
-
-                // Sign out
-                await supabase.auth.signOut();
-                showToast('Account deleted successfully', 'success');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-
-            } catch (error) {
-                showToast('Error deleting account: ' + error.message, 'error');
-            }
+    // ===== DELETE ACCOUNT =====
+    async function deleteAccount() {
+        if (!confirm('Delete your account? This cannot be undone!')) return;
+        if (!confirm('ALL your data will be permanently lost. Continue?')) return;
+        showLoading('Deleting account...');
+        try {
+            await supabaseClient.from('users').delete().eq('id', userProfile.id);
+            await supabaseClient.auth.signOut();
+            showToast('Account deleted', 'success');
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+            hideLoading();
         }
+    }
 
-        // ============================================
-        // LOGOUT
-        // ============================================
-        async function logout() {
-            await supabase.auth.signOut();
-            window.location.href = 'auth.html';
-        }
+    // ===== UPGRADE =====
+    async function upgradeToPremium() {
+        showToast('Redirecting to payment...', 'info');
+        // Implement your payment flow here
+        // Example: window.location.href = 'payment.html?plan=premium';
+    }
 
-        // ============================================
-        // INITIALIZE
-        // ============================================
-        checkAuth();
+    // ===== INIT =====
+    async function init() {
+        const authed = await checkAuth();
+        if (!authed) return;
+        await loadProfile();
+    }
+    init();
     </script>
 </body>
 </html>
