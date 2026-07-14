@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Academy Styles */
+        /* [Previous CSS remains identical - truncated for brevity but included in full output] */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
@@ -40,12 +40,9 @@
             padding: 0 24px;
         }
 
-        /* Header */
         .header {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
             background: var(--bg-glass);
             backdrop-filter: blur(20px);
@@ -115,7 +112,11 @@
             color: var(--text-secondary);
         }
 
-        /* Academy Hero */
+        .badge-admin {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+        }
+
         .academy-hero {
             padding: 120px 0 60px;
             text-align: center;
@@ -163,7 +164,6 @@
             border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
-        /* Academy Tabs */
         .academy-tabs {
             display: flex;
             gap: 8px;
@@ -197,7 +197,6 @@
             color: var(--text-primary);
         }
 
-        /* Content Panels */
         .tab-content {
             display: none;
             padding: 20px 0;
@@ -213,7 +212,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Class Cards */
         .class-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -265,9 +263,7 @@
             margin: 12px 0;
         }
 
-        .class-meta i {
-            margin-right: 4px;
-        }
+        .class-meta i { margin-right: 4px; }
 
         .class-description {
             color: var(--text-secondary);
@@ -304,7 +300,11 @@
             cursor: not-allowed;
         }
 
-        /* Chat Area */
+        .btn-class-admin {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+        }
+
         .chat-area {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -371,10 +371,7 @@
             margin-top: 4px;
         }
 
-        .chat-message.own {
-            flex-direction: row-reverse;
-        }
-
+        .chat-message.own { flex-direction: row-reverse; }
         .chat-message.own .content {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.1));
             border: 1px solid rgba(99, 102, 241, 0.2);
@@ -418,7 +415,22 @@
             box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
-        /* Tools Section */
+        .chat-attachment {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-attachment:hover {
+            background: var(--primary);
+            color: white;
+        }
+
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -446,16 +458,8 @@
             color: var(--primary);
         }
 
-        .tool-card h4 {
-            font-size: 0.95rem;
-            margin-bottom: 4px;
-        }
-
-        .tool-card p {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-bottom: 12px;
-        }
+        .tool-card h4 { font-size: 0.95rem; margin-bottom: 4px; }
+        .tool-card p { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px; }
 
         .btn-tool {
             padding: 6px 16px;
@@ -476,12 +480,9 @@
             border-color: var(--primary);
         }
 
-        /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             z-index: 999;
             background: var(--bg-glass);
             backdrop-filter: blur(20px);
@@ -522,26 +523,16 @@
             max-width: 120px;
         }
 
-        .bottom-nav-btn i {
-            font-size: 1.3rem;
-            transition: all 0.3s ease;
-        }
-
-        .bottom-nav-btn:hover {
-            color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
+        .bottom-nav-btn i { font-size: 1.3rem; transition: all 0.3s ease; }
+        .bottom-nav-btn:hover { color: var(--primary); background: rgba(99, 102, 241, 0.1); }
         .bottom-nav-btn.active {
             color: var(--primary);
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.1));
         }
 
-        /* Toast */
         .toast-container {
             position: fixed;
-            top: 80px;
-            right: 20px;
+            top: 80px; right: 20px;
             z-index: 10001;
             display: flex;
             flex-direction: column;
@@ -564,17 +555,12 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
+        .toast.show { transform: translateX(0); opacity: 1; }
         .toast-success { background: rgba(16, 185, 129, 0.95); }
         .toast-error { background: rgba(239, 68, 68, 0.95); }
         .toast-warning { background: rgba(245, 158, 11, 0.95); }
         .toast-info { background: rgba(99, 102, 241, 0.95); }
 
-        /* Loading Skeleton */
         .skeleton {
             background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
             background-size: 200% 100%;
@@ -587,31 +573,21 @@
             100% { background-position: -200% 0; }
         }
 
-        .skeleton-card {
-            height: 200px;
-            width: 100%;
-        }
+        .skeleton-card { height: 200px; width: 100%; }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-muted);
         }
 
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
+        .empty-state i { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
         .empty-state h4 {
             font-family: 'Space Grotesk', sans-serif;
             margin-bottom: 8px;
             color: var(--text-secondary);
         }
 
-        /* Upgrade Modal */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -624,9 +600,7 @@
             padding: 20px;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal {
             background: var(--bg-card);
@@ -643,15 +617,8 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        .modal h3 {
-            font-family: 'Space Grotesk', sans-serif;
-            margin-bottom: 12px;
-        }
-
-        .modal p {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
+        .modal h3 { font-family: 'Space Grotesk', sans-serif; margin-bottom: 12px; }
+        .modal p { color: var(--text-secondary); margin-bottom: 20px; }
 
         .feature-list {
             list-style: none;
@@ -666,8 +633,155 @@
             gap: 8px;
         }
 
-        .feature-list li i {
-            color: #10b981;
+        .feature-list li i { color: #10b981; }
+
+        /* Upload zone */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 24px;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .upload-zone i { font-size: 2rem; color: var(--primary); margin-bottom: 12px; }
+        .upload-zone h4 { font-family: 'Space Grotesk'; margin-bottom: 8px; }
+        .upload-zone p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .upload-progress {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .upload-progress.active { display: block; }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .file-preview img {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .file-preview .info { flex: 1; }
+        .file-preview .name { font-weight: 600; font-size: 0.9rem; }
+        .file-preview .size { color: var(--text-muted); font-size: 0.8rem; }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-icon:hover { background: var(--primary); color: white; }
+
+        .storage-stats-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            font-size: 0.85rem;
+        }
+
+        .stat-pill i { color: var(--primary); }
+
+        .resource-file-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .resource-file-card:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .resource-file-card .file-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .resource-file-card .info { flex: 1; }
+        .resource-file-card .name { font-weight: 600; margin-bottom: 4px; }
+        .resource-file-card .meta { color: var(--text-muted); font-size: 0.8rem; }
+
+        .admin-panel {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .admin-panel h4 {
+            font-family: 'Space Grotesk';
+            color: #f59e0b;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         @media (max-width: 768px) {
@@ -683,7 +797,7 @@
             .academy-tab { padding: 8px 16px; font-size: 0.8rem; }
         }
     </style>
-<base target="_blank">
+    <base target="_blank">
 </head>
 <body>
 
@@ -704,7 +818,7 @@
             <button class="btn-class btn-class-primary" onclick="redirectToPayment()">
                 <i class="fas fa-rocket"></i> Upgrade Now — ₦13,500
             </button>
-            <button class="btn-google" onclick="closeUpgradeModal()" style="margin-top: 12px; width: 100%;">
+            <button class="btn-class" onclick="closeUpgradeModal()" style="margin-top: 12px; width: 100%; background: var(--bg-secondary); color: var(--text-secondary);">
                 Maybe Later
             </button>
         </div>
@@ -793,6 +907,29 @@
 
             <!-- Resources Tab -->
             <div class="tab-content" id="tab-resources">
+                <!-- Admin Upload Panel (hidden by default, shown for admins) -->
+                <div id="adminUploadPanel" class="admin-panel" style="display: none;">
+                    <h4><i class="fas fa-shield-alt"></i> Admin: Upload Resources</h4>
+                    <div class="upload-zone" id="resourceUploadZone" onclick="document.getElementById('resourceFileInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>Drop files here or click to upload</h4>
+                        <p>Supports images, PDFs, ZIPs, and design files</p>
+                        <input type="file" id="resourceFileInput" style="display: none;" multiple onchange="handleResourceUpload(event)">
+                    </div>
+                    <div class="upload-progress" id="uploadProgress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p style="text-align: center; margin-top: 8px; color: var(--text-muted); font-size: 0.85rem;" id="uploadStatus">Uploading...</p>
+                    </div>
+                </div>
+
+                <!-- Storage Stats -->
+                <div class="storage-stats-bar" id="storageStats">
+                    <div class="stat-pill"><i class="fas fa-hdd"></i> <span id="totalFiles">0 files</span></div>
+                    <div class="stat-pill"><i class="fas fa-weight-hanging"></i> <span id="totalSize">0 MB</span></div>
+                </div>
+
                 <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 24px;">📁 Resources</h3>
                 <div id="resourceGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
                     <div class="skeleton skeleton-card"></div>
@@ -803,6 +940,17 @@
 
             <!-- Tools Tab -->
             <div class="tab-content" id="tab-tools">
+                <!-- Admin Upload Panel for Tools -->
+                <div id="adminToolsPanel" class="admin-panel" style="display: none;">
+                    <h4><i class="fas fa-shield-alt"></i> Admin: Manage Tools</h4>
+                    <div class="upload-zone" id="toolUploadZone" onclick="document.getElementById('toolFileInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>Upload tool files</h4>
+                        <p>APKs, executables, or ZIP archives</p>
+                        <input type="file" id="toolFileInput" style="display: none;" onchange="handleToolUpload(event)">
+                    </div>
+                </div>
+
                 <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 8px;">🛠️ Design Tools</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 24px;">Download essential design tools to level up your workflow</p>
                 <div class="tools-grid" id="toolsGrid">
@@ -825,6 +973,10 @@
                         </div>
                     </div>
                     <div class="chat-input">
+                        <div class="chat-attachment" onclick="document.getElementById('chatFileInput').click()" title="Attach file">
+                            <i class="fas fa-paperclip"></i>
+                        </div>
+                        <input type="file" id="chatFileInput" style="display: none;" onchange="handleChatAttachment(event)">
                         <input type="text" id="chatInput" placeholder="Type a message..." maxlength="500">
                         <button id="sendMessageBtn"><i class="fas fa-paper-plane"></i> Send</button>
                     </div>
@@ -848,11 +1000,10 @@
         // ============================================
         // SUPABASE CONFIGURATION
         // ============================================
-        // TODO: Replace these with your actual Supabase credentials
         const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
+        const BUCKET_NAME = 'aurex-assets';
 
-        // Initialize Supabase client (fixed naming conflict)
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -860,6 +1011,14 @@
         let userProfile = null;
         let currentClassId = '00000000-0000-0000-0000-000000000000';
         let chatSubscription = null;
+        let isAdmin = false;
+
+        // ============================================
+        // STORAGE URL HELPER (matches SQL function)
+        // ============================================
+        function getStorageUrl(bucket, filePath) {
+            return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`;
+        }
 
         // ============================================
         // TOAST SYSTEM
@@ -895,26 +1054,19 @@
         async function checkAuth() {
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
-
                 if (error) throw error;
-
                 if (!session) {
                     showToast('Please sign in to access the Academy', 'warning');
-                    setTimeout(() => {
-                        window.location.href = 'auth.html';
-                    }, 1500);
+                    setTimeout(() => { window.location.href = 'auth.html'; }, 1500);
                     return false;
                 }
-
                 currentUser = session.user;
                 await loadUserProfile();
                 return true;
             } catch (error) {
                 console.error('Auth check error:', error);
                 showToast('Authentication error. Please sign in again.', 'error');
-                setTimeout(() => {
-                    window.location.href = 'auth.html';
-                }, 1500);
+                setTimeout(() => { window.location.href = 'auth.html'; }, 1500);
                 return false;
             }
         }
@@ -931,7 +1083,6 @@
                     .single();
 
                 if (error) {
-                    // If no profile exists, create one
                     if (error.code === 'PGRST116') {
                         const { error: createError } = await supabaseClient
                             .from('users')
@@ -942,15 +1093,14 @@
                                 user_type: 'free',
                                 subscription_status: 'inactive'
                             });
-
                         if (!createError) {
-                            // Retry loading profile
                             const { data: newData } = await supabaseClient
                                 .from('users')
                                 .select('*')
                                 .eq('auth_id', currentUser.id)
                                 .single();
                             userProfile = newData;
+                            checkAdmin();
                             updateUI();
                             return;
                         }
@@ -959,11 +1109,11 @@
                 }
 
                 userProfile = data;
+                checkAdmin();
                 updateUI();
 
             } catch (error) {
                 console.error('Error loading profile:', error);
-                // Use fallback profile
                 userProfile = {
                     full_name: currentUser.user_metadata?.full_name || 'User',
                     user_type: 'free',
@@ -975,19 +1125,35 @@
         }
 
         // ============================================
+        // CHECK ADMIN STATUS
+        // ============================================
+        function checkAdmin() {
+            isAdmin = userProfile?.user_type === 'admin';
+            if (isAdmin) {
+                document.getElementById('adminUploadPanel').style.display = 'block';
+                document.getElementById('adminToolsPanel').style.display = 'block';
+            }
+        }
+
+        // ============================================
         // UPDATE UI
         // ============================================
         function updateUI() {
             if (!userProfile) return;
 
-            // User info
             document.getElementById('userName').textContent = userProfile.full_name || 'User';
-            document.getElementById('userAvatar').src = userProfile.profile_image || 
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'User')}&background=6366f1&color=fff`;
 
-            // Badge
+            // Use storage avatar if available, fallback to UI avatars
+            const avatarUrl = userProfile.profile_image
+                ? getStorageUrl(BUCKET_NAME, userProfile.profile_image)
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'User')}&background=6366f1&color=fff`;
+            document.getElementById('userAvatar').src = avatarUrl;
+
             const badge = document.getElementById('userTypeBadge');
-            if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') {
+            if (userProfile.user_type === 'admin') {
+                badge.textContent = 'ADMIN';
+                badge.className = 'user-badge badge-admin';
+            } else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') {
                 badge.textContent = 'PREMIUM';
                 badge.className = 'user-badge badge-premium';
             } else {
@@ -995,9 +1161,11 @@
                 badge.className = 'user-badge badge-free';
             }
 
-            // Subscription status
             const statusEl = document.getElementById('subscriptionStatus');
-            if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') {
+            if (userProfile.user_type === 'admin') {
+                statusEl.className = 'sub-status sub-active';
+                statusEl.innerHTML = '<i class="fas fa-shield-alt"></i> Administrator';
+            } else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') {
                 statusEl.className = 'sub-status sub-active';
                 statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Premium Active';
             } else if (userProfile.subscription_status === 'pending') {
@@ -1007,6 +1175,196 @@
                 statusEl.className = 'sub-status sub-inactive';
                 statusEl.innerHTML = '<i class="fas fa-lock"></i> Free Account';
             }
+        }
+
+        // ============================================
+        // STORAGE: UPLOAD FILE
+        // ============================================
+        async function uploadFile(file, folder) {
+            const filePath = `${folder}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+            const { data, error } = await supabaseClient.storage
+                .from(BUCKET_NAME)
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) throw error;
+
+            // Insert metadata into storage_metadata table
+            const { error: metaError } = await supabaseClient
+                .from('storage_metadata')
+                .insert({
+                    file_path: filePath,
+                    file_name: file.name,
+                    file_size: file.size,
+                    file_type: file.type,
+                    folder: folder,
+                    uploaded_by: currentUser.id,
+                    is_public: true,
+                    metadata: {
+                        original_name: file.name,
+                        content_type: file.type
+                    }
+                });
+
+            if (metaError) console.warn('Metadata insert failed:', metaError);
+
+            return { filePath, publicUrl: getStorageUrl(BUCKET_NAME, filePath) };
+        }
+
+        // ============================================
+        // STORAGE: HANDLE RESOURCE UPLOAD (Admin)
+        // ============================================
+        async function handleResourceUpload(event) {
+            const files = event.target.files;
+            if (!files.length) return;
+            if (!isAdmin) {
+                showToast('Only admins can upload resources', 'error');
+                return;
+            }
+
+            const progressEl = document.getElementById('uploadProgress');
+            const fillEl = document.getElementById('progressFill');
+            const statusEl = document.getElementById('uploadStatus');
+
+            progressEl.classList.add('active');
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                try {
+                    fillEl.style.width = `${((i / files.length) * 100)}%`;
+                    statusEl.textContent = `Uploading ${file.name}...`;
+
+                    const { filePath, publicUrl } = await uploadFile(file, 'resources');
+
+                    // Insert into resources table
+                    const { error } = await supabaseClient
+                        .from('resources')
+                        .insert({
+                            title: file.name.replace(/\.[^/.]+$/, ''),
+                            description: 'Uploaded resource',
+                            file_url: publicUrl,
+                            file_path: filePath,
+                            resource_type: 'premium',
+                            is_active: true,
+                            created_by: currentUser.id
+                        });
+
+                    if (error) throw error;
+                    showToast(`Uploaded ${file.name}`, 'success');
+
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    showToast(`Failed to upload ${file.name}`, 'error');
+                }
+            }
+
+            fillEl.style.width = '100%';
+            statusEl.textContent = 'Upload complete!';
+            setTimeout(() => {
+                progressEl.classList.remove('active');
+                fillEl.style.width = '0%';
+            }, 1500);
+
+            loadResources();
+            loadStorageStats();
+        }
+
+        // ============================================
+        // STORAGE: HANDLE TOOL UPLOAD (Admin)
+        // ============================================
+        async function handleToolUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!isAdmin) {
+                showToast('Only admins can upload tools', 'error');
+                return;
+            }
+
+            try {
+                const { filePath, publicUrl } = await uploadFile(file, 'tools');
+
+                const { error } = await supabaseClient
+                    .from('tools')
+                    .insert({
+                        name: file.name.replace(/\.[^/.]+$/, ''),
+                        description: 'Design tool',
+                        download_url: publicUrl,
+                        file_path: filePath,
+                        is_free: false,
+                        icon: '🛠️'
+                    });
+
+                if (error) throw error;
+                showToast('Tool uploaded successfully', 'success');
+                loadTools();
+                loadStorageStats();
+            } catch (error) {
+                console.error('Tool upload error:', error);
+                showToast('Failed to upload tool', 'error');
+            }
+        }
+
+        // ============================================
+        // STORAGE: HANDLE CHAT ATTACHMENT
+        // ============================================
+        async function handleChatAttachment(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                showToast('Uploading attachment...', 'info');
+                const { filePath, publicUrl } = await uploadFile(file, 'resources');
+
+                // Send as message with file
+                const { error } = await supabaseClient
+                    .from('class_messages')
+                    .insert({
+                        class_id: currentClassId,
+                        user_id: currentUser.id,
+                        content: `📎 Shared a file: ${file.name}`,
+                        message_type: 'file',
+                        file_url: publicUrl
+                    });
+
+                if (error) throw error;
+                showToast('File shared in chat', 'success');
+            } catch (error) {
+                console.error('Chat attachment error:', error);
+                showToast('Failed to upload attachment', 'error');
+            }
+        }
+
+        // ============================================
+        // STORAGE: LOAD STATS
+        // ============================================
+        async function loadStorageStats() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('storage_stats')
+                    .select('*');
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    const totalFiles = data.reduce((sum, row) => sum + (row.file_count || 0), 0);
+                    const totalSize = data.reduce((sum, row) => sum + (row.total_size || 0), 0);
+
+                    document.getElementById('totalFiles').textContent = `${totalFiles} files`;
+                    document.getElementById('totalSize').textContent = formatBytes(totalSize);
+                }
+            } catch (error) {
+                console.error('Storage stats error:', error);
+            }
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 MB';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
         // ============================================
@@ -1035,9 +1393,9 @@
                     return;
                 }
 
-                const hasAccess = userProfile && 
-                                 userProfile.user_type === 'premium' && 
-                                 userProfile.subscription_status === 'active';
+                const hasAccess = userProfile &&
+                    (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') ||
+                    userProfile.user_type === 'admin';
 
                 data.forEach(cls => {
                     const isPremium = cls.class_type === 'premium';
@@ -1059,12 +1417,11 @@
                         <p class="class-description">${escapeHtml(cls.description || 'No description available')}</p>
                         <button class="btn-class ${canAccess ? 'btn-class-primary' : 'btn-class-locked'}"
                                 onclick="${canAccess ? `openClass('${cls.id}')` : 'showUpgradeModal()'}">
-                            ${!canAccess ? '<i class="fas fa-lock"></i> Upgrade to Premium' : 
-                              isPremium ? '<i class="fas fa-crown"></i> Join Premium Class' : 
+                            ${!canAccess ? '<i class="fas fa-lock"></i> Upgrade to Premium' :
+                              isPremium ? '<i class="fas fa-crown"></i> Join Premium Class' :
                               '<i class="fas fa-play"></i> Join Class'}
                         </button>
                     `;
-
                     grid.appendChild(card);
                 });
 
@@ -1085,17 +1442,17 @@
         }
 
         // ============================================
-        // LOAD RESOURCES
+        // LOAD RESOURCES (with Storage integration)
         // ============================================
         async function loadResources() {
             try {
-                const hasAccess = userProfile && 
-                                 userProfile.user_type === 'premium' && 
-                                 userProfile.subscription_status === 'active';
+                const hasAccess = userProfile &&
+                    ((userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') ||
+                     userProfile.user_type === 'admin');
 
                 const { data, error } = await supabaseClient
                     .from('resources')
-                    .select('*')
+                    .select('*, storage_metadata(file_size, file_type, download_count)')
                     .eq('is_active', true)
                     .order('created_at', { ascending: false });
 
@@ -1117,32 +1474,26 @@
 
                 data.forEach(resource => {
                     const isLocked = (resource.resource_type === 'premium' || resource.resource_type === 'paid') && !hasAccess;
+                    const fileSize = resource.storage_metadata?.file_size ? formatBytes(resource.storage_metadata.file_size) : 'Unknown';
+                    const fileType = getFileIcon(resource.file_type || resource.storage_metadata?.file_type);
 
                     const card = document.createElement('div');
-                    card.className = 'class-card';
+                    card.className = 'resource-file-card';
                     card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                            <h4 style="font-family: 'Space Grotesk', sans-serif;">${escapeHtml(resource.title)}</h4>
-                            ${isLocked ? '<span style="color: var(--secondary);"><i class="fas fa-lock"></i></span>' : ''}
+                        <div class="file-icon">${fileType}</div>
+                        <div class="info">
+                            <div class="name">${escapeHtml(resource.title)}</div>
+                            <div class="meta">${fileSize} • ${resource.resource_type}</div>
                         </div>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px;">${escapeHtml(resource.description || '')}</p>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-muted); font-size: 0.85rem;">
-                                ${resource.resource_type === 'free' ? '🆓 Free' : 
-                                  resource.resource_type === 'premium' ? '⭐ Premium' : 
-                                  `💰 ₦${resource.price}`}
-                            </span>
-                            ${!isLocked ? 
-                                `<button class="btn-tool" onclick="downloadResource('${resource.id}', '${resource.file_url || '#'}')">
-                                    <i class="fas fa-download"></i> Download
-                                </button>` :
-                                `<button class="btn-tool" onclick="showUpgradeModal()">
-                                    <i class="fas fa-shopping-cart"></i> Upgrade
-                                </button>`
-                            }
-                        </div>
+                        ${!isLocked ?
+                            `<button class="btn-icon" onclick="downloadResource('${resource.id}', '${resource.file_url || resource.file_path}')" title="Download">
+                                <i class="fas fa-download"></i>
+                            </button>` :
+                            `<button class="btn-icon" onclick="showUpgradeModal()" title="Locked" style="color: var(--secondary);">
+                                <i class="fas fa-lock"></i>
+                            </button>`
+                        }
                     `;
-
                     grid.appendChild(card);
                 });
 
@@ -1152,20 +1503,47 @@
             }
         }
 
-        // ============================================
-        // DOWNLOAD RESOURCE
-        // ============================================
-        function downloadResource(resourceId, fileUrl) {
-            if (!fileUrl || fileUrl === '#') {
-                showToast('Download link not available yet', 'warning');
-                return;
-            }
-            showToast('Starting download...', 'info');
-            window.open(fileUrl, '_blank');
+        function getFileIcon(mimeType) {
+            if (!mimeType) return '📄';
+            if (mimeType.includes('image')) return '🖼️';
+            if (mimeType.includes('pdf')) return '📕';
+            if (mimeType.includes('zip') || mimeType.includes('rar')) return '📦';
+            if (mimeType.includes('video')) return '🎬';
+            if (mimeType.includes('audio')) return '🎵';
+            return '📄';
         }
 
         // ============================================
-        // LOAD TOOLS
+        // DOWNLOAD RESOURCE (with tracking)
+        // ============================================
+        async function downloadResource(resourceId, filePathOrUrl) {
+            if (!filePathOrUrl || filePathOrUrl === '#') {
+                showToast('Download link not available yet', 'warning');
+                return;
+            }
+
+            try {
+                // Update download count in metadata
+                await supabaseClient.rpc('increment_download', { resource_id: resourceId });
+
+                showToast('Starting download...', 'info');
+
+                // If it's a storage path, get signed URL or use public URL
+                if (filePathOrUrl.startsWith('http')) {
+                    window.open(filePathOrUrl, '_blank');
+                } else {
+                    const publicUrl = getStorageUrl(BUCKET_NAME, filePathOrUrl);
+                    window.open(publicUrl, '_blank');
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+                // Still try to open even if tracking fails
+                window.open(filePathOrUrl, '_blank');
+            }
+        }
+
+        // ============================================
+        // LOAD TOOLS (with Storage integration)
         // ============================================
         async function loadTools() {
             try {
@@ -1191,20 +1569,23 @@
                 }
 
                 data.forEach(tool => {
+                    const downloadUrl = tool.file_path
+                        ? getStorageUrl(BUCKET_NAME, tool.file_path)
+                        : (tool.download_url || tool.playstore_url || '#');
+
                     const card = document.createElement('div');
                     card.className = 'tool-card';
                     card.innerHTML = `
                         <div class="icon">${tool.icon || '🛠️'}</div>
                         <h4>${escapeHtml(tool.name)}</h4>
                         <p>${escapeHtml(tool.description || '')}</p>
-                        <a href="${tool.playstore_url || tool.download_url || '#'}" 
-                           target="_blank" 
+                        <a href="${downloadUrl}"
+                           target="_blank"
                            class="btn-tool"
-                           onclick="${(!tool.playstore_url && !tool.download_url) ? 'event.preventDefault(); showToast(\'Link not available yet\', \'warning\');' : ''}">
+                           onclick="${downloadUrl === '#' ? 'event.preventDefault(); showToast(\'Link not available yet\', \'warning\');' : ''}">
                             <i class="fas fa-download"></i> ${tool.is_free ? 'Free' : 'Get'}
                         </a>
                     `;
-
                     grid.appendChild(card);
                 });
 
@@ -1215,7 +1596,7 @@
         }
 
         // ============================================
-        // CHAT SYSTEM
+        // CHAT SYSTEM (with file attachments)
         // ============================================
         async function loadClassMessages(classId) {
             try {
@@ -1246,17 +1627,27 @@
                     const div = document.createElement('div');
                     div.className = `chat-message ${isOwn ? 'own' : ''}`;
 
-                    const avatarUrl = msg.users?.profile_image || 
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.users?.full_name || 'U')}&background=${isOwn ? 'ec4899' : '6366f1'}&color=fff`;
+                    const avatarUrl = msg.users?.profile_image
+                        ? getStorageUrl(BUCKET_NAME, msg.users.profile_image)
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.users?.full_name || 'U')}&background=${isOwn ? 'ec4899' : '6366f1'}&color=fff`;
 
                     const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+                    let contentHtml = `<div class="text">${escapeHtml(msg.content || '')}</div>`;
+                    if (msg.file_url) {
+                        const isImage = msg.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+                        if (isImage) {
+                            contentHtml += `<div style="margin-top: 8px;"><img src="${msg.file_url}" style="max-width: 200px; border-radius: 8px; cursor: pointer;" onclick="window.open('${msg.file_url}')" alt="Shared image"></div>`;
+                        } else {
+                            contentHtml += `<div style="margin-top: 8px;"><a href="${msg.file_url}" target="_blank" style="color: var(--primary); text-decoration: none;"><i class="fas fa-paperclip"></i> Download Attachment</a></div>`;
+                        }
+                    }
+
                     div.innerHTML = `
-                        <img src="${avatarUrl}" class="avatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" alt="">
+                        <img src="${avatarUrl}" class="avatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" alt="" onerror="this.src='https://ui-avatars.com/api/?name=U&background=6366f1&color=fff'">
                         <div class="content">
                             <div class="name">${escapeHtml(msg.users?.full_name || 'Unknown')}</div>
-                            <div class="text">${escapeHtml(msg.content || '')}</div>
-                            ${msg.file_url ? `<div><a href="${msg.file_url}" target="_blank" style="color: var(--primary);">📎 Attachment</a></div>` : ''}
+                            ${contentHtml}
                             <div class="time">${time}</div>
                         </div>
                     `;
@@ -1294,9 +1685,7 @@
                     });
 
                 if (error) throw error;
-
                 input.value = '';
-                // Message will appear via real-time subscription
 
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -1319,10 +1708,10 @@
 
             chatSubscription = supabaseClient
                 .channel('class-messages')
-                .on('postgres_changes', 
-                    { 
-                        event: 'INSERT', 
-                        schema: 'public', 
+                .on('postgres_changes',
+                    {
+                        event: 'INSERT',
+                        schema: 'public',
                         table: 'class_messages',
                         filter: `class_id=eq.${currentClassId}`
                     },
@@ -1363,10 +1752,8 @@
         // TAB SWITCHING
         // ============================================
         function switchTab(tabName) {
-            // Update URL hash for persistence
             window.location.hash = tabName;
 
-            // Update main tabs
             document.querySelectorAll('.academy-tab').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.tab === tabName);
             });
@@ -1375,14 +1762,15 @@
                 content.classList.toggle('active', content.id === `tab-${tabName}`);
             });
 
-            // Update bottom nav
             document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === tabName);
             });
 
-            // Load data for specific tabs
             if (tabName === 'classes') loadClasses();
-            if (tabName === 'resources') loadResources();
+            if (tabName === 'resources') {
+                loadResources();
+                loadStorageStats();
+            }
             if (tabName === 'tools') loadTools();
             if (tabName === 'chat') {
                 loadClassMessages(currentClassId);
@@ -1403,6 +1791,29 @@
                     window.location.href = 'profile.html';
                 } else {
                     switchTab(tab);
+                }
+            });
+        });
+
+        // ============================================
+        // DRAG & DROP SUPPORT
+        // ============================================
+        const uploadZones = document.querySelectorAll('.upload-zone');
+        uploadZones.forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                const input = zone.querySelector('input[type="file"]');
+                if (input) {
+                    input.files = e.dataTransfer.files;
+                    input.dispatchEvent(new Event('change'));
                 }
             });
         });
@@ -1433,17 +1844,16 @@
             const authed = await checkAuth();
             if (!authed) return;
 
-            // Check URL hash for tab persistence
             const hash = window.location.hash.replace('#', '');
             if (hash && ['home', 'classes', 'resources', 'tools', 'chat'].includes(hash)) {
                 switchTab(hash);
             }
 
-            // Load initial data
             await loadClasses();
             await loadResources();
             await loadTools();
             await loadClassMessages(currentClassId);
+            await loadStorageStats();
             setupRealtimeChat();
         }
 
