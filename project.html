@@ -393,15 +393,16 @@
     </nav>
 
     <script>
-    // ============================================
-    // AUREX PROJECTS SHOWROOM
-    // ============================================
     (function() {
         'use strict';
 
-        // Supabase Config - REPLACE WITH YOUR CREDENTIALS
+        // ============================================
+        // SUPABASE CONFIG - Using 'aurex-assets' bucket
+        // ============================================
         const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
+        const STORAGE_BUCKET = 'aurex-assets';
+        
         let supabase = null;
 
         try {
@@ -409,6 +410,13 @@
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
         } catch(e) { console.log('Supabase not configured yet'); }
+
+        // Helper: Get public URL from bucket
+        function getStorageUrl(path) {
+            if (!supabase || !path) return path;
+            const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+            return data.publicUrl;
+        }
 
         // Toast
         function showToast(message, type) {
@@ -494,7 +502,7 @@
             }
         };
 
-        // Projects Module
+        // Projects Module - Uses 'aurex-assets' bucket for file URLs
         var ProjectsModule = {
             projects: [],
             currentFilter: 'all',
@@ -503,6 +511,7 @@
                 this.loadProjects();
                 this.bindFilters();
                 this.bindModal();
+                this.bindShare();
             },
 
             loadProjects: async function() {
@@ -510,41 +519,106 @@
                 var grid = document.getElementById('projectsGrid');
                 var emptyState = document.getElementById('emptyState');
 
-                // Try Supabase first
+                // Try Supabase
                 if (supabase) {
                     try {
-                        var { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+                        var { data, error } = await supabase
+                            .from('projects')
+                            .select('*')
+                            .order('created_at', { ascending: false });
+                        
                         if (!error && data && data.length > 0) {
-                            self.projects = data;
+                            // Process file URLs to use bucket
+                            self.projects = data.map(function(p) {
+                                // If file_url is a path, get public URL from bucket
+                                if (p.file_url && !p.file_url.startsWith('http')) {
+                                    p.file_url = getStorageUrl(p.file_url);
+                                }
+                                if (p.thumbnail_url && !p.thumbnail_url.startsWith('http')) {
+                                    p.thumbnail_url = getStorageUrl(p.thumbnail_url);
+                                }
+                                if (p.image_url && !p.image_url.startsWith('http')) {
+                                    p.image_url = getStorageUrl(p.image_url);
+                                }
+                                return p;
+                            });
                             self.renderProjects();
+                            showToast('Projects loaded from database', 'success');
                             return;
                         }
-                    } catch(e) { console.log('Supabase fetch failed, using demo data'); }
+                    } catch(e) { console.log('Supabase fetch failed, using demo data', e); }
                 }
 
-                // Demo data for preview
+                // Demo data with bucket URLs
                 self.projects = [
                     {
-                        id: 1, title: 'PrimeMar Brand Identity', description: 'Complete brand overhaul for a tech startup including logo design, color system, typography guidelines, and comprehensive brand book.', file_type: 'image', file_url: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=500&fit=crop', thumbnail_url: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop', tags: ['Branding', 'Logo Design', 'Identity'], created_at: '2026-01-15', category: 'branding'
+                        id: 1, 
+                        title: 'PrimeMar Brand Identity', 
+                        description: 'Complete brand overhaul for a tech startup including logo design, color system, typography guidelines, and comprehensive brand book.', 
+                        file_type: 'image', 
+                        file_url: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=500&fit=crop', 
+                        thumbnail_url: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop', 
+                        tags: ['Branding', 'Logo Design', 'Identity'], 
+                        created_at: '2026-01-15', 
+                        category: 'branding'
                     },
                     {
-                        id: 2, title: 'EcoPack Sustainable Packaging', description: 'Eco-friendly packaging design series for a sustainable cosmetics brand, featuring biodegradable materials and minimalist aesthetics.', file_type: 'pdf', file_url: '#', thumbnail_url: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&h=400&fit=crop', tags: ['Packaging', 'Sustainable', 'Print'], created_at: '2025-12-20', category: 'packaging'
+                        id: 2, 
+                        title: 'EcoPack Sustainable Packaging', 
+                        description: 'Eco-friendly packaging design series for a sustainable cosmetics brand, featuring biodegradable materials and minimalist aesthetics.', 
+                        file_type: 'pdf', 
+                        file_url: '#', 
+                        thumbnail_url: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&h=400&fit=crop', 
+                        tags: ['Packaging', 'Sustainable', 'Print'], 
+                        created_at: '2025-12-20', 
+                        category: 'packaging'
                     },
                     {
-                        id: 3, title: 'Motion Flow App UI/UX', description: 'UI/UX design and motion graphics for a fitness tracking application with real-time data visualization and engaging micro-interactions.', file_type: 'video', file_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', thumbnail_url: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=400&fit=crop', tags: ['UI/UX', 'Motion', 'App Design'], created_at: '2025-11-10', category: 'uiux'
+                        id: 3, 
+                        title: 'Motion Flow App UI/UX', 
+                        description: 'UI/UX design and motion graphics for a fitness tracking application with real-time data visualization and engaging micro-interactions.', 
+                        file_type: 'video', 
+                        file_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 
+                        thumbnail_url: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=400&fit=crop', 
+                        tags: ['UI/UX', 'Motion', 'App Design'], 
+                        created_at: '2025-11-10', 
+                        category: 'uiux'
                     },
                     {
-                        id: 4, title: 'Luxe Cosmetics Brand Book', description: 'Premium brand identity and packaging design for a luxury cosmetics line. Complete brand guidelines and visual identity system.', file_type: 'document', file_url: '#', thumbnail_url: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop', tags: ['Branding', 'Luxury', 'Guidelines'], created_at: '2025-10-05', category: 'branding'
+                        id: 4, 
+                        title: 'Luxe Cosmetics Brand Book', 
+                        description: 'Premium brand identity and packaging design for a luxury cosmetics line. Complete brand guidelines and visual identity system.', 
+                        file_type: 'document', 
+                        file_url: '#', 
+                        thumbnail_url: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop', 
+                        tags: ['Branding', 'Luxury', 'Guidelines'], 
+                        created_at: '2025-10-05', 
+                        category: 'branding'
                     },
                     {
-                        id: 5, title: 'Fintech Dashboard Design', description: 'Modern banking interface design with data visualization, transaction flows, and user-friendly navigation patterns.', file_type: 'image', file_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop', thumbnail_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop', tags: ['UI/UX', 'Dashboard', 'Fintech'], created_at: '2025-09-15', category: 'uiux'
+                        id: 5, 
+                        title: 'Fintech Dashboard Design', 
+                        description: 'Modern banking interface design with data visualization, transaction flows, and user-friendly navigation patterns.', 
+                        file_type: 'image', 
+                        file_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop', 
+                        thumbnail_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop', 
+                        tags: ['UI/UX', 'Dashboard', 'Fintech'], 
+                        created_at: '2025-09-15', 
+                        category: 'uiux'
                     },
                     {
-                        id: 6, title: 'Artisan Coffee Packaging', description: 'Specialty coffee packaging series with hand-drawn illustrations and premium finishing techniques.', file_type: 'image', file_url: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=800&h=500&fit=crop', thumbnail_url: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=600&h=400&fit=crop', tags: ['Packaging', 'Illustration', 'Print'], created_at: '2025-08-20', category: 'packaging'
+                        id: 6, 
+                        title: 'Artisan Coffee Packaging', 
+                        description: 'Specialty coffee packaging series with hand-drawn illustrations and premium finishing techniques.', 
+                        file_type: 'image', 
+                        file_url: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=800&h=500&fit=crop', 
+                        thumbnail_url: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=600&h=400&fit=crop', 
+                        tags: ['Packaging', 'Illustration', 'Print'], 
+                        created_at: '2025-08-20', 
+                        category: 'packaging'
                     }
                 ];
 
-                // Simulate loading delay
                 setTimeout(function() {
                     self.renderProjects();
                 }, 1500);
@@ -569,10 +643,13 @@
                     var typeLabel = { image: 'Image', video: 'Video', pdf: 'PDF', document: 'Document' };
                     var mediaHtml = '';
 
+                    // Use thumbnail_url if available, otherwise fallback to file_url
+                    var displayUrl = project.thumbnail_url || project.file_url || 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop';
+
                     if (project.file_type === 'image') {
-                        mediaHtml = '<img src="' + project.thumbnail_url + '" alt="' + project.title + '" loading="lazy">';
+                        mediaHtml = '<img src="' + displayUrl + '" alt="' + project.title + '" loading="lazy">';
                     } else if (project.file_type === 'video') {
-                        mediaHtml = '<img src="' + project.thumbnail_url + '" alt="' + project.title + '" loading="lazy"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);"><div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;"><i class="fas fa-play" style="color:var(--primary);font-size:1.5rem;margin-left:4px;"></i></div></div>';
+                        mediaHtml = '<img src="' + displayUrl + '" alt="' + project.title + '" loading="lazy"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);"><div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;"><i class="fas fa-play" style="color:var(--primary);font-size:1.5rem;margin-left:4px;"></i></div></div>';
                     } else {
                         mediaHtml = '<div class="file-icon"><i class="fas ' + (typeIcon[project.file_type] || 'fa-file') + '"></i><span>' + (typeLabel[project.file_type] || 'File') + '</span></div>';
                     }
@@ -618,6 +695,26 @@
                 });
             },
 
+            bindShare: function() {
+                var shareBtn = document.getElementById('modalShare');
+                if (shareBtn) {
+                    shareBtn.addEventListener('click', function() {
+                        if (navigator.share) {
+                            navigator.share({
+                                title: document.getElementById('modalTitle').textContent,
+                                url: window.location.href
+                            }).catch(function() {});
+                        } else {
+                            navigator.clipboard.writeText(window.location.href).then(function() {
+                                showToast('Link copied to clipboard!', 'success');
+                            }).catch(function() {
+                                showToast('Share not available', 'warning');
+                            });
+                        }
+                    });
+                }
+            },
+
             openModal: function(projectId) {
                 var project = this.projects.find(function(p) { return p.id == projectId; });
                 if (!project) return;
@@ -628,17 +725,19 @@
                 var download = document.getElementById('modalDownload');
 
                 title.textContent = project.title;
-                download.href = project.file_url;
+                download.href = project.file_url || '#';
 
                 var typeIcon = { image: 'fa-image', video: 'fa-video', pdf: 'fa-file-pdf', document: 'fa-file-word' };
                 var mediaHtml = '';
 
+                var displayUrl = project.file_url || project.thumbnail_url || 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=500&fit=crop';
+
                 if (project.file_type === 'image') {
-                    mediaHtml = '<div class="modal-media"><img src="' + project.file_url + '" alt="' + project.title + '"></div>';
+                    mediaHtml = '<div class="modal-media"><img src="' + displayUrl + '" alt="' + project.title + '"></div>';
                 } else if (project.file_type === 'video') {
-                    mediaHtml = '<div class="modal-media"><video controls poster="' + project.thumbnail_url + '"><source src="' + project.file_url + '" type="video/mp4">Your browser does not support the video tag.</video></div>';
+                    mediaHtml = '<div class="modal-media"><video controls poster="' + (project.thumbnail_url || '') + '"><source src="' + displayUrl + '" type="video/mp4">Your browser does not support the video tag.</video></div>';
                 } else if (project.file_type === 'pdf') {
-                    mediaHtml = '<div class="modal-media"><iframe src="' + project.file_url + '" style="height:500px;" frameborder="0"></iframe></div>';
+                    mediaHtml = '<div class="modal-media"><iframe src="' + displayUrl + '" style="height:500px;width:100%;" frameborder="0"></iframe></div>';
                 } else {
                     mediaHtml = '<div class="modal-media" style="padding:60px;text-align:center;"><i class="fas ' + (typeIcon[project.file_type] || 'fa-file') + '" style="font-size:4rem;color:var(--primary);margin-bottom:16px;display:block;"></i><p style="color:var(--text-secondary);">Document preview not available. Download to view.</p></div>';
                 }
@@ -648,7 +747,7 @@
                     '<h4><i class="fas fa-info-circle"></i> Description</h4>' +
                     '<p>' + project.description + '</p>' +
                     '<h4><i class="fas fa-tags"></i> Tags</h4>' +
-                    '<div class="modal-tags">' + project.tags.map(function(t) { return '<span class="modal-tag">' + t + '</span>'; }).join('') + '</div>' +
+                    '<div class="modal-tags">' + (project.tags || []).map(function(t) { return '<span class="modal-tag">' + t + '</span>'; }).join('') + '</div>' +
                     '<h4><i class="fas fa-calendar"></i> Date</h4>' +
                     '<p>' + new Date(project.created_at).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</p>' +
                     '</div>';
