@@ -7,712 +7,119 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== PROJECTS PAGE STYLES ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --accent: #06b6d4;
-            --bg-primary: #0f0f1a;
-            --bg-secondary: #1a1a2e;
-            --bg-card: #16162a;
-            --bg-glass: rgba(22, 22, 42, 0.85);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border: rgba(255, 255, 255, 0.08);
-            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #ec4899; --accent: #06b6d4;
+            --bg-primary: #0f0f1a; --bg-secondary: #1a1a2e; --bg-card: #16162a; --bg-glass: rgba(22,22,42,0.85);
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border: rgba(255,255,255,0.08); --shadow-glow: 0 0 40px rgba(99,102,241,0.3);
             --bottom-nav-height: 70px;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            padding-bottom: var(--bottom-nav-height);
-        }
-
+        body { font-family: 'Inter',sans-serif; background: var(--bg-primary); color: var(--text-primary); padding-bottom: var(--bottom-nav-height); }
         .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
-
-        /* Header */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 0;
-        }
-
-        .nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo img {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            border: 2px solid var(--primary);
-        }
-
-        .logo span {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-            object-fit: cover;
-            cursor: pointer;
-        }
-
-        .btn-academy {
-            padding: 8px 16px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            text-decoration: none;
-        }
-
-        .btn-academy:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        }
-
-        /* Hero */
-        .projects-hero {
-            padding: 120px 0 40px;
-            text-align: center;
-            background: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.1), transparent 60%);
-        }
-
-        .projects-hero h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-        }
-
-        .projects-hero p {
-            color: var(--text-secondary);
-            font-size: 1.05rem;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .text-gradient {
-            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Stats Bar */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 24px;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-item .number {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .stat-item .label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* Search & Filters */
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin: 32px 0;
-        }
-
-        .search-box {
-            position: relative;
-            max-width: 400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 16px 12px 44px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-        }
-
-        .search-box input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-
-        .filters {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .filter-btn {
-            padding: 8px 20px;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn:hover,
-        .filter-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Project Grid */
-        .project-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
-            padding: 20px 0;
-        }
-
-        .project-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .project-card:hover {
-            transform: translateY(-6px);
-            border-color: var(--primary);
-            box-shadow: var(--shadow-glow);
-        }
-
-        .project-card .image-wrap {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16/10;
-            overflow: hidden;
-            background: var(--bg-secondary);
-        }
-
-        .project-card .image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .project-card:hover .image {
-            transform: scale(1.05);
-        }
-
-        .project-card .image-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to top, rgba(15, 15, 26, 0.8), transparent);
-            display: flex;
-            align-items: flex-end;
-            padding: 16px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .project-card:hover .image-overlay {
-            opacity: 1;
-        }
-
-        .project-card .image-overlay .view-btn {
-            padding: 8px 16px;
-            background: var(--primary);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .project-card .info {
-            padding: 20px;
-        }
-
-        .project-card .info .category {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: rgba(99, 102, 241, 0.15);
-            color: var(--primary);
-            margin-bottom: 8px;
-            text-transform: capitalize;
-        }
-
-        .project-card .info h3 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-
-        .project-card .info .desc {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .project-card .info .meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border);
-        }
-
-        .project-card .info .meta .date {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .project-card .info .meta .likes {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .project-card .info .meta .likes:hover {
-            color: var(--secondary);
-        }
-
-        .project-card .info .meta .likes.liked {
-            color: var(--secondary);
-        }
-
-        .project-card .info .tags {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
-
-        .project-card .info .tags span {
-            padding: 2px 10px;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
-
-        /* Skeleton Loading */
-        .skeleton {
-            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 8px;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .skeleton-image {
-            width: 100%;
-            aspect-ratio: 16/10;
-        }
-
-        .skeleton-text {
-            height: 16px;
-            margin: 8px 0;
-        }
-
+        .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 16px 0; }
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo img { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--primary); }
+        .logo span { font-family: 'Space Grotesk',sans-serif; font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; cursor: pointer; }
+        .btn-academy { padding: 8px 16px; background: linear-gradient(135deg,var(--primary),var(--primary-dark)); border: none; border-radius: 8px; color: white; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn-academy:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+        .projects-hero { padding: 120px 0 40px; text-align: center; background: radial-gradient(ellipse at top, rgba(99,102,241,0.1), transparent 60%); }
+        .projects-hero h1 { font-family: 'Space Grotesk',sans-serif; font-size: 2.5rem; margin-bottom: 12px; }
+        .projects-hero p { color: var(--text-secondary); font-size: 1.05rem; max-width: 500px; margin: 0 auto; }
+        .text-gradient { background: linear-gradient(135deg,var(--primary),var(--secondary),var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stats-bar { display: flex; justify-content: center; gap: 40px; margin-top: 24px; flex-wrap: wrap; }
+        .stat-item { text-align: center; }
+        .stat-item .number { font-family: 'Space Grotesk',sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .stat-item .label { font-size: 0.8rem; color: var(--text-muted); }
+        .controls { display: flex; flex-direction: column; gap: 16px; margin: 32px 0; }
+        .search-box { position: relative; max-width: 400px; margin: 0 auto; width: 100%; }
+        .search-box input { width: 100%; padding: 12px 16px 12px 44px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter',sans-serif; font-size: 0.95rem; transition: all 0.3s ease; }
+        .search-box input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .filters { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .filter-btn { padding: 8px 20px; border: 1px solid var(--border); border-radius: 20px; background: transparent; color: var(--text-secondary); font-family: 'Inter',sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 24px; padding: 20px 0; }
+        .project-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; cursor: pointer; }
+        .project-card:hover { transform: translateY(-6px); border-color: var(--primary); box-shadow: var(--shadow-glow); }
+        .project-card .image-wrap { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; background: var(--bg-secondary); }
+        .project-card .image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .project-card:hover .image { transform: scale(1.05); }
+        .project-card .image-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(15,15,26,0.8), transparent); display: flex; align-items: flex-end; padding: 16px; opacity: 0; transition: opacity 0.3s ease; }
+        .project-card:hover .image-overlay { opacity: 1; }
+        .project-card .image-overlay .view-btn { padding: 8px 16px; background: var(--primary); border: none; border-radius: 8px; color: white; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .project-card .info { padding: 20px; }
+        .project-card .info .category { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; background: rgba(99,102,241,0.15); color: var(--primary); margin-bottom: 8px; text-transform: capitalize; }
+        .project-card .info h3 { font-family: 'Space Grotesk',sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
+        .project-card .info .desc { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .project-card .info .meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+        .project-card .info .meta .date { font-size: 0.8rem; color: var(--text-muted); }
+        .project-card .info .meta .likes { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
+        .project-card .info .meta .likes:hover { color: var(--secondary); }
+        .project-card .info .meta .likes.liked { color: var(--secondary); }
+        .project-card .info .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+        .project-card .info .tags span { padding: 2px 10px; background: var(--bg-secondary); border-radius: 12px; font-size: 0.7rem; color: var(--text-muted); }
+        .skeleton { background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skeleton-image { width: 100%; aspect-ratio: 16/10; }
+        .skeleton-text { height: 16px; margin: 8px 0; }
         .skeleton-text.short { width: 40%; }
         .skeleton-text.medium { width: 70%; }
         .skeleton-text.long { width: 90%; }
-
-        /* Empty State */
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--text-muted);
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-
-        .empty-state h4 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.3rem;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state p {
-            font-size: 0.95rem;
-        }
-
-        /* Bottom Nav */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 999;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: var(--bottom-nav-height);
-            padding: 0 16px;
-        }
-
-        .bottom-nav-inner {
-            display: flex;
-            gap: 8px;
-            max-width: 500px;
-            width: 100%;
-            justify-content: space-around;
-        }
-
-        .bottom-nav-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 8px 16px;
-            background: transparent;
-            border: none;
-            border-radius: 12px;
-            color: var(--text-secondary);
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 0.7rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1;
-            max-width: 120px;
-        }
-
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 80px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 4rem; margin-bottom: 20px; opacity: 0.3; }
+        .empty-state h4 { font-family: 'Space Grotesk',sans-serif; font-size: 1.3rem; margin-bottom: 8px; color: var(--text-secondary); }
+        .empty-state p { font-size: 0.95rem; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--bg-glass); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: center; align-items: center; height: var(--bottom-nav-height); padding: 0 16px; }
+        .bottom-nav-inner { display: flex; gap: 8px; max-width: 500px; width: 100%; justify-content: space-around; }
+        .bottom-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px 16px; background: transparent; border: none; border-radius: 12px; color: var(--text-secondary); font-family: 'Space Grotesk',sans-serif; font-weight: 600; font-size: 0.7rem; text-decoration: none; cursor: pointer; transition: all 0.3s ease; flex: 1; max-width: 120px; }
         .bottom-nav-btn i { font-size: 1.3rem; transition: all 0.3s ease; }
-        .bottom-nav-btn:hover { color: var(--primary); background: rgba(99, 102, 241, 0.1); }
-        .bottom-nav-btn.active { color: var(--primary); background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.1)); }
-
-        /* Toast */
-        .toast-container {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 10001;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            padding: 14px 20px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transform: translateX(120%);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 320px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
+        .bottom-nav-btn:hover { color: var(--primary); background: rgba(99,102,241,0.1); }
+        .bottom-nav-btn.active { color: var(--primary); background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(236,72,153,0.1)); }
+        .toast-container { position: fixed; top: 80px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 14px 20px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.9rem; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); max-width: 320px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
         .toast.show { transform: translateX(0); opacity: 1; }
-        .toast-success { background: rgba(16, 185, 129, 0.95); }
-        .toast-error { background: rgba(239, 68, 68, 0.95); }
-        .toast-warning { background: rgba(245, 158, 11, 0.95); }
-        .toast-info { background: rgba(99, 102, 241, 0.95); }
-
-        /* Project Detail Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .project-modal {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: modalIn 0.3s ease;
-        }
-
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .project-modal .modal-image {
-            width: 100%;
-            aspect-ratio: 16/9;
-            object-fit: cover;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .project-modal .modal-content {
-            padding: 32px;
-        }
-
-        .project-modal .modal-content h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-        }
-
-        .project-modal .modal-content .category {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            background: rgba(99, 102, 241, 0.15);
-            color: var(--primary);
-            margin-bottom: 16px;
-            text-transform: capitalize;
-        }
-
-        .project-modal .modal-content p {
-            color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 20px;
-        }
-
-        .project-modal .modal-content .modal-meta {
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .project-modal .modal-content .modal-meta span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .project-modal .modal-content .modal-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-
-        .project-modal .modal-content .modal-tags span {
-            padding: 6px 14px;
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .project-modal .modal-content .modal-actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .project-modal .modal-content .modal-actions button {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .project-modal .modal-content .modal-actions .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        .project-modal .modal-content .modal-actions .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-        }
-
-        .project-modal .modal-content .modal-actions .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .project-modal .modal-content .modal-actions .btn-secondary:hover {
-            border-color: var(--primary);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 40px;
-            height: 40px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .modal-close:hover {
-            background: var(--primary);
-        }
-
-        @media (max-width: 768px) {
-            .project-grid { grid-template-columns: 1fr; }
-            .projects-hero h1 { font-size: 2rem; }
-            .container { padding: 0 16px; }
-            .stats-bar { gap: 24px; }
-            .project-modal .modal-content { padding: 20px; }
-        }
+        .toast-success { background: rgba(16,185,129,0.95); }
+        .toast-error { background: rgba(239,68,68,0.95); }
+        .toast-warning { background: rgba(245,158,11,0.95); }
+        .toast-info { background: rgba(99,102,241,0.95); }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .modal-overlay.active { display: flex; }
+        .project-modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; animation: modalIn 0.3s ease; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .project-modal .modal-image { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 20px 20px 0 0; }
+        .project-modal .modal-content { padding: 32px; }
+        .project-modal .modal-content h2 { font-family: 'Space Grotesk',sans-serif; font-size: 1.5rem; margin-bottom: 8px; }
+        .project-modal .modal-content .category { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; background: rgba(99,102,241,0.15); color: var(--primary); margin-bottom: 16px; text-transform: capitalize; }
+        .project-modal .modal-content p { color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .project-modal .modal-content .modal-meta { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 20px; }
+        .project-modal .modal-content .modal-meta span { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 0.9rem; }
+        .project-modal .modal-content .modal-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+        .project-modal .modal-content .modal-tags span { padding: 6px 14px; background: var(--bg-secondary); border-radius: 20px; font-size: 0.8rem; color: var(--text-secondary); }
+        .project-modal .modal-content .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .project-modal .modal-content .modal-actions button { padding: 10px 24px; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .project-modal .modal-content .modal-actions .btn-primary { background: linear-gradient(135deg,var(--primary),var(--primary-dark)); color: white; }
+        .project-modal .modal-content .modal-actions .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.4); }
+        .project-modal .modal-content .modal-actions .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); }
+        .project-modal .modal-content .modal-actions .btn-secondary:hover { border-color: var(--primary); }
+        .modal-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; color: white; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .modal-close:hover { background: var(--primary); }
+        @media (max-width: 768px) { .project-grid { grid-template-columns: 1fr; } .projects-hero h1 { font-size: 2rem; } .container { padding: 0 16px; } .stats-bar { gap: 24px; } .project-modal .modal-content { padding: 20px; } }
     </style>
-<base target="_blank">
+    <base target="_blank">
 </head>
 <body>
-
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Project Detail Modal -->
     <div class="modal-overlay" id="projectModal">
         <div style="position: relative; width: 100%; max-width: 800px;">
-            <button class="modal-close" onclick="closeProjectModal()">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="project-modal" id="modalContent">
-                <!-- Dynamic content -->
-            </div>
+            <button class="modal-close" onclick="closeProjectModal()"><i class="fas fa-times"></i></button>
+            <div class="project-modal" id="modalContent"></div>
         </div>
     </div>
-
-    <!-- Header -->
     <header class="header">
         <nav class="nav">
             <a href="index.html" class="logo">
@@ -721,37 +128,23 @@
             </a>
             <div class="header-actions">
                 <img id="userAvatar" class="user-avatar" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="User" style="display: none;">
-                <a href="academy.html" class="btn-academy">
-                    <i class="fas fa-graduation-cap"></i> Academy
-                </a>
+                <a href="academy.html" class="btn-academy"><i class="fas fa-graduation-cap"></i> Academy</a>
             </div>
         </nav>
     </header>
-
     <main>
         <section class="projects-hero">
             <div class="container">
                 <h1>🎨 <span class="text-gradient">Project Showroom</span></h1>
                 <p>Explore our creative projects and design portfolio</p>
                 <div class="stats-bar" id="statsBar">
-                    <div class="stat-item">
-                        <div class="number" id="statTotal">0</div>
-                        <div class="label">Projects</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number" id="statCategories">0</div>
-                        <div class="label">Categories</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number" id="statLikes">0</div>
-                        <div class="label">Likes</div>
-                    </div>
+                    <div class="stat-item"><div class="number" id="statTotal">0</div><div class="label">Projects</div></div>
+                    <div class="stat-item"><div class="number" id="statCategories">0</div><div class="label">Categories</div></div>
+                    <div class="stat-item"><div class="number" id="statLikes">0</div><div class="label">Likes</div></div>
                 </div>
             </div>
         </section>
-
         <div class="container">
-            <!-- Search & Filters -->
             <div class="controls">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
@@ -767,38 +160,13 @@
                     <button class="filter-btn" data-filter="packaging">Packaging</button>
                 </div>
             </div>
-
-            <!-- Project Grid -->
             <div class="project-grid" id="projectGrid">
-                <div class="project-card">
-                    <div class="skeleton skeleton-image"></div>
-                    <div style="padding: 20px;">
-                        <div class="skeleton skeleton-text short"></div>
-                        <div class="skeleton skeleton-text medium"></div>
-                        <div class="skeleton skeleton-text long"></div>
-                    </div>
-                </div>
-                <div class="project-card">
-                    <div class="skeleton skeleton-image"></div>
-                    <div style="padding: 20px;">
-                        <div class="skeleton skeleton-text short"></div>
-                        <div class="skeleton skeleton-text medium"></div>
-                        <div class="skeleton skeleton-text long"></div>
-                    </div>
-                </div>
-                <div class="project-card">
-                    <div class="skeleton skeleton-image"></div>
-                    <div style="padding: 20px;">
-                        <div class="skeleton skeleton-text short"></div>
-                        <div class="skeleton skeleton-text medium"></div>
-                        <div class="skeleton skeleton-text long"></div>
-                    </div>
-                </div>
+                <div class="project-card"><div class="skeleton skeleton-image"></div><div style="padding: 20px;"><div class="skeleton skeleton-text short"></div><div class="skeleton skeleton-text medium"></div><div class="skeleton skeleton-text long"></div></div></div>
+                <div class="project-card"><div class="skeleton skeleton-image"></div><div style="padding: 20px;"><div class="skeleton skeleton-text short"></div><div class="skeleton skeleton-text medium"></div><div class="skeleton skeleton-text long"></div></div></div>
+                <div class="project-card"><div class="skeleton skeleton-image"></div><div style="padding: 20px;"><div class="skeleton skeleton-text short"></div><div class="skeleton skeleton-text medium"></div><div class="skeleton skeleton-text long"></div></div></div>
             </div>
         </div>
     </main>
-
-    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <div class="bottom-nav-inner">
             <a href="index.html" class="bottom-nav-btn"><i class="fas fa-home"></i><span>Home</span></a>
@@ -807,108 +175,65 @@
             <a href="profile.html" class="bottom-nav-btn"><i class="fas fa-user"></i><span>Profile</span></a>
         </div>
     </nav>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ============================================
-        // SUPABASE CONFIGURATION
-        // ============================================
         const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
-
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         let allProjects = [];
         let currentFilter = 'all';
         let currentUser = null;
 
-        // ============================================
-        // TOAST SYSTEM
-        // ============================================
         function showToast(message, type) {
             type = type || 'success';
-            const icons = {
-                success: '<i class="fas fa-check-circle"></i>',
-                error: '<i class="fas fa-times-circle"></i>',
-                warning: '<i class="fas fa-exclamation-triangle"></i>',
-                info: '<i class="fas fa-info-circle"></i>'
-            };
-
+            const icons = { success: '<i class="fas fa-check-circle"></i>', error: '<i class="fas fa-times-circle"></i>', warning: '<i class="fas fa-exclamation-triangle"></i>', info: '<i class="fas fa-info-circle"></i>' };
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `${icons[type] || icons.success} ${message}`;
             container.appendChild(toast);
-
             requestAnimationFrame(() => toast.classList.add('show'));
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    if (toast.parentNode) toast.parentNode.removeChild(toast);
-                }, 400);
-            }, 3000);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400); }, 3000);
         }
 
-        // ============================================
-        // CHECK AUTH (optional - for likes & user avatar)
-        // ============================================
         async function checkAuth() {
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) {
                     currentUser = session.user;
-                    // Show user avatar
                     const avatar = document.getElementById('userAvatar');
-                    avatar.src = currentUser.user_metadata?.avatar_url || 
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.user_metadata?.full_name || 'U')}&background=6366f1&color=fff`;
+                    avatar.src = currentUser.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.user_metadata?.full_name || 'U')}&background=6366f1&color=fff`;
                     avatar.style.display = 'block';
                     avatar.onclick = () => window.location.href = 'profile.html';
                 }
-            } catch (error) {
-                console.error('Auth check error:', error);
-            }
+            } catch (error) { console.error('Auth check error:', error); }
         }
 
-        // ============================================
-        // LOAD PROJECTS
-        // ============================================
         async function loadProjects() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('projects')
-                    .select('*')
-                    .eq('is_active', true)
-                    .order('created_at', { ascending: false });
-
+                // FIX: Also fetch project_likes to show user_liked status
+                let likedProjectIds = [];
+                if (currentUser) {
+                    const { data: likesData } = await supabaseClient.from('project_likes').select('project_id').eq('user_id', currentUser.id);
+                    likedProjectIds = likesData?.map(l => l.project_id) || [];
+                }
+                const { data, error } = await supabaseClient.from('projects').select('*').eq('is_active', true).order('created_at', { ascending: false });
                 if (error) throw error;
-
-                allProjects = data || [];
+                allProjects = (data || []).map(p => ({ ...p, user_liked: likedProjectIds.includes(p.id) }));
                 renderProjects(allProjects);
                 updateStats(allProjects);
-
             } catch (error) {
                 console.error('Error loading projects:', error);
                 showToast('Failed to load projects. Please try again.', 'error');
-                document.getElementById('projectGrid').innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <h4>Unable to Load Projects</h4>
-                        <p>Please check your connection and try again.</p>
-                    </div>
-                `;
+                document.getElementById('projectGrid').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h4>Unable to Load Projects</h4><p>Please check your connection and try again.</p></div>';
             }
         }
 
-        // ============================================
-        // UPDATE STATS
-        // ============================================
         function updateStats(projects) {
             const total = projects.length;
             const categories = new Set(projects.map(p => p.category).filter(Boolean)).size;
             const likes = projects.reduce((sum, p) => sum + (p.likes_count || 0), 0);
-
             animateNumber('statTotal', total);
             animateNumber('statCategories', categories);
             animateNumber('statLikes', likes);
@@ -919,83 +244,50 @@
             const duration = 1000;
             const start = 0;
             const startTime = performance.now();
-
             function update(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 const easeOut = 1 - Math.pow(1 - progress, 3);
-                const current = Math.floor(start + (target - start) * easeOut);
-                el.textContent = current.toLocaleString();
+                el.textContent = Math.floor(start + (target - start) * easeOut).toLocaleString();
                 if (progress < 1) requestAnimationFrame(update);
             }
-
             requestAnimationFrame(update);
         }
 
-        // ============================================
-        // RENDER PROJECTS
-        // ============================================
         function renderProjects(projects) {
             const grid = document.getElementById('projectGrid');
-
             if (!projects || projects.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open"></i>
-                        <h4>No Projects Found</h4>
-                        <p>Try adjusting your filters or search terms.</p>
-                    </div>
-                `;
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><h4>No Projects Found</h4><p>Try adjusting your filters or search terms.</p></div>';
                 return;
             }
-
             grid.innerHTML = projects.map(project => `
                 <div class="project-card" data-category="${escapeHtml(project.category || '')}" onclick="openProjectModal('${project.id}')">
                     <div class="image-wrap">
-                        ${project.image_url ? 
-                            `<img src="${escapeHtml(project.image_url)}" alt="${escapeHtml(project.title)}" class="image" loading="lazy">` :
-                            `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
-                                <i class="fas fa-image" style="font-size: 2rem;"></i>
-                            </div>`
-                        }
-                        <div class="image-overlay">
-                            <button class="view-btn">
-                                <i class="fas fa-eye"></i> View Project
-                            </button>
-                        </div>
+                        ${project.image_url ? `<img src="${escapeHtml(project.image_url)}" alt="${escapeHtml(project.title)}" class="image" loading="lazy">` : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted);"><i class="fas fa-image" style="font-size: 2rem;"></i></div>`}
+                        <div class="image-overlay"><button class="view-btn"><i class="fas fa-eye"></i> View Project</button></div>
                     </div>
                     <div class="info">
                         <span class="category">${escapeHtml(project.category || 'Uncategorized')}</span>
                         <h3>${escapeHtml(project.title)}</h3>
                         <p class="desc">${escapeHtml(project.description || 'No description available')}</p>
                         <div class="meta">
-                            <span class="date">
-                                <i class="fas fa-calendar"></i> ${formatDate(project.created_at)}
-                            </span>
+                            <span class="date"><i class="fas fa-calendar"></i> ${formatDate(project.created_at)}</span>
                             <span class="likes ${project.user_liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${project.id}', this)">
                                 <i class="${project.user_liked ? 'fas' : 'far'} fa-heart"></i> ${project.likes_count || 0}
                             </span>
                         </div>
-                        ${project.tags && project.tags.length > 0 ? `
-                            <div class="tags">
-                                ${project.tags.map(tag => `<span>#${escapeHtml(tag)}</span>`).join('')}
-                            </div>
-                        ` : ''}
+                        ${project.tags && project.tags.length > 0 ? `<div class="tags">${project.tags.map(tag => `<span>#${escapeHtml(tag)}</span>`).join('')}</div>` : ''}
                     </div>
                 </div>
             `).join('');
         }
 
-        // ============================================
-        // FORMAT DATE
-        // ============================================
         function formatDate(dateString) {
             if (!dateString) return '';
             const date = new Date(dateString);
             const now = new Date();
             const diff = now - date;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
             if (days === 0) return 'Today';
             if (days === 1) return 'Yesterday';
             if (days < 7) return `${days} days ago`;
@@ -1004,69 +296,31 @@
             return `${Math.floor(days / 365)} years ago`;
         }
 
-        // ============================================
-        // FILTER PROJECTS
-        // ============================================
         function filterProjects(category) {
             currentFilter = category;
-
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.filter === category);
-            });
-
+            document.querySelectorAll('.filter-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.filter === category); });
             applyFilters();
         }
 
-        // ============================================
-        // SEARCH PROJECTS
-        // ============================================
-        function searchProjects(query) {
-            applyFilters(query);
-        }
+        function searchProjects(query) { applyFilters(query); }
 
-        // ============================================
-        // APPLY BOTH FILTER & SEARCH
-        // ============================================
         function applyFilters(searchQuery = '') {
             let filtered = allProjects;
-
-            // Category filter
-            if (currentFilter !== 'all') {
-                filtered = filtered.filter(p => 
-                    p.category && p.category.toLowerCase() === currentFilter.toLowerCase()
-                );
-            }
-
-            // Search filter
+            if (currentFilter !== 'all') { filtered = filtered.filter(p => p.category && p.category.toLowerCase() === currentFilter.toLowerCase()); }
             if (searchQuery) {
                 const q = searchQuery.toLowerCase();
-                filtered = filtered.filter(p => 
-                    (p.title && p.title.toLowerCase().includes(q)) ||
-                    (p.description && p.description.toLowerCase().includes(q)) ||
-                    (p.tags && p.tags.some(tag => tag.toLowerCase().includes(q)))
-                );
+                filtered = filtered.filter(p => (p.title && p.title.toLowerCase().includes(q)) || (p.description && p.description.toLowerCase().includes(q)) || (p.tags && p.tags.some(tag => tag.toLowerCase().includes(q))));
             }
-
             renderProjects(filtered);
         }
 
-        // ============================================
-        // OPEN PROJECT MODAL
-        // ============================================
         function openProjectModal(projectId) {
             const project = allProjects.find(p => p.id === projectId);
             if (!project) return;
-
             const modal = document.getElementById('projectModal');
             const content = document.getElementById('modalContent');
-
             content.innerHTML = `
-                ${project.image_url ? 
-                    `<img src="${escapeHtml(project.image_url)}" alt="${escapeHtml(project.title)}" class="modal-image">` :
-                    `<div style="width: 100%; aspect-ratio: 16/9; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
-                        <i class="fas fa-image" style="font-size: 3rem;"></i>
-                    </div>`
-                }
+                ${project.image_url ? `<img src="${escapeHtml(project.image_url)}" alt="${escapeHtml(project.title)}" class="modal-image">` : `<div style="width: 100%; aspect-ratio: 16/9; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; color: var(--text-muted);"><i class="fas fa-image" style="font-size: 3rem;"></i></div>`}
                 <div class="modal-content">
                     <span class="category">${escapeHtml(project.category || 'Uncategorized')}</span>
                     <h2>${escapeHtml(project.title)}</h2>
@@ -1076,128 +330,52 @@
                         ${project.client ? `<span><i class="fas fa-building"></i> ${escapeHtml(project.client)}</span>` : ''}
                     </div>
                     <p>${escapeHtml(project.description || 'No description available.')}</p>
-                    ${project.tags && project.tags.length > 0 ? `
-                        <div class="modal-tags">
-                            ${project.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}
-                        </div>
-                    ` : ''}
+                    ${project.tags && project.tags.length > 0 ? `<div class="modal-tags">${project.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}</div>` : ''}
                     <div class="modal-actions">
-                        ${project.project_url ? `
-                            <a href="${escapeHtml(project.project_url)}" target="_blank" class="btn-primary" style="text-decoration: none;">
-                                <i class="fas fa-external-link-alt"></i> View Live
-                            </a>
-                        ` : ''}
-                        ${project.behance_url ? `
-                            <a href="${escapeHtml(project.behance_url)}" target="_blank" class="btn-secondary" style="text-decoration: none;">
-                                <i class="fab fa-behance"></i> Behance
-                            </a>
-                        ` : ''}
-                        ${project.dribbble_url ? `
-                            <a href="${escapeHtml(project.dribbble_url)}" target="_blank" class="btn-secondary" style="text-decoration: none;">
-                                <i class="fab fa-dribbble"></i> Dribbble
-                            </a>
-                        ` : ''}
+                        ${project.project_url ? `<a href="${escapeHtml(project.project_url)}" target="_blank" class="btn-primary" style="text-decoration: none;"><i class="fas fa-external-link-alt"></i> View Live</a>` : ''}
+                        ${project.behance_url ? `<a href="${escapeHtml(project.behance_url)}" target="_blank" class="btn-secondary" style="text-decoration: none;"><i class="fab fa-behance"></i> Behance</a>` : ''}
+                        ${project.dribbble_url ? `<a href="${escapeHtml(project.dribbble_url)}" target="_blank" class="btn-secondary" style="text-decoration: none;"><i class="fab fa-dribbble"></i> Dribbble</a>` : ''}
                     </div>
                 </div>
             `;
-
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
-        function closeProjectModal() {
-            document.getElementById('projectModal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
+        function closeProjectModal() { document.getElementById('projectModal').classList.remove('active'); document.body.style.overflow = ''; }
+        document.getElementById('projectModal').addEventListener('click', (e) => { if (e.target.id === 'projectModal') closeProjectModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProjectModal(); });
 
-        // Close modal on overlay click
-        document.getElementById('projectModal').addEventListener('click', (e) => {
-            if (e.target.id === 'projectModal') closeProjectModal();
-        });
-
-        // Close on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeProjectModal();
-        });
-
-        // ============================================
-        // TOGGLE LIKE
-        // ============================================
+        // FIX: Handle case where project_likes table doesn't exist yet
         async function toggleLike(projectId, el) {
-            if (!currentUser) {
-                showToast('Please sign in to like projects', 'warning');
-                setTimeout(() => window.location.href = 'auth.html', 1500);
-                return;
-            }
-
+            if (!currentUser) { showToast('Please sign in to like projects', 'warning'); setTimeout(() => window.location.href = 'auth.html', 1500); return; }
             try {
                 const project = allProjects.find(p => p.id === projectId);
                 const isLiked = el.classList.contains('liked');
-
                 if (isLiked) {
-                    // Unlike
-                    await supabaseClient
-                        .from('project_likes')
-                        .delete()
-                        .eq('project_id', projectId)
-                        .eq('user_id', currentUser.id);
-
+                    const { error } = await supabaseClient.from('project_likes').delete().eq('project_id', projectId).eq('user_id', currentUser.id);
+                    if (error) { if (error.code === '42P01') { showToast('Like feature coming soon!', 'info'); return; } throw error; }
                     project.likes_count = Math.max(0, (project.likes_count || 0) - 1);
                     project.user_liked = false;
                 } else {
-                    // Like
-                    await supabaseClient
-                        .from('project_likes')
-                        .insert({ project_id: projectId, user_id: currentUser.id });
-
+                    const { error } = await supabaseClient.from('project_likes').insert({ project_id: projectId, user_id: currentUser.id });
+                    if (error) { if (error.code === '42P01') { showToast('Like feature coming soon!', 'info'); return; } throw error; }
                     project.likes_count = (project.likes_count || 0) + 1;
                     project.user_liked = true;
                 }
-
-                // Update UI
                 el.classList.toggle('liked');
                 el.querySelector('i').className = project.user_liked ? 'fas fa-heart' : 'far fa-heart';
                 el.innerHTML = `<i class="${project.user_liked ? 'fas' : 'far'} fa-heart"></i> ${project.likes_count}`;
-
                 updateStats(allProjects);
-
-            } catch (error) {
-                console.error('Like error:', error);
-                showToast('Failed to update like', 'error');
-            }
+            } catch (error) { console.error('Like error:', error); showToast('Failed to update like', 'error'); }
         }
 
-        // ============================================
-        // EVENT LISTENERS
-        // ============================================
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                filterProjects(this.dataset.filter);
-            });
-        });
+        document.querySelectorAll('.filter-btn').forEach(btn => { btn.addEventListener('click', function() { filterProjects(this.dataset.filter); }); });
+        document.getElementById('searchInput').addEventListener('input', function() { searchProjects(this.value.trim()); });
 
-        document.getElementById('searchInput').addEventListener('input', function() {
-            searchProjects(this.value.trim());
-        });
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
-        // ============================================
-        // UTILITY: Escape HTML
-        // ============================================
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // ============================================
-        // INITIALIZE
-        // ============================================
-        async function init() {
-            await checkAuth();
-            await loadProjects();
-        }
-
+        async function init() { await checkAuth(); await loadProjects(); }
         init();
     </script>
 </body>
