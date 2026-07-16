@@ -134,7 +134,7 @@
         @media (max-width: 768px) { .academy-hero h1 { font-size: 2rem; } .class-grid { grid-template-columns: 1fr; } .tools-grid { grid-template-columns: repeat(2,1fr); } .container { padding: 0 16px; } }
         @media (max-width: 480px) { .tools-grid { grid-template-columns: 1fr; } .academy-tabs { gap: 4px; } .academy-tab { padding: 8px 16px; font-size: 0.8rem; } }
     </style>
-<base target="_blank">
+    <base target="_blank">
 </head>
 <body>
     <div class="toast-container" id="toastContainer"></div>
@@ -300,32 +300,94 @@
         const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
         const BUCKET_NAME = 'aurex-assets';
-       const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        let supabaseClient = null;
         let currentUser = null, userProfile = null, currentClassId = null, chatSubscription = null, isAdmin = false;
 
-        function getStorageUrl(bucket, filePath) { return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`; }
+        // FIX: Wait for Supabase CDN to fully load before initializing
+        function initializeApp() {
+            if (typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function') {
+                console.warn('Supabase not loaded yet, retrying in 300ms...');
+                setTimeout(initializeApp, 300);
+                return;
+            }
+            
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase client ready');
+            
+            // Attach event listeners now that DOM is ready
+            document.querySelectorAll('.academy-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+            document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+                    if (tab === 'profile') window.location.href = 'profile.html';
+                    else switchTab(tab);
+                });
+            });
+            const sendBtn = document.getElementById('sendMessageBtn');
+            if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+            // Start the app
+            init();
+        }
+
+        // Wait for both DOM and Supabase
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        function getStorageUrl(bucket, filePath) { 
+            return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`; 
+        }
 
         function showToast(message, type = 'success') {
-            const icons = { success: '<i class="fas fa-check-circle"></i>', error: '<i class="fas fa-times-circle"></i>', warning: '<i class="fas fa-exclamation-triangle"></i>', info: '<i class="fas fa-info-circle"></i>' };
+            const icons = { 
+                success: '<i class="fas fa-check-circle"></i>', 
+                error: '<i class="fas fa-times-circle"></i>', 
+                warning: '<i class="fas fa-exclamation-triangle"></i>', 
+                info: '<i class="fas fa-info-circle"></i>' 
+            };
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `${icons[type] || icons.success} ${message}`;
             container.appendChild(toast);
             requestAnimationFrame(() => toast.classList.add('show'));
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400); }, 3000);
+            setTimeout(() => { 
+                toast.classList.remove('show'); 
+                setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400); 
+            }, 3000);
         }
 
+        // FIX: Check auth immediately — redirect to auth.html if no user session
         async function checkAuth() {
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
                 if (error) throw error;
-                if (!session) { showToast('Please sign in to access the Academy', 'warning'); setTimeout(() => { window.location.href = 'auth.html'; }, 1500); return false; }
+                
+                // If no session exists, redirect immediately to auth page
+                if (!session) {
+                    console.log('No active session — redirecting to auth.html');
+                    window.location.replace('auth.html');
+                    return false;
+                }
+                
                 currentUser = session.user;
                 await loadUserProfile();
                 return true;
-            } catch (error) { console.error('Auth check error:', error); showToast('Authentication error. Please sign in again.', 'error'); setTimeout(() => { window.location.href = 'auth.html'; }, 1500); return false; }
+            } catch (error) { 
+                console.error('Auth check error:', error); 
+                // On any auth error, redirect to login
+                window.location.replace('auth.html');
+                return false; 
+            }
         }
 
         async function loadUserProfile() {
@@ -333,53 +395,109 @@
                 const { data, error } = await supabaseClient.from('users').select('*').eq('auth_id', currentUser.id).single();
                 if (error) {
                     if (error.code === 'PGRST116') {
-                        const { error: createError } = await supabaseClient.from('users').insert({ auth_id: currentUser.id, email: currentUser.email, full_name: currentUser.user_metadata?.full_name || 'User', user_type: 'free', subscription_status: 'inactive' });
+                        const { error: createError } = await supabaseClient.from('users').insert({ 
+                            auth_id: currentUser.id, 
+                            email: currentUser.email, 
+                            full_name: currentUser.user_metadata?.full_name || 'User', 
+                            user_type: 'free', 
+                            subscription_status: 'inactive' 
+                        });
                         if (!createError) {
                             const { data: newData } = await supabaseClient.from('users').select('*').eq('auth_id', currentUser.id).single();
-                            userProfile = newData; checkAdmin(); updateUI(); return;
+                            userProfile = newData; 
+                            checkAdmin(); 
+                            updateUI(); 
+                            return;
                         }
                     }
                     throw error;
                 }
-                userProfile = data; checkAdmin(); updateUI();
+                userProfile = data; 
+                checkAdmin(); 
+                updateUI();
             } catch (error) {
                 console.error('Error loading profile:', error);
-                userProfile = { full_name: currentUser.user_metadata?.full_name || 'User', user_type: 'free', subscription_status: 'inactive', profile_image: null };
+                userProfile = { 
+                    full_name: currentUser.user_metadata?.full_name || 'User', 
+                    user_type: 'free', 
+                    subscription_status: 'inactive', 
+                    profile_image: null 
+                };
                 updateUI();
             }
         }
 
         function checkAdmin() {
             isAdmin = userProfile?.user_type === 'admin';
-            if (isAdmin) { document.getElementById('adminUploadPanel').style.display = 'block'; document.getElementById('adminToolsPanel').style.display = 'block'; }
+            if (isAdmin) { 
+                const adminUpload = document.getElementById('adminUploadPanel');
+                const adminTools = document.getElementById('adminToolsPanel');
+                if (adminUpload) adminUpload.style.display = 'block'; 
+                if (adminTools) adminTools.style.display = 'block'; 
+            }
         }
 
         function updateUI() {
             if (!userProfile) return;
-            document.getElementById('userName').textContent = userProfile.full_name || 'User';
-            const avatarUrl = userProfile.profile_image ? getStorageUrl(BUCKET_NAME, userProfile.profile_image) : `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'User')}&background=6366f1&color=fff`;
-            document.getElementById('userAvatar').src = avatarUrl;
+            const userNameEl = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
             const badge = document.getElementById('userTypeBadge');
-            if (userProfile.user_type === 'admin') { badge.textContent = 'ADMIN'; badge.className = 'user-badge badge-admin'; }
-            else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') { badge.textContent = 'PREMIUM'; badge.className = 'user-badge badge-premium'; }
-            else { badge.textContent = 'FREE'; badge.className = 'user-badge badge-free'; }
             const statusEl = document.getElementById('subscriptionStatus');
-            if (userProfile.user_type === 'admin') { statusEl.className = 'sub-status sub-active'; statusEl.innerHTML = '<i class="fas fa-shield-alt"></i> Administrator'; }
-            else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') { statusEl.className = 'sub-status sub-active'; statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Premium Active'; }
-            else if (userProfile.subscription_status === 'pending') { statusEl.className = 'sub-status sub-pending'; statusEl.innerHTML = '<i class="fas fa-clock"></i> Payment Pending'; }
-            else { statusEl.className = 'sub-status sub-inactive'; statusEl.innerHTML = '<i class="fas fa-lock"></i> Free Account'; }
+            
+            if (userNameEl) userNameEl.textContent = userProfile.full_name || 'User';
+            const avatarUrl = userProfile.profile_image ? 
+                getStorageUrl(BUCKET_NAME, userProfile.profile_image) : 
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'User')}&background=6366f1&color=fff`;
+            if (userAvatar) userAvatar.src = avatarUrl;
+            
+            if (badge) {
+                if (userProfile.user_type === 'admin') { 
+                    badge.textContent = 'ADMIN'; 
+                    badge.className = 'user-badge badge-admin'; 
+                } else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') { 
+                    badge.textContent = 'PREMIUM'; 
+                    badge.className = 'user-badge badge-premium'; 
+                } else { 
+                    badge.textContent = 'FREE'; 
+                    badge.className = 'user-badge badge-free'; 
+                }
+            }
+            
+            if (statusEl) {
+                if (userProfile.user_type === 'admin') { 
+                    statusEl.className = 'sub-status sub-active'; 
+                    statusEl.innerHTML = '<i class="fas fa-shield-alt"></i> Administrator'; 
+                } else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') { 
+                    statusEl.className = 'sub-status sub-active'; 
+                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Premium Active'; 
+                } else if (userProfile.subscription_status === 'pending') { 
+                    statusEl.className = 'sub-status sub-pending'; 
+                    statusEl.innerHTML = '<i class="fas fa-clock"></i> Payment Pending'; 
+                } else { 
+                    statusEl.className = 'sub-status sub-inactive'; 
+                    statusEl.innerHTML = '<i class="fas fa-lock"></i> Free Account'; 
+                }
+            }
         }
 
         async function uploadFile(file, folder) {
             const filePath = `${folder}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
             const { data, error } = await supabaseClient.storage.from(BUCKET_NAME).upload(filePath, file, { cacheControl: '3600', upsert: false });
             if (error) throw error;
-            const { error: metaError } = await supabaseClient.from('storage_metadata').insert({ file_path: filePath, file_name: file.name, file_size: file.size, file_type: file.type, folder: folder, uploaded_by: currentUser.id, is_public: true, metadata: { original_name: file.name, content_type: file.type } });
+            const { error: metaError } = await supabaseClient.from('storage_metadata').insert({ 
+                file_path: filePath, 
+                file_name: file.name, 
+                file_size: file.size, 
+                file_type: file.type, 
+                folder: folder, 
+                uploaded_by: currentUser.id, 
+                is_public: true, 
+                metadata: { original_name: file.name, content_type: file.type } 
+            });
             if (metaError) console.warn('Metadata insert failed:', metaError);
             return { filePath, publicUrl: getStorageUrl(BUCKET_NAME, filePath) };
         }
 
-        // FIX: Admin check moved to TOP of handler
         async function handleResourceUpload(event) {
             const files = event.target.files;
             if (!files.length) return;
@@ -387,38 +505,75 @@
             const progressEl = document.getElementById('uploadProgress');
             const fillEl = document.getElementById('progressFill');
             const statusEl = document.getElementById('uploadStatus');
-            progressEl.style.display = 'block';
+            if (progressEl) progressEl.style.display = 'block';
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 try {
-                    fillEl.style.width = `${((i + 1) / files.length) * 100}%`;
-                    statusEl.textContent = `Uploading ${file.name}...`;
+                    if (fillEl) fillEl.style.width = `${((i + 1) / files.length) * 100}%`;
+                    if (statusEl) statusEl.textContent = `Uploading ${file.name}...`;
                     const { filePath, publicUrl } = await uploadFile(file, 'resources');
-                    const { error } = await supabaseClient.from('resources').insert({ title: file.name.replace(/\.[^/.]+$/, ''), description: 'Uploaded resource', file_url: publicUrl, file_path: filePath, resource_type: 'premium', is_active: true, created_by: currentUser.id });
+                    const { error } = await supabaseClient.from('resources').insert({ 
+                        title: file.name.replace(/\.[^/.]+$/, ''), 
+                        description: 'Uploaded resource', 
+                        file_url: publicUrl, 
+                        file_path: filePath, 
+                        resource_type: 'premium', 
+                        is_active: true, 
+                        created_by: currentUser.id 
+                    });
                     if (error) {
-                        if (error.code === '42501' || error.message?.includes('403') || error.message?.includes('permission')) { showToast('Permission denied: Admin access required', 'error'); }
-                        else { throw error; }
-                    } else { showToast(`Uploaded ${file.name}`, 'success'); }
-                } catch (error) { console.error('Upload error:', error); showToast(`Failed to upload ${file.name}`, 'error'); }
+                        if (error.code === '42501' || error.message?.includes('403') || error.message?.includes('permission')) { 
+                            showToast('Permission denied: Admin access required', 'error'); 
+                        } else { 
+                            throw error; 
+                        }
+                    } else { 
+                        showToast(`Uploaded ${file.name}`, 'success'); 
+                    }
+                } catch (error) { 
+                    console.error('Upload error:', error); 
+                    showToast(`Failed to upload ${file.name}`, 'error'); 
+                }
             }
-            fillEl.style.width = '100%'; statusEl.textContent = 'Upload complete!';
-            setTimeout(() => { progressEl.style.display = 'none'; fillEl.style.width = '0%'; }, 1500);
-            loadResources(); loadStorageStats();
+            if (fillEl) fillEl.style.width = '100%'; 
+            if (statusEl) statusEl.textContent = 'Upload complete!';
+            setTimeout(() => { 
+                if (progressEl) progressEl.style.display = 'none'; 
+                if (fillEl) fillEl.style.width = '0%'; 
+            }, 1500);
+            loadResources(); 
+            loadStorageStats();
         }
 
-        // FIX: Admin check moved to TOP of handler
         async function handleToolUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             if (!isAdmin) { showToast('Only admins can upload tools', 'error'); return; }
             try {
                 const { filePath, publicUrl } = await uploadFile(file, 'tools');
-                const { error } = await supabaseClient.from('tools').insert({ name: file.name.replace(/\.[^/.]+$/, ''), description: 'Design tool', download_url: publicUrl, file_path: filePath, is_free: false, icon: '🛠️' });
+                const { error } = await supabaseClient.from('tools').insert({ 
+                    name: file.name.replace(/\.[^/.]+$/, ''), 
+                    description: 'Design tool', 
+                    download_url: publicUrl, 
+                    file_path: filePath, 
+                    is_free: false, 
+                    icon: '🛠️' 
+                });
                 if (error) {
-                    if (error.code === '42501' || error.message?.includes('403') || error.message?.includes('permission')) { showToast('Permission denied: Admin access required', 'error'); }
-                    else { throw error; }
-                } else { showToast('Tool uploaded successfully', 'success'); loadTools(); loadStorageStats(); }
-            } catch (error) { console.error('Tool upload error:', error); showToast('Failed to upload tool', 'error'); }
+                    if (error.code === '42501' || error.message?.includes('403') || error.message?.includes('permission')) { 
+                        showToast('Permission denied: Admin access required', 'error'); 
+                    } else { 
+                        throw error; 
+                    }
+                } else { 
+                    showToast('Tool uploaded successfully', 'success'); 
+                    loadTools(); 
+                    loadStorageStats(); 
+                }
+            } catch (error) { 
+                console.error('Tool upload error:', error); 
+                showToast('Failed to upload tool', 'error'); 
+            }
         }
 
         async function handleChatAttachment(event) {
@@ -427,46 +582,81 @@
             try {
                 showToast('Uploading attachment...', 'info');
                 const { filePath, publicUrl } = await uploadFile(file, 'resources');
-                const { error } = await supabaseClient.from('class_messages').insert({ class_id: currentClassId, user_id: currentUser.id, content: `📎 Shared a file: ${file.name}`, message_type: 'file', file_url: publicUrl });
+                const { error } = await supabaseClient.from('class_messages').insert({ 
+                    class_id: currentClassId, 
+                    user_id: currentUser.id, 
+                    content: `📎 Shared a file: ${file.name}`, 
+                    message_type: 'file', 
+                    file_url: publicUrl 
+                });
                 if (error) throw error;
                 showToast('File shared in chat', 'success');
-            } catch (error) { console.error('Chat attachment error:', error); showToast('Failed to upload attachment', 'error'); }
+            } catch (error) { 
+                console.error('Chat attachment error:', error); 
+                showToast('Failed to upload attachment', 'error'); 
+            }
         }
 
-        // FIX: Uses storage_metadata instead of storage_stats
         async function loadStorageStats() {
             try {
                 const { data, error } = await supabaseClient.from('storage_metadata').select('file_size');
                 if (error) throw error;
                 const totalFiles = data?.length || 0;
                 const totalSize = data?.reduce((sum, row) => sum + (row.file_size || 0), 0) || 0;
-                document.getElementById('totalFiles').textContent = `${totalFiles} files`;
-                document.getElementById('totalSize').textContent = formatBytes(totalSize);
-            } catch (error) { console.error('Storage stats error:', error); document.getElementById('totalFiles').textContent = '0 files'; document.getElementById('totalSize').textContent = '0 MB'; }
+                const totalFilesEl = document.getElementById('totalFiles');
+                const totalSizeEl = document.getElementById('totalSize');
+                if (totalFilesEl) totalFilesEl.textContent = `${totalFiles} files`;
+                if (totalSizeEl) totalSizeEl.textContent = formatBytes(totalSize);
+            } catch (error) { 
+                console.error('Storage stats error:', error); 
+                const totalFilesEl = document.getElementById('totalFiles');
+                const totalSizeEl = document.getElementById('totalSize');
+                if (totalFilesEl) totalFilesEl.textContent = '0 files'; 
+                if (totalSizeEl) totalSizeEl.textContent = '0 MB'; 
+            }
         }
 
-        function formatBytes(bytes) { if (bytes === 0) return '0 MB'; const k = 1024; const sizes = ['B','KB','MB','GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]; }
+        function formatBytes(bytes) { 
+            if (bytes === 0) return '0 MB'; 
+            const k = 1024; 
+            const sizes = ['B','KB','MB','GB']; 
+            const i = Math.floor(Math.log(bytes) / Math.log(k)); 
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]; 
+        }
 
         async function loadClasses() {
             try {
                 const { data, error } = await supabaseClient.from('classes').select('*').eq('is_active', true).order('created_at', { ascending: false });
                 if (error) throw error;
                 const grid = document.getElementById('classGrid');
+                if (!grid) return;
                 grid.innerHTML = '';
-                if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;"><i class="fas fa-video-slash"></i><h4>No Classes Available</h4><p>Check back soon for new content!</p></div>'; return; }
-                const hasPremium = userProfile && (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') || userProfile.user_type === 'admin';
+                if (!data || data.length === 0) { 
+                    grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;"><i class="fas fa-video-slash"></i><h4>No Classes Available</h4><p>Check back soon for new content!</p></div>'; 
+                    return; 
+                }
+                const hasPremium = userProfile && ((userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') || userProfile.user_type === 'admin');
                 data.forEach(cls => {
                     const isPremium = cls.class_type === 'premium';
                     const canAccess = !isPremium || hasPremium;
                     const card = document.createElement('div');
                     card.className = 'class-card';
-                    card.innerHTML = `<div class="class-header"><h4 class="class-title">${escapeHtml(cls.title)}</h4><span class="class-type ${isPremium ? 'type-premium' : 'type-free'}">${isPremium ? '🔒 Premium' : '🆓 Free'}</span></div><div class="class-meta"><span><i class="fas fa-clock"></i> ${cls.duration_minutes || 60}m</span><span><i class="fas fa-users"></i> ${cls.capacity || 'Unlimited'}</span></div><p class="class-description">${escapeHtml(cls.description || 'No description available')}</p><button class="btn-class ${canAccess ? 'btn-class-primary' : 'btn-class-locked'}" onclick="${canAccess ? `openClass('${cls.id}')` : 'showUpgradeModal()'}`">${!canAccess ? '<i class="fas fa-lock"></i> Upgrade to Premium' : isPremium ? '<i class="fas fa-crown"></i> Join Premium Class' : '<i class="fas fa-play"></i> Join Class'}</button>`;
+                    card.innerHTML = `<div class="class-header"><h4 class="class-title">${escapeHtml(cls.title)}</h4><span class="class-type ${isPremium ? 'type-premium' : 'type-free'}">${isPremium ? '🔒 Premium' : '🆓 Free'}</span></div><div class="class-meta"><span><i class="fas fa-clock"></i> ${cls.duration_minutes || 60}m</span><span><i class="fas fa-users"></i> ${cls.capacity || 'Unlimited'}</span></div><p class="class-description">${escapeHtml(cls.description || 'No description available')}</p><button class="btn-class ${canAccess ? 'btn-class-primary' : 'btn-class-locked'}" onclick="${canAccess ? `openClass('${cls.id}')` : 'showUpgradeModal()'}">${!canAccess ? '<i class="fas fa-lock"></i> Upgrade to Premium' : isPremium ? '<i class="fas fa-crown"></i> Join Premium Class' : '<i class="fas fa-play"></i> Join Class'}</button>`;
                     grid.appendChild(card);
                 });
-            } catch (error) { console.error('Error loading classes:', error); showToast('Failed to load classes', 'error'); }
+            } catch (error) { 
+                console.error('Error loading classes:', error); 
+                showToast('Failed to load classes', 'error'); 
+            }
         }
 
-        function openClass(classId) { currentClassId = classId; switchTab('chat'); showToast('Joining class chat...', 'info'); loadClassMessages(classId); setupRealtimeChat(); }
+        function openClass(classId) { 
+            currentClassId = classId; 
+            switchTab('chat'); 
+            showToast('Joining class chat...', 'info'); 
+            loadClassMessages(classId); 
+            setupRealtimeChat(); 
+        }
 
         async function loadResources() {
             try {
@@ -474,8 +664,12 @@
                 const { data, error } = await supabaseClient.from('resources').select('*').eq('is_active', true).order('created_at', { ascending: false });
                 if (error) throw error;
                 const grid = document.getElementById('resourceGrid');
+                if (!grid) return;
                 grid.innerHTML = '';
-                if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><h4>No Resources Available</h4><p>Check back soon for new content!</p></div>'; return; }
+                if (!data || data.length === 0) { 
+                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><h4>No Resources Available</h4><p>Check back soon for new content!</p></div>'; 
+                    return; 
+                }
                 data.forEach(resource => {
                     const isLocked = (resource.resource_type === 'premium' || resource.resource_type === 'paid') && !hasPremium;
                     const fileType = getFileIcon(resource.file_url || resource.file_path);
@@ -484,7 +678,10 @@
                     card.innerHTML = `<div class="file-icon">${fileType}</div><div class="info"><div class="name">${escapeHtml(resource.title)}</div><div class="meta">${resource.resource_type || 'free'}</div></div>${!isLocked ? `<button class="btn-icon" onclick="downloadResource('${resource.id}', '${resource.file_url || resource.file_path || '#'}')" title="Download"><i class="fas fa-download"></i></button>` : `<button class="btn-icon" onclick="showUpgradeModal()" title="Locked" style="color: var(--secondary);"><i class="fas fa-lock"></i></button>`}`;
                     grid.appendChild(card);
                 });
-            } catch (error) { console.error('Error loading resources:', error); showToast('Failed to load resources', 'error'); }
+            } catch (error) { 
+                console.error('Error loading resources:', error); 
+                showToast('Failed to load resources', 'error'); 
+            }
         }
 
         function getFileIcon(filePath) {
@@ -498,11 +695,21 @@
         }
 
         async function downloadResource(resourceId, filePathOrUrl) {
-            if (!filePathOrUrl || filePathOrUrl === '#') { showToast('Download link not available yet', 'warning'); return; }
-            try { await supabaseClient.rpc('increment_download', { resource_id: resourceId }); showToast('Starting download...', 'info'); }
-            catch (error) { console.error('Download tracking error:', error); }
-            if (filePathOrUrl.startsWith('http')) { window.open(filePathOrUrl, '_blank'); }
-            else { window.open(getStorageUrl(BUCKET_NAME, filePathOrUrl), '_blank'); }
+            if (!filePathOrUrl || filePathOrUrl === '#') { 
+                showToast('Download link not available yet', 'warning'); 
+                return; 
+            }
+            try { 
+                await supabaseClient.rpc('increment_download', { resource_id: resourceId }); 
+                showToast('Starting download...', 'info'); 
+            } catch (error) { 
+                console.error('Download tracking error:', error); 
+            }
+            if (filePathOrUrl.startsWith('http')) { 
+                window.open(filePathOrUrl, '_blank'); 
+            } else { 
+                window.open(getStorageUrl(BUCKET_NAME, filePathOrUrl), '_blank'); 
+            }
         }
 
         async function loadTools() {
@@ -510,16 +717,25 @@
                 const { data, error } = await supabaseClient.from('tools').select('*').eq('is_active', true).order('name');
                 if (error) throw error;
                 const grid = document.getElementById('toolsGrid');
+                if (!grid) return;
                 grid.innerHTML = '';
-                if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;"><i class="fas fa-tools"></i><h4>No Tools Available</h4><p>Check back soon for new tools!</p></div>'; return; }
+                if (!data || data.length === 0) { 
+                    grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;"><i class="fas fa-tools"></i><h4>No Tools Available</h4><p>Check back soon for new tools!</p></div>'; 
+                    return; 
+                }
                 data.forEach(tool => {
-                    const downloadUrl = tool.file_path ? getStorageUrl(BUCKET_NAME, tool.file_path) : (tool.download_url || tool.playstore_url || '#');
+                    const downloadUrl = tool.file_path ? 
+                        getStorageUrl(BUCKET_NAME, tool.file_path) : 
+                        (tool.download_url || tool.playstore_url || '#');
                     const card = document.createElement('div');
                     card.className = 'tool-card';
                     card.innerHTML = `<div class="icon">${tool.icon || '🛠️'}</div><h4>${escapeHtml(tool.name)}</h4><p>${escapeHtml(tool.description || '')}</p><a href="${downloadUrl}" target="_blank" class="btn-tool" onclick="${downloadUrl === '#' ? 'event.preventDefault(); showToast(\'Link not available yet\', \'warning\');' : ''}"><i class="fas fa-download"></i> ${tool.is_free ? 'Free' : 'Get'}</a>`;
                     grid.appendChild(card);
                 });
-            } catch (error) { console.error('Error loading tools:', error); showToast('Failed to load tools', 'error'); }
+            } catch (error) { 
+                console.error('Error loading tools:', error); 
+                showToast('Failed to load tools', 'error'); 
+            }
         }
 
         async function loadClassMessages(classId) {
@@ -528,93 +744,139 @@
                 const { data, error } = await supabaseClient.from('class_messages').select('*, users(full_name, profile_image)').eq('class_id', classId).order('created_at', { ascending: true });
                 if (error) throw error;
                 const messagesDiv = document.getElementById('chatMessages');
+                if (!messagesDiv) return;
                 messagesDiv.innerHTML = '';
-                if (!data || data.length === 0) { messagesDiv.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><h4>Welcome to the Chat</h4><p>Be the first to send a message!</p></div>'; return; }
+                if (!data || data.length === 0) { 
+                    messagesDiv.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><h4>Welcome to the Chat</h4><p>Be the first to send a message!</p></div>'; 
+                    return; 
+                }
                 data.forEach(msg => {
                     const isOwn = msg.user_id === currentUser?.id;
                     const div = document.createElement('div');
                     div.className = `chat-message ${isOwn ? 'own' : ''}`;
-                    const avatarUrl = msg.users?.profile_image ? getStorageUrl(BUCKET_NAME, msg.users.profile_image) : `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.users?.full_name || 'U')}&background=${isOwn ? 'ec4899' : '6366f1'}&color=fff`;
+                    const avatarUrl = msg.users?.profile_image ? 
+                        getStorageUrl(BUCKET_NAME, msg.users.profile_image) : 
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.users?.full_name || 'U')}&background=${isOwn ? 'ec4899' : '6366f1'}&color=fff`;
                     const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     let contentHtml = `<div class="text">${escapeHtml(msg.content || '')}</div>`;
                     if (msg.file_url) {
                         const isImage = msg.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-                        if (isImage) { contentHtml += `<div style="margin-top: 8px;"><img src="${msg.file_url}" style="max-width: 200px; border-radius: 8px; cursor: pointer;" onclick="window.open('${msg.file_url}')" alt="Shared image"></div>`; }
-                        else { contentHtml += `<div style="margin-top: 8px;"><a href="${msg.file_url}" target="_blank" style="color: var(--primary); text-decoration: none;"><i class="fas fa-paperclip"></i> Download Attachment</a></div>`; }
+                        if (isImage) { 
+                            contentHtml += `<div style="margin-top: 8px;"><img src="${msg.file_url}" style="max-width: 200px; border-radius: 8px; cursor: pointer;" onclick="window.open('${msg.file_url}')" alt="Shared image"></div>`; 
+                        } else { 
+                            contentHtml += `<div style="margin-top: 8px;"><a href="${msg.file_url}" target="_blank" style="color: var(--primary); text-decoration: none;"><i class="fas fa-paperclip"></i> Download Attachment</a></div>`; 
+                        }
                     }
                     div.innerHTML = `<img src="${avatarUrl}" class="avatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" alt="" onerror="this.src='https://ui-avatars.com/api/?name=U&background=6366f1&color=fff'"><div class="content"><div class="name">${escapeHtml(msg.users?.full_name || 'Unknown')}</div>${contentHtml}<div class="time">${time}</div></div>`;
                     messagesDiv.appendChild(div);
                 });
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            } catch (error) { console.error('Error loading messages:', error); }
+            } catch (error) { 
+                console.error('Error loading messages:', error); 
+            }
         }
 
         async function sendMessage() {
             const input = document.getElementById('chatInput');
+            if (!input) return;
             const message = input.value.trim();
             if (!message) return;
             if (!currentUser) { showToast('Please sign in to send messages', 'warning'); return; }
             if (!currentClassId) { showToast('Please join a class first', 'warning'); return; }
             try {
-                const { error } = await supabaseClient.from('class_messages').insert({ class_id: currentClassId, user_id: currentUser.id, content: message, message_type: 'text' });
+                const { error } = await supabaseClient.from('class_messages').insert({ 
+                    class_id: currentClassId, 
+                    user_id: currentUser.id, 
+                    content: message, 
+                    message_type: 'text' 
+                });
                 if (error) throw error;
                 input.value = '';
-            } catch (error) { console.error('Error sending message:', error); showToast('Failed to send message', 'error'); }
+            } catch (error) { 
+                console.error('Error sending message:', error); 
+                showToast('Failed to send message', 'error'); 
+            }
         }
 
         function setupRealtimeChat() {
-            if (chatSubscription) { chatSubscription.unsubscribe(); }
+            if (chatSubscription) { 
+                chatSubscription.unsubscribe(); 
+            }
             if (!currentClassId) return;
-            chatSubscription = supabaseClient.channel(`class-messages-${currentClassId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'class_messages', filter: `class_id=eq.${currentClassId}` }, (payload) => { loadClassMessages(currentClassId); }).subscribe();
+            chatSubscription = supabaseClient.channel(`class-messages-${currentClassId}`).on('postgres_changes', { 
+                event: 'INSERT', 
+                schema: 'public', 
+                table: 'class_messages', 
+                filter: `class_id=eq.${currentClassId}` 
+            }, (payload) => { 
+                loadClassMessages(currentClassId); 
+            }).subscribe();
         }
 
-        function showUpgradeModal() { document.getElementById('upgradeModal').classList.add('active'); }
-        function closeUpgradeModal() { document.getElementById('upgradeModal').classList.remove('active'); }
+        function showUpgradeModal() { 
+            const modal = document.getElementById('upgradeModal');
+            if (modal) modal.classList.add('active'); 
+        }
+        
+        function closeUpgradeModal() { 
+            const modal = document.getElementById('upgradeModal');
+            if (modal) modal.classList.remove('active'); 
+        }
+        
         function redirectToPayment() {
-            const message = encodeURIComponent('Premium Upgrade Request 🚀
-
-I want to upgrade to Premium!
-Account Name: Mustapha Iman Oniyangi
-Account Number: 8028741731
-Bank: Moniepoint
-Amount: ₦13,500
-
-Please find my payment screenshot attached.
-Thank you! 🙏');
+            const message = encodeURIComponent('Premium Upgrade Request 🚀\n\nI want to upgrade to Premium!\nAccount Name: Mustapha Iman Oniyangi\nAccount Number: 8028741731\nBank: Moniepoint\nAmount: ₦13,500\n\nPlease find my payment screenshot attached.\nThank you! 🙏');
             window.open(`https://wa.me/2349127161200?text=${message}`, '_blank');
             showToast('Redirecting to WhatsApp...', 'info');
         }
 
         function switchTab(tabName) {
             window.location.hash = tabName;
-            document.querySelectorAll('.academy-tab').forEach(tab => { tab.classList.toggle('active', tab.dataset.tab === tabName); });
-            document.querySelectorAll('.tab-content').forEach(content => { content.classList.toggle('active', content.id === `tab-${tabName}`); });
-            document.querySelectorAll('.bottom-nav-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.tab === tabName); });
+            document.querySelectorAll('.academy-tab').forEach(tab => { 
+                tab.classList.toggle('active', tab.dataset.tab === tabName); 
+            });
+            document.querySelectorAll('.tab-content').forEach(content => { 
+                content.classList.toggle('active', content.id === `tab-${tabName}`); 
+            });
+            document.querySelectorAll('.bottom-nav-btn').forEach(btn => { 
+                btn.classList.toggle('active', btn.dataset.tab === tabName); 
+            });
             if (tabName === 'classes') loadClasses();
             if (tabName === 'resources') { loadResources(); loadStorageStats(); }
             if (tabName === 'tools') loadTools();
             if (tabName === 'chat' && currentClassId) { loadClassMessages(currentClassId); setupRealtimeChat(); }
         }
 
-        document.querySelectorAll('.academy-tab').forEach(tab => { tab.addEventListener('click', () => switchTab(tab.dataset.tab)); });
-        document.querySelectorAll('.bottom-nav-btn').forEach(btn => { btn.addEventListener('click', () => { const tab = btn.dataset.tab; if (tab === 'profile') { window.location.href = 'profile.html'; } else { switchTab(tab); } }); });
-        document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
-        document.getElementById('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        function escapeHtml(text) { 
+            if (!text) return ''; 
+            const div = document.createElement('div'); 
+            div.textContent = text; 
+            return div.innerHTML; 
+        }
 
-        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-
-        supabaseClient.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT') { window.location.href = 'auth.html'; } });
-
+        // FIX: Auth guard — if no session, redirect immediately before loading any data
         async function init() {
             const authed = await checkAuth();
-            if (!authed) return;
+            if (!authed) return; // Stop here — already redirected to auth.html
+            
             const hash = window.location.hash.replace('#', '');
-            if (hash && ['home','classes','resources','tools','chat'].includes(hash)) { switchTab(hash); }
-            await loadClasses(); await loadResources(); await loadTools(); await loadStorageStats();
-            const { data: firstClass } = await supabaseClient.from('classes').select('id').eq('is_active', true).limit(1).single();
-            if (firstClass) { currentClassId = firstClass.id; await loadClassMessages(currentClassId); setupRealtimeChat(); }
+            if (hash && ['home','classes','resources','tools','chat'].includes(hash)) { 
+                switchTab(hash); 
+            }
+            await loadClasses(); 
+            await loadResources(); 
+            await loadTools(); 
+            await loadStorageStats();
+            try {
+                const { data: firstClass } = await supabaseClient.from('classes').select('id').eq('is_active', true).limit(1).single();
+                if (firstClass) { 
+                    currentClassId = firstClass.id; 
+                    await loadClassMessages(currentClassId); 
+                    setupRealtimeChat(); 
+                }
+            } catch (e) {
+                console.log('No classes found for chat initialization');
+            }
         }
-        init();
     </script>
 </body>
 </html>
