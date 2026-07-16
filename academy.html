@@ -684,38 +684,60 @@
 
         .stat-pill i { color: var(--primary); }
 
-        .resource-file-card {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .resource-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            margin-bottom: 12px;
+            padding: 20px;
             transition: all 0.3s ease;
         }
 
-        .resource-file-card:hover {
+        .resource-card:hover {
+            transform: translateY(-4px);
             border-color: var(--primary);
-            transform: translateX(4px);
         }
 
-        .resource-file-card .file-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: var(--bg-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+        .resource-card .file-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
             color: var(--primary);
         }
 
-        .resource-file-card .info { flex: 1; }
-        .resource-file-card .name { font-weight: 600; margin-bottom: 4px; }
-        .resource-file-card .meta { color: var(--text-muted); font-size: 0.8rem; }
+        .resource-card .name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .resource-card .meta {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+        }
+
+        .resource-card .btn-download {
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .resource-card .btn-download:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
 
         .btn-icon {
             width: 32px;
@@ -737,6 +759,7 @@
             .academy-hero h1 { font-size: 2rem; }
             .class-grid { grid-template-columns: 1fr; }
             .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .resource-grid { grid-template-columns: 1fr; }
             .container { padding: 0 16px; }
         }
 
@@ -846,40 +869,34 @@
                         <i class="fas fa-lock" style="color: var(--secondary);"></i> Locked classes require Premium
                     </span>
                 </div>
-                <div class="class-grid" id="classGrid">
-                    <!-- Will be populated by JavaScript -->
-                </div>
+                <div class="class-grid" id="classGrid"></div>
             </div>
 
             <!-- Resources Tab -->
             <div class="tab-content" id="tab-resources">
-                <!-- Admin Upload Panel -->
                 <div id="adminUploadPanel" class="admin-panel" style="display: none;">
                     <h4><i class="fas fa-shield-alt"></i> Admin: Upload Resources</h4>
-                    <div class="upload-zone" id="resourceUploadZone" onclick="document.getElementById('resourceFileInput').click()">
+                    <div class="upload-zone" onclick="document.getElementById('resourceFileInput').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <h4>Drop files here or click to upload</h4>
                         <p>Supports images, PDFs, ZIPs, and design files</p>
                         <input type="file" id="resourceFileInput" style="display: none;" multiple onchange="handleResourceUpload(event)">
                     </div>
-                    <div class="upload-progress" id="uploadProgress" style="display: none;">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                    <div id="uploadProgress" style="display: none; margin-top: 16px;">
+                        <div style="height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden;">
+                            <div id="progressFill" style="height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.3s ease; width: 0%;"></div>
                         </div>
                         <p style="text-align: center; margin-top: 8px; color: var(--text-muted); font-size: 0.85rem;" id="uploadStatus">Uploading...</p>
                     </div>
                 </div>
 
-                <!-- Storage Stats -->
-                <div class="storage-stats-bar" id="storageStats">
+                <div class="storage-stats-bar">
                     <div class="stat-pill"><i class="fas fa-hdd"></i> <span id="totalFiles">0 files</span></div>
                     <div class="stat-pill"><i class="fas fa-weight-hanging"></i> <span id="totalSize">0 MB</span></div>
                 </div>
 
                 <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 24px;">📁 Resources</h3>
-                <div id="resourceGrid">
-                    <!-- Will be populated by JavaScript -->
-                </div>
+                <div class="resource-grid" id="resourceGrid"></div>
             </div>
 
             <!-- Tools Tab -->
@@ -895,15 +912,13 @@
                 </div>
                 <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 8px;">🛠️ Design Tools</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 24px;">Download essential design tools to level up your workflow</p>
-                <div class="tools-grid" id="toolsGrid">
-                    <!-- Will be populated by JavaScript -->
-                </div>
+                <div class="tools-grid" id="toolsGrid"></div>
             </div>
 
             <!-- Chat Tab -->
             <div class="tab-content" id="tab-chat">
                 <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 16px;">💬 Community Chat</h3>
-                <div class="chat-area" id="chatArea">
+                <div class="chat-area">
                     <div class="chat-messages" id="chatMessages">
                         <div class="empty-state">
                             <i class="fas fa-comments"></i>
@@ -936,9 +951,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ============================================
-        // SUPABASE CONFIGURATION
-        // ============================================
         const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
         const BUCKET_NAME = 'aurex-assets';
@@ -952,16 +964,10 @@
         let chatSubscription = null;
         let isAdmin = false;
 
-        // ============================================
-        // STORAGE URL HELPER
-        // ============================================
         function getStorageUrl(bucket, filePath) {
             return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`;
         }
 
-        // ============================================
-        // TOAST SYSTEM
-        // ============================================
         function showToast(message, type = 'success') {
             const icons = {
                 success: '<i class="fas fa-check-circle"></i>',
@@ -986,9 +992,6 @@
             }, 3000);
         }
 
-        // ============================================
-        // CHECK AUTH
-        // ============================================
         async function checkAuth() {
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -1009,9 +1012,6 @@
             }
         }
 
-        // ============================================
-        // LOAD USER PROFILE
-        // ============================================
         async function loadUserProfile() {
             try {
                 const { data, error } = await supabaseClient
@@ -1062,9 +1062,6 @@
             }
         }
 
-        // ============================================
-        // CHECK ADMIN STATUS
-        // ============================================
         function checkAdmin() {
             isAdmin = userProfile?.user_type === 'admin';
             if (isAdmin) {
@@ -1075,9 +1072,6 @@
             }
         }
 
-        // ============================================
-        // UPDATE UI
-        // ============================================
         function updateUI() {
             if (!userProfile) return;
 
@@ -1116,9 +1110,6 @@
             }
         }
 
-        // ============================================
-        // UPLOAD FILE
-        // ============================================
         async function uploadFile(file, folder) {
             const filePath = `${folder}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
             const { data, error } = await supabaseClient.storage
@@ -1151,9 +1142,6 @@
             return { filePath, publicUrl: getStorageUrl(BUCKET_NAME, filePath) };
         }
 
-        // ============================================
-        // HANDLE RESOURCE UPLOAD
-        // ============================================
         async function handleResourceUpload(event) {
             const files = event.target.files;
             if (!files.length) return;
@@ -1209,9 +1197,6 @@
             loadStorageStats();
         }
 
-        // ============================================
-        // HANDLE TOOL UPLOAD
-        // ============================================
         async function handleToolUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1244,9 +1229,6 @@
             }
         }
 
-        // ============================================
-        // HANDLE CHAT ATTACHMENT
-        // ============================================
         async function handleChatAttachment(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1273,9 +1255,6 @@
             }
         }
 
-        // ============================================
-        // LOAD STORAGE STATS
-        // ============================================
         async function loadStorageStats() {
             try {
                 const { data, error } = await supabaseClient
@@ -1304,9 +1283,6 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // ============================================
-        // LOAD CLASSES
-        // ============================================
         async function loadClasses() {
             try {
                 const { data, error } = await supabaseClient
@@ -1315,10 +1291,7 @@
                     .eq('is_active', true)
                     .order('created_at', { ascending: false });
 
-                if (error) {
-                    console.error('Classes query error:', error);
-                    throw error;
-                }
+                if (error) throw error;
 
                 const grid = document.getElementById('classGrid');
                 grid.innerHTML = '';
@@ -1366,7 +1339,6 @@
                     grid.appendChild(card);
                 });
 
-                // Set first class as current class for chat
                 if (data.length > 0 && !currentClassId) {
                     currentClassId = data[0].id;
                 }
@@ -1377,9 +1349,6 @@
             }
         }
 
-        // ============================================
-        // OPEN CLASS
-        // ============================================
         function openClass(classId) {
             currentClassId = classId;
             switchTab('chat');
@@ -1388,9 +1357,6 @@
             setupRealtimeChat();
         }
 
-        // ============================================
-        // LOAD RESOURCES
-        // ============================================
         async function loadResources() {
             try {
                 const hasPremium = userProfile &&
@@ -1403,17 +1369,14 @@
                     .eq('is_active', true)
                     .order('created_at', { ascending: false });
 
-                if (error) {
-                    console.error('Resources query error:', error);
-                    throw error;
-                }
+                if (error) throw error;
 
                 const grid = document.getElementById('resourceGrid');
                 grid.innerHTML = '';
 
                 if (!data || data.length === 0) {
                     grid.innerHTML = `
-                        <div class="empty-state">
+                        <div class="empty-state" style="grid-column: 1 / -1;">
                             <i class="fas fa-folder-open"></i>
                             <h4>No Resources Available</h4>
                             <p>Check back soon for new content!</p>
@@ -1427,19 +1390,17 @@
                     const fileType = getFileIcon(resource.file_url || resource.file_path);
 
                     const card = document.createElement('div');
-                    card.className = 'resource-file-card';
+                    card.className = 'resource-card';
                     card.innerHTML = `
                         <div class="file-icon">${fileType}</div>
-                        <div class="info">
-                            <div class="name">${escapeHtml(resource.title)}</div>
-                            <div class="meta">${resource.resource_type || 'free'}</div>
-                        </div>
+                        <div class="name">${escapeHtml(resource.title)}</div>
+                        <div class="meta">${resource.resource_type || 'free'}</div>
                         ${!isLocked ?
-                            `<button class="btn-icon" onclick="downloadResource('${resource.id}', '${resource.file_url || resource.file_path || '#'}')" title="Download">
-                                <i class="fas fa-download"></i>
+                            `<button class="btn-download" onclick="downloadResource('${resource.id}', '${resource.file_url || resource.file_path || '#'}')">
+                                <i class="fas fa-download"></i> Download
                             </button>` :
-                            `<button class="btn-icon" onclick="showUpgradeModal()" title="Locked" style="color: var(--secondary);">
-                                <i class="fas fa-lock"></i>
+                            `<button class="btn-download" onclick="showUpgradeModal()" style="color: var(--secondary); border-color: var(--secondary);">
+                                <i class="fas fa-lock"></i> Premium
                             </button>`
                         }
                     `;
@@ -1462,9 +1423,6 @@
             return '📄';
         }
 
-        // ============================================
-        // DOWNLOAD RESOURCE
-        // ============================================
         async function downloadResource(resourceId, filePathOrUrl) {
             if (!filePathOrUrl || filePathOrUrl === '#') {
                 showToast('Download link not available yet', 'warning');
@@ -1486,9 +1444,6 @@
             }
         }
 
-        // ============================================
-        // LOAD TOOLS
-        // ============================================
         async function loadTools() {
             try {
                 const { data, error } = await supabaseClient
@@ -1497,10 +1452,7 @@
                     .eq('is_active', true)
                     .order('name');
 
-                if (error) {
-                    console.error('Tools query error:', error);
-                    throw error;
-                }
+                if (error) throw error;
 
                 const grid = document.getElementById('toolsGrid');
                 grid.innerHTML = '';
@@ -1543,9 +1495,6 @@
             }
         }
 
-        // ============================================
-        // LOAD CLASS MESSAGES
-        // ============================================
         async function loadClassMessages(classId) {
             if (!classId) return;
 
@@ -1556,10 +1505,7 @@
                     .eq('class_id', classId)
                     .order('created_at', { ascending: true });
 
-                if (error) {
-                    console.error('Messages query error:', error);
-                    throw error;
-                }
+                if (error) throw error;
 
                 const messagesDiv = document.getElementById('chatMessages');
                 messagesDiv.innerHTML = '';
@@ -1597,7 +1543,7 @@
                     }
 
                     div.innerHTML = `
-                        <img src="${avatarUrl}" class="avatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" alt="" onerror="this.src='https://ui-avatars.com/api/?name=U&background=6366f1&color=fff'">
+                        <img src="${avatarUrl}" class="avatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" alt="">
                         <div class="content">
                             <div class="name">${escapeHtml(msg.users?.full_name || 'Unknown')}</div>
                             ${contentHtml}
@@ -1614,9 +1560,6 @@
             }
         }
 
-        // ============================================
-        // SEND MESSAGE
-        // ============================================
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
@@ -1650,9 +1593,6 @@
             }
         }
 
-        // ============================================
-        // REAL-TIME CHAT SUBSCRIPTION
-        // ============================================
         function setupRealtimeChat() {
             if (chatSubscription) {
                 chatSubscription.unsubscribe();
@@ -1676,9 +1616,6 @@
                 .subscribe();
         }
 
-        // ============================================
-        // UPGRADE MODAL
-        // ============================================
         function showUpgradeModal() {
             document.getElementById('upgradeModal').classList.add('active');
         }
@@ -1702,9 +1639,6 @@
             showToast('Redirecting to WhatsApp...', 'info');
         }
 
-        // ============================================
-        // TAB SWITCHING
-        // ============================================
         function switchTab(tabName) {
             window.location.hash = tabName;
 
@@ -1732,9 +1666,6 @@
             }
         }
 
-        // ============================================
-        // UTILITY: Escape HTML
-        // ============================================
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -1742,9 +1673,6 @@
             return div.innerHTML;
         }
 
-        // ============================================
-        // EVENT LISTENERS
-        // ============================================
         document.querySelectorAll('.academy-tab').forEach(tab => {
             tab.addEventListener('click', () => switchTab(tab.dataset.tab));
         });
@@ -1765,18 +1693,12 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        // ============================================
-        // AUTH STATE LISTENER
-        // ============================================
         supabaseClient.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_OUT') {
                 window.location.href = 'auth.html';
             }
         });
 
-        // ============================================
-        // INITIALIZE
-        // ============================================
         async function init() {
             const authed = await checkAuth();
             if (!authed) return;
@@ -1791,7 +1713,6 @@
             await loadTools();
             await loadStorageStats();
 
-            // If no class selected, try to get the first class
             if (!currentClassId) {
                 const { data } = await supabaseClient
                     .from('classes')
