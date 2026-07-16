@@ -299,11 +299,6 @@
             cursor: not-allowed;
         }
 
-        .btn-class-admin {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            color: white;
-        }
-
         .chat-area {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -852,9 +847,7 @@
                     </span>
                 </div>
                 <div class="class-grid" id="classGrid">
-                    <div class="skeleton skeleton-card"></div>
-                    <div class="skeleton skeleton-card"></div>
-                    <div class="skeleton skeleton-card"></div>
+                    <!-- Will be populated by JavaScript -->
                 </div>
             </div>
 
@@ -885,9 +878,7 @@
 
                 <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 24px;">📁 Resources</h3>
                 <div id="resourceGrid">
-                    <div class="skeleton skeleton-card"></div>
-                    <div class="skeleton skeleton-card"></div>
-                    <div class="skeleton skeleton-card"></div>
+                    <!-- Will be populated by JavaScript -->
                 </div>
             </div>
 
@@ -905,10 +896,7 @@
                 <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 8px;">🛠️ Design Tools</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 24px;">Download essential design tools to level up your workflow</p>
                 <div class="tools-grid" id="toolsGrid">
-                    <div class="skeleton skeleton-card" style="height: 150px;"></div>
-                    <div class="skeleton skeleton-card" style="height: 150px;"></div>
-                    <div class="skeleton skeleton-card" style="height: 150px;"></div>
-                    <div class="skeleton skeleton-card" style="height: 150px;"></div>
+                    <!-- Will be populated by JavaScript -->
                 </div>
             </div>
 
@@ -1034,7 +1022,6 @@
 
                 if (error) {
                     if (error.code === 'PGRST116') {
-                        // Create profile if doesn't exist
                         const { error: createError } = await supabaseClient
                             .from('users')
                             .insert({
@@ -1081,8 +1068,10 @@
         function checkAdmin() {
             isAdmin = userProfile?.user_type === 'admin';
             if (isAdmin) {
-                document.getElementById('adminUploadPanel').style.display = 'block';
-                document.getElementById('adminToolsPanel').style.display = 'block';
+                const uploadPanel = document.getElementById('adminUploadPanel');
+                const toolsPanel = document.getElementById('adminToolsPanel');
+                if (uploadPanel) uploadPanel.style.display = 'block';
+                if (toolsPanel) toolsPanel.style.display = 'block';
             }
         }
 
@@ -1141,7 +1130,6 @@
 
             if (error) throw error;
 
-            // Insert metadata
             const { error: metaError } = await supabaseClient
                 .from('storage_metadata')
                 .insert({
@@ -1327,7 +1315,10 @@
                     .eq('is_active', true)
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Classes query error:', error);
+                    throw error;
+                }
 
                 const grid = document.getElementById('classGrid');
                 grid.innerHTML = '';
@@ -1344,8 +1335,8 @@
                 }
 
                 const hasPremium = userProfile &&
-                    (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') ||
-                    userProfile.user_type === 'admin';
+                    ((userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') ||
+                     userProfile.user_type === 'admin');
 
                 data.forEach(cls => {
                     const isPremium = cls.class_type === 'premium';
@@ -1374,6 +1365,11 @@
                     `;
                     grid.appendChild(card);
                 });
+
+                // Set first class as current class for chat
+                if (data.length > 0 && !currentClassId) {
+                    currentClassId = data[0].id;
+                }
 
             } catch (error) {
                 console.error('Error loading classes:', error);
@@ -1407,7 +1403,10 @@
                     .eq('is_active', true)
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Resources query error:', error);
+                    throw error;
+                }
 
                 const grid = document.getElementById('resourceGrid');
                 grid.innerHTML = '';
@@ -1473,14 +1472,12 @@
             }
 
             try {
-                // Try to increment download count
                 await supabaseClient.rpc('increment_download', { resource_id: resourceId });
                 showToast('Starting download...', 'info');
             } catch (error) {
                 console.error('Download tracking error:', error);
             }
 
-            // Open the file
             if (filePathOrUrl.startsWith('http')) {
                 window.open(filePathOrUrl, '_blank');
             } else {
@@ -1500,7 +1497,10 @@
                     .eq('is_active', true)
                     .order('name');
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Tools query error:', error);
+                    throw error;
+                }
 
                 const grid = document.getElementById('toolsGrid');
                 grid.innerHTML = '';
@@ -1556,7 +1556,10 @@
                     .eq('class_id', classId)
                     .order('created_at', { ascending: true });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Messages query error:', error);
+                    throw error;
+                }
 
                 const messagesDiv = document.getElementById('chatMessages');
                 messagesDiv.innerHTML = '';
@@ -1729,12 +1732,23 @@
             }
         }
 
-        // Tab clicks
+        // ============================================
+        // UTILITY: Escape HTML
+        // ============================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
         document.querySelectorAll('.academy-tab').forEach(tab => {
             tab.addEventListener('click', () => switchTab(tab.dataset.tab));
         });
 
-        // Bottom nav clicks
         document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.dataset.tab;
@@ -1746,21 +1760,10 @@
             });
         });
 
-        // Send message
         document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
         document.getElementById('chatInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
-
-        // ============================================
-        // UTILITY: Escape HTML
-        // ============================================
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
 
         // ============================================
         // AUTH STATE LISTENER
@@ -1783,24 +1786,24 @@
                 switchTab(hash);
             }
 
-            // Load all data
             await loadClasses();
             await loadResources();
             await loadTools();
             await loadStorageStats();
-            
-            // Set default class ID from first class if available
-            const { data: firstClass } = await supabaseClient
-                .from('classes')
-                .select('id')
-                .eq('is_active', true)
-                .limit(1)
-                .single();
-            
-            if (firstClass) {
-                currentClassId = firstClass.id;
-                await loadClassMessages(currentClassId);
-                setupRealtimeChat();
+
+            // If no class selected, try to get the first class
+            if (!currentClassId) {
+                const { data } = await supabaseClient
+                    .from('classes')
+                    .select('id')
+                    .eq('is_active', true)
+                    .limit(1)
+                    .single();
+                if (data) {
+                    currentClassId = data.id;
+                    await loadClassMessages(currentClassId);
+                    setupRealtimeChat();
+                }
             }
         }
 
