@@ -8,774 +8,135 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --accent: #06b6d4;
-            --bg-primary: #0f0f1a;
-            --bg-secondary: #1a1a2e;
-            --bg-card: #16162a;
-            --bg-glass: rgba(22, 22, 42, 0.85);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border: rgba(255, 255, 255, 0.08);
-            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #ec4899; --accent: #06b6d4;
+            --bg-primary: #0f0f1a; --bg-secondary: #1a1a2e; --bg-card: #16162a; --bg-glass: rgba(22,22,42,0.85);
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border: rgba(255,255,255,0.08); --shadow-glow: 0 0 40px rgba(99,102,241,0.3);
             --bottom-nav-height: 70px;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            padding-bottom: var(--bottom-nav-height);
-        }
-
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 0;
-        }
-
-        .nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo img {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            border: 2px solid var(--primary);
-        }
-
-        .logo span {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-            object-fit: cover;
-        }
-
-        .user-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge-premium {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-
-        .badge-free {
-            background: var(--border);
-            color: var(--text-secondary);
-        }
-
-        .badge-admin {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            color: white;
-        }
-
-        .academy-hero {
-            padding: 120px 0 60px;
-            text-align: center;
-            background: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.15), transparent 60%);
-        }
-
-        .academy-hero h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 3rem;
-            margin-bottom: 16px;
-        }
-
-        .academy-hero p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 24px;
-        }
-
-        .sub-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .sub-active {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .sub-inactive {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .sub-pending {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
-        .academy-tabs {
-            display: flex;
-            gap: 8px;
-            margin: 32px 0;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 4px;
-            overflow-x: auto;
-        }
-
-        .academy-tab {
-            padding: 12px 24px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .academy-tab.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .academy-tab:hover:not(.active) {
-            color: var(--text-primary);
-        }
-
-        .tab-content {
-            display: none;
-            padding: 20px 0;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .class-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
-        }
-
-        .class-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .class-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-            box-shadow: var(--shadow-glow);
-        }
-
-        .class-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 12px;
-        }
-
-        .class-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-
-        .class-type {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .type-free { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .type-premium { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
-
-        .class-meta {
-            display: flex;
-            gap: 16px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin: 12px 0;
-        }
-
+        body { font-family: 'Inter',sans-serif; background: var(--bg-primary); color: var(--text-primary); padding-bottom: var(--bottom-nav-height); }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 16px 0; }
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo img { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--primary); }
+        .logo span { font-family: 'Space Grotesk',sans-serif; font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+        .user-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .badge-premium { background: linear-gradient(135deg,var(--primary),var(--secondary)); color: white; }
+        .badge-free { background: var(--border); color: var(--text-secondary); }
+        .badge-admin { background: linear-gradient(135deg,#f59e0b,#ef4444); color: white; }
+        .academy-hero { padding: 120px 0 60px; text-align: center; background: radial-gradient(ellipse at top, rgba(99,102,241,0.15), transparent 60%); }
+        .academy-hero h1 { font-family: 'Space Grotesk',sans-serif; font-size: 3rem; margin-bottom: 16px; }
+        .academy-hero p { color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto 24px; }
+        .sub-status { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; }
+        .sub-active { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .sub-inactive { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .sub-pending { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+        .academy-tabs { display: flex; gap: 8px; margin: 32px 0; background: var(--bg-secondary); border-radius: 12px; padding: 4px; overflow-x: auto; }
+        .academy-tab { padding: 12px 24px; border: none; background: transparent; color: var(--text-secondary); font-family: 'Space Grotesk',sans-serif; font-weight: 600; font-size: 0.9rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
+        .academy-tab.active { background: var(--primary); color: white; }
+        .academy-tab:hover:not(.active) { color: var(--text-primary); }
+        .tab-content { display: none; padding: 20px 0; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 24px; }
+        .class-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s ease; }
+        .class-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: var(--shadow-glow); }
+        .class-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px; }
+        .class-title { font-family: 'Space Grotesk',sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
+        .class-type { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .type-free { background: rgba(16,185,129,0.2); color: #10b981; }
+        .type-premium { background: rgba(99,102,241,0.2); color: #6366f1; }
+        .class-meta { display: flex; gap: 16px; color: var(--text-muted); font-size: 0.85rem; margin: 12px 0; }
         .class-meta i { margin-right: 4px; }
-
-        .class-description {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin: 12px 0;
-        }
-
-        .btn-class {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-class-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        .btn-class-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-class-locked {
-            background: var(--bg-secondary);
-            color: var(--text-muted);
-            cursor: not-allowed;
-        }
-
-        .chat-area {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            height: 500px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .chat-message {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-            animation: messageIn 0.3s ease;
-        }
-
-        @keyframes messageIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .chat-message .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-            color: white;
-        }
-
-        .chat-message .content {
-            background: var(--bg-secondary);
-            padding: 12px 16px;
-            border-radius: 12px;
-            max-width: 70%;
-        }
-
-        .chat-message .content .name {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-
-        .chat-message .content .text {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .chat-message .content .time {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
+        .class-description { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin: 12px 0; }
+        .btn-class { width: 100%; padding: 10px; border: none; border-radius: 8px; font-family: 'Space Grotesk',sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; }
+        .btn-class-primary { background: linear-gradient(135deg,var(--primary),var(--primary-dark)); color: white; }
+        .btn-class-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.4); }
+        .btn-class-locked { background: var(--bg-secondary); color: var(--text-muted); cursor: not-allowed; }
+        .chat-area { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; height: 500px; display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; }
+        .chat-message { display: flex; gap: 12px; margin-bottom: 16px; animation: messageIn 0.3s ease; }
+        @keyframes messageIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .chat-message .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; flex-shrink: 0; color: white; }
+        .chat-message .content { background: var(--bg-secondary); padding: 12px 16px; border-radius: 12px; max-width: 70%; }
+        .chat-message .content .name { font-weight: 600; font-size: 0.85rem; color: var(--primary); margin-bottom: 4px; }
+        .chat-message .content .text { color: var(--text-secondary); font-size: 0.9rem; }
+        .chat-message .content .time { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
         .chat-message.own { flex-direction: row-reverse; }
-        .chat-message.own .content {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.1));
-            border: 1px solid rgba(99, 102, 241, 0.2);
-        }
-
-        .chat-input {
-            display: flex;
-            gap: 12px;
-            padding: 16px;
-            border-top: 1px solid var(--border);
-        }
-
-        .chat-input input {
-            flex: 1;
-            padding: 10px 16px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-        }
-
-        .chat-input input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .chat-input button {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .chat-input button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        }
-
-        .chat-attachment {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .chat-attachment:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 20px;
-        }
-
-        .tool-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .tool-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-        }
-
-        .tool-card .icon {
-            font-size: 2rem;
-            margin-bottom: 8px;
-            color: var(--primary);
-        }
-
+        .chat-message.own .content { background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(236,72,153,0.1)); border: 1px solid rgba(99,102,241,0.2); }
+        .chat-input { display: flex; gap: 12px; padding: 16px; border-top: 1px solid var(--border); }
+        .chat-input input { flex: 1; padding: 10px 16px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Inter',sans-serif; }
+        .chat-input input:focus { outline: none; border-color: var(--primary); }
+        .chat-input button { padding: 10px 20px; background: linear-gradient(135deg,var(--primary),var(--primary-dark)); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+        .chat-input button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+        .chat-attachment { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg-secondary); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
+        .chat-attachment:hover { background: var(--primary); color: white; }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 16px; margin-top: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.3s ease; }
+        .tool-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+        .tool-card .icon { font-size: 2rem; margin-bottom: 8px; color: var(--primary); }
         .tool-card h4 { font-size: 0.95rem; margin-bottom: 4px; }
         .tool-card p { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px; }
-
-        .btn-tool {
-            padding: 6px 16px;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-tool:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            z-index: 999;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: var(--bottom-nav-height);
-            padding: 0 16px;
-        }
-
-        .bottom-nav-inner {
-            display: flex;
-            gap: 8px;
-            max-width: 500px;
-            width: 100%;
-            justify-content: space-around;
-        }
-
-        .bottom-nav-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 8px 16px;
-            background: transparent;
-            border: none;
-            border-radius: 12px;
-            color: var(--text-secondary);
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 0.7rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1;
-            max-width: 120px;
-        }
-
+        .btn-tool { padding: 6px 16px; border: 1px solid var(--border); border-radius: 20px; background: transparent; color: var(--text-secondary); font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
+        .btn-tool:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--bg-glass); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: center; align-items: center; height: var(--bottom-nav-height); padding: 0 16px; }
+        .bottom-nav-inner { display: flex; gap: 8px; max-width: 500px; width: 100%; justify-content: space-around; }
+        .bottom-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px 16px; background: transparent; border: none; border-radius: 12px; color: var(--text-secondary); font-family: 'Space Grotesk',sans-serif; font-weight: 600; font-size: 0.7rem; text-decoration: none; cursor: pointer; transition: all 0.3s ease; flex: 1; max-width: 120px; }
         .bottom-nav-btn i { font-size: 1.3rem; transition: all 0.3s ease; }
-        .bottom-nav-btn:hover { color: var(--primary); background: rgba(99, 102, 241, 0.1); }
-        .bottom-nav-btn.active {
-            color: var(--primary);
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.1));
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 80px; right: 20px;
-            z-index: 10001;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            padding: 14px 20px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transform: translateX(120%);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 320px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
+        .bottom-nav-btn:hover { color: var(--primary); background: rgba(99,102,241,0.1); }
+        .bottom-nav-btn.active { color: var(--primary); background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(236,72,153,0.1)); }
+        .toast-container { position: fixed; top: 80px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 14px 20px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.9rem; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); max-width: 320px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
         .toast.show { transform: translateX(0); opacity: 1; }
-        .toast-success { background: rgba(16, 185, 129, 0.95); }
-        .toast-error { background: rgba(239, 68, 68, 0.95); }
-        .toast-warning { background: rgba(245, 158, 11, 0.95); }
-        .toast-info { background: rgba(99, 102, 241, 0.95); }
-
-        .skeleton {
-            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 8px;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
+        .toast-success { background: rgba(16,185,129,0.95); }
+        .toast-error { background: rgba(239,68,68,0.95); }
+        .toast-warning { background: rgba(245,158,11,0.95); }
+        .toast-info { background: rgba(99,102,241,0.95); }
+        .skeleton { background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .skeleton-card { height: 200px; width: 100%; }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
         .empty-state i { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state h4 {
-            font-family: 'Space Grotesk', sans-serif;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
+        .empty-state h4 { font-family: 'Space Grotesk',sans-serif; margin-bottom: 8px; color: var(--text-secondary); }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-overlay.active { display: flex; }
-
-        .modal {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px;
-            max-width: 420px;
-            width: 100%;
-            animation: modalIn 0.3s ease;
-        }
-
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .modal h3 { font-family: 'Space Grotesk', sans-serif; margin-bottom: 12px; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 32px; max-width: 420px; width: 100%; animation: modalIn 0.3s ease; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal h3 { font-family: 'Space Grotesk',sans-serif; margin-bottom: 12px; }
         .modal p { color: var(--text-secondary); margin-bottom: 20px; }
-
-        .feature-list {
-            list-style: none;
-            margin: 16px 0;
-        }
-
-        .feature-list li {
-            padding: 8px 0;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
+        .feature-list { list-style: none; margin: 16px 0; }
+        .feature-list li { padding: 8px 0; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
         .feature-list li i { color: #10b981; }
-
-        .admin-panel {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.05));
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-
-        .admin-panel h4 {
-            font-family: 'Space Grotesk';
-            color: #f59e0b;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .upload-zone {
-            border: 2px dashed var(--border);
-            border-radius: 16px;
-            padding: 40px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.05);
-        }
-
+        .admin-panel { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(239,68,68,0.05)); border: 1px solid rgba(245,158,11,0.2); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+        .admin-panel h4 { font-family: 'Space Grotesk'; color: #f59e0b; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .upload-zone { border: 2px dashed var(--border); border-radius: 16px; padding: 40px; text-align: center; transition: all 0.3s ease; cursor: pointer; }
+        .upload-zone:hover, .upload-zone.dragover { border-color: var(--primary); background: rgba(99,102,241,0.05); }
         .upload-zone i { font-size: 2rem; color: var(--primary); margin-bottom: 12px; }
         .upload-zone h4 { font-family: 'Space Grotesk'; margin-bottom: 8px; }
         .upload-zone p { color: var(--text-muted); font-size: 0.9rem; }
-
-        .storage-stats-bar {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .stat-pill {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            font-size: 0.85rem;
-        }
-
+        .storage-stats-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .stat-pill { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 50px; font-size: 0.85rem; }
         .stat-pill i { color: var(--primary); }
-
-        .resource-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .resource-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .resource-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-        }
-
-        .resource-card .file-icon {
-            font-size: 2rem;
-            margin-bottom: 12px;
-            color: var(--primary);
-        }
-
-        .resource-card .name {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .resource-card .meta {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-bottom: 12px;
-        }
-
-        .resource-card .btn-download {
-            padding: 6px 16px;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .resource-card .btn-download:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .btn-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: none;
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
+        .resource-file-card { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; transition: all 0.3s ease; }
+        .resource-file-card:hover { border-color: var(--primary); transform: translateX(4px); }
+        .resource-file-card .file-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--primary); }
+        .resource-file-card .info { flex: 1; }
+        .resource-file-card .name { font-weight: 600; margin-bottom: 4px; }
+        .resource-file-card .meta { color: var(--text-muted); font-size: 0.8rem; }
+        .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--bg-card); color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
         .btn-icon:hover { background: var(--primary); color: white; }
-
-        @media (max-width: 768px) {
-            .academy-hero h1 { font-size: 2rem; }
-            .class-grid { grid-template-columns: 1fr; }
-            .tools-grid { grid-template-columns: repeat(2, 1fr); }
-            .resource-grid { grid-template-columns: 1fr; }
-            .container { padding: 0 16px; }
-        }
-
-        @media (max-width: 480px) {
-            .tools-grid { grid-template-columns: 1fr; }
-            .academy-tabs { gap: 4px; }
-            .academy-tab { padding: 8px 16px; font-size: 0.8rem; }
-        }
+        .progress-bar { width: 100%; height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden; margin-top: 16px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 4px; transition: width 0.3s ease; }
+        @media (max-width: 768px) { .academy-hero h1 { font-size: 2rem; } .class-grid { grid-template-columns: 1fr; } .tools-grid { grid-template-columns: repeat(2,1fr); } .container { padding: 0 16px; } }
+        @media (max-width: 480px) { .tools-grid { grid-template-columns: 1fr; } .academy-tabs { gap: 4px; } .academy-tab { padding: 8px 16px; font-size: 0.8rem; } }
     </style>
 </head>
 <body>
-
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Upgrade Modal -->
     <div class="modal-overlay" id="upgradeModal">
         <div class="modal">
             <h3><i class="fas fa-crown" style="color: var(--secondary);"></i> Upgrade to Premium</h3>
@@ -794,8 +155,6 @@
             </button>
         </div>
     </div>
-
-    <!-- Header -->
     <header class="header">
         <nav class="nav">
             <a href="academy.html" class="logo">
@@ -809,9 +168,7 @@
             </div>
         </nav>
     </header>
-
     <main>
-        <!-- Academy Hero -->
         <section class="academy-hero">
             <div class="container">
                 <h1>📚 <span class="text-gradient">Aurex Academy</span></h1>
@@ -821,9 +178,7 @@
                 </div>
             </div>
         </section>
-
         <div class="container">
-            <!-- Tabs -->
             <div class="academy-tabs" id="academyTabs">
                 <button class="academy-tab active" data-tab="home"><i class="fas fa-home"></i> Home</button>
                 <button class="academy-tab" data-tab="classes"><i class="fas fa-video"></i> Classes</button>
@@ -831,17 +186,11 @@
                 <button class="academy-tab" data-tab="tools"><i class="fas fa-tools"></i> Tools</button>
                 <button class="academy-tab" data-tab="chat"><i class="fas fa-comments"></i> Chat</button>
             </div>
-
-            <!-- Home Tab -->
             <div class="tab-content active" id="tab-home">
                 <div style="text-align: center; padding: 40px 20px;">
-                    <h2 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 16px;">
-                        Welcome to Aurex Academy <span style="font-size: 2rem;">🎨</span>
-                    </h2>
-                    <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 32px;">
-                        Your creative community hub. Learn new skills, access resources, and connect with fellow designers.
-                    </p>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 700px; margin: 0 auto;">
+                    <h2 style="font-family: 'Space Grotesk',sans-serif; margin-bottom: 16px;">Welcome to Aurex Academy <span style="font-size: 2rem;">🎨</span></h2>
+                    <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 32px;">Your creative community hub. Learn new skills, access resources, and connect with fellow designers.</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 20px; max-width: 700px; margin: 0 auto;">
                         <div style="background: var(--bg-card); padding: 24px; border-radius: 16px; border: 1px solid var(--border); cursor: pointer; transition: all 0.3s;" onclick="switchTab('classes')">
                             <i class="fas fa-video" style="font-size: 2rem; color: var(--primary);"></i>
                             <h4 style="margin: 8px 0;">Live Classes</h4>
@@ -860,46 +209,42 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Classes Tab -->
             <div class="tab-content" id="tab-classes">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
-                    <h3 style="font-family: 'Space Grotesk', sans-serif;">📺 Available Classes</h3>
-                    <span style="color: var(--text-muted); font-size: 0.9rem;">
-                        <i class="fas fa-lock" style="color: var(--secondary);"></i> Locked classes require Premium
-                    </span>
+                    <h3 style="font-family: 'Space Grotesk',sans-serif;">📺 Available Classes</h3>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="fas fa-lock" style="color: var(--secondary);"></i> Locked classes require Premium</span>
                 </div>
-                <div class="class-grid" id="classGrid"></div>
+                <div class="class-grid" id="classGrid">
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                </div>
             </div>
-
-            <!-- Resources Tab -->
             <div class="tab-content" id="tab-resources">
                 <div id="adminUploadPanel" class="admin-panel" style="display: none;">
                     <h4><i class="fas fa-shield-alt"></i> Admin: Upload Resources</h4>
-                    <div class="upload-zone" onclick="document.getElementById('resourceFileInput').click()">
+                    <div class="upload-zone" id="resourceUploadZone" onclick="document.getElementById('resourceFileInput').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <h4>Drop files here or click to upload</h4>
                         <p>Supports images, PDFs, ZIPs, and design files</p>
                         <input type="file" id="resourceFileInput" style="display: none;" multiple onchange="handleResourceUpload(event)">
                     </div>
-                    <div id="uploadProgress" style="display: none; margin-top: 16px;">
-                        <div style="height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden;">
-                            <div id="progressFill" style="height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.3s ease; width: 0%;"></div>
-                        </div>
+                    <div class="upload-progress" id="uploadProgress" style="display: none;">
+                        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%;"></div></div>
                         <p style="text-align: center; margin-top: 8px; color: var(--text-muted); font-size: 0.85rem;" id="uploadStatus">Uploading...</p>
                     </div>
                 </div>
-
-                <div class="storage-stats-bar">
+                <div class="storage-stats-bar" id="storageStats">
                     <div class="stat-pill"><i class="fas fa-hdd"></i> <span id="totalFiles">0 files</span></div>
                     <div class="stat-pill"><i class="fas fa-weight-hanging"></i> <span id="totalSize">0 MB</span></div>
                 </div>
-
-                <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 24px;">📁 Resources</h3>
-                <div class="resource-grid" id="resourceGrid"></div>
+                <h3 style="font-family: 'Space Grotesk',sans-serif; margin-bottom: 24px;">📁 Resources</h3>
+                <div id="resourceGrid">
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                </div>
             </div>
-
-            <!-- Tools Tab -->
             <div class="tab-content" id="tab-tools">
                 <div id="adminToolsPanel" class="admin-panel" style="display: none;">
                     <h4><i class="fas fa-shield-alt"></i> Admin: Manage Tools</h4>
@@ -910,15 +255,18 @@
                         <input type="file" id="toolFileInput" style="display: none;" onchange="handleToolUpload(event)">
                     </div>
                 </div>
-                <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 8px;">🛠️ Design Tools</h3>
+                <h3 style="font-family: 'Space Grotesk',sans-serif; margin-bottom: 8px;">🛠️ Design Tools</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 24px;">Download essential design tools to level up your workflow</p>
-                <div class="tools-grid" id="toolsGrid"></div>
+                <div class="tools-grid" id="toolsGrid">
+                    <div class="skeleton skeleton-card" style="height: 150px;"></div>
+                    <div class="skeleton skeleton-card" style="height: 150px;"></div>
+                    <div class="skeleton skeleton-card" style="height: 150px;"></div>
+                    <div class="skeleton skeleton-card" style="height: 150px;"></div>
+                </div>
             </div>
-
-            <!-- Chat Tab -->
             <div class="tab-content" id="tab-chat">
-                <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 16px;">💬 Community Chat</h3>
-                <div class="chat-area">
+                <h3 style="font-family: 'Space Grotesk',sans-serif; margin-bottom: 16px;">💬 Community Chat</h3>
+                <div class="chat-area" id="chatArea">
                     <div class="chat-messages" id="chatMessages">
                         <div class="empty-state">
                             <i class="fas fa-comments"></i>
@@ -938,8 +286,6 @@
             </div>
         </div>
     </main>
-
-    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <div class="bottom-nav-inner">
             <button class="bottom-nav-btn active" data-tab="home"><i class="fas fa-home"></i><span>Home</span></button>
@@ -948,469 +294,196 @@
             <button class="bottom-nav-btn" data-tab="profile"><i class="fas fa-user"></i><span>Profile</span></button>
         </div>
     </nav>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
         const BUCKET_NAME = 'aurex-assets';
-
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null, userProfile = null, currentClassId = null, chatSubscription = null, isAdmin = false;
 
-        let currentUser = null;
-        let userProfile = null;
-        let currentClassId = null;
-        let chatSubscription = null;
-        let isAdmin = false;
-
-        function getStorageUrl(bucket, filePath) {
-            return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`;
-        }
+        function getStorageUrl(bucket, filePath) { return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`; }
 
         function showToast(message, type = 'success') {
-            const icons = {
-                success: '<i class="fas fa-check-circle"></i>',
-                error: '<i class="fas fa-times-circle"></i>',
-                warning: '<i class="fas fa-exclamation-triangle"></i>',
-                info: '<i class="fas fa-info-circle"></i>'
-            };
-
+            const icons = { success: '<i class="fas fa-check-circle"></i>', error: '<i class="fas fa-times-circle"></i>', warning: '<i class="fas fa-exclamation-triangle"></i>', info: '<i class="fas fa-info-circle"></i>' };
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `${icons[type] || icons.success} ${message}`;
             container.appendChild(toast);
-
             requestAnimationFrame(() => toast.classList.add('show'));
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    if (toast.parentNode) toast.parentNode.removeChild(toast);
-                }, 400);
-            }, 3000);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400); }, 3000);
         }
 
         async function checkAuth() {
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
                 if (error) throw error;
-                if (!session) {
-                    showToast('Please sign in to access the Academy', 'warning');
-                    setTimeout(() => { window.location.href = 'auth.html'; }, 1500);
-                    return false;
-                }
+                if (!session) { showToast('Please sign in to access the Academy', 'warning'); setTimeout(() => { window.location.href = 'auth.html'; }, 1500); return false; }
                 currentUser = session.user;
                 await loadUserProfile();
                 return true;
-            } catch (error) {
-                console.error('Auth check error:', error);
-                showToast('Authentication error. Please sign in again.', 'error');
-                setTimeout(() => { window.location.href = 'auth.html'; }, 1500);
-                return false;
-            }
+            } catch (error) { console.error('Auth check error:', error); showToast('Authentication error. Please sign in again.', 'error'); setTimeout(() => { window.location.href = 'auth.html'; }, 1500); return false; }
         }
 
         async function loadUserProfile() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .eq('auth_id', currentUser.id)
-                    .single();
-
+                const { data, error } = await supabaseClient.from('users').select('*').eq('auth_id', currentUser.id).single();
                 if (error) {
                     if (error.code === 'PGRST116') {
-                        const { error: createError } = await supabaseClient
-                            .from('users')
-                            .insert({
-                                auth_id: currentUser.id,
-                                email: currentUser.email,
-                                full_name: currentUser.user_metadata?.full_name || 'User',
-                                user_type: 'free',
-                                subscription_status: 'inactive'
-                            });
+                        const { error: createError } = await supabaseClient.from('users').insert({ auth_id: currentUser.id, email: currentUser.email, full_name: currentUser.user_metadata?.full_name || 'User', user_type: 'free', subscription_status: 'inactive' });
                         if (!createError) {
-                            const { data: newData } = await supabaseClient
-                                .from('users')
-                                .select('*')
-                                .eq('auth_id', currentUser.id)
-                                .single();
-                            userProfile = newData;
-                            checkAdmin();
-                            updateUI();
-                            return;
+                            const { data: newData } = await supabaseClient.from('users').select('*').eq('auth_id', currentUser.id).single();
+                            userProfile = newData; checkAdmin(); updateUI(); return;
                         }
                     }
                     throw error;
                 }
-
-                userProfile = data;
-                checkAdmin();
-                updateUI();
-
+                userProfile = data; checkAdmin(); updateUI();
             } catch (error) {
                 console.error('Error loading profile:', error);
-                userProfile = {
-                    full_name: currentUser.user_metadata?.full_name || 'User',
-                    user_type: 'free',
-                    subscription_status: 'inactive',
-                    profile_image: null
-                };
+                userProfile = { full_name: currentUser.user_metadata?.full_name || 'User', user_type: 'free', subscription_status: 'inactive', profile_image: null };
                 updateUI();
             }
         }
 
         function checkAdmin() {
             isAdmin = userProfile?.user_type === 'admin';
-            if (isAdmin) {
-                const uploadPanel = document.getElementById('adminUploadPanel');
-                const toolsPanel = document.getElementById('adminToolsPanel');
-                if (uploadPanel) uploadPanel.style.display = 'block';
-                if (toolsPanel) toolsPanel.style.display = 'block';
-            }
+            if (isAdmin) { document.getElementById('adminUploadPanel').style.display = 'block'; document.getElementById('adminToolsPanel').style.display = 'block'; }
         }
 
         function updateUI() {
             if (!userProfile) return;
-
             document.getElementById('userName').textContent = userProfile.full_name || 'User';
-
-            const avatarUrl = userProfile.profile_image
-                ? getStorageUrl(BUCKET_NAME, userProfile.profile_image)
-                : `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'User')}&background=6366f1&color=fff`;
+            const avatarUrl = userProfile.profile_image ? getStorageUrl(BUCKET_NAME, userProfile.profile_image) : `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'User')}&background=6366f1&color=fff`;
             document.getElementById('userAvatar').src = avatarUrl;
-
             const badge = document.getElementById('userTypeBadge');
-            if (userProfile.user_type === 'admin') {
-                badge.textContent = 'ADMIN';
-                badge.className = 'user-badge badge-admin';
-            } else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') {
-                badge.textContent = 'PREMIUM';
-                badge.className = 'user-badge badge-premium';
-            } else {
-                badge.textContent = 'FREE';
-                badge.className = 'user-badge badge-free';
-            }
-
+            if (userProfile.user_type === 'admin') { badge.textContent = 'ADMIN'; badge.className = 'user-badge badge-admin'; }
+            else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') { badge.textContent = 'PREMIUM'; badge.className = 'user-badge badge-premium'; }
+            else { badge.textContent = 'FREE'; badge.className = 'user-badge badge-free'; }
             const statusEl = document.getElementById('subscriptionStatus');
-            if (userProfile.user_type === 'admin') {
-                statusEl.className = 'sub-status sub-active';
-                statusEl.innerHTML = '<i class="fas fa-shield-alt"></i> Administrator';
-            } else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') {
-                statusEl.className = 'sub-status sub-active';
-                statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Premium Active';
-            } else if (userProfile.subscription_status === 'pending') {
-                statusEl.className = 'sub-status sub-pending';
-                statusEl.innerHTML = '<i class="fas fa-clock"></i> Payment Pending';
-            } else {
-                statusEl.className = 'sub-status sub-inactive';
-                statusEl.innerHTML = '<i class="fas fa-lock"></i> Free Account';
-            }
+            if (userProfile.user_type === 'admin') { statusEl.className = 'sub-status sub-active'; statusEl.innerHTML = '<i class="fas fa-shield-alt"></i> Administrator'; }
+            else if (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') { statusEl.className = 'sub-status sub-active'; statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Premium Active'; }
+            else if (userProfile.subscription_status === 'pending') { statusEl.className = 'sub-status sub-pending'; statusEl.innerHTML = '<i class="fas fa-clock"></i> Payment Pending'; }
+            else { statusEl.className = 'sub-status sub-inactive'; statusEl.innerHTML = '<i class="fas fa-lock"></i> Free Account'; }
         }
 
         async function uploadFile(file, folder) {
             const filePath = `${folder}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-            const { data, error } = await supabaseClient.storage
-                .from(BUCKET_NAME)
-                .upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
-
+            const { data, error } = await supabaseClient.storage.from(BUCKET_NAME).upload(filePath, file, { cacheControl: '3600', upsert: false });
             if (error) throw error;
-
-            const { error: metaError } = await supabaseClient
-                .from('storage_metadata')
-                .insert({
-                    file_path: filePath,
-                    file_name: file.name,
-                    file_size: file.size,
-                    file_type: file.type,
-                    folder: folder,
-                    uploaded_by: currentUser.id,
-                    is_public: true,
-                    metadata: {
-                        original_name: file.name,
-                        content_type: file.type
-                    }
-                });
-
+            const { error: metaError } = await supabaseClient.from('storage_metadata').insert({ file_path: filePath, file_name: file.name, file_size: file.size, file_type: file.type, folder: folder, uploaded_by: currentUser.id, is_public: true, metadata: { original_name: file.name, content_type: file.type } });
             if (metaError) console.warn('Metadata insert failed:', metaError);
-
             return { filePath, publicUrl: getStorageUrl(BUCKET_NAME, filePath) };
         }
 
+        // FIX: Admin check moved to TOP of handler
         async function handleResourceUpload(event) {
             const files = event.target.files;
             if (!files.length) return;
-            if (!isAdmin) {
-                showToast('Only admins can upload resources', 'error');
-                return;
-            }
-
+            if (!isAdmin) { showToast('Only admins can upload resources', 'error'); return; }
             const progressEl = document.getElementById('uploadProgress');
             const fillEl = document.getElementById('progressFill');
             const statusEl = document.getElementById('uploadStatus');
-
             progressEl.style.display = 'block';
-
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 try {
-                    const progress = ((i + 1) / files.length) * 100;
-                    fillEl.style.width = `${progress}%`;
+                    fillEl.style.width = `${((i + 1) / files.length) * 100}%`;
                     statusEl.textContent = `Uploading ${file.name}...`;
-
                     const { filePath, publicUrl } = await uploadFile(file, 'resources');
-
-                    const { error } = await supabaseClient
-                        .from('resources')
-                        .insert({
-                            title: file.name.replace(/\.[^/.]+$/, ''),
-                            description: 'Uploaded resource',
-                            file_url: publicUrl,
-                            file_path: filePath,
-                            resource_type: 'premium',
-                            is_active: true,
-                            created_by: currentUser.id
-                        });
-
-                    if (error) throw error;
-                    showToast(`Uploaded ${file.name}`, 'success');
-
-                } catch (error) {
-                    console.error('Upload error:', error);
-                    showToast(`Failed to upload ${file.name}`, 'error');
-                }
+                    const { error } = await supabaseClient.from('resources').insert({ title: file.name.replace(/\.[^/.]+$/, ''), description: 'Uploaded resource', file_url: publicUrl, file_path: filePath, resource_type: 'premium', is_active: true, created_by: currentUser.id });
+                    if (error) {
+                        if (error.code === '42501' || error.message?.includes('403') || error.message?.includes('permission')) { showToast('Permission denied: Admin access required', 'error'); }
+                        else { throw error; }
+                    } else { showToast(`Uploaded ${file.name}`, 'success'); }
+                } catch (error) { console.error('Upload error:', error); showToast(`Failed to upload ${file.name}`, 'error'); }
             }
-
-            fillEl.style.width = '100%';
-            statusEl.textContent = 'Upload complete!';
-            setTimeout(() => {
-                progressEl.style.display = 'none';
-                fillEl.style.width = '0%';
-            }, 1500);
-
-            loadResources();
-            loadStorageStats();
+            fillEl.style.width = '100%'; statusEl.textContent = 'Upload complete!';
+            setTimeout(() => { progressEl.style.display = 'none'; fillEl.style.width = '0%'; }, 1500);
+            loadResources(); loadStorageStats();
         }
 
+        // FIX: Admin check moved to TOP of handler
         async function handleToolUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            if (!isAdmin) {
-                showToast('Only admins can upload tools', 'error');
-                return;
-            }
-
+            if (!isAdmin) { showToast('Only admins can upload tools', 'error'); return; }
             try {
                 const { filePath, publicUrl } = await uploadFile(file, 'tools');
-
-                const { error } = await supabaseClient
-                    .from('tools')
-                    .insert({
-                        name: file.name.replace(/\.[^/.]+$/, ''),
-                        description: 'Design tool',
-                        download_url: publicUrl,
-                        file_path: filePath,
-                        is_free: false,
-                        icon: '🛠️'
-                    });
-
-                if (error) throw error;
-                showToast('Tool uploaded successfully', 'success');
-                loadTools();
-                loadStorageStats();
-            } catch (error) {
-                console.error('Tool upload error:', error);
-                showToast('Failed to upload tool', 'error');
-            }
+                const { error } = await supabaseClient.from('tools').insert({ name: file.name.replace(/\.[^/.]+$/, ''), description: 'Design tool', download_url: publicUrl, file_path: filePath, is_free: false, icon: '🛠️' });
+                if (error) {
+                    if (error.code === '42501' || error.message?.includes('403') || error.message?.includes('permission')) { showToast('Permission denied: Admin access required', 'error'); }
+                    else { throw error; }
+                } else { showToast('Tool uploaded successfully', 'success'); loadTools(); loadStorageStats(); }
+            } catch (error) { console.error('Tool upload error:', error); showToast('Failed to upload tool', 'error'); }
         }
 
         async function handleChatAttachment(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             try {
                 showToast('Uploading attachment...', 'info');
                 const { filePath, publicUrl } = await uploadFile(file, 'resources');
-
-                const { error } = await supabaseClient
-                    .from('class_messages')
-                    .insert({
-                        class_id: currentClassId,
-                        user_id: currentUser.id,
-                        content: `📎 Shared a file: ${file.name}`,
-                        message_type: 'file',
-                        file_url: publicUrl
-                    });
-
+                const { error } = await supabaseClient.from('class_messages').insert({ class_id: currentClassId, user_id: currentUser.id, content: `📎 Shared a file: ${file.name}`, message_type: 'file', file_url: publicUrl });
                 if (error) throw error;
                 showToast('File shared in chat', 'success');
-            } catch (error) {
-                console.error('Chat attachment error:', error);
-                showToast('Failed to upload attachment', 'error');
-            }
+            } catch (error) { console.error('Chat attachment error:', error); showToast('Failed to upload attachment', 'error'); }
         }
 
+        // FIX: Uses storage_metadata instead of storage_stats
         async function loadStorageStats() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('storage_stats')
-                    .select('*');
-
+                const { data, error } = await supabaseClient.from('storage_metadata').select('file_size');
                 if (error) throw error;
-
-                if (data && data.length > 0) {
-                    const totalFiles = data.reduce((sum, row) => sum + (row.file_count || 0), 0);
-                    const totalSize = data.reduce((sum, row) => sum + (row.total_size || 0), 0);
-
-                    document.getElementById('totalFiles').textContent = `${totalFiles} files`;
-                    document.getElementById('totalSize').textContent = formatBytes(totalSize);
-                }
-            } catch (error) {
-                console.error('Storage stats error:', error);
-            }
+                const totalFiles = data?.length || 0;
+                const totalSize = data?.reduce((sum, row) => sum + (row.file_size || 0), 0) || 0;
+                document.getElementById('totalFiles').textContent = `${totalFiles} files`;
+                document.getElementById('totalSize').textContent = formatBytes(totalSize);
+            } catch (error) { console.error('Storage stats error:', error); document.getElementById('totalFiles').textContent = '0 files'; document.getElementById('totalSize').textContent = '0 MB'; }
         }
 
-        function formatBytes(bytes) {
-            if (bytes === 0) return '0 MB';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
+        function formatBytes(bytes) { if (bytes === 0) return '0 MB'; const k = 1024; const sizes = ['B','KB','MB','GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]; }
 
         async function loadClasses() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('classes')
-                    .select('*')
-                    .eq('is_active', true)
-                    .order('created_at', { ascending: false });
-
+                const { data, error } = await supabaseClient.from('classes').select('*').eq('is_active', true).order('created_at', { ascending: false });
                 if (error) throw error;
-
                 const grid = document.getElementById('classGrid');
                 grid.innerHTML = '';
-
-                if (!data || data.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-state" style="grid-column: 1 / -1;">
-                            <i class="fas fa-video-slash"></i>
-                            <h4>No Classes Available</h4>
-                            <p>Check back soon for new content!</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const hasPremium = userProfile &&
-                    ((userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') ||
-                     userProfile.user_type === 'admin');
-
+                if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;"><i class="fas fa-video-slash"></i><h4>No Classes Available</h4><p>Check back soon for new content!</p></div>'; return; }
+                const hasPremium = userProfile && (userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') || userProfile.user_type === 'admin';
                 data.forEach(cls => {
                     const isPremium = cls.class_type === 'premium';
                     const canAccess = !isPremium || hasPremium;
-
                     const card = document.createElement('div');
                     card.className = 'class-card';
-                    card.innerHTML = `
-                        <div class="class-header">
-                            <h4 class="class-title">${escapeHtml(cls.title)}</h4>
-                            <span class="class-type ${isPremium ? 'type-premium' : 'type-free'}">
-                                ${isPremium ? '🔒 Premium' : '🆓 Free'}
-                            </span>
-                        </div>
-                        <div class="class-meta">
-                            <span><i class="fas fa-clock"></i> ${cls.duration_minutes || 60}m</span>
-                            <span><i class="fas fa-users"></i> ${cls.capacity || 'Unlimited'}</span>
-                        </div>
-                        <p class="class-description">${escapeHtml(cls.description || 'No description available')}</p>
-                        <button class="btn-class ${canAccess ? 'btn-class-primary' : 'btn-class-locked'}"
-                                onclick="${canAccess ? `openClass('${cls.id}')` : 'showUpgradeModal()'}">
-                            ${!canAccess ? '<i class="fas fa-lock"></i> Upgrade to Premium' :
-                              isPremium ? '<i class="fas fa-crown"></i> Join Premium Class' :
-                              '<i class="fas fa-play"></i> Join Class'}
-                        </button>
-                    `;
+                    card.innerHTML = `<div class="class-header"><h4 class="class-title">${escapeHtml(cls.title)}</h4><span class="class-type ${isPremium ? 'type-premium' : 'type-free'}">${isPremium ? '🔒 Premium' : '🆓 Free'}</span></div><div class="class-meta"><span><i class="fas fa-clock"></i> ${cls.duration_minutes || 60}m</span><span><i class="fas fa-users"></i> ${cls.capacity || 'Unlimited'}</span></div><p class="class-description">${escapeHtml(cls.description || 'No description available')}</p><button class="btn-class ${canAccess ? 'btn-class-primary' : 'btn-class-locked'}" onclick="${canAccess ? `openClass('${cls.id}')` : 'showUpgradeModal()'}`">${!canAccess ? '<i class="fas fa-lock"></i> Upgrade to Premium' : isPremium ? '<i class="fas fa-crown"></i> Join Premium Class' : '<i class="fas fa-play"></i> Join Class'}</button>`;
                     grid.appendChild(card);
                 });
-
-                if (data.length > 0 && !currentClassId) {
-                    currentClassId = data[0].id;
-                }
-
-            } catch (error) {
-                console.error('Error loading classes:', error);
-                showToast('Failed to load classes', 'error');
-            }
+            } catch (error) { console.error('Error loading classes:', error); showToast('Failed to load classes', 'error'); }
         }
 
-        function openClass(classId) {
-            currentClassId = classId;
-            switchTab('chat');
-            showToast('Joining class chat...', 'info');
-            loadClassMessages(classId);
-            setupRealtimeChat();
-        }
+        function openClass(classId) { currentClassId = classId; switchTab('chat'); showToast('Joining class chat...', 'info'); loadClassMessages(classId); setupRealtimeChat(); }
 
         async function loadResources() {
             try {
-                const hasPremium = userProfile &&
-                    ((userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') ||
-                     userProfile.user_type === 'admin');
-
-                const { data, error } = await supabaseClient
-                    .from('resources')
-                    .select('*')
-                    .eq('is_active', true)
-                    .order('created_at', { ascending: false });
-
+                const hasPremium = userProfile && ((userProfile.user_type === 'premium' && userProfile.subscription_status === 'active') || userProfile.user_type === 'admin');
+                const { data, error } = await supabaseClient.from('resources').select('*').eq('is_active', true).order('created_at', { ascending: false });
                 if (error) throw error;
-
                 const grid = document.getElementById('resourceGrid');
                 grid.innerHTML = '';
-
-                if (!data || data.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-state" style="grid-column: 1 / -1;">
-                            <i class="fas fa-folder-open"></i>
-                            <h4>No Resources Available</h4>
-                            <p>Check back soon for new content!</p>
-                        </div>
-                    `;
-                    return;
-                }
-
+                if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><h4>No Resources Available</h4><p>Check back soon for new content!</p></div>'; return; }
                 data.forEach(resource => {
                     const isLocked = (resource.resource_type === 'premium' || resource.resource_type === 'paid') && !hasPremium;
                     const fileType = getFileIcon(resource.file_url || resource.file_path);
-
                     const card = document.createElement('div');
-                    card.className = 'resource-card';
-                    card.innerHTML = `
-                        <div class="file-icon">${fileType}</div>
-                        <div class="name">${escapeHtml(resource.title)}</div>
-                        <div class="meta">${resource.resource_type || 'free'}</div>
-                        ${!isLocked ?
-                            `<button class="btn-download" onclick="downloadResource('${resource.id}', '${resource.file_url || resource.file_path || '#'}')">
-                                <i class="fas fa-download"></i> Download
-                            </button>` :
-                            `<button class="btn-download" onclick="showUpgradeModal()" style="color: var(--secondary); border-color: var(--secondary);">
-                                <i class="fas fa-lock"></i> Premium
-                            </button>`
-                        }
-                    `;
+                    card.className = 'resource-file-card';
+                    card.innerHTML = `<div class="file-icon">${fileType}</div><div class="info"><div class="name">${escapeHtml(resource.title)}</div><div class="meta">${resource.resource_type || 'free'}</div></div>${!isLocked ? `<button class="btn-icon" onclick="downloadResource('${resource.id}', '${resource.file_url || resource.file_path || '#'}')" title="Download"><i class="fas fa-download"></i></button>` : `<button class="btn-icon" onclick="showUpgradeModal()" title="Locked" style="color: var(--secondary);"><i class="fas fa-lock"></i></button>`}`;
                     grid.appendChild(card);
                 });
-
-            } catch (error) {
-                console.error('Error loading resources:', error);
-                showToast('Failed to load resources', 'error');
-            }
+            } catch (error) { console.error('Error loading resources:', error); showToast('Failed to load resources', 'error'); }
         }
 
         function getFileIcon(filePath) {
@@ -1424,310 +497,122 @@
         }
 
         async function downloadResource(resourceId, filePathOrUrl) {
-            if (!filePathOrUrl || filePathOrUrl === '#') {
-                showToast('Download link not available yet', 'warning');
-                return;
-            }
-
-            try {
-                await supabaseClient.rpc('increment_download', { resource_id: resourceId });
-                showToast('Starting download...', 'info');
-            } catch (error) {
-                console.error('Download tracking error:', error);
-            }
-
-            if (filePathOrUrl.startsWith('http')) {
-                window.open(filePathOrUrl, '_blank');
-            } else {
-                const publicUrl = getStorageUrl(BUCKET_NAME, filePathOrUrl);
-                window.open(publicUrl, '_blank');
-            }
+            if (!filePathOrUrl || filePathOrUrl === '#') { showToast('Download link not available yet', 'warning'); return; }
+            try { await supabaseClient.rpc('increment_download', { resource_id: resourceId }); showToast('Starting download...', 'info'); }
+            catch (error) { console.error('Download tracking error:', error); }
+            if (filePathOrUrl.startsWith('http')) { window.open(filePathOrUrl, '_blank'); }
+            else { window.open(getStorageUrl(BUCKET_NAME, filePathOrUrl), '_blank'); }
         }
 
         async function loadTools() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('tools')
-                    .select('*')
-                    .eq('is_active', true)
-                    .order('name');
-
+                const { data, error } = await supabaseClient.from('tools').select('*').eq('is_active', true).order('name');
                 if (error) throw error;
-
                 const grid = document.getElementById('toolsGrid');
                 grid.innerHTML = '';
-
-                if (!data || data.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-state" style="grid-column: 1 / -1;">
-                            <i class="fas fa-tools"></i>
-                            <h4>No Tools Available</h4>
-                            <p>Check back soon for new tools!</p>
-                        </div>
-                    `;
-                    return;
-                }
-
+                if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;"><i class="fas fa-tools"></i><h4>No Tools Available</h4><p>Check back soon for new tools!</p></div>'; return; }
                 data.forEach(tool => {
-                    const downloadUrl = tool.file_path
-                        ? getStorageUrl(BUCKET_NAME, tool.file_path)
-                        : (tool.download_url || tool.playstore_url || '#');
-
+                    const downloadUrl = tool.file_path ? getStorageUrl(BUCKET_NAME, tool.file_path) : (tool.download_url || tool.playstore_url || '#');
                     const card = document.createElement('div');
                     card.className = 'tool-card';
-                    card.innerHTML = `
-                        <div class="icon">${tool.icon || '🛠️'}</div>
-                        <h4>${escapeHtml(tool.name)}</h4>
-                        <p>${escapeHtml(tool.description || '')}</p>
-                        <a href="${downloadUrl}"
-                           target="_blank"
-                           class="btn-tool"
-                           onclick="${downloadUrl === '#' ? 'event.preventDefault(); showToast(\'Link not available yet\', \'warning\');' : ''}">
-                            <i class="fas fa-download"></i> ${tool.is_free ? 'Free' : 'Get'}
-                        </a>
-                    `;
+                    card.innerHTML = `<div class="icon">${tool.icon || '🛠️'}</div><h4>${escapeHtml(tool.name)}</h4><p>${escapeHtml(tool.description || '')}</p><a href="${downloadUrl}" target="_blank" class="btn-tool" onclick="${downloadUrl === '#' ? 'event.preventDefault(); showToast(\'Link not available yet\', \'warning\');' : ''}"><i class="fas fa-download"></i> ${tool.is_free ? 'Free' : 'Get'}</a>`;
                     grid.appendChild(card);
                 });
-
-            } catch (error) {
-                console.error('Error loading tools:', error);
-                showToast('Failed to load tools', 'error');
-            }
+            } catch (error) { console.error('Error loading tools:', error); showToast('Failed to load tools', 'error'); }
         }
 
         async function loadClassMessages(classId) {
             if (!classId) return;
-
             try {
-                const { data, error } = await supabaseClient
-                    .from('class_messages')
-                    .select('*, users(full_name, profile_image)')
-                    .eq('class_id', classId)
-                    .order('created_at', { ascending: true });
-
+                const { data, error } = await supabaseClient.from('class_messages').select('*, users(full_name, profile_image)').eq('class_id', classId).order('created_at', { ascending: true });
                 if (error) throw error;
-
                 const messagesDiv = document.getElementById('chatMessages');
                 messagesDiv.innerHTML = '';
-
-                if (!data || data.length === 0) {
-                    messagesDiv.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-comments"></i>
-                            <h4>Welcome to the Chat</h4>
-                            <p>Be the first to send a message!</p>
-                        </div>
-                    `;
-                    return;
-                }
-
+                if (!data || data.length === 0) { messagesDiv.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><h4>Welcome to the Chat</h4><p>Be the first to send a message!</p></div>'; return; }
                 data.forEach(msg => {
                     const isOwn = msg.user_id === currentUser?.id;
                     const div = document.createElement('div');
                     div.className = `chat-message ${isOwn ? 'own' : ''}`;
-
-                    const avatarUrl = msg.users?.profile_image
-                        ? getStorageUrl(BUCKET_NAME, msg.users.profile_image)
-                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.users?.full_name || 'U')}&background=${isOwn ? 'ec4899' : '6366f1'}&color=fff`;
-
+                    const avatarUrl = msg.users?.profile_image ? getStorageUrl(BUCKET_NAME, msg.users.profile_image) : `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.users?.full_name || 'U')}&background=${isOwn ? 'ec4899' : '6366f1'}&color=fff`;
                     const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
                     let contentHtml = `<div class="text">${escapeHtml(msg.content || '')}</div>`;
                     if (msg.file_url) {
                         const isImage = msg.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-                        if (isImage) {
-                            contentHtml += `<div style="margin-top: 8px;"><img src="${msg.file_url}" style="max-width: 200px; border-radius: 8px; cursor: pointer;" onclick="window.open('${msg.file_url}')" alt="Shared image"></div>`;
-                        } else {
-                            contentHtml += `<div style="margin-top: 8px;"><a href="${msg.file_url}" target="_blank" style="color: var(--primary); text-decoration: none;"><i class="fas fa-paperclip"></i> Download Attachment</a></div>`;
-                        }
+                        if (isImage) { contentHtml += `<div style="margin-top: 8px;"><img src="${msg.file_url}" style="max-width: 200px; border-radius: 8px; cursor: pointer;" onclick="window.open('${msg.file_url}')" alt="Shared image"></div>`; }
+                        else { contentHtml += `<div style="margin-top: 8px;"><a href="${msg.file_url}" target="_blank" style="color: var(--primary); text-decoration: none;"><i class="fas fa-paperclip"></i> Download Attachment</a></div>`; }
                     }
-
-                    div.innerHTML = `
-                        <img src="${avatarUrl}" class="avatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" alt="">
-                        <div class="content">
-                            <div class="name">${escapeHtml(msg.users?.full_name || 'Unknown')}</div>
-                            ${contentHtml}
-                            <div class="time">${time}</div>
-                        </div>
-                    `;
+                    div.innerHTML = `<img src="${avatarUrl}" class="avatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" alt="" onerror="this.src='https://ui-avatars.com/api/?name=U&background=6366f1&color=fff'"><div class="content"><div class="name">${escapeHtml(msg.users?.full_name || 'Unknown')}</div>${contentHtml}<div class="time">${time}</div></div>`;
                     messagesDiv.appendChild(div);
                 });
-
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            } catch (error) {
-                console.error('Error loading messages:', error);
-            }
+            } catch (error) { console.error('Error loading messages:', error); }
         }
 
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
-
             if (!message) return;
-            if (!currentUser) {
-                showToast('Please sign in to send messages', 'warning');
-                return;
-            }
-            if (!currentClassId) {
-                showToast('Please join a class first', 'warning');
-                return;
-            }
-
+            if (!currentUser) { showToast('Please sign in to send messages', 'warning'); return; }
+            if (!currentClassId) { showToast('Please join a class first', 'warning'); return; }
             try {
-                const { error } = await supabaseClient
-                    .from('class_messages')
-                    .insert({
-                        class_id: currentClassId,
-                        user_id: currentUser.id,
-                        content: message,
-                        message_type: 'text'
-                    });
-
+                const { error } = await supabaseClient.from('class_messages').insert({ class_id: currentClassId, user_id: currentUser.id, content: message, message_type: 'text' });
                 if (error) throw error;
                 input.value = '';
-
-            } catch (error) {
-                console.error('Error sending message:', error);
-                showToast('Failed to send message', 'error');
-            }
+            } catch (error) { console.error('Error sending message:', error); showToast('Failed to send message', 'error'); }
         }
 
         function setupRealtimeChat() {
-            if (chatSubscription) {
-                chatSubscription.unsubscribe();
-            }
-
+            if (chatSubscription) { chatSubscription.unsubscribe(); }
             if (!currentClassId) return;
-
-            chatSubscription = supabaseClient
-                .channel(`class-messages-${currentClassId}`)
-                .on('postgres_changes',
-                    {
-                        event: 'INSERT',
-                        schema: 'public',
-                        table: 'class_messages',
-                        filter: `class_id=eq.${currentClassId}`
-                    },
-                    (payload) => {
-                        loadClassMessages(currentClassId);
-                    }
-                )
-                .subscribe();
+            chatSubscription = supabaseClient.channel(`class-messages-${currentClassId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'class_messages', filter: `class_id=eq.${currentClassId}` }, (payload) => { loadClassMessages(currentClassId); }).subscribe();
         }
 
-        function showUpgradeModal() {
-            document.getElementById('upgradeModal').classList.add('active');
-        }
-
-        function closeUpgradeModal() {
-            document.getElementById('upgradeModal').classList.remove('active');
-        }
-
+        function showUpgradeModal() { document.getElementById('upgradeModal').classList.add('active'); }
+        function closeUpgradeModal() { document.getElementById('upgradeModal').classList.remove('active'); }
         function redirectToPayment() {
-            const message = encodeURIComponent(
-                'Premium Upgrade Request 🚀\n\n' +
-                'I want to upgrade to Premium!\n' +
-                'Account Name: Mustapha Iman Oniyangi\n' +
-                'Account Number: 8028741731\n' +
-                'Bank: Moniepoint\n' +
-                'Amount: ₦13,500\n\n' +
-                'Please find my payment screenshot attached.\n' +
-                'Thank you! 🙏'
-            );
+            const message = encodeURIComponent('Premium Upgrade Request 🚀
+
+I want to upgrade to Premium!
+Account Name: Mustapha Iman Oniyangi
+Account Number: 8028741731
+Bank: Moniepoint
+Amount: ₦13,500
+
+Please find my payment screenshot attached.
+Thank you! 🙏');
             window.open(`https://wa.me/2349127161200?text=${message}`, '_blank');
             showToast('Redirecting to WhatsApp...', 'info');
         }
 
         function switchTab(tabName) {
             window.location.hash = tabName;
-
-            document.querySelectorAll('.academy-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
-            });
-
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.toggle('active', content.id === `tab-${tabName}`);
-            });
-
-            document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tab === tabName);
-            });
-
+            document.querySelectorAll('.academy-tab').forEach(tab => { tab.classList.toggle('active', tab.dataset.tab === tabName); });
+            document.querySelectorAll('.tab-content').forEach(content => { content.classList.toggle('active', content.id === `tab-${tabName}`); });
+            document.querySelectorAll('.bottom-nav-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.tab === tabName); });
             if (tabName === 'classes') loadClasses();
-            if (tabName === 'resources') {
-                loadResources();
-                loadStorageStats();
-            }
+            if (tabName === 'resources') { loadResources(); loadStorageStats(); }
             if (tabName === 'tools') loadTools();
-            if (tabName === 'chat' && currentClassId) {
-                loadClassMessages(currentClassId);
-                setupRealtimeChat();
-            }
+            if (tabName === 'chat' && currentClassId) { loadClassMessages(currentClassId); setupRealtimeChat(); }
         }
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        document.querySelectorAll('.academy-tab').forEach(tab => {
-            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-        });
-
-        document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.dataset.tab;
-                if (tab === 'profile') {
-                    window.location.href = 'profile.html';
-                } else {
-                    switchTab(tab);
-                }
-            });
-        });
-
+        document.querySelectorAll('.academy-tab').forEach(tab => { tab.addEventListener('click', () => switchTab(tab.dataset.tab)); });
+        document.querySelectorAll('.bottom-nav-btn').forEach(btn => { btn.addEventListener('click', () => { const tab = btn.dataset.tab; if (tab === 'profile') { window.location.href = 'profile.html'; } else { switchTab(tab); } }); });
         document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
+        document.getElementById('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
-        supabaseClient.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_OUT') {
-                window.location.href = 'auth.html';
-            }
-        });
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+        supabaseClient.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT') { window.location.href = 'auth.html'; } });
 
         async function init() {
             const authed = await checkAuth();
             if (!authed) return;
-
             const hash = window.location.hash.replace('#', '');
-            if (hash && ['home', 'classes', 'resources', 'tools', 'chat'].includes(hash)) {
-                switchTab(hash);
-            }
-
-            await loadClasses();
-            await loadResources();
-            await loadTools();
-            await loadStorageStats();
-
-            if (!currentClassId) {
-                const { data } = await supabaseClient
-                    .from('classes')
-                    .select('id')
-                    .eq('is_active', true)
-                    .limit(1)
-                    .single();
-                if (data) {
-                    currentClassId = data.id;
-                    await loadClassMessages(currentClassId);
-                    setupRealtimeChat();
-                }
-            }
+            if (hash && ['home','classes','resources','tools','chat'].includes(hash)) { switchTab(hash); }
+            await loadClasses(); await loadResources(); await loadTools(); await loadStorageStats();
+            const { data: firstClass } = await supabaseClient.from('classes').select('id').eq('is_active', true).limit(1).single();
+            if (firstClass) { currentClassId = firstClass.id; await loadClassMessages(currentClassId); setupRealtimeChat(); }
         }
-
         init();
     </script>
 </body>
