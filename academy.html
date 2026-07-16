@@ -300,8 +300,8 @@
         const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
         const BUCKET_NAME = 'aurex-assets';
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+       const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let currentUser = null, userProfile = null, currentClassId = null, chatSubscription = null, isAdmin = false;
 
         function getStorageUrl(bucket, filePath) { return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`; }
