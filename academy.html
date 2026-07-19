@@ -1043,20 +1043,32 @@
         let classId = '00000000-0000-0000-0000-000000000000';
         let chatSub = null;
         let avatarFile = null;
+        let initialized = false;
 
         // ============================================================
         // INITIALIZE SUPABASE
         // ============================================================
         function initSupabase() {
+            // Check if Supabase is loaded
             if (typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function') {
-                console.warn('Supabase not loaded, retrying...');
+                console.warn('Supabase not loaded yet, retrying in 300ms...');
                 setTimeout(initSupabase, 300);
                 return;
             }
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('Supabase initialized');
-            // Start app
-            init();
+
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase client initialized successfully');
+                
+                if (!initialized) {
+                    initialized = true;
+                    // Start the app
+                    startApp();
+                }
+            } catch (error) {
+                console.error('Failed to initialize Supabase:', error);
+                toast('Failed to connect to server. Please refresh.', 'error');
+            }
         }
 
         // ============================================================
@@ -1074,14 +1086,17 @@
             type = type || 'info';
             const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
             const stack = document.getElementById('toastStack');
+            if (!stack) return;
             const el = document.createElement('div');
             el.className = `toast toast-${type}`;
-            el.innerHTML = `<i class="fas ${icons[type]}"></i> ${msg}`;
+            el.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${msg}`;
             stack.appendChild(el);
             requestAnimationFrame(() => el.classList.add('show'));
             setTimeout(() => {
                 el.classList.remove('show');
-                setTimeout(() => el.remove(), 500);
+                setTimeout(() => {
+                    if (el.parentNode) el.parentNode.removeChild(el);
+                }, 400);
             }, 3500);
         }
 
@@ -1089,25 +1104,34 @@
         // MODALS
         // ============================================================
         function openModal(id) {
-            document.getElementById(id).classList.add('active');
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('active');
         }
         function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('active');
         }
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); });
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('active');
+            });
         });
 
         // ============================================================
         // AUTH
         // ============================================================
         async function checkAuth() {
+            if (!supabase) {
+                toast('Supabase not initialized', 'error');
+                return false;
+            }
+
             try {
                 const { data: { session }, error } = await supabase.auth.getSession();
                 if (error) throw error;
                 if (!session) {
                     toast('Please sign in first', 'warning');
-                    setTimeout(() => location.href = 'auth.html', 1500);
+                    setTimeout(() => window.location.href = 'auth.html', 1500);
                     return false;
                 }
                 user = session.user;
@@ -1116,15 +1140,18 @@
             } catch (e) {
                 console.error('Auth error:', e);
                 toast('Please sign in', 'warning');
-                setTimeout(() => location.href = 'auth.html', 1500);
+                setTimeout(() => window.location.href = 'auth.html', 1500);
                 return false;
             }
         }
 
         async function loadProfile() {
+            if (!supabase || !user) return;
+            
             try {
                 let { data, error } = await supabase.from('users').select('*').eq('auth_id', user.id).single();
                 if (error && error.code === 'PGRST116') {
+                    // Create profile if it doesn't exist
                     await supabase.from('users').insert({
                         auth_id: user.id,
                         email: user.email,
@@ -1133,6 +1160,8 @@
                         subscription_status: 'inactive'
                     });
                     ({ data } = await supabase.from('users').select('*').eq('auth_id', user.id).single());
+                } else if (error) {
+                    throw error;
                 }
                 profile = data;
                 isAdmin = profile?.user_type === 'admin';
@@ -1149,35 +1178,44 @@
 
         function renderUser() {
             if (!profile) return;
+            
             const badge = document.getElementById('userBadge');
-            if (profile.user_type === 'admin') {
-                badge.textContent = 'ADMIN';
-                badge.className = 'user-badge badge-admin';
-            } else if (profile.user_type === 'premium' && profile.subscription_status === 'active') {
-                badge.textContent = 'PREMIUM';
-                badge.className = 'user-badge badge-premium';
-            } else {
-                badge.textContent = 'FREE';
-                badge.className = 'user-badge badge-free';
+            if (badge) {
+                if (profile.user_type === 'admin') {
+                    badge.textContent = 'ADMIN';
+                    badge.className = 'user-badge badge-admin';
+                } else if (profile.user_type === 'premium' && profile.subscription_status === 'active') {
+                    badge.textContent = 'PREMIUM';
+                    badge.className = 'user-badge badge-premium';
+                } else {
+                    badge.textContent = 'FREE';
+                    badge.className = 'user-badge badge-free';
+                }
             }
 
-            const avatar = profile.profile_image ? storageUrl(profile.profile_image) : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.full_name || 'User')}&background=6366f1&color=fff&size=128`;
-            document.getElementById('userAvatar').src = avatar;
-            document.getElementById('avatarPreview').src = avatar;
+            const avatar = profile.profile_image ? storageUrl(profile.profile_image) : 
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.full_name || 'User')}&background=6366f1&color=fff&size=128`;
+            
+            const userAvatar = document.getElementById('userAvatar');
+            const avatarPreview = document.getElementById('avatarPreview');
+            if (userAvatar) userAvatar.src = avatar;
+            if (avatarPreview) avatarPreview.src = avatar;
 
             const subBadge = document.getElementById('subBadge');
-            if (profile.user_type === 'admin') {
-                subBadge.className = 'hero-badge active';
-                subBadge.innerHTML = '<i class="fas fa-shield-alt"></i> Administrator';
-            } else if (profile.user_type === 'premium' && profile.subscription_status === 'active') {
-                subBadge.className = 'hero-badge active';
-                subBadge.innerHTML = '<i class="fas fa-check-circle"></i> Premium Active';
-            } else if (profile.subscription_status === 'pending') {
-                subBadge.className = 'hero-badge pending';
-                subBadge.innerHTML = '<i class="fas fa-clock"></i> Payment Pending';
-            } else {
-                subBadge.className = 'hero-badge inactive';
-                subBadge.innerHTML = '<i class="fas fa-lock"></i> Free Account';
+            if (subBadge) {
+                if (profile.user_type === 'admin') {
+                    subBadge.className = 'hero-badge active';
+                    subBadge.innerHTML = '<i class="fas fa-shield-alt"></i> Administrator';
+                } else if (profile.user_type === 'premium' && profile.subscription_status === 'active') {
+                    subBadge.className = 'hero-badge active';
+                    subBadge.innerHTML = '<i class="fas fa-check-circle"></i> Premium Active';
+                } else if (profile.subscription_status === 'pending') {
+                    subBadge.className = 'hero-badge pending';
+                    subBadge.innerHTML = '<i class="fas fa-clock"></i> Payment Pending';
+                } else {
+                    subBadge.className = 'hero-badge inactive';
+                    subBadge.innerHTML = '<i class="fas fa-lock"></i> Free Account';
+                }
             }
         }
 
@@ -1196,12 +1234,17 @@
             if (file.size > 5 * 1024 * 1024) { toast('Max 5MB please', 'error'); return; }
             avatarFile = file;
             const reader = new FileReader();
-            reader.onload = ev => document.getElementById('avatarPreview').src = ev.target.result;
+            reader.onload = ev => {
+                const preview = document.getElementById('avatarPreview');
+                if (preview) preview.src = ev.target.result;
+            };
             reader.readAsDataURL(file);
         }
 
         async function doAvatarUpload() {
             if (!avatarFile || !user) { toast('Select an image first', 'warning'); return; }
+            if (!supabase) { toast('Supabase not initialized', 'error'); return; }
+            
             const btn = document.getElementById('btnAvatarUpload');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
@@ -1229,6 +1272,8 @@
         // GENERIC FILE UPLOAD
         // ============================================================
         async function uploadToStorage(file, folder) {
+            if (!supabase) throw new Error('Supabase not initialized');
+            
             const ext = file.name.split('.').pop();
             const path = `${folder}/${Date.now()}_${user.id.slice(0,8)}.${ext}`;
             const { error } = await supabase.storage.from(BUCKET).upload(path, file, { cacheControl: '3600', upsert: false });
@@ -1267,6 +1312,8 @@
 
         async function doResourceUpload(files) {
             if (!isAdmin) { toast('Admin only', 'error'); return; }
+            if (!supabase) { toast('Supabase not initialized', 'error'); return; }
+            
             const bar = document.getElementById('resourceProgress');
             const fill = document.getElementById('resourceProgressFill');
             const text = document.getElementById('resourceProgressText');
@@ -1310,6 +1357,8 @@
         async function onToolSelect(e) {
             const file = e.target.files[0];
             if (!file || !isAdmin) return;
+            if (!supabase) { toast('Supabase not initialized', 'error'); return; }
+            
             try {
                 toast('Uploading tool...', 'info');
                 const { path, url } = await uploadToStorage(file, 'tools');
@@ -1335,6 +1384,8 @@
         async function onChatFile(e) {
             const file = e.target.files[0];
             if (!file || !user) return;
+            if (!supabase) { toast('Supabase not initialized', 'error'); return; }
+            
             try {
                 toast('Sending file...', 'info');
                 const { url } = await uploadToStorage(file, 'resources');
@@ -1354,6 +1405,8 @@
         // LOAD CLASSES
         // ============================================================
         async function loadClasses() {
+            if (!supabase) { console.warn('Supabase not ready'); return; }
+            
             try {
                 const { data, error } = await supabase.from('classes').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
@@ -1403,6 +1456,8 @@
         // LOAD RESOURCES
         // ============================================================
         async function loadResources() {
+            if (!supabase) { console.warn('Supabase not ready'); return; }
+            
             try {
                 const { data, error } = await supabase.from('resources').select('*').eq('is_active', true).order('created_at', { ascending: false });
                 if (error) throw error;
@@ -1437,22 +1492,30 @@
 
         async function downloadResource(id, urlOrPath) {
             if (!urlOrPath || urlOrPath === 'null') { toast('Link unavailable', 'warning'); return; }
+            if (!supabase) { toast('Supabase not initialized', 'error'); return; }
+            
             try { await supabase.rpc('increment_download', { resource_id: id }); } catch (e) {}
             const url = urlOrPath.startsWith('http') ? urlOrPath : storageUrl(urlOrPath);
-            const a = document.createElement('a');
-            a.href = url;
-            a.target = '_blank';
-            a.download = '';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            toast('Downloading...', 'info');
+            if (url) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.download = '';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                toast('Downloading...', 'info');
+            } else {
+                toast('Invalid download URL', 'error');
+            }
         }
 
         // ============================================================
         // LOAD TOOLS
         // ============================================================
         async function loadTools() {
+            if (!supabase) { console.warn('Supabase not ready'); return; }
+            
             try {
                 const { data, error } = await supabase.from('tools').select('*').order('name');
                 if (error) throw error;
@@ -1488,6 +1551,8 @@
         // CHAT SYSTEM
         // ============================================================
         async function loadMessages(cid) {
+            if (!supabase) { console.warn('Supabase not ready'); return; }
+            
             try {
                 const { data, error } = await supabase.from('class_messages')
                     .select('*, users(full_name, profile_image)')
@@ -1509,7 +1574,8 @@
             const own = m.user_id === user?.id;
             const div = document.createElement('div');
             div.className = `msg ${own ? 'own' : ''}`;
-            const avatar = m.users?.profile_image ? storageUrl(m.users.profile_image) : `https://ui-avatars.com/api/?name=${encodeURIComponent(m.users?.full_name || 'U')}&background=${own ? 'ec4899' : '6366f1'}&color=fff&size=64`;
+            const avatar = m.users?.profile_image ? storageUrl(m.users.profile_image) : 
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(m.users?.full_name || 'U')}&background=${own ? 'ec4899' : '6366f1'}&color=fff&size=64`;
             const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             let fileHtml = '';
             if (m.file_url) {
@@ -1536,6 +1602,8 @@
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text || !user) return;
+            if (!supabase) { toast('Supabase not initialized', 'error'); return; }
+            
             try {
                 const { error } = await supabase.from('class_messages').insert({
                     class_id: classId,
@@ -1550,11 +1618,65 @@
             }
         }
 
-        document.getElementById('btnSend').addEventListener('click', sendMessage);
-        document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+        // ============================================================
+        // SETUP EVENT LISTENERS
+        // ============================================================
+        function setupEventListeners() {
+            const sendBtn = document.getElementById('btnSend');
+            if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+            
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
 
+            // Tab switching
+            document.querySelectorAll('.academy-tab').forEach(t => {
+                t.addEventListener('click', () => switchTab(t.dataset.tab));
+            });
+
+            // Bottom nav
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.addEventListener('click', () => {
+                    if (b.dataset.tab === 'profile') window.location.href = 'profile.html';
+                    else switchTab(b.dataset.tab);
+                });
+            });
+
+            // Upload zones drag & drop
+            document.querySelectorAll('.upload-zone').forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    zone.classList.add('dragover');
+                });
+                zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('dragover');
+                    const input = zone.querySelector('input[type="file"]');
+                    if (input) {
+                        input.files = e.dataTransfer.files;
+                        input.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                const header = document.getElementById('mainHeader');
+                if (header) header.classList.toggle('scrolled', window.scrollY > 10);
+            });
+        }
+
+        // ============================================================
+        // SETUP REALTIME CHAT
+        // ============================================================
         function setupChatRealtime() {
-            if (chatSub) chatSub.unsubscribe();
+            if (chatSub) {
+                try { chatSub.unsubscribe(); } catch (e) {}
+            }
+            if (!supabase) return;
+            
             chatSub = supabase.channel('chat-' + classId)
                 .on('postgres_changes', {
                     event: 'INSERT',
@@ -1563,9 +1685,11 @@
                     filter: `class_id=eq.${classId}`
                 }, (payload) => {
                     const box = document.getElementById('chatMessages');
-                    if (box.querySelector('.empty')) box.innerHTML = '';
-                    renderMessage(payload.new, box);
-                    box.scrollTop = box.scrollHeight;
+                    if (box) {
+                        if (box.querySelector('.empty')) box.innerHTML = '';
+                        renderMessage(payload.new, box);
+                        box.scrollTop = box.scrollHeight;
+                    }
                 })
                 .subscribe();
         }
@@ -1574,6 +1698,8 @@
         // STORAGE STATS
         // ============================================================
         async function loadStats() {
+            if (!supabase) { console.warn('Supabase not ready'); return; }
+            
             try {
                 const { data, error } = await supabase.from('storage_metadata').select('file_size');
                 if (error) throw error;
@@ -1594,44 +1720,22 @@
         // TAB SWITCHING
         // ============================================================
         function switchTab(name) {
-            location.hash = name;
-            document.querySelectorAll('.academy-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+            window.location.hash = name;
+            document.querySelectorAll('.academy-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === name);
+            });
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.toggle('active', c.id === 'tab-' + name);
+            });
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.tab === name);
+            });
+            
             if (name === 'classes') loadClasses();
             if (name === 'resources') { loadResources(); loadStats(); }
             if (name === 'tools') loadTools();
             if (name === 'chat') { loadMessages(classId); setupChatRealtime(); }
         }
-
-        document.querySelectorAll('.academy-tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
-        document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => {
-            if (b.dataset.tab === 'profile') location.href = 'profile.html';
-            else switchTab(b.dataset.tab);
-        }));
-
-        // ============================================================
-        // DRAG & DROP
-        // ============================================================
-        document.querySelectorAll('.upload-zone').forEach(zone => {
-            zone.addEventListener('dragover', e => { e.preventDefault();
-                zone.classList.add('dragover'); });
-            zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-            zone.addEventListener('drop', e => {
-                e.preventDefault();
-                zone.classList.remove('dragover');
-                const input = zone.querySelector('input[type="file"]');
-                if (input) { input.files = e.dataTransfer.files;
-                    input.dispatchEvent(new Event('change')); }
-            });
-        });
-
-        // ============================================================
-        // HEADER SCROLL EFFECT
-        // ============================================================
-        window.addEventListener('scroll', () => {
-            document.getElementById('mainHeader').classList.toggle('scrolled', window.scrollY > 10);
-        });
 
         // ============================================================
         // UTILITIES
@@ -1644,7 +1748,7 @@
         }
 
         function formatBytes(bytes) {
-            if (!bytes) return '0 B';
+            if (!bytes || bytes === 0) return '0 B';
             const k = 1024;
             const sizes = ['B', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -1677,20 +1781,29 @@ Thank you!');
         }
 
         // ============================================================
-        // INIT
+        // START APP
         // ============================================================
-        async function init() {
+        async function startApp() {
+            // Setup event listeners first
+            setupEventListeners();
+
+            // Check authentication
             const authed = await checkAuth();
             if (!authed) return;
 
-            const hash = location.hash.replace('#', '');
-            if (hash && ['home', 'classes', 'resources', 'tools', 'chat'].includes(hash)) switchTab(hash);
+            // Handle hash
+            const hash = window.location.hash.replace('#', '');
+            if (hash && ['home', 'classes', 'resources', 'tools', 'chat'].includes(hash)) {
+                switchTab(hash);
+            }
 
+            // Load initial data
             await loadClasses();
             await loadResources();
             await loadTools();
             await loadStats();
 
+            // Initialize chat with first class
             try {
                 const { data: firstClass } = await supabase.from('classes').select('id').eq('is_active', true).limit(1).single();
                 if (firstClass) {
@@ -1704,7 +1817,7 @@ Thank you!');
         }
 
         // ============================================================
-        // START
+        // INIT - Wait for DOM and Supabase
         // ============================================================
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initSupabase);
