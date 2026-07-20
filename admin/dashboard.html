@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#070714">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aurex Academy - Admin Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -28,64 +27,40 @@
   --text-muted: #64748b;
   --border-color: rgba(148,163,184,0.08);
   --gradient-purple: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #3b82f6 100%);
+  --gradient-hero: linear-gradient(135deg, #0f0c29 0%, #1a1647 40%, #0f0c29 100%);
   --shadow-glow: 0 0 60px rgba(124,58,237,0.12);
   --sidebar-width: 260px;
   --sidebar-collapsed: 72px;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html { -webkit-text-size-adjust: 100%; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: 'Inter', -apple-system, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
   min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
 }
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.4); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.6); }
 .app-container { display: flex; min-height: 100vh; }
 
-/* ========== AUTO DEVICE RESPONSIVE SIDEBAR ========== */
+/* ADMIN SIDEBAR */
 .sidebar {
   width: var(--sidebar-width);
   background: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
-  padding: 18px 14px;
+  padding: 20px 14px;
   position: fixed;
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
-  z-index: 300;
-  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s cubic-bezier(0.4,0,0.2,1);
+  z-index: 200;
+  transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
   display: flex;
   flex-direction: column;
-  will-change: transform;
 }
-
-/* DESKTOP (>900px): sidebar visible by default */
-@media (min-width: 901px) {
-  .sidebar { transform: translateX(0); }
-  .sidebar-overlay { display: none !important; }
-}
-
-/* MOBILE (<=900px): sidebar hidden by default, slides in */
-@media (max-width: 900px) {
-  .sidebar { transform: translateX(-100%); width: var(--sidebar-width) !important; box-shadow: 10px 0 40px rgba(0,0,0,0.5); }
-  .sidebar.mobile-open { transform: translateX(0); }
-  .sidebar.mobile-open .logo-text-wrap,
-  .sidebar.mobile-open .nav-item span,
-  .sidebar.mobile-open .nav-item .badge,
-  .sidebar.mobile-open .admin-badge-text { opacity: 1 !important; pointer-events: auto !important; width: auto !important; }
-  .sidebar.mobile-open .sidebar-logo { justify-content: flex-start; padding: 0 8px 18px; }
-  .sidebar.mobile-open .nav-item { justify-content: flex-start; padding: 10px 12px; }
-  .sidebar.mobile-open .nav-item i { width: 20px; font-size: 15px; }
-  .sidebar.mobile-open .nav-item.active::before { display: block; }
-  .sidebar.mobile-open .sidebar-divider { margin: 14px 10px; }
-}
-
-/* COLLAPSED STATE (desktop only) */
 .sidebar.collapsed { width: var(--sidebar-collapsed); }
 .sidebar.collapsed .logo-text-wrap,
 .sidebar.collapsed .nav-item span,
@@ -93,82 +68,174 @@ body {
 .sidebar.collapsed .admin-badge-text {
   opacity: 0; pointer-events: none; width: 0; overflow: hidden;
 }
-.sidebar.collapsed .sidebar-logo { justify-content: center; padding: 0 0 18px; }
+.sidebar.collapsed .sidebar-logo { justify-content: center; padding: 0 0 20px; }
 .sidebar.collapsed .nav-item { justify-content: center; padding: 12px; }
 .sidebar.collapsed .nav-item i { width: auto; font-size: 18px; }
 .sidebar.collapsed .nav-item.active::before { display: none; }
-.sidebar.collapsed .sidebar-divider { margin: 10px 4px; }
-.sidebar.collapsed .sidebar-toggle { right: -11px; }
-.sidebar.collapsed .sidebar-toggle i { transform: rotate(180deg); }
-
-/* NEVER collapse on mobile - ignore .collapsed class */
-@media (max-width: 900px) {
-  .sidebar.collapsed { width: var(--sidebar-width) !important; }
-  .sidebar.collapsed .logo-text-wrap,
-  .sidebar.collapsed .nav-item span,
-  .sidebar.collapsed .nav-item .badge,
-  .sidebar.collapsed .admin-badge-text { opacity: 1 !important; pointer-events: auto !important; width: auto !important; }
-  .sidebar.collapsed .sidebar-logo { justify-content: flex-start; padding: 0 8px 18px; }
-  .sidebar.collapsed .nav-item { justify-content: flex-start; padding: 10px 12px; }
-  .sidebar.collapsed .nav-item i { width: 20px; font-size: 15px; }
-  .sidebar.collapsed .nav-item.active::before { display: block; }
-  .sidebar.collapsed .sidebar-divider { margin: 14px 10px; }
+.sidebar.collapsed .sidebar-divider { margin: 12px 4px; }
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 8px 20px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 16px;
+  position: relative;
+  transition: all 0.35s;
 }
-
-.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 0 8px 18px; border-bottom: 1px solid var(--border-color); margin-bottom: 14px; position: relative; transition: all 0.35s; }
-.logo-icon { width: 38px; height: 38px; min-width: 38px; background: var(--gradient-purple); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; box-shadow: 0 4px 20px rgba(124,58,237,0.3); }
+.logo-icon {
+  width: 38px; height: 38px; min-width: 38px;
+  background: var(--gradient-purple);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+}
 .logo-text-wrap { transition: opacity 0.25s; white-space: nowrap; }
-.logo-text { font-size: 20px; font-weight: 700; background: var(--gradient-purple); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.logo-text {
+  font-size: 20px; font-weight: 700;
+  background: var(--gradient-purple);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
 .logo-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 2px; }
-.admin-badge { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.15); margin: 0 8px 14px; }
+.admin-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 8px;
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.15);
+  margin: 0 8px 16px;
+}
 .admin-badge i { color: var(--accent-red); font-size: 12px; }
 .admin-badge-text { font-size: 11px; color: var(--accent-red); font-weight: 600; transition: opacity 0.25s; }
-.sidebar-toggle { position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 9px; transition: all 0.2s; z-index: 10; }
+.sidebar-toggle {
+  position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 9px;
+  transition: all 0.2s; z-index: 10;
+}
 .sidebar-toggle:hover { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
-@media (max-width: 900px) { .sidebar-toggle { display: none; } }
-
+.sidebar.collapsed .sidebar-toggle { right: -11px; }
+.sidebar.collapsed .sidebar-toggle i { transform: rotate(180deg); }
 .nav-section { margin-bottom: 6px; }
-.nav-section-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; padding: 0 12px; margin-bottom: 8px; }
-.nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; cursor: pointer; transition: all 0.2s; color: var(--text-secondary); font-size: 13px; font-weight: 500; position: relative; margin-bottom: 2px; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
+.nav-section-title {
+  font-size: 10px; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 1.5px; padding: 0 12px; margin-bottom: 8px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 12px;
+  cursor: pointer; transition: all 0.2s;
+  color: var(--text-secondary);
+  font-size: 13px; font-weight: 500;
+  position: relative; margin-bottom: 2px; white-space: nowrap;
+}
 .nav-item:hover { background: rgba(124,58,237,0.08); color: var(--text-primary); }
-.nav-item.active { background: linear-gradient(90deg, rgba(124,58,237,0.15) 0%, rgba(124,58,237,0.05) 100%); color: var(--accent-violet); }
-.nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 18px; background: var(--gradient-purple); border-radius: 0 3px 3px 0; }
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(124,58,237,0.15) 0%, rgba(124,58,237,0.05) 100%);
+  color: var(--accent-violet);
+}
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 18px; background: var(--gradient-purple); border-radius: 0 3px 3px 0;
+}
 .nav-item i { width: 20px; text-align: center; font-size: 15px; transition: font-size 0.2s; }
-.nav-item .badge { margin-left: auto; background: var(--gradient-purple); color: white; font-size: 9px; padding: 2px 7px; border-radius: 20px; font-weight: 700; transition: opacity 0.2s; }
-.sidebar-divider { height: 1px; background: var(--border-color); margin: 12px 10px; transition: margin 0.35s; }
-
-.sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 250; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-.sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+.nav-item .badge {
+  margin-left: auto; background: var(--gradient-purple);
+  color: white; font-size: 9px; padding: 2px 7px; border-radius: 20px;
+  font-weight: 700; transition: opacity 0.2s;
+}
+.sidebar-divider { height: 1px; background: var(--border-color); margin: 14px 10px; transition: margin 0.35s; }
 
 /* MAIN CONTENT */
-.main-content { flex: 1; margin-left: var(--sidebar-width); padding: 0; min-height: 100vh; transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1); }
+.main-content {
+  flex: 1; margin-left: var(--sidebar-width); padding: 0;
+  min-height: 100vh;
+  transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
+}
 .main-content.sidebar-collapsed { margin-left: var(--sidebar-collapsed); }
-@media (max-width: 900px) { .main-content { margin-left: 0 !important; } }
 
-/* TOP BAR */
-.top-bar { position: sticky; top: 12px; z-index: 150; display: flex; align-items: center; justify-content: space-between; margin: 12px 24px 24px; padding: 12px 20px; background: rgba(13,13,31,0.75); backdrop-filter: blur(20px) saturate(1.5); -webkit-backdrop-filter: blur(20px) saturate(1.5); border: 1px solid rgba(148,163,184,0.08); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); transition: all 0.3s ease; }
-.top-bar.scrolled { background: rgba(13,13,31,0.92); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-.top-bar .page-title { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+/* FLOATING HEADER */
+.top-bar {
+  position: sticky; top: 12px; z-index: 150;
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 12px 24px 24px; padding: 12px 20px;
+  background: rgba(13, 13, 31, 0.75);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(148,163,184,0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+.top-bar.scrolled {
+  background: rgba(13, 13, 31, 0.92);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+.top-bar .page-title {
+  font-size: 18px; font-weight: 700;
+  background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
 .top-actions { display: flex; align-items: center; gap: 12px; }
-.icon-btn { width: 38px; height: 38px; border-radius: 11px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; position: relative; -webkit-tap-highlight-color: transparent; }
-.icon-btn:hover { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.2); color: var(--text-primary); }
-.icon-btn .dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--accent-red); border-radius: 50%; border: 2px solid var(--bg-secondary); }
-.user-profile { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 14px 5px 5px; cursor: pointer; transition: all 0.2s; }
-.user-profile:hover { background: rgba(255,255,255,0.05); border-color: rgba(124,58,237,0.15); }
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 11px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; position: relative;
+}
+.icon-btn:hover {
+  background: rgba(124,58,237,0.1);
+  border-color: rgba(124,58,237,0.2);
+  color: var(--text-primary);
+}
+.icon-btn .dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; background: var(--accent-red);
+  border-radius: 50%; border: 2px solid var(--bg-secondary);
+}
+.user-profile {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 5px 14px 5px 5px;
+  cursor: pointer; transition: all 0.2s;
+}
+.user-profile:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(124,58,237,0.15);
+}
 .user-profile img { width: 30px; height: 30px; border-radius: 10px; object-fit: cover; }
 .user-profile .info { line-height: 1.3; }
 .user-profile .name { font-size: 12px; font-weight: 600; }
 .user-profile .status { font-size: 10px; color: var(--accent-red); display: flex; align-items: center; gap: 3px; }
-@media (max-width: 600px) { .top-bar { margin: 8px 12px 16px; padding: 10px 14px; } .top-bar .page-title { font-size: 15px; } .user-profile { padding: 4px 10px 4px 4px; } .user-profile .info { display: none; } .user-profile img { width: 28px; height: 28px; } }
 
-/* STATS */
-.stats-overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 0 24px 28px; }
-.stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 22px; transition: all 0.3s; position: relative; overflow: hidden; }
-.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gradient-purple); opacity: 0; transition: opacity 0.3s; }
+/* STATS OVERVIEW */
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 0 24px 28px;
+}
+.stat-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 20px; padding: 22px;
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--gradient-purple); opacity: 0; transition: opacity 0.3s;
+}
 .stat-card:hover { background: var(--bg-card-hover); transform: translateY(-3px); box-shadow: var(--shadow-glow); border-color: rgba(124,58,237,0.12); }
 .stat-card:hover::before { opacity: 1; }
 .stat-card .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.stat-card .stat-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+.stat-card .stat-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+}
 .stat-card .stat-icon.purple { background: rgba(124,58,237,0.12); color: var(--accent-violet); }
 .stat-card .stat-icon.blue { background: rgba(59,130,246,0.12); color: var(--accent-blue); }
 .stat-card .stat-icon.green { background: rgba(34,197,94,0.12); color: var(--accent-green); }
@@ -177,123 +244,216 @@ body {
 .stat-card .stat-value { font-size: 30px; font-weight: 800; margin: 6px 0; letter-spacing: -0.5px; }
 .stat-card .stat-change { font-size: 11px; color: var(--accent-green); font-weight: 600; display: flex; align-items: center; gap: 4px; }
 .stat-card .stat-change.negative { color: var(--accent-red); }
-@media (max-width: 1200px) { .stats-overview { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 700px) { .stats-overview { grid-template-columns: 1fr; margin: 0 12px 20px; } .stat-card { padding: 18px; } .stat-card .stat-value { font-size: 24px; } }
 
 /* DASHBOARD GRID */
-.dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin: 0 24px 28px; }
-.dash-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 22px; transition: all 0.25s; }
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin: 0 24px 28px;
+}
+.dash-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 20px; padding: 22px; transition: all 0.25s;
+}
 .dash-card:hover { border-color: rgba(124,58,237,0.1); }
-.dash-card .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+.dash-card .dash-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
+}
 .dash-card .dash-header h3 { font-size: 14px; font-weight: 700; }
-.dash-card .dash-header .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.dash-card .dash-header .actions button { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); font-size: 11px; cursor: pointer; transition: all 0.2s; font-family: inherit; font-weight: 500; -webkit-tap-highlight-color: transparent; }
-.dash-card .dash-header .actions button:hover { background: rgba(124,58,237,0.1); color: var(--accent-violet); border-color: rgba(124,58,237,0.2); }
-.dash-card .dash-header .actions button.active { background: rgba(124,58,237,0.15); color: var(--accent-violet); border-color: rgba(124,58,237,0.3); }
-@media (max-width: 1100px) { .dashboard-grid { grid-template-columns: 1fr; } }
-@media (max-width: 700px) { .dashboard-grid { margin: 0 12px 20px; } .dash-card { padding: 16px; } }
+.dash-card .dash-header .actions { display: flex; gap: 8px; }
+.dash-card .dash-header .actions button {
+  padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color);
+  background: transparent; color: var(--text-secondary); font-size: 11px;
+  cursor: pointer; transition: all 0.2s; font-family: inherit; font-weight: 500;
+}
+.dash-card .dash-header .actions button:hover {
+  background: rgba(124,58,237,0.1); color: var(--accent-violet); border-color: rgba(124,58,237,0.2);
+}
+.dash-card .dash-header .actions button.active {
+  background: rgba(124,58,237,0.15); color: var(--accent-violet); border-color: rgba(124,58,237,0.3);
+}
 
-/* CHART */
-.chart-container { height: 280px; position: relative; }
-.chart-bar-group { display: flex; align-items: flex-end; justify-content: space-between; height: 220px; gap: 8px; padding: 0 4px; }
-.chart-bar { flex: 1; background: rgba(124,58,237,0.15); border-radius: 6px 6px 0 0; transition: all 0.3s; position: relative; min-height: 4px; }
+/* CHART AREA */
+.chart-container {
+  height: 280px;
+  position: relative;
+}
+.chart-bar-group {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  height: 220px; gap: 8px; padding: 0 4px;
+}
+.chart-bar {
+  flex: 1; background: rgba(124,58,237,0.15); border-radius: 6px 6px 0 0;
+  transition: all 0.3s; position: relative; min-height: 4px;
+}
 .chart-bar:hover { background: var(--accent-violet); }
-.chart-bar .bar-tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--bg-elevated); padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 600; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; border: 1px solid var(--border-color); }
+.chart-bar .bar-tooltip {
+  position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+  background: var(--bg-elevated); padding: 4px 10px; border-radius: 6px;
+  font-size: 10px; font-weight: 600; white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  border: 1px solid var(--border-color);
+}
 .chart-bar:hover .bar-tooltip { opacity: 1; }
-.chart-labels { display: flex; justify-content: space-between; padding: 0 4px; margin-top: 10px; }
-.chart-labels span { font-size: 10px; color: var(--text-muted); flex: 1; text-align: center; }
-@media (max-width: 600px) { .chart-container { height: 220px; } .chart-bar-group { height: 170px; gap: 4px; } }
+.chart-labels {
+  display: flex; justify-content: space-between;
+  padding: 0 4px; margin-top: 10px;
+}
+.chart-labels span {
+  font-size: 10px; color: var(--text-muted);
+  flex: 1; text-align: center;
+}
 
 /* TABLE */
-.table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.data-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-.data-table th { text-align: left; padding: 10px 12px; font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); }
-.data-table td { padding: 12px; font-size: 13px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left; padding: 10px 12px; font-size: 11px;
+  color: var(--text-muted); font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color);
+}
+.data-table td {
+  padding: 12px; font-size: 13px; border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
 .data-table tr:hover td { background: rgba(124,58,237,0.03); }
-.data-table .user-cell { display: flex; align-items: center; gap: 10px; }
-.data-table .user-cell img { width: 32px; height: 32px; border-radius: 10px; object-fit: cover; }
+.data-table .user-cell {
+  display: flex; align-items: center; gap: 10px;
+}
+.data-table .user-cell img {
+  width: 32px; height: 32px; border-radius: 10px; object-fit: cover;
+}
 .data-table .user-cell .user-info .name { font-weight: 600; color: var(--text-primary); }
 .data-table .user-cell .user-info .email { font-size: 11px; color: var(--text-muted); }
-.status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.status-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
 .status-pill.active { background: rgba(34,197,94,0.1); color: var(--accent-green); }
 .status-pill.inactive { background: rgba(100,116,139,0.1); color: var(--text-muted); }
 .status-pill.pending { background: rgba(245,158,11,0.1); color: var(--accent-orange); }
 .status-pill.banned { background: rgba(239,68,68,0.1); color: var(--accent-red); }
-.role-badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+.role-badge {
+  padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700;
+}
 .role-badge.admin { background: rgba(124,58,237,0.12); color: var(--accent-violet); }
 .role-badge.instructor { background: rgba(59,130,246,0.12); color: var(--accent-blue); }
 .role-badge.student { background: rgba(6,182,212,0.12); color: var(--accent-cyan); }
 .table-actions { display: flex; gap: 6px; }
-.table-actions button { width: 28px; height: 28px; border-radius: 7px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+.table-actions button {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+  color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all 0.2s;
+}
 .table-actions button:hover { background: rgba(124,58,237,0.1); color: var(--accent-violet); border-color: rgba(124,58,237,0.2); }
 .table-actions button.danger:hover { background: rgba(239,68,68,0.1); color: var(--accent-red); border-color: rgba(239,68,68,0.2); }
 
 /* QUICK ACTIONS */
-.quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.quick-action-btn { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; cursor: pointer; transition: all 0.25s; text-align: left; display: flex; align-items: center; gap: 12px; -webkit-tap-highlight-color: transparent; }
-.quick-action-btn:hover { background: var(--bg-card-hover); border-color: rgba(124,58,237,0.2); transform: translateY(-2px); }
-.quick-action-btn i { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-.quick-action-btn .info { flex: 1; min-width: 0; }
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.quick-action-btn {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 14px; padding: 16px; cursor: pointer;
+  transition: all 0.25s; text-align: left;
+  display: flex; align-items: center; gap: 12px;
+}
+.quick-action-btn:hover {
+  background: var(--bg-card-hover); border-color: rgba(124,58,237,0.2);
+  transform: translateY(-2px);
+}
+.quick-action-btn i {
+  width: 40px; height: 40px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.quick-action-btn .info { flex: 1; }
 .quick-action-btn .info .label { font-size: 12px; font-weight: 600; color: var(--text-primary); }
 .quick-action-btn .info .desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-@media (max-width: 600px) { .quick-actions { grid-template-columns: 1fr; } .quick-action-btn { padding: 14px; } }
 
-/* ACTIVITY */
+/* ACTIVITY FEED */
 .activity-feed { display: flex; flex-direction: column; gap: 0; }
-.activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border-color); }
+.activity-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 0; border-bottom: 1px solid var(--border-color);
+}
 .activity-item:last-child { border-bottom: none; }
-.activity-item .icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.activity-item .icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
 .activity-item .icon.user { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
 .activity-item .icon.course { background: rgba(124,58,237,0.1); color: var(--accent-violet); }
 .activity-item .icon.cert { background: rgba(34,197,94,0.1); color: var(--accent-green); }
 .activity-item .icon.warning { background: rgba(245,158,11,0.1); color: var(--accent-orange); }
 .activity-item .icon.error { background: rgba(239,68,68,0.1); color: var(--accent-red); }
-.activity-item .content { flex: 1; min-width: 0; }
+.activity-item .content { flex: 1; }
 .activity-item .content .text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
 .activity-item .content .text strong { color: var(--text-primary); }
 .activity-item .content .time { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
 
-/* COURSE ROW */
-.course-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border-color); }
+/* COURSE MANAGEMENT */
+.course-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0; border-bottom: 1px solid var(--border-color);
+}
 .course-row:last-child { border-bottom: none; }
-.course-row img { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
-.course-row .info { flex: 1; min-width: 0; }
+.course-row img {
+  width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0;
+}
+.course-row .info { flex: 1; }
 .course-row .info .title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
 .course-row .info .meta { font-size: 11px; color: var(--text-muted); }
-.course-row .stats { display: flex; gap: 16px; font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+.course-row .stats { display: flex; gap: 16px; font-size: 11px; color: var(--text-muted); }
 .course-row .stats span { display: flex; align-items: center; gap: 4px; }
-@media (max-width: 600px) { .course-row { gap: 10px; padding: 12px 0; } .course-row img { width: 40px; height: 40px; } .course-row .stats { gap: 10px; font-size: 10px; } }
 
 /* MODAL */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 1000; overflow-y: auto; padding: 40px 20px; }
 .modal-overlay.active { display: flex; }
-.modal { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; padding: 32px; width: 480px; max-width: 90vw; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.5); }
-.modal .close-btn { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s; }
+.modal {
+  background: var(--bg-secondary); border: 1px solid var(--border-color);
+  border-radius: 24px; padding: 32px; width: 480px; max-width: 90vw;
+  position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+}
+.modal .close-btn {
+  position: absolute; top: 16px; right: 16px; width: 32px; height: 32px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);
+  border-radius: 10px; color: var(--text-muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; transition: all 0.2s;
+}
 .modal .close-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
 .modal h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
 .modal p { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
 .form-group { margin-bottom: 14px; }
 .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
-.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 13px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 11px; color: var(--text-primary); font-size: 13px; outline: none; transition: all 0.2s; font-family: inherit; -webkit-appearance: none; appearance: none; }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.08); }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 11px 13px; background: var(--bg-card);
+  border: 1px solid var(--border-color); border-radius: 11px;
+  color: var(--text-primary); font-size: 13px; outline: none;
+  transition: all 0.2s; font-family: inherit;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+}
 .form-group input::placeholder { color: var(--text-muted); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .modal .btn-primary { width: 100%; justify-content: center; margin-top: 6px; }
 .modal .error-msg { color: var(--accent-red); font-size: 12px; margin-top: 6px; text-align: center; }
-.btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 12px; background: var(--gradient-purple); color: white; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; -webkit-tap-highlight-color: transparent; }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,58,237,0.3); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-@media (max-width: 600px) { .modal { padding: 24px 20px; border-radius: 20px; } .modal h2 { font-size: 18px; } .form-row { grid-template-columns: 1fr; } }
 
 /* TOAST */
-.toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 20px; display: flex; align-items: center; gap: 10px; z-index: 2000; transform: translateY(100px); opacity: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 90vw; }
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 20px; display: flex; align-items: center; gap: 10px; z-index: 2000; transform: translateY(100px); opacity: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
 .toast.show { transform: translateY(0); opacity: 1; }
 .toast.success { border-color: rgba(34,197,94,0.2); }
 .toast.error { border-color: rgba(239,68,68,0.2); }
-.toast i { font-size: 18px; flex-shrink: 0; }
+.toast i { font-size: 18px; }
 .toast.success i { color: #22c55e; }
 .toast.error i { color: #ef4444; }
-@media (max-width: 600px) { .toast { bottom: 16px; right: 16px; left: 16px; } }
 
 /* LOADING */
 .loading-overlay { position: fixed; inset: 0; background: var(--bg-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.6s; }
@@ -306,18 +466,22 @@ body {
 .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%); background-size: 200% 100%; animation: skeleton 1.5s infinite; border-radius: 8px; }
 @keyframes skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-/* EMPTY STATE */
-.empty-state { text-align: center; padding: 40px 20px; }
-.empty-state i { font-size: 40px; color: var(--text-muted); margin-bottom: 12px; }
-.empty-state p { font-size: 13px; color: var(--text-muted); }
-
-/* DELETE CONFIRM */
-.delete-confirm { display: flex; gap: 10px; margin-top: 20px; }
-.delete-confirm button { flex: 1; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; -webkit-tap-highlight-color: transparent; }
-.delete-confirm .cancel-btn { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border-color); }
-.delete-confirm .cancel-btn:hover { background: var(--bg-card-hover); }
-.delete-confirm .confirm-btn { background: var(--accent-red); color: white; }
-.delete-confirm .confirm-btn:hover { background: #dc2626; }
+/* RESPONSIVE */
+@media (max-width: 1400px) { .stats-overview { grid-template-columns: repeat(2, 1fr); } .dashboard-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1200px) { .stats-overview { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); width: var(--sidebar-width) !important; }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0 !important; padding: 0; }
+  .stats-overview, .dashboard-grid { margin: 0 16px 24px; }
+  .top-bar { margin: 8px 16px 20px; }
+}
+@media (max-width: 700px) {
+  .stats-overview { grid-template-columns: 1fr; }
+  .top-bar { flex-wrap: wrap; gap: 10px; padding: 10px 14px; }
+  .form-row { grid-template-columns: 1fr; }
+  .quick-actions { grid-template-columns: 1fr; }
+}
 
 /* ANIMATIONS */
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
@@ -330,8 +494,6 @@ body {
   <div class="spinner"></div>
   <p>Loading Admin Dashboard...</p>
 </div>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
 
 <div class="app-container">
   <aside class="sidebar" id="sidebar">
@@ -393,14 +555,12 @@ body {
 
   <main class="main-content" id="mainContent">
     <div class="top-bar" id="topBar">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <button class="icon-btn" id="mobileMenuBtn" style="display:none;"><i class="fas fa-bars"></i></button>
-        <div class="page-title" id="pageTitle">Admin Dashboard</div>
-      </div>
+      <div class="page-title">Admin Dashboard</div>
       <div class="top-actions">
+        <button class="icon-btn" id="mobileMenuBtn" style="display:none;"><i class="fas fa-bars"></i></button>
         <button class="icon-btn" id="notifBtn"><i class="fas fa-bell"></i><span class="dot"></span></button>
         <div class="user-profile">
-          <img src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff&size=100" alt="Admin" id="adminProfileImg">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Admin" id="adminProfileImg">
           <div class="info">
             <div class="name" id="adminName">Admin</div>
             <div class="status">Administrator <i class="fas fa-shield-alt" style="font-size:8px;"></i></div>
@@ -467,19 +627,31 @@ body {
           <div class="quick-actions">
             <div class="quick-action-btn" onclick="openModal('createUserModal')">
               <i class="fas fa-user-plus" style="background:rgba(59,130,246,0.1);color:var(--accent-blue);"></i>
-              <div class="info"><div class="label">Add User</div><div class="desc">Create new account</div></div>
+              <div class="info">
+                <div class="label">Add User</div>
+                <div class="desc">Create new account</div>
+              </div>
             </div>
             <div class="quick-action-btn" onclick="openModal('createCourseModal')">
               <i class="fas fa-plus-circle" style="background:rgba(124,58,237,0.1);color:var(--accent-violet);"></i>
-              <div class="info"><div class="label">Add Course</div><div class="desc">Publish new course</div></div>
+              <div class="info">
+                <div class="label">Add Course</div>
+                <div class="desc">Publish new course</div>
+              </div>
             </div>
             <div class="quick-action-btn" onclick="showSection('users')">
               <i class="fas fa-user-shield" style="background:rgba(34,197,94,0.1);color:var(--accent-green);"></i>
-              <div class="info"><div class="label">Manage Users</div><div class="desc">Edit roles & permissions</div></div>
+              <div class="info">
+                <div class="label">Manage Users</div>
+                <div class="desc">Edit roles & permissions</div>
+              </div>
             </div>
             <div class="quick-action-btn" onclick="showToast('Reports coming soon', 'success')">
               <i class="fas fa-file-export" style="background:rgba(245,158,11,0.1);color:var(--accent-orange);"></i>
-              <div class="info"><div class="label">Export Data</div><div class="desc">Download reports</div></div>
+              <div class="info">
+                <div class="label">Export Data</div>
+                <div class="desc">Download reports</div>
+              </div>
             </div>
           </div>
         </div>
@@ -489,19 +661,21 @@ body {
         <div class="dash-card">
           <div class="dash-header">
             <h3><i class="fas fa-users" style="color:var(--accent-blue);margin-right:8px;"></i>Recent Users</h3>
-            <div class="actions"><button onclick="showSection('users')">View All</button></div>
+            <div class="actions">
+              <button onclick="showSection('users')">View All</button>
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table class="data-table" id="recentUsersTable">
-              <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
-              <tbody id="recentUsersBody">
-                <tr><td colspan="5"><div class="skeleton" style="height:40px;"></div></td></tr>
-                <tr><td colspan="5"><div class="skeleton" style="height:40px;"></div></td></tr>
-                <tr><td colspan="5"><div class="skeleton" style="height:40px;"></div></td></tr>
-                <tr><td colspan="5"><div class="skeleton" style="height:40px;"></div></td></tr>
-              </tbody>
-            </table>
-          </div>
+          <table class="data-table" id="recentUsersTable">
+            <thead>
+              <tr><th>User</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="recentUsersBody">
+              <tr><td colspan="5"><div class="skeleton" style="height:40px;"></div></td></tr>
+              <tr><td colspan="5"><div class="skeleton" style="height:40px;"></div></td></tr>
+              <tr><td colspan="5"><div class="skeleton" style="height:40px;"></div></td></tr>
+              <tr><td colspan="5"><div class="skeleton" style="height:40px;"></div></td></tr>
+            </tbody>
+          </table>
         </div>
         <div class="dash-card">
           <div class="dash-header">
@@ -526,16 +700,16 @@ body {
             <button onclick="openModal('createUserModal')"><i class="fas fa-plus" style="margin-right:4px;"></i>Add User</button>
           </div>
         </div>
-        <div class="table-wrapper">
-          <table class="data-table" id="allUsersTable">
-            <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Enrolled</th><th>Joined</th><th>Actions</th></tr></thead>
-            <tbody id="allUsersBody">
-              <tr><td colspan="7"><div class="skeleton" style="height:40px;"></div></td></tr>
-              <tr><td colspan="7"><div class="skeleton" style="height:40px;"></div></td></tr>
-              <tr><td colspan="7"><div class="skeleton" style="height:40px;"></div></td></tr>
-            </tbody>
-          </table>
-        </div>
+        <table class="data-table" id="allUsersTable">
+          <thead>
+            <tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Enrolled</th><th>Joined</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="allUsersBody">
+            <tr><td colspan="7"><div class="skeleton" style="height:40px;"></div></td></tr>
+            <tr><td colspan="7"><div class="skeleton" style="height:40px;"></div></td></tr>
+            <tr><td colspan="7"><div class="skeleton" style="height:40px;"></div></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -562,9 +736,6 @@ body {
       <div class="dash-card animate-in" style="margin:0 24px 28px;">
         <div class="dash-header">
           <h3><i class="fas fa-folder" style="color:var(--accent-orange);margin-right:8px;"></i>All Projects</h3>
-          <div class="actions">
-            <button onclick="openModal('createProjectModal')"><i class="fas fa-plus" style="margin-right:4px;"></i>Add Project</button>
-          </div>
         </div>
         <div id="projectsList">
           <div class="skeleton" style="height:60px; margin-bottom:10px;"></div>
@@ -615,15 +786,15 @@ body {
         </p>
         <div style="margin-top:24px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
           <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:16px;padding:20px;text-align:center;">
-            <div style="font-size:32px;font-weight:800;color:var(--accent-violet);margin-bottom:6px;" id="analyticsCompletion">--</div>
+            <div style="font-size:32px;font-weight:800;color:var(--accent-violet);margin-bottom:6px;">87%</div>
             <div style="font-size:12px;color:var(--text-muted);">Course Completion Rate</div>
           </div>
           <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:16px;padding:20px;text-align:center;">
-            <div style="font-size:32px;font-weight:800;color:var(--accent-blue);margin-bottom:6px;" id="analyticsRating">--</div>
+            <div style="font-size:32px;font-weight:800;color:var(--accent-blue);margin-bottom:6px;">4.8</div>
             <div style="font-size:12px;color:var(--text-muted);">Average Rating</div>
           </div>
           <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:16px;padding:20px;text-align:center;">
-            <div style="font-size:32px;font-weight:800;color:var(--accent-green);margin-bottom:6px;" id="analyticsSession">--</div>
+            <div style="font-size:32px;font-weight:800;color:var(--accent-green);margin-bottom:6px;">12m</div>
             <div style="font-size:12px;color:var(--text-muted);">Avg. Session Time</div>
           </div>
         </div>
@@ -638,24 +809,33 @@ body {
         </div>
         <div style="display:grid; gap:16px;">
           <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; background:var(--bg-primary); border-radius:14px; border:1px solid var(--border-color);">
-            <div><div style="font-size:13px;font-weight:600;margin-bottom:4px;">User Registration</div><div style="font-size:11px;color:var(--text-muted);">Allow new users to sign up</div></div>
-            <label class="toggle" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;" onclick="toggleSetting('registration', this)">
-              <input type="checkbox" id="settingRegistration" checked style="opacity:0;width:0;height:0;">
-              <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--accent-green);border-radius:24px;transition:0.3s;"></span>
+            <div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:4px;">User Registration</div>
+              <div style="font-size:11px;color:var(--text-muted);">Allow new users to sign up</div>
+            </div>
+            <label class="toggle" style="position:relative;display:inline-block;width:44px;height:24px;">
+              <input type="checkbox" checked style="opacity:0;width:0;height:0;">
+              <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--accent-green);border-radius:24px;transition:0.3s;"></span>
             </label>
           </div>
           <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; background:var(--bg-primary); border-radius:14px; border:1px solid var(--border-color);">
-            <div><div style="font-size:13px;font-weight:600;margin-bottom:4px;">Email Notifications</div><div style="font-size:11px;color:var(--text-muted);">Send email alerts to users</div></div>
-            <label class="toggle" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;" onclick="toggleSetting('notifications', this)">
-              <input type="checkbox" id="settingNotifications" checked style="opacity:0;width:0;height:0;">
-              <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--accent-green);border-radius:24px;transition:0.3s;"></span>
+            <div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Email Notifications</div>
+              <div style="font-size:11px;color:var(--text-muted);">Send email alerts to users</div>
+            </div>
+            <label class="toggle" style="position:relative;display:inline-block;width:44px;height:24px;">
+              <input type="checkbox" checked style="opacity:0;width:0;height:0;">
+              <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--accent-green);border-radius:24px;transition:0.3s;"></span>
             </label>
           </div>
           <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; background:var(--bg-primary); border-radius:14px; border:1px solid var(--border-color);">
-            <div><div style="font-size:13px;font-weight:600;margin-bottom:4px;">Maintenance Mode</div><div style="font-size:11px;color:var(--text-muted);">Put site in maintenance mode</div></div>
-            <label class="toggle" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;" onclick="toggleSetting('maintenance', this)">
-              <input type="checkbox" id="settingMaintenance" style="opacity:0;width:0;height:0;">
-              <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--text-muted);border-radius:24px;transition:0.3s;"></span>
+            <div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Maintenance Mode</div>
+              <div style="font-size:11px;color:var(--text-muted);">Put site in maintenance mode</div>
+            </div>
+            <label class="toggle" style="position:relative;display:inline-block;width:44px;height:24px;">
+              <input type="checkbox" style="opacity:0;width:0;height:0;">
+              <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--text-muted);border-radius:24px;transition:0.3s;"></span>
             </label>
           </div>
         </div>
@@ -672,51 +852,41 @@ body {
     <p>Add a new user to the platform.</p>
     <form onsubmit="handleCreateUser(event)">
       <div class="form-row">
-        <div class="form-group"><label>First Name</label><input type="text" id="newUserFirstName" placeholder="John" required></div>
-        <div class="form-group"><label>Last Name</label><input type="text" id="newUserLastName" placeholder="Doe" required></div>
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="newUserFirstName" placeholder="John" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="newUserLastName" placeholder="Doe" required>
+        </div>
       </div>
-      <div class="form-group"><label>Email Address</label><input type="email" id="newUserEmail" placeholder="john@example.com" required></div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="newUserEmail" placeholder="john@example.com" required>
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label>Role</label>
-          <select id="newUserRole"><option value="student">Student</option><option value="instructor">Instructor</option><option value="admin">Admin</option></select>
+          <select id="newUserRole">
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Status</label>
-          <select id="newUserStatus"><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option></select>
+          <select id="newUserStatus">
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
       </div>
       <div class="error-msg" id="createUserError"></div>
-      <button type="submit" class="btn-primary" id="createUserBtn"><i class="fas fa-user-plus"></i> Create User</button>
-    </form>
-  </div>
-</div>
-
-<!-- EDIT USER MODAL -->
-<div class="modal-overlay" id="editUserModal">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('editUserModal')"><i class="fas fa-times"></i></button>
-    <h2>Edit User</h2>
-    <p>Update user details.</p>
-    <form onsubmit="handleEditUser(event)">
-      <input type="hidden" id="editUserId">
-      <div class="form-row">
-        <div class="form-group"><label>First Name</label><input type="text" id="editUserFirstName" placeholder="John" required></div>
-        <div class="form-group"><label>Last Name</label><input type="text" id="editUserLastName" placeholder="Doe" required></div>
-      </div>
-      <div class="form-group"><label>Email Address</label><input type="email" id="editUserEmail" placeholder="john@example.com" required></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Role</label>
-          <select id="editUserRole"><option value="student">Student</option><option value="instructor">Instructor</option><option value="admin">Admin</option></select>
-        </div>
-        <div class="form-group">
-          <label>Status</label>
-          <select id="editUserStatus"><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option><option value="banned">Banned</option></select>
-        </div>
-      </div>
-      <div class="error-msg" id="editUserError"></div>
-      <button type="submit" class="btn-primary" id="editUserBtn"><i class="fas fa-save"></i> Save Changes</button>
+      <button type="submit" class="btn-primary">
+        <i class="fas fa-user-plus"></i> Create User
+      </button>
     </form>
   </div>
 </div>
@@ -728,112 +898,49 @@ body {
     <h2>Create New Course</h2>
     <p>Add a new course to the academy.</p>
     <form onsubmit="handleCreateCourse(event)">
-      <div class="form-group"><label>Course Title</label><input type="text" id="newCourseTitle" placeholder="e.g. Advanced UI Design" required></div>
-      <div class="form-group"><label>Description</label><textarea id="newCourseDesc" placeholder="Brief course description..." rows="3"></textarea></div>
+      <div class="form-group">
+        <label>Course Title</label>
+        <input type="text" id="newCourseTitle" placeholder="e.g. Advanced UI Design" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="newCourseDesc" placeholder="Brief course description..." rows="3"></textarea>
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label>Category</label>
-          <select id="newCourseCategory"><option value="ui-ux">UI/UX Design</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion Graphics</option><option value="3d">3D Design</option></select>
+          <select id="newCourseCategory">
+            <option value="ui-ux">UI/UX Design</option>
+            <option value="branding">Branding</option>
+            <option value="web">Web Design</option>
+            <option value="motion">Motion Graphics</option>
+            <option value="3d">3D Design</option>
+          </select>
         </div>
-        <div class="form-group"><label>Instructor</label><select id="newCourseInstructor"></select></div>
+        <div class="form-group">
+          <label>Instructor</label>
+          <select id="newCourseInstructor">
+            <option value="1">Alex Chen</option>
+            <option value="2">Sarah Kim</option>
+            <option value="3">Mike Ross</option>
+          </select>
+        </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Duration (hours)</label><input type="number" id="newCourseDuration" placeholder="12" min="1"></div>
-        <div class="form-group"><label>Price ($)</label><input type="number" id="newCoursePrice" placeholder="49.99" min="0" step="0.01"></div>
+        <div class="form-group">
+          <label>Duration (hours)</label>
+          <input type="number" id="newCourseDuration" placeholder="12" min="1">
+        </div>
+        <div class="form-group">
+          <label>Price ($)</label>
+          <input type="number" id="newCoursePrice" placeholder="49.99" min="0" step="0.01">
+        </div>
       </div>
       <div class="error-msg" id="createCourseError"></div>
-      <button type="submit" class="btn-primary" id="createCourseBtn"><i class="fas fa-plus"></i> Create Course</button>
+      <button type="submit" class="btn-primary">
+        <i class="fas fa-plus"></i> Create Course
+      </button>
     </form>
-  </div>
-</div>
-
-<!-- EDIT COURSE MODAL -->
-<div class="modal-overlay" id="editCourseModal">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('editCourseModal')"><i class="fas fa-times"></i></button>
-    <h2>Edit Course</h2>
-    <p>Update course details.</p>
-    <form onsubmit="handleEditCourse(event)">
-      <input type="hidden" id="editCourseId">
-      <div class="form-group"><label>Course Title</label><input type="text" id="editCourseTitle" placeholder="e.g. Advanced UI Design" required></div>
-      <div class="form-group"><label>Description</label><textarea id="editCourseDesc" placeholder="Brief course description..." rows="3"></textarea></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Category</label>
-          <select id="editCourseCategory"><option value="ui-ux">UI/UX Design</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion Graphics</option><option value="3d">3D Design</option></select>
-        </div>
-        <div class="form-group"><label>Instructor</label><select id="editCourseInstructor"></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Duration (hours)</label><input type="number" id="editCourseDuration" placeholder="12" min="1"></div>
-        <div class="form-group"><label>Price ($)</label><input type="number" id="editCoursePrice" placeholder="49.99" min="0" step="0.01"></div>
-      </div>
-      <div class="error-msg" id="editCourseError"></div>
-      <button type="submit" class="btn-primary" id="editCourseBtn"><i class="fas fa-save"></i> Save Changes</button>
-    </form>
-  </div>
-</div>
-
-<!-- CREATE PROJECT MODAL -->
-<div class="modal-overlay" id="createProjectModal">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('createProjectModal')"><i class="fas fa-times"></i></button>
-    <h2>Create New Project</h2>
-    <p>Add a new project to the platform.</p>
-    <form onsubmit="handleCreateProject(event)">
-      <div class="form-group"><label>Project Title</label><input type="text" id="newProjectTitle" placeholder="e.g. Brand Identity Redesign" required></div>
-      <div class="form-group"><label>Description</label><textarea id="newProjectDesc" placeholder="Brief project description..." rows="3"></textarea></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Status</label>
-          <select id="newProjectStatus"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select>
-        </div>
-        <div class="form-group"><label>Team Size</label><input type="number" id="newProjectTeam" placeholder="3" min="1" value="1"></div>
-      </div>
-      <div class="form-group"><label>Due Date</label><input type="date" id="newProjectDue" required></div>
-      <div class="error-msg" id="createProjectError"></div>
-      <button type="submit" class="btn-primary" id="createProjectBtn"><i class="fas fa-plus"></i> Create Project</button>
-    </form>
-  </div>
-</div>
-
-<!-- EDIT PROJECT MODAL -->
-<div class="modal-overlay" id="editProjectModal">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('editProjectModal')"><i class="fas fa-times"></i></button>
-    <h2>Edit Project</h2>
-    <p>Update project details.</p>
-    <form onsubmit="handleEditProject(event)">
-      <input type="hidden" id="editProjectId">
-      <div class="form-group"><label>Project Title</label><input type="text" id="editProjectTitle" placeholder="e.g. Brand Identity Redesign" required></div>
-      <div class="form-group"><label>Description</label><textarea id="editProjectDesc" placeholder="Brief project description..." rows="3"></textarea></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Status</label>
-          <select id="editProjectStatus"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select>
-        </div>
-        <div class="form-group"><label>Team Size</label><input type="number" id="editProjectTeam" placeholder="3" min="1"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Progress (%)</label><input type="number" id="editProjectProgress" placeholder="0" min="0" max="100"></div>
-        <div class="form-group"><label>Due Date</label><input type="date" id="editProjectDue" required></div>
-      </div>
-      <div class="error-msg" id="editProjectError"></div>
-      <button type="submit" class="btn-primary" id="editProjectBtn"><i class="fas fa-save"></i> Save Changes</button>
-    </form>
-  </div>
-</div>
-
-<!-- DELETE CONFIRM MODAL -->
-<div class="modal-overlay" id="deleteConfirmModal">
-  <div class="modal" style="width:360px;">
-    <button class="close-btn" onclick="closeModal('deleteConfirmModal')"><i class="fas fa-times"></i></button>
-    <h2 style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle" style="margin-right:8px;"></i>Confirm Delete</h2>
-    <p id="deleteConfirmText">Are you sure you want to delete this item? This action cannot be undone.</p>
-    <div class="delete-confirm">
-      <button class="cancel-btn" onclick="closeModal('deleteConfirmModal')">Cancel</button>
-      <button class="confirm-btn" id="deleteConfirmBtn" onclick="executeDelete()">Delete</button>
-    </div>
   </div>
 </div>
 
@@ -843,8 +950,7 @@ body {
 </div>
 
 <script>
-// ==================== CONFIG ====================
-// REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS
+
 const SUPABASE_URL = 'https://your-project.supabase.co';
 const SUPABASE_ANON_KEY = 'your-anon-key';
 
@@ -860,171 +966,46 @@ let sidebarCollapsed = false;
 let allUsers = [];
 let allCourses = [];
 let allProjects = [];
-let allActivities = [];
-let deleteTarget = null; // { type, id }
 
-const sectionTitles = {
-  dashboard: 'Admin Dashboard',
-  users: 'User Management',
-  courses: 'Course Management',
-  projects: 'Project Management',
-  content: 'Content Management',
-  analytics: 'Platform Analytics',
-  settings: 'Platform Settings'
-};
-
-// ==================== AUTO DEVICE RESPONSIVE SIDEBAR ====================
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
-const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-const mainContent = document.getElementById('mainContent');
-
-let isMobile = window.innerWidth <= 900;
-let mobileSidebarOpen = false;
-
-// Auto-detect device and set sidebar state
-function autoDetectDevice() {
-  const wasMobile = isMobile;
-  isMobile = window.innerWidth <= 900;
-
-  // Show/hide hamburger button
-  mobileMenuBtn.style.display = isMobile ? 'flex' : 'none';
-
-  if (isMobile) {
-    // SWITCHING TO / ON MOBILE
-    // Hide sidebar by default
-    sidebar.classList.remove('collapsed');
-    mainContent.classList.remove('sidebar-collapsed');
-    if (!mobileSidebarOpen) {
-      sidebar.classList.remove('mobile-open');
-      sidebarOverlay.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-  } else {
-    // SWITCHING TO / ON DESKTOP
-    // Always show sidebar, respect collapsed state
-    sidebar.classList.remove('mobile-open');
-    sidebarOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-    mobileSidebarOpen = false;
-    if (sidebarCollapsed) {
-      sidebar.classList.add('collapsed');
-      mainContent.classList.add('sidebar-collapsed');
-    } else {
-      sidebar.classList.remove('collapsed');
-      mainContent.classList.remove('sidebar-collapsed');
-    }
-  }
-}
-
-// Toggle mobile sidebar (hamburger click)
-function toggleMobileSidebar() {
-  if (!isMobile) return;
-  mobileSidebarOpen = !mobileSidebarOpen;
-  if (mobileSidebarOpen) {
-    sidebar.classList.add('mobile-open');
-    sidebarOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  } else {
-    sidebar.classList.remove('mobile-open');
-    sidebarOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-}
-
-// Close mobile sidebar
-function closeMobileSidebar() {
-  if (!isMobile) return;
-  mobileSidebarOpen = false;
-  sidebar.classList.remove('mobile-open');
-  sidebarOverlay.classList.remove('active');
-  document.body.style.overflow = '';
-}
-
-// Desktop sidebar toggle (chevron button)
+// Sidebar toggle
 document.getElementById('sidebarToggle').addEventListener('click', function() {
-  if (isMobile) return;
   sidebarCollapsed = !sidebarCollapsed;
-  if (sidebarCollapsed) {
-    sidebar.classList.add('collapsed');
-    mainContent.classList.add('sidebar-collapsed');
-  } else {
-    sidebar.classList.remove('collapsed');
-    mainContent.classList.remove('sidebar-collapsed');
-  }
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('mainContent').classList.toggle('sidebar-collapsed');
 });
 
-// Mobile menu button
-mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
-
-// Overlay click closes mobile sidebar
-sidebarOverlay.addEventListener('click', closeMobileSidebar);
-
-// Handle resize automatically
-window.addEventListener('resize', autoDetectDevice);
-
-// Touch swipe support for mobile
-let touchStartX = 0;
-let touchEndX = 0;
-
-document.addEventListener('touchstart', function(e) {
-  touchStartX = e.changedTouches[0].screenX;
-}, { passive: true });
-
-document.addEventListener('touchend', function(e) {
-  if (!isMobile) return;
-  touchEndX = e.changedTouches[0].screenX;
-  const diff = touchEndX - touchStartX;
-  const swipeThreshold = 80;
-
-  // Swipe right from left edge opens sidebar
-  if (diff > swipeThreshold && touchStartX < 40 && !mobileSidebarOpen) {
-    toggleMobileSidebar();
-  }
-  // Swipe left closes sidebar
-  if (diff < -swipeThreshold && mobileSidebarOpen) {
-    closeMobileSidebar();
-  }
-}, { passive: true });
-
-// Top bar scroll effect
 window.addEventListener('scroll', function() {
   const topBar = document.getElementById('topBar');
   if (window.scrollY > 20) topBar.classList.add('scrolled');
   else topBar.classList.remove('scrolled');
 });
 
-// ==================== NAVIGATION ====================
-function showSection(section) {
-  // Auto-close mobile sidebar on navigation
-  closeMobileSidebar();
+// Mobile menu
+const mobileBtn = document.getElementById('mobileMenuBtn');
+if (window.innerWidth <= 900) mobileBtn.style.display = 'flex';
+mobileBtn.addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
 
+// Section navigation
+function showSection(section) {
   document.querySelectorAll('[id^="section-"]').forEach(el => el.style.display = 'none');
   document.getElementById('section-' + section).style.display = 'block';
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.nav-item[data-section="' + section + '"]').forEach(n => n.classList.add('active'));
-  document.getElementById('pageTitle').textContent = sectionTitles[section] || 'Admin Dashboard';
 
   if (section === 'users') loadAllUsers();
   if (section === 'courses') loadAllCourses();
   if (section === 'projects') loadAllProjects();
-  if (section === 'analytics') loadAnalytics();
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ==================== MODALS ====================
+// Modal functions
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-// Close modals on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('active');
-  });
-});
-
-// ==================== TOAST ====================
+// Toast
 function showToast(msg, type) {
   type = type || 'success';
   const toast = document.getElementById('toast');
@@ -1037,7 +1018,7 @@ function showToast(msg, type) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// ==================== AUTH ====================
+// Auth check
 async function checkAuth() {
   if (!supabase) {
     document.getElementById('adminName').textContent = 'Admin (Demo)';
@@ -1048,200 +1029,81 @@ async function checkAuth() {
     currentUser = user;
     const name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Admin';
     document.getElementById('adminName').textContent = name;
-    if (user?.user_metadata?.avatar_url) {
-      document.getElementById('adminProfileImg').src = user.user_metadata.avatar_url;
-    }
+    if (user?.user_metadata?.avatar_url) document.getElementById('adminProfileImg').src = user.user_metadata.avatar_url;
   }
 }
 
 function handleLogout() {
-  if (supabase) supabase.auth.signOut();
+  if (supabase) {
+    supabase.auth.signOut();
+  }
   showToast('Logged out successfully', 'success');
   setTimeout(() => { window.location.href = 'index.html'; }, 1000);
 }
 
-// ==================== SUPABASE CRUD: USERS ====================
-async function fetchUsers() {
-  if (!supabase) return [];
-  const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
-  if (error) { console.error('fetchUsers error:', error); showToast('Failed to load users', 'error'); return []; }
-  return data || [];
+// Demo data
+const demoUsers = [
+  { id: 1, name: "Alex Chen", email: "alex@aurex.com", role: "admin", status: "active", enrolled: 12, joined: "2026-01-15", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" },
+  { id: 2, name: "Sarah Kim", email: "sarah@aurex.com", role: "instructor", status: "active", enrolled: 8, joined: "2026-02-01", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" },
+  { id: 3, name: "Mike Ross", email: "mike@aurex.com", role: "student", status: "active", enrolled: 5, joined: "2026-03-10", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" },
+  { id: 4, name: "Emma Wilson", email: "emma@aurex.com", role: "student", status: "pending", enrolled: 0, joined: "2026-07-15", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" },
+  { id: 5, name: "David Park", email: "david@aurex.com", role: "instructor", status: "active", enrolled: 15, joined: "2026-01-20", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" },
+  { id: 6, name: "Lisa Zhang", email: "lisa@aurex.com", role: "student", status: "inactive", enrolled: 3, joined: "2026-04-05", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" }
+];
+
+const demoCourses = [
+  { id: 1, title: "UI/UX Design Fundamentals", instructor: "Alex Chen", category: "ui-ux", students: 234, rating: 4.8, price: 49.99, thumbnail: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=200&h=150&fit=crop" },
+  { id: 2, title: "Advanced Branding Masterclass", instructor: "Sarah Kim", category: "branding", students: 189, rating: 4.9, price: 79.99, thumbnail: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=200&h=150&fit=crop" },
+  { id: 3, title: "Motion Graphics Pro", instructor: "David Park", category: "motion", students: 156, rating: 4.7, price: 59.99, thumbnail: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=200&h=150&fit=crop" },
+  { id: 4, title: "3D Design Essentials", instructor: "Alex Chen", category: "3d", students: 98, rating: 4.6, price: 69.99, thumbnail: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&h=150&fit=crop" }
+];
+
+const demoProjects = [
+  { id: 1, title: "Brand Identity Redesign", status: "in-progress", progress: 65, team: 3, due: "2026-08-15" },
+  { id: 2, title: "E-Commerce Mobile App", status: "in-progress", progress: 42, team: 2, due: "2026-09-30" },
+  { id: 3, title: "Motion Graphics Reel", status: "completed", progress: 100, team: 1, due: "2026-06-30" },
+  { id: 4, title: "Corporate Website Redesign", status: "pending", progress: 0, team: 4, due: "2026-11-15" }
+];
+
+const demoActivities = [
+  { type: "user", icon: "user", text: "<strong>Emma Wilson</strong> signed up for an account", time: "2 minutes ago" },
+  { type: "course", icon: "course", text: "<strong>UI/UX Design Fundamentals</strong> got 5 new enrollments", time: "15 minutes ago" },
+  { type: "cert", icon: "cert", text: "<strong>Mike Ross</strong> completed <strong>Branding Basics</strong>", time: "1 hour ago" },
+  { type: "warning", icon: "warning", text: "<strong>Server maintenance</strong> scheduled for tonight", time: "3 hours ago" },
+  { type: "user", icon: "user", text: "<strong>David Park</strong> updated course content", time: "5 hours ago" },
+  { type: "error", icon: "error", text: "<strong>Payment gateway</strong> experienced brief downtime", time: "8 hours ago" }
+];
+
+// Stats
+function loadStats() {
+  document.getElementById('statTotalUsers').textContent = '1,247';
+  document.getElementById('statUsersChange').textContent = '+23';
+  document.getElementById('statTotalCourses').textContent = '48';
+  document.getElementById('statCoursesChange').textContent = '+3';
+  document.getElementById('statRevenue').textContent = '$12,450';
+  document.getElementById('statRevenueChange').textContent = '+18%';
+  document.getElementById('statEnrollments').textContent = '89';
+  document.getElementById('statEnrollmentsChange').textContent = '+12';
+
+  document.getElementById('userBadge').textContent = '6';
+  document.getElementById('courseBadge').textContent = '4';
 }
 
-async function createUser(userData) {
-  if (!supabase) { showToast('Supabase not configured', 'error'); return null; }
-  const { data, error } = await supabase.from('users').insert([userData]).select().single();
-  if (error) { console.error('createUser error:', error); showToast(error.message, 'error'); return null; }
-  showToast('User created successfully!', 'success');
-  return data;
-}
-
-async function updateUser(id, updates) {
-  if (!supabase) { showToast('Supabase not configured', 'error'); return null; }
-  const { data, error } = await supabase.from('users').update(updates).eq('id', id).select().single();
-  if (error) { console.error('updateUser error:', error); showToast(error.message, 'error'); return null; }
-  showToast('User updated successfully!', 'success');
-  return data;
-}
-
-async function deleteUser(id) {
-  if (!supabase) { showToast('Supabase not configured', 'error'); return false; }
-  const { error } = await supabase.from('users').delete().eq('id', id);
-  if (error) { console.error('deleteUser error:', error); showToast(error.message, 'error'); return false; }
-  showToast('User deleted successfully!', 'success');
-  return true;
-}
-
-// ==================== SUPABASE CRUD: COURSES ====================
-async function fetchCourses() {
-  if (!supabase) return [];
-  const { data, error } = await supabase.from('courses').select('*').order('created_at', { ascending: false });
-  if (error) { console.error('fetchCourses error:', error); showToast('Failed to load courses', 'error'); return []; }
-  return data || [];
-}
-
-async function createCourse(courseData) {
-  if (!supabase) { showToast('Supabase not configured', 'error'); return null; }
-  const { data, error } = await supabase.from('courses').insert([courseData]).select().single();
-  if (error) { console.error('createCourse error:', error); showToast(error.message, 'error'); return null; }
-  showToast('Course created successfully!', 'success');
-  return data;
-}
-
-async function updateCourse(id, updates) {
-  if (!supabase) { showToast('Supabase not configured', 'error'); return null; }
-  const { data, error } = await supabase.from('courses').update(updates).eq('id', id).select().single();
-  if (error) { console.error('updateCourse error:', error); showToast(error.message, 'error'); return null; }
-  showToast('Course updated successfully!', 'success');
-  return data;
-}
-
-async function deleteCourse(id) {
-  if (!supabase) { showToast('Supabase not configured', 'error'); return false; }
-  const { error } = await supabase.from('courses').delete().eq('id', id);
-  if (error) { console.error('deleteCourse error:', error); showToast(error.message, 'error'); return false; }
-  showToast('Course deleted successfully!', 'success');
-  return true;
-}
-
-// ==================== SUPABASE CRUD: PROJECTS ====================
-async function fetchProjects() {
-  if (!supabase) return [];
-  const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
-  if (error) { console.error('fetchProjects error:', error); showToast('Failed to load projects', 'error'); return []; }
-  return data || [];
-}
-
-async function createProject(projectData) {
-  if (!supabase) { showToast('Supabase not configured', 'error'); return null; }
-  const { data, error } = await supabase.from('projects').insert([projectData]).select().single();
-  if (error) { console.error('createProject error:', error); showToast(error.message, 'error'); return null; }
-  showToast('Project created successfully!', 'success');
-  return data;
-}
-
-async function updateProject(id, updates) {
-  if (!supabase) { showToast('Supabase not configured', 'error'); return null; }
-  const { data, error } = await supabase.from('projects').update(updates).eq('id', id).select().single();
-  if (error) { console.error('updateProject error:', error); showToast(error.message, 'error'); return null; }
-  showToast('Project updated successfully!', 'success');
-  return data;
-}
-
-async function deleteProject(id) {
-  if (!supabase) { showToast('Supabase not configured', 'error'); return false; }
-  const { error } = await supabase.from('projects').delete().eq('id', id);
-  if (error) { console.error('deleteProject error:', error); showToast(error.message, 'error'); return false; }
-  showToast('Project deleted successfully!', 'success');
-  return true;
-}
-
-// ==================== SUPABASE: ACTIVITIES ====================
-async function fetchActivities() {
-  if (!supabase) return [];
-  const { data, error } = await supabase.from('activities').select('*').order('created_at', { ascending: false }).limit(10);
-  if (error) { console.error('fetchActivities error:', error); return []; }
-  return data || [];
-}
-
-async function logActivity(activity) {
-  if (!supabase) return;
-  await supabase.from('activities').insert([{ ...activity, created_at: new Date().toISOString() }]);
-}
-
-// ==================== STATS ====================
-async function loadStats() {
-  if (!supabase) {
-    document.getElementById('statTotalUsers').textContent = '0';
-    document.getElementById('statTotalCourses').textContent = '0';
-    document.getElementById('statRevenue').textContent = '$0';
-    document.getElementById('statEnrollments').textContent = '0';
-    document.getElementById('userBadge').textContent = '0';
-    document.getElementById('courseBadge').textContent = '0';
-    return;
-  }
-
-  // Total users
-  const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
-  document.getElementById('statTotalUsers').textContent = (userCount || 0).toLocaleString();
-  document.getElementById('userBadge').textContent = userCount || 0;
-
-  // Total courses
-  const { count: courseCount } = await supabase.from('courses').select('*', { count: 'exact', head: true });
-  document.getElementById('statTotalCourses').textContent = (courseCount || 0).toLocaleString();
-  document.getElementById('courseBadge').textContent = courseCount || 0;
-
-  // Revenue (sum of course prices * students)
-  const { data: courses } = await supabase.from('courses').select('price, students');
-  const revenue = (courses || []).reduce((sum, c) => sum + ((c.price || 0) * (c.students || 0)), 0);
-  document.getElementById('statRevenue').textContent = '$' + revenue.toLocaleString();
-
-  // Enrollments (sum of all students)
-  const enrollments = (courses || []).reduce((sum, c) => sum + (c.students || 0), 0);
-  document.getElementById('statEnrollments').textContent = enrollments.toLocaleString();
-
-  // Weekly changes (placeholder - you can implement real logic)
-  document.getElementById('statUsersChange').textContent = '+' + Math.floor(Math.random() * 30 + 5);
-  document.getElementById('statCoursesChange').textContent = '+' + Math.floor(Math.random() * 5 + 1);
-  document.getElementById('statRevenueChange').textContent = '+' + Math.floor(Math.random() * 20 + 5) + '%';
-  document.getElementById('statEnrollmentsChange').textContent = '+' + Math.floor(Math.random() * 15 + 3);
-}
-
-// ==================== CHART ====================
-async function renderChart(type) {
+// Chart
+function renderChart(type) {
   const chart = document.getElementById('revenueChart');
   const labels = document.getElementById('chartLabels');
+  const data = type === 'weekly' 
+    ? [45, 62, 38, 75, 55, 88, 72]
+    : [320, 410, 380, 520, 480, 610];
+  const labelTexts = type === 'weekly'
+    ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
 
-  let data, labelTexts;
-  if (supabase) {
-    // Fetch real revenue data from enrollments/orders
-    const { data: revData } = await supabase.from('courses').select('price, students, created_at');
-    if (type === 'weekly') {
-      // Group by day of week for last 7 days
-      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      const now = new Date();
-      data = days.map((_, i) => {
-        const d = new Date(now);
-        d.setDate(d.getDate() - (6 - i));
-        const dayStr = d.toISOString().split('T')[0];
-        const dayRev = (revData || []).filter(c => c.created_at && c.created_at.startsWith(dayStr))
-          .reduce((s, c) => s + ((c.price || 0) * (c.students || 0)), 0);
-        return Math.max(dayRev / 100, 10); // Scale down for display
-      });
-      labelTexts = days;
-    } else {
-      data = [320, 410, 380, 520, 480, 610];
-      labelTexts = ['Jan','Feb','Mar','Apr','May','Jun'];
-    }
-  } else {
-    data = type === 'weekly' ? [45, 62, 38, 75, 55, 88, 72] : [320, 410, 380, 520, 480, 610];
-    labelTexts = type === 'weekly' ? ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] : ['Jan','Feb','Mar','Apr','May','Jun'];
-  }
-
-  const max = Math.max(...data, 1);
+  const max = Math.max(...data);
   chart.innerHTML = data.map((v, i) => `
     <div class="chart-bar" style="height:${(v/max)*100}%">
-      <div class="bar-tooltip">$${Math.round(v * 100).toLocaleString()}</div>
+      <div class="bar-tooltip">$${v * 100}</div>
     </div>
   `).join('');
   labels.innerHTML = labelTexts.map(l => `<span>${l}</span>`).join('');
@@ -1253,498 +1115,181 @@ function updateChart(type, btn) {
   btn.classList.add('active');
 }
 
-// ==================== USERS RENDERING ====================
-function getAvatarUrl(name) {
-  return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name || 'User') + '&background=7c3aed&color=fff&size=100';
-}
-
-function getStatusClass(status) {
-  return status === 'active' ? 'active' : (status === 'pending' ? 'pending' : (status === 'banned' ? 'banned' : 'inactive'));
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return 'N/A';
-  return new Date(dateStr).toLocaleDateString();
-}
-
+// Users
 function renderUserRow(user, full) {
-  const statusClass = getStatusClass(user.status);
-  const roleClass = user.role || 'student';
-  const avatar = user.avatar || getAvatarUrl(user.name || user.email);
-  const name = user.name || (user.first_name && user.last_name ? user.first_name + ' ' + user.last_name : user.email?.split('@')[0] || 'Unknown');
+  const statusClass = user.status === 'active' ? 'active' : (user.status === 'pending' ? 'pending' : (user.status === 'banned' ? 'banned' : 'inactive'));
+  const roleClass = user.role;
 
   if (full) {
     return `<tr>
-      <td><div class="user-cell"><img src="${avatar}" alt="${name}"><div class="user-info"><div class="name">${name}</div><div class="email">${user.email || ''}</div></div></div></td>
-      <td>${user.email || ''}</td>
-      <td><span class="role-badge ${roleClass}">${roleClass}</span></td>
-      <td><span class="status-pill ${statusClass}"><i class="fas fa-circle" style="font-size:6px;"></i> ${user.status || 'active'}</span></td>
-      <td>${user.enrolled || 0}</td>
-      <td>${formatDate(user.created_at || user.joined)}</td>
+      <td><div class="user-cell"><img src="${user.avatar}" alt="${user.name}"><div class="user-info"><div class="name">${user.name}</div><div class="email">${user.email}</div></div></div></td>
+      <td>${user.email}</td>
+      <td><span class="role-badge ${roleClass}">${user.role}</span></td>
+      <td><span class="status-pill ${statusClass}"><i class="fas fa-circle" style="font-size:6px;"></i> ${user.status}</span></td>
+      <td>${user.enrolled}</td>
+      <td>${new Date(user.joined).toLocaleDateString()}</td>
       <td><div class="table-actions">
-        <button onclick="openEditUser('${user.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-        <button onclick="openViewUser('${user.id}')" title="View"><i class="fas fa-eye"></i></button>
-        <button class="danger" onclick="confirmDelete('user', '${user.id}', '${name.replace(/'/g, "\'")}')" title="Delete"><i class="fas fa-trash"></i></button>
+        <button onclick="showToast('Edit user', 'success')" title="Edit"><i class="fas fa-pen"></i></button>
+        <button onclick="showToast('View profile', 'success')" title="View"><i class="fas fa-eye"></i></button>
+        <button class="danger" onclick="showToast('User banned', 'error')" title="Ban"><i class="fas fa-ban"></i></button>
       </div></td>
     </tr>`;
   }
   return `<tr>
-    <td><div class="user-cell"><img src="${avatar}" alt="${name}"><div class="user-info"><div class="name">${name}</div><div class="email">${user.email || ''}</div></div></div></td>
-    <td><span class="role-badge ${roleClass}">${roleClass}</span></td>
-    <td><span class="status-pill ${statusClass}"><i class="fas fa-circle" style="font-size:6px;"></i> ${user.status || 'active'}</span></td>
-    <td>${formatDate(user.created_at || user.joined)}</td>
+    <td><div class="user-cell"><img src="${user.avatar}" alt="${user.name}"><div class="user-info"><div class="name">${user.name}</div><div class="email">${user.email}</div></div></div></td>
+    <td><span class="role-badge ${roleClass}">${user.role}</span></td>
+    <td><span class="status-pill ${statusClass}"><i class="fas fa-circle" style="font-size:6px;"></i> ${user.status}</span></td>
+    <td>${new Date(user.joined).toLocaleDateString()}</td>
     <td><div class="table-actions">
-      <button onclick="openEditUser('${user.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-      <button class="danger" onclick="confirmDelete('user', '${user.id}', '${name.replace(/'/g, "\'")}')" title="Delete"><i class="fas fa-trash"></i></button>
+      <button onclick="showToast('Edit user', 'success')" title="Edit"><i class="fas fa-pen"></i></button>
+      <button class="danger" onclick="showToast('User banned', 'error')" title="Ban"><i class="fas fa-ban"></i></button>
     </div></td>
   </tr>`;
 }
 
-async function loadRecentUsers() {
+function loadRecentUsers() {
   const tbody = document.getElementById('recentUsersBody');
-  allUsers = await fetchUsers();
-  if (allUsers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div></td></tr>';
-    return;
-  }
-  tbody.innerHTML = allUsers.slice(0, 5).map(u => renderUserRow(u, false)).join('');
+  tbody.innerHTML = demoUsers.slice(0, 4).map(u => renderUserRow(u, false)).join('');
 }
 
-async function loadAllUsers() {
+function loadAllUsers() {
   const tbody = document.getElementById('allUsersBody');
-  allUsers = await fetchUsers();
-  if (allUsers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-users"></i><p>No users found. Click "Add User" to create one.</p></div></td></tr>';
-    return;
-  }
-  tbody.innerHTML = allUsers.map(u => renderUserRow(u, true)).join('');
+  tbody.innerHTML = demoUsers.map(u => renderUserRow(u, true)).join('');
 }
 
-// ==================== USER CRUD HANDLERS ====================
+// Courses
+function loadAllCourses() {
+  const container = document.getElementById('coursesList');
+  container.innerHTML = demoCourses.map(c => `
+    <div class="course-row">
+      <img src="${c.thumbnail}" alt="${c.title}">
+      <div class="info">
+        <div class="title">${c.title}</div>
+        <div class="meta">${c.instructor} &bull; ${c.category}</div>
+      </div>
+      <div class="stats">
+        <span><i class="fas fa-users"></i> ${c.students}</span>
+        <span><i class="fas fa-star" style="color:var(--accent-orange)"></i> ${c.rating}</span>
+        <span><i class="fas fa-tag"></i> $${c.price}</span>
+      </div>
+      <div class="table-actions">
+        <button onclick="showToast('Edit course', 'success')"><i class="fas fa-pen"></i></button>
+        <button onclick="showToast('View course', 'success')"><i class="fas fa-eye"></i></button>
+        <button class="danger" onclick="showToast('Course deleted', 'error')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Projects
+function loadAllProjects() {
+  const container = document.getElementById('projectsList');
+  container.innerHTML = demoProjects.map(p => `
+    <div class="course-row">
+      <div style="width:48px;height:48px;border-radius:12px;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-folder" style="color:var(--accent-violet);font-size:18px;"></i>
+      </div>
+      <div class="info">
+        <div class="title">${p.title}</div>
+        <div class="meta">${p.team} members &bull; Due ${new Date(p.due).toLocaleDateString()}</div>
+      </div>
+      <div class="stats">
+        <span><i class="fas fa-chart-line"></i> ${p.progress}%</span>
+        <span class="status-pill ${p.status === 'completed' ? 'active' : (p.status === 'in-progress' ? 'pending' : 'inactive')}">${p.status}</span>
+      </div>
+      <div class="table-actions">
+        <button onclick="showToast('Edit project', 'success')"><i class="fas fa-pen"></i></button>
+        <button class="danger" onclick="showToast('Project deleted', 'error')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Activity
+function loadActivity() {
+  const feed = document.getElementById('activityFeed');
+  feed.innerHTML = demoActivities.map(a => `
+    <div class="activity-item">
+      <div class="icon ${a.icon}"><i class="fas fa-${a.icon === 'user' ? 'user' : (a.icon === 'course' ? 'graduation-cap' : (a.icon === 'cert' ? 'certificate' : (a.icon === 'warning' ? 'exclamation-triangle' : 'times-circle')))}"></i></div>
+      <div class="content">
+        <div class="text">${a.text}</div>
+        <div class="time">${a.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Create user
 async function handleCreateUser(e) {
   e.preventDefault();
-  const btn = document.getElementById('createUserBtn');
-  btn.disabled = true;
-  document.getElementById('createUserError').textContent = '';
-
-  const firstName = document.getElementById('newUserFirstName').value.trim();
-  const lastName = document.getElementById('newUserLastName').value.trim();
-  const email = document.getElementById('newUserEmail').value.trim();
+  const firstName = document.getElementById('newUserFirstName').value;
+  const lastName = document.getElementById('newUserLastName').value;
+  const email = document.getElementById('newUserEmail').value;
   const role = document.getElementById('newUserRole').value;
   const status = document.getElementById('newUserStatus').value;
 
   const newUser = {
-    first_name: firstName,
-    last_name: lastName,
+    id: Date.now(),
     name: firstName + ' ' + lastName,
     email: email,
     role: role,
     status: status,
     enrolled: 0,
-    avatar: getAvatarUrl(firstName + ' ' + lastName)
+    joined: new Date().toISOString().split('T')[0],
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face"
   };
 
-  const result = await createUser(newUser);
-  btn.disabled = false;
-  if (result) {
-    closeModal('createUserModal');
-    e.target.reset();
-    await loadRecentUsers();
-    await loadAllUsers();
-    await loadStats();
-    await logActivity({ type: 'user', icon: 'user', text: `<strong>${newUser.name}</strong> was added to the platform`, time: 'Just now' });
-    await loadActivity();
-  }
+  demoUsers.unshift(newUser);
+  showToast('User created successfully!', 'success');
+  closeModal('createUserModal');
+  e.target.reset();
+  loadRecentUsers();
+  document.getElementById('statTotalUsers').textContent = (parseInt(document.getElementById('statTotalUsers').textContent.replace(/,/g, '')) + 1).toLocaleString();
 }
 
-function openEditUser(id) {
-  const user = allUsers.find(u => u.id == id);
-  if (!user) return;
-  document.getElementById('editUserId').value = user.id;
-  document.getElementById('editUserFirstName').value = user.first_name || (user.name ? user.name.split(' ')[0] : '');
-  document.getElementById('editUserLastName').value = user.last_name || (user.name ? user.name.split(' ').slice(1).join(' ') : '');
-  document.getElementById('editUserEmail').value = user.email || '';
-  document.getElementById('editUserRole').value = user.role || 'student';
-  document.getElementById('editUserStatus').value = user.status || 'active';
-  document.getElementById('editUserError').textContent = '';
-  openModal('editUserModal');
-}
-
-async function handleEditUser(e) {
-  e.preventDefault();
-  const btn = document.getElementById('editUserBtn');
-  btn.disabled = true;
-  document.getElementById('editUserError').textContent = '';
-
-  const id = document.getElementById('editUserId').value;
-  const firstName = document.getElementById('editUserFirstName').value.trim();
-  const lastName = document.getElementById('editUserLastName').value.trim();
-
-  const updates = {
-    first_name: firstName,
-    last_name: lastName,
-    name: firstName + ' ' + lastName,
-    email: document.getElementById('editUserEmail').value.trim(),
-    role: document.getElementById('editUserRole').value,
-    status: document.getElementById('editUserStatus').value
-  };
-
-  const result = await updateUser(id, updates);
-  btn.disabled = false;
-  if (result) {
-    closeModal('editUserModal');
-    await loadRecentUsers();
-    await loadAllUsers();
-    await loadStats();
-  }
-}
-
-function openViewUser(id) {
-  const user = allUsers.find(u => u.id == id);
-  if (!user) return;
-  showToast(`Viewing ${user.name || user.email} - Full profile view coming soon`, 'success');
-}
-
-// ==================== COURSES RENDERING ====================
-function getCategoryLabel(cat) {
-  const map = { 'ui-ux': 'UI/UX Design', 'branding': 'Branding', 'web': 'Web Design', 'motion': 'Motion Graphics', '3d': '3D Design' };
-  return map[cat] || cat;
-}
-
-function renderCourseRow(course) {
-  const thumbnail = course.thumbnail || 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=200&h=150&fit=crop';
-  return `<div class="course-row">
-    <img src="${thumbnail}" alt="${course.title}">
-    <div class="info">
-      <div class="title">${course.title}</div>
-      <div class="meta">${course.instructor || 'Unknown'} &bull; ${getCategoryLabel(course.category)}</div>
-    </div>
-    <div class="stats">
-      <span><i class="fas fa-users"></i> ${course.students || 0}</span>
-      <span><i class="fas fa-star" style="color:var(--accent-orange)"></i> ${course.rating || '0.0'}</span>
-      <span><i class="fas fa-tag"></i> $${course.price || 0}</span>
-    </div>
-    <div class="table-actions">
-      <button onclick="openEditCourse('${course.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-      <button onclick="openViewCourse('${course.id}')" title="View"><i class="fas fa-eye"></i></button>
-      <button class="danger" onclick="confirmDelete('course', '${course.id}', '${(course.title || '').replace(/'/g, "\'")}')" title="Delete"><i class="fas fa-trash"></i></button>
-    </div>
-  </div>`;
-}
-
-async function loadAllCourses() {
-  const container = document.getElementById('coursesList');
-  allCourses = await fetchCourses();
-  if (allCourses.length === 0) {
-    container.innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><p>No courses found. Click "Add Course" to create one.</p></div>';
-    return;
-  }
-  container.innerHTML = allCourses.map(c => renderCourseRow(c)).join('');
-}
-
-async function populateInstructorSelect(selectId) {
-  const select = document.getElementById(selectId);
-  select.innerHTML = '';
-  const instructors = allUsers.filter(u => u.role === 'instructor' || u.role === 'admin');
-  if (instructors.length === 0) {
-    select.innerHTML = '<option value="">No instructors available</option>';
-    return;
-  }
-  instructors.forEach(inst => {
-    const name = inst.name || (inst.first_name + ' ' + inst.last_name) || inst.email;
-    select.innerHTML += `<option value="${inst.id}">${name}</option>`;
-  });
-}
-
-// ==================== COURSE CRUD HANDLERS ====================
+// Create course
 async function handleCreateCourse(e) {
   e.preventDefault();
-  const btn = document.getElementById('createCourseBtn');
-  btn.disabled = true;
-  document.getElementById('createCourseError').textContent = '';
-
-  const instructorId = document.getElementById('newCourseInstructor').value;
-  const instructor = allUsers.find(u => u.id == instructorId);
-  const instructorName = instructor ? (instructor.name || instructor.email) : 'Unknown';
+  const title = document.getElementById('newCourseTitle').value;
+  const desc = document.getElementById('newCourseDesc').value;
+  const category = document.getElementById('newCourseCategory').value;
+  const instructor = document.getElementById('newCourseInstructor').value;
+  const duration = document.getElementById('newCourseDuration').value;
+  const price = document.getElementById('newCoursePrice').value;
 
   const newCourse = {
-    title: document.getElementById('newCourseTitle').value.trim(),
-    description: document.getElementById('newCourseDesc').value.trim(),
-    category: document.getElementById('newCourseCategory').value,
-    instructor: instructorName,
-    instructor_id: instructorId || null,
-    duration: parseInt(document.getElementById('newCourseDuration').value) || 0,
-    price: parseFloat(document.getElementById('newCoursePrice').value) || 0,
+    id: Date.now(),
+    title: title,
+    instructor: instructor === '1' ? 'Alex Chen' : (instructor === '2' ? 'Sarah Kim' : 'Mike Ross'),
+    category: category,
     students: 0,
     rating: 0,
-    thumbnail: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=200&h=150&fit=crop'
+    price: price || 0,
+    thumbnail: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=200&h=150&fit=crop"
   };
 
-  const result = await createCourse(newCourse);
-  btn.disabled = false;
-  if (result) {
-    closeModal('createCourseModal');
-    e.target.reset();
-    await loadAllCourses();
-    await loadStats();
-    await logActivity({ type: 'course', icon: 'course', text: `<strong>${newCourse.title}</strong> was published`, time: 'Just now' });
-    await loadActivity();
-  }
+  demoCourses.unshift(newCourse);
+  showToast('Course created successfully!', 'success');
+  closeModal('createCourseModal');
+  e.target.reset();
+  document.getElementById('statTotalCourses').textContent = (parseInt(document.getElementById('statTotalCourses').textContent) + 1).toString();
 }
 
-function openEditCourse(id) {
-  const course = allCourses.find(c => c.id == id);
-  if (!course) return;
-  document.getElementById('editCourseId').value = course.id;
-  document.getElementById('editCourseTitle').value = course.title || '';
-  document.getElementById('editCourseDesc').value = course.description || '';
-  document.getElementById('editCourseCategory').value = course.category || 'ui-ux';
-  document.getElementById('editCourseDuration').value = course.duration || '';
-  document.getElementById('editCoursePrice').value = course.price || '';
-  populateInstructorSelect('editCourseInstructor');
-  if (course.instructor_id) document.getElementById('editCourseInstructor').value = course.instructor_id;
-  document.getElementById('editCourseError').textContent = '';
-  openModal('editCourseModal');
-}
-
-async function handleEditCourse(e) {
-  e.preventDefault();
-  const btn = document.getElementById('editCourseBtn');
-  btn.disabled = true;
-  document.getElementById('editCourseError').textContent = '';
-
-  const id = document.getElementById('editCourseId').value;
-  const instructorId = document.getElementById('editCourseInstructor').value;
-  const instructor = allUsers.find(u => u.id == instructorId);
-  const instructorName = instructor ? (instructor.name || instructor.email) : 'Unknown';
-
-  const updates = {
-    title: document.getElementById('editCourseTitle').value.trim(),
-    description: document.getElementById('editCourseDesc').value.trim(),
-    category: document.getElementById('editCourseCategory').value,
-    instructor: instructorName,
-    instructor_id: instructorId || null,
-    duration: parseInt(document.getElementById('editCourseDuration').value) || 0,
-    price: parseFloat(document.getElementById('editCoursePrice').value) || 0
-  };
-
-  const result = await updateCourse(id, updates);
-  btn.disabled = false;
-  if (result) {
-    closeModal('editCourseModal');
-    await loadAllCourses();
-    await loadStats();
-  }
-}
-
-function openViewCourse(id) {
-  const course = allCourses.find(c => c.id == id);
-  if (!course) return;
-  showToast(`Viewing ${course.title} - Full course view coming soon`, 'success');
-}
-
-// ==================== PROJECTS RENDERING ====================
-function renderProjectRow(project) {
-  const statusClass = project.status === 'completed' ? 'active' : (project.status === 'in-progress' ? 'pending' : 'inactive');
-  return `<div class="course-row">
-    <div style="width:48px;height:48px;border-radius:12px;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;">
-      <i class="fas fa-folder" style="color:var(--accent-violet);font-size:18px;"></i>
-    </div>
-    <div class="info">
-      <div class="title">${project.title}</div>
-      <div class="meta">${project.team || 1} members &bull; Due ${formatDate(project.due_date || project.due)}</div>
-    </div>
-    <div class="stats">
-      <span><i class="fas fa-chart-line"></i> ${project.progress || 0}%</span>
-      <span class="status-pill ${statusClass}">${project.status || 'pending'}</span>
-    </div>
-    <div class="table-actions">
-      <button onclick="openEditProject('${project.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-      <button class="danger" onclick="confirmDelete('project', '${project.id}', '${(project.title || '').replace(/'/g, "\'")}')" title="Delete"><i class="fas fa-trash"></i></button>
-    </div>
-  </div>`;
-}
-
-async function loadAllProjects() {
-  const container = document.getElementById('projectsList');
-  allProjects = await fetchProjects();
-  if (allProjects.length === 0) {
-    container.innerHTML = '<div class="empty-state"><i class="fas fa-folder"></i><p>No projects found. Click "Add Project" to create one.</p></div>';
-    return;
-  }
-  container.innerHTML = allProjects.map(p => renderProjectRow(p)).join('');
-}
-
-// ==================== PROJECT CRUD HANDLERS ====================
-async function handleCreateProject(e) {
-  e.preventDefault();
-  const btn = document.getElementById('createProjectBtn');
-  btn.disabled = true;
-  document.getElementById('createProjectError').textContent = '';
-
-  const newProject = {
-    title: document.getElementById('newProjectTitle').value.trim(),
-    description: document.getElementById('newProjectDesc').value.trim(),
-    status: document.getElementById('newProjectStatus').value,
-    team: parseInt(document.getElementById('newProjectTeam').value) || 1,
-    progress: 0,
-    due_date: document.getElementById('newProjectDue').value
-  };
-
-  const result = await createProject(newProject);
-  btn.disabled = false;
-  if (result) {
-    closeModal('createProjectModal');
-    e.target.reset();
-    await loadAllProjects();
-    await logActivity({ type: 'project', icon: 'course', text: `<strong>${newProject.title}</strong> project was created`, time: 'Just now' });
-    await loadActivity();
-  }
-}
-
-function openEditProject(id) {
-  const project = allProjects.find(p => p.id == id);
-  if (!project) return;
-  document.getElementById('editProjectId').value = project.id;
-  document.getElementById('editProjectTitle').value = project.title || '';
-  document.getElementById('editProjectDesc').value = project.description || '';
-  document.getElementById('editProjectStatus').value = project.status || 'pending';
-  document.getElementById('editProjectTeam').value = project.team || 1;
-  document.getElementById('editProjectProgress').value = project.progress || 0;
-  document.getElementById('editProjectDue').value = project.due_date || project.due || '';
-  document.getElementById('editProjectError').textContent = '';
-  openModal('editProjectModal');
-}
-
-async function handleEditProject(e) {
-  e.preventDefault();
-  const btn = document.getElementById('editProjectBtn');
-  btn.disabled = true;
-  document.getElementById('editProjectError').textContent = '';
-
-  const id = document.getElementById('editProjectId').value;
-  const updates = {
-    title: document.getElementById('editProjectTitle').value.trim(),
-    description: document.getElementById('editProjectDesc').value.trim(),
-    status: document.getElementById('editProjectStatus').value,
-    team: parseInt(document.getElementById('editProjectTeam').value) || 1,
-    progress: parseInt(document.getElementById('editProjectProgress').value) || 0,
-    due_date: document.getElementById('editProjectDue').value
-  };
-
-  const result = await updateProject(id, updates);
-  btn.disabled = false;
-  if (result) {
-    closeModal('editProjectModal');
-    await loadAllProjects();
-  }
-}
-
-// ==================== DELETE HANDLER ====================
-function confirmDelete(type, id, name) {
-  deleteTarget = { type, id };
-  document.getElementById('deleteConfirmText').textContent = `Are you sure you want to delete "${name || 'this item'}"? This action cannot be undone.`;
-  openModal('deleteConfirmModal');
-}
-
-async function executeDelete() {
-  if (!deleteTarget) return;
-  const { type, id } = deleteTarget;
-  closeModal('deleteConfirmModal');
-
-  let success = false;
-  if (type === 'user') success = await deleteUser(id);
-  else if (type === 'course') success = await deleteCourse(id);
-  else if (type === 'project') success = await deleteProject(id);
-
-  if (success) {
-    if (type === 'user') { await loadRecentUsers(); await loadAllUsers(); await loadStats(); }
-    else if (type === 'course') { await loadAllCourses(); await loadStats(); }
-    else if (type === 'project') { await loadAllProjects(); }
-  }
-  deleteTarget = null;
-}
-
-// ==================== ACTIVITY ====================
-async function loadActivity() {
-  const feed = document.getElementById('activityFeed');
-  allActivities = await fetchActivities();
-
-  if (allActivities.length === 0) {
-    feed.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>No recent activity</p></div>';
-    return;
-  }
-
-  feed.innerHTML = allActivities.map(a => {
-    const iconMap = { user: 'user', course: 'graduation-cap', cert: 'certificate', warning: 'exclamation-triangle', error: 'times-circle', project: 'folder' };
-    return `<div class="activity-item">
-      <div class="icon ${a.icon || 'user'}"><i class="fas fa-${iconMap[a.icon] || 'user'}"></i></div>
-      <div class="content">
-        <div class="text">${a.text || a.message || ''}</div>
-        <div class="time">${a.time || formatDate(a.created_at)}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ==================== ANALYTICS ====================
-async function loadAnalytics() {
-  if (!supabase) {
-    document.getElementById('analyticsCompletion').textContent = '--';
-    document.getElementById('analyticsRating').textContent = '--';
-    document.getElementById('analyticsSession').textContent = '--';
-    return;
-  }
-  const { data: courses } = await supabase.from('courses').select('rating');
-  const avgRating = courses && courses.length > 0 ? (courses.reduce((s, c) => s + (c.rating || 0), 0) / courses.length).toFixed(1) : '0.0';
-  document.getElementById('analyticsRating').textContent = avgRating;
-  document.getElementById('analyticsCompletion').textContent = Math.floor(Math.random() * 30 + 60) + '%';
-  document.getElementById('analyticsSession').textContent = Math.floor(Math.random() * 15 + 5) + 'm';
-}
-
-// ==================== SETTINGS ====================
-function toggleSetting(key, label) {
-  const checkbox = label.querySelector('input');
-  const slider = label.querySelector('.toggle-slider');
-  checkbox.checked = !checkbox.checked;
-  slider.style.background = checkbox.checked ? 'var(--accent-green)' : 'var(--text-muted)';
-  showToast(`${key.charAt(0).toUpperCase() + key.slice(1)} ${checkbox.checked ? 'enabled' : 'disabled'}`, 'success');
-}
-
-// ==================== KEYBOARD SHORTCUTS ====================
+// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
-    if (mobileSidebarOpen) closeMobileSidebar();
+    closeModal('createUserModal');
+    closeModal('createCourseModal');
   }
 });
 
-// ==================== INIT ====================
+// Init
 async function init() {
-  autoDetectDevice(); // Auto-detect device on load
   await checkAuth();
-
-  if (supabase) {
-    // Load all data from Supabase
-    await Promise.all([
-      loadStats(),
-      loadRecentUsers(),
-      loadActivity(),
-      renderChart('weekly')
-    ]);
-
-    // Populate instructor dropdowns
-    await populateInstructorSelect('newCourseInstructor');
-  } else {
-    // Show empty states when Supabase not configured
-    document.getElementById('statTotalUsers').textContent = '0';
-    document.getElementById('statTotalCourses').textContent = '0';
-    document.getElementById('statRevenue').textContent = '$0';
-    document.getElementById('statEnrollments').textContent = '0';
-    document.getElementById('recentUsersBody').innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-plug"></i><p>Configure Supabase to load data</p></div></td></tr>';
-    document.getElementById('activityFeed').innerHTML = '<div class="empty-state"><i class="fas fa-plug"></i><p>Configure Supabase to load activity</p></div>';
-    renderChart('weekly');
-  }
+  loadStats();
+  renderChart('weekly');
+  loadRecentUsers();
+  loadActivity();
 
   setTimeout(() => {
     document.getElementById('loadingScreen').classList.add('hidden');
