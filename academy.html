@@ -1,72 +1,1422 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aurex Designs — Master Creative Skills</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-  <style>
-    /* All your CSS here (same as before but with updated design) */
-    :root {
-      --primary: #6C3CE1;
-      --primary-dark: #5B2FB5;
-      --secondary: #FF6B6B;
-      --accent: #00D4AA;
-      --accent-gold: #F8B739;
-      --bg-primary: #0A0A1A;
-      --bg-secondary: #111128;
-      --bg-tertiary: #1A1A3A;
-      --text-primary: #FFFFFF;
-      --text-secondary: #A0A0B8;
-      --text-muted: #6B6B80;
-      --border-glass: rgba(255,255,255,0.1);
-      --shadow-glow: 0 0 40px rgba(108,60,225,0.2);
-    }
-    /* ... rest of CSS ... */
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurex Academy - Master Creative Skills</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bg-primary: #070714;
+  --bg-secondary: #0d0d1f;
+  --bg-card: #13132a;
+  --bg-card-hover: #1a1a3e;
+  --accent-purple: #7c3aed;
+  --accent-violet: #a855f7;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-pink: #ec4899;
+  --accent-orange: #f59e0b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-color: rgba(148,163,184,0.08);
+  --gradient-purple: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #3b82f6 100%);
+  --gradient-hero: linear-gradient(135deg, #0f0c29 0%, #1a1647 40%, #0f0c29 100%);
+  --shadow-glow: 0 0 60px rgba(124,58,237,0.12);
+  --sidebar-width: 260px;
+  --sidebar-collapsed: 72px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.4); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.6); }
+.app-container { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  padding: 20px 14px;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 200;
+  transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
+  display: flex;
+  flex-direction: column;
+}
+.sidebar.collapsed { width: var(--sidebar-collapsed); }
+.sidebar.collapsed .logo-text-wrap,
+.sidebar.collapsed .nav-item span,
+.sidebar.collapsed .nav-item .badge,
+.sidebar.collapsed .upgrade-card {
+  opacity: 0; pointer-events: none; width: 0; overflow: hidden;
+}
+.sidebar.collapsed .sidebar-logo { justify-content: center; padding: 0 0 20px; }
+.sidebar.collapsed .nav-item { justify-content: center; padding: 12px; }
+.sidebar.collapsed .nav-item i { width: auto; font-size: 18px; }
+.sidebar.collapsed .nav-item.active::before { display: none; }
+.sidebar.collapsed .sidebar-divider { margin: 12px 4px; }
+
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 8px 20px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 16px;
+  position: relative;
+  transition: all 0.35s;
+}
+.logo-icon {
+  width: 38px; height: 38px; min-width: 38px;
+  background: var(--gradient-purple);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+}
+.logo-text-wrap { transition: opacity 0.25s; white-space: nowrap; }
+.logo-text {
+  font-size: 20px; font-weight: 700;
+  background: var(--gradient-purple);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.logo-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 2px; }
+
+.sidebar-toggle {
+  position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 9px;
+  transition: all 0.2s; z-index: 10;
+}
+.sidebar-toggle:hover { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+.sidebar.collapsed .sidebar-toggle { right: -11px; }
+.sidebar.collapsed .sidebar-toggle i { transform: rotate(180deg); }
+
+.nav-section { margin-bottom: 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 12px;
+  cursor: pointer; transition: all 0.2s;
+  color: var(--text-secondary);
+  font-size: 13px; font-weight: 500;
+  position: relative; margin-bottom: 2px; white-space: nowrap;
+}
+.nav-item:hover { background: rgba(124,58,237,0.08); color: var(--text-primary); }
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(124,58,237,0.15) 0%, rgba(124,58,237,0.05) 100%);
+  color: var(--accent-violet);
+}
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 18px; background: var(--gradient-purple); border-radius: 0 3px 3px 0;
+}
+.nav-item i { width: 20px; text-align: center; font-size: 15px; transition: font-size 0.2s; }
+.nav-item .badge {
+  margin-left: auto; background: var(--gradient-purple);
+  color: white; font-size: 9px; padding: 2px 7px; border-radius: 20px;
+  font-weight: 700; transition: opacity 0.2s;
+}
+.sidebar-divider { height: 1px; background: var(--border-color); margin: 14px 10px; transition: margin 0.35s; }
+.upgrade-card {
+  background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(59,130,246,0.08));
+  border: 1px solid rgba(124,58,237,0.15);
+  border-radius: 16px; padding: 18px;
+  margin-top: auto; text-align: center;
+  transition: opacity 0.25s;
+}
+.upgrade-card h4 { font-size: 13px; margin-bottom: 6px; }
+.upgrade-card p { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5; }
+.upgrade-btn {
+  background: var(--gradient-purple); border: none; color: white;
+  padding: 9px 20px; border-radius: 10px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  width: 100%; transition: all 0.2s;
+}
+.upgrade-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(124,58,237,0.3); }
+
+/* MAIN CONTENT */
+.main-content {
+  flex: 1; margin-left: var(--sidebar-width); padding: 0;
+  min-height: 100vh;
+  transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.main-content.sidebar-collapsed { margin-left: var(--sidebar-collapsed); }
+
+/* FLOATING HEADER */
+.top-bar {
+  position: sticky; top: 12px; z-index: 150;
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 12px 24px 24px; padding: 12px 20px;
+  background: rgba(13, 13, 31, 0.75);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(148,163,184,0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+.top-bar.scrolled {
+  background: rgba(13, 13, 31, 0.92);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+.search-box {
+  display: flex; align-items: center;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 10px 16px;
+  width: 380px; gap: 10px;
+  transition: all 0.2s;
+}
+.search-box:focus-within {
+  border-color: rgba(124,58,237,0.4);
+  background: rgba(124,58,237,0.03);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+}
+.search-box input {
+  background: none; border: none; color: var(--text-primary);
+  outline: none; flex: 1; font-size: 13px; font-family: inherit;
+}
+.search-box input::placeholder { color: var(--text-muted); }
+.search-box .kbd {
+  background: rgba(255,255,255,0.04); padding: 3px 8px; border-radius: 6px;
+  font-size: 10px; color: var(--text-muted); border: 1px solid var(--border-color);
+  font-family: inherit;
+}
+.top-actions { display: flex; align-items: center; gap: 12px; }
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 11px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; position: relative;
+}
+.icon-btn:hover {
+  background: rgba(124,58,237,0.1);
+  border-color: rgba(124,58,237,0.2);
+  color: var(--text-primary);
+}
+.icon-btn .dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; background: var(--accent-pink);
+  border-radius: 50%; border: 2px solid var(--bg-secondary);
+}
+.user-profile {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 5px 14px 5px 5px;
+  cursor: pointer; transition: all 0.2s;
+}
+.user-profile:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(124,58,237,0.15);
+}
+.user-profile img { width: 30px; height: 30px; border-radius: 10px; object-fit: cover; }
+.user-profile .info { line-height: 1.3; }
+.user-profile .name { font-size: 12px; font-weight: 600; }
+.user-profile .status { font-size: 10px; color: var(--accent-orange); display: flex; align-items: center; gap: 3px; }
+
+/* HERO */
+.hero {
+  background: var(--gradient-hero);
+  border-radius: 28px; padding: 52px 48px;
+  margin: 0 24px 32px;
+  position: relative; overflow: hidden;
+  border: 1px solid rgba(124,58,237,0.1);
+}
+.hero::before {
+  content: ''; position: absolute; top: -40%; right: -5%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 65%);
+  border-radius: 50%;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -30%; left: -10%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 65%);
+  border-radius: 50%;
+}
+.hero-content { position: relative; z-index: 2; max-width: 52%; }
+.hero-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(124,58,237,0.12);
+  border: 1px solid rgba(124,58,237,0.2);
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; color: var(--accent-violet);
+  margin-bottom: 20px; letter-spacing: 0.5px;
+}
+.hero h1 {
+  font-size: 52px; font-weight: 800; line-height: 1.05;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #fff 0%, #c4b5fd 60%, #a78bfa 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero h1 span { display: block; color: var(--accent-violet); -webkit-text-fill-color: var(--accent-violet); }
+.hero p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 28px; max-width: 90%; }
+.hero-actions { display: flex; gap: 14px; align-items: center; }
+.btn-primary {
+  background: var(--gradient-purple); border: none; color: white;
+  padding: 14px 26px; border-radius: 14px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: all 0.25s;
+  box-shadow: 0 8px 30px rgba(124,58,237,0.25);
+  letter-spacing: 0.3px;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,0.35); }
+.btn-secondary {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);
+  color: var(--text-primary); padding: 14px 26px; border-radius: 14px;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.25s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); }
+.hero-students { display: flex; align-items: center; gap: 12px; margin-top: 28px; }
+.avatar-group { display: flex; }
+.avatar-group img {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--bg-secondary); margin-left: -8px; object-fit: cover;
+}
+.avatar-group img:first-child { margin-left: 0; }
+.hero-students span { font-size: 13px; color: var(--text-secondary); }
+.hero-students span strong { color: var(--text-primary); font-weight: 600; }
+.hero-visual {
+  position: absolute; right: 56px; top: 50%; transform: translateY(-50%);
+  width: 300px; height: 260px;
+}
+.graduation-cap {
+  width: 130px; height: 130px;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, #1e1b4b, #2d2a6e);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 52px; color: var(--accent-violet);
+  box-shadow: 0 25px 70px rgba(124,58,237,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+  border: 1px solid rgba(124,58,237,0.15);
+}
+.floating-icon {
+  position: absolute; width: 44px; height: 44px;
+  background: var(--bg-card); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; border: 1px solid var(--border-color);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  animation: float 4s ease-in-out infinite;
+}
+.floating-icon:nth-child(1) { top: 10px; right: 50px; color: var(--accent-blue); animation-delay: 0s; }
+.floating-icon:nth-child(2) { bottom: 50px; left: 10px; color: var(--accent-pink); animation-delay: 0.7s; }
+.floating-icon:nth-child(3) { top: 70px; left: 0; color: var(--accent-orange); animation-delay: 1.4s; }
+.floating-icon:nth-child(4) { bottom: 10px; right: 30px; color: var(--accent-cyan); animation-delay: 2.1s; }
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-12px) rotate(2deg); }
+  66% { transform: translateY(-6px) rotate(-1deg); }
+}
+
+/* STATS */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  margin: 0 24px 32px;
+}
+.stat-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 20px; padding: 22px;
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--gradient-purple); opacity: 0; transition: opacity 0.3s;
+}
+.stat-card:hover { background: var(--bg-card-hover); transform: translateY(-3px); box-shadow: var(--shadow-glow); border-color: rgba(124,58,237,0.12); }
+.stat-card:hover::before { opacity: 1; }
+.stat-card .stat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.stat-card .stat-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+}
+.stat-card .stat-icon.purple { background: rgba(124,58,237,0.12); color: var(--accent-violet); }
+.stat-card .stat-icon.pink { background: rgba(236,72,153,0.12); color: var(--accent-pink); }
+.stat-card .stat-icon.blue { background: rgba(59,130,246,0.12); color: var(--accent-blue); }
+.stat-card .stat-icon.cyan { background: rgba(6,182,212,0.12); color: var(--accent-cyan); }
+.stat-card .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.stat-card .stat-value { font-size: 30px; font-weight: 800; margin: 6px 0; letter-spacing: -0.5px; }
+.stat-card .stat-change { font-size: 11px; color: var(--accent-cyan); font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.stat-card .stat-chart { height: 32px; margin-top: 12px; display: flex; align-items: flex-end; gap: 3px; }
+.stat-chart .bar { flex: 1; background: rgba(124,58,237,0.2); border-radius: 3px 3px 0 0; transition: all 0.3s; min-height: 4px; }
+.stat-chart .bar:hover { background: var(--accent-violet); }
+
+/* SECTIONS */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin: 0 24px 18px; }
+.section-header h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.section-header .view-all {
+  font-size: 12px; color: var(--accent-violet); text-decoration: none; font-weight: 600;
+  display: flex; align-items: center; gap: 5px; transition: all 0.2s;
+}
+.section-header .view-all:hover { gap: 8px; }
+
+/* CATEGORIES */
+.categories-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin: 0 24px 32px; }
+.category-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 14px; padding: 16px 8px; text-align: center;
+  cursor: pointer; transition: all 0.25s;
+}
+.category-card:hover { background: var(--bg-card-hover); border-color: rgba(124,58,237,0.2); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.category-card .cat-icon { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 16px; transition: transform 0.2s; }
+.category-card:hover .cat-icon { transform: scale(1.1); }
+.category-card .cat-name { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+
+/* COURSES */
+.courses-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin: 0 24px 32px; }
+.course-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 20px; overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.4,0,0.2,1); cursor: pointer;
+}
+.course-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: var(--shadow-glow), 0 20px 50px rgba(0,0,0,0.3); border-color: rgba(124,58,237,0.15); }
+.course-card .course-image { height: 140px; position: relative; overflow: hidden; }
+.course-card .course-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+.course-card:hover .course-image img { transform: scale(1.08); }
+.course-card .course-badge {
+  position: absolute; top: 12px; left: 12px;
+  padding: 4px 10px; border-radius: 8px;
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.badge-bestseller { background: var(--accent-purple); color: white; }
+.badge-popular { background: var(--accent-blue); color: white; }
+.badge-trending { background: var(--accent-orange); color: white; }
+.badge-new { background: var(--accent-cyan); color: white; }
+.badge-hot { background: var(--accent-pink); color: white; }
+.course-card .heart-btn {
+  position: absolute; top: 12px; right: 12px; width: 30px; height: 30px;
+  background: rgba(0,0,0,0.45); backdrop-filter: blur(8px);
+  border: none; border-radius: 10px; color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s;
+}
+.course-card .heart-btn:hover { background: var(--accent-pink); }
+.course-card .course-body { padding: 16px; }
+.course-card .course-title { font-size: 13px; font-weight: 600; margin-bottom: 10px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.course-card .course-instructor { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; }
+.course-card .course-instructor img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+.course-card .course-instructor span { font-size: 11px; color: var(--text-muted); }
+.course-card .course-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.course-card .rating { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+.course-card .rating .stars { color: var(--accent-orange); }
+.course-card .rating .count { color: var(--text-muted); }
+.course-card .duration { font-size: 11px; color: var(--text-muted); }
+.course-card .progress-bar { height: 4px; background: rgba(255,255,255,0.04); border-radius: 2px; margin-bottom: 10px; overflow: hidden; }
+.course-card .progress-fill { height: 100%; border-radius: 2px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.course-card .progress-text { font-size: 10px; color: var(--text-muted); margin-bottom: 12px; }
+.course-card .continue-btn {
+  width: 100%; padding: 10px; background: rgba(124,58,237,0.1);
+  border: 1px solid rgba(124,58,237,0.15); color: var(--accent-violet);
+  border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.25s;
+}
+.course-card .continue-btn:hover { background: var(--gradient-purple); color: white; box-shadow: 0 4px 20px rgba(124,58,237,0.3); }
+
+/* DASHBOARD GRID */
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: auto auto; gap: 16px; margin: 0 24px 32px; }
+.dash-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 22px; transition: all 0.25s; }
+.dash-card:hover { border-color: rgba(124,58,237,0.1); }
+.dash-card .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.dash-card .dash-header h3 { font-size: 14px; font-weight: 600; }
+.dash-card .dash-header a { font-size: 11px; color: var(--accent-violet); text-decoration: none; font-weight: 600; }
+.continue-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+.continue-item:last-child { border-bottom: none; }
+.continue-item img { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; }
+.continue-item .info { flex: 1; }
+.continue-item .info .title { font-size: 12px; font-weight: 600; margin-bottom: 5px; }
+.continue-item .info .progress-row { display: flex; align-items: center; gap: 8px; }
+.continue-item .info .progress-row .bar { flex: 1; height: 4px; background: rgba(255,255,255,0.04); border-radius: 2px; overflow: hidden; }
+.continue-item .info .progress-row .bar .fill { height: 100%; border-radius: 2px; }
+.continue-item .info .progress-row span { font-size: 10px; color: var(--text-muted); }
+.continue-item .play-btn { width: 32px; height: 32px; background: var(--gradient-purple); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all 0.2s; }
+.continue-item .play-btn:hover { transform: scale(1.1); }
+.streak-card .streak-number { font-size: 40px; font-weight: 800; background: var(--gradient-purple); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
+.streak-card .streak-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+.streak-days { display: flex; gap: 8px; }
+.streak-day { text-align: center; }
+.streak-day .day-label { font-size: 10px; color: var(--text-muted); margin-bottom: 5px; }
+.streak-day .day-dot { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all 0.2s; }
+.streak-day.active .day-dot { background: var(--gradient-purple); }
+.streak-day.inactive .day-dot { background: rgba(255,255,255,0.04); color: var(--text-muted); }
+.streak-day.today .day-dot { background: rgba(245,158,11,0.15); border: 2px solid var(--accent-orange); color: var(--accent-orange); }
+.xp-card { text-align: center; }
+.xp-card .xp-value { font-size: 34px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; }
+.xp-card .xp-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+.xp-card .xp-bar { height: 8px; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.xp-card .xp-bar .fill { height: 100%; background: var(--gradient-purple); border-radius: 4px; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+.xp-card .xp-next { font-size: 11px; color: var(--text-muted); }
+.xp-card .level-badge { width: 56px; height: 56px; background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(59,130,246,0.08)); border: 2px solid rgba(124,58,237,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 22px; color: var(--accent-violet); }
+.certs-grid { display: flex; gap: 10px; justify-content: center; }
+.cert-item { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--accent-orange); transition: all 0.2s; }
+.cert-item:hover { transform: translateY(-2px); }
+.achievements-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.ach-item { width: 36px; height: 36px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s; }
+.ach-item.unlocked { color: var(--accent-violet); background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.2); }
+.ach-item.locked { color: var(--text-muted); }
+.ach-item:hover { transform: scale(1.1); }
+
+/* INSTRUCTORS */
+.instructors-list { margin: 0 24px 32px; }
+.instructor-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+.instructor-item:last-child { border-bottom: none; }
+.instructor-item img { width: 40px; height: 40px; border-radius: 12px; object-fit: cover; }
+.instructor-item .info { flex: 1; }
+.instructor-item .info .name { font-size: 13px; font-weight: 600; }
+.instructor-item .info .role { font-size: 11px; color: var(--text-muted); }
+.instructor-item .stats { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--text-muted); }
+.instructor-item .stats .rating { color: var(--accent-orange); }
+.instructor-item .follow-btn { width: 28px; height: 28px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.instructor-item .follow-btn:hover { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+
+/* TESTIMONIALS */
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 0 24px 32px; }
+.testimonial-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 24px; transition: all 0.25s; }
+.testimonial-card:hover { border-color: rgba(124,58,237,0.1); transform: translateY(-2px); }
+.testimonial-card .quote-icon { font-size: 22px; color: var(--accent-violet); margin-bottom: 12px; opacity: 0.4; }
+.testimonial-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+.testimonial-card .stars { color: var(--accent-orange); font-size: 11px; margin-bottom: 16px; }
+.testimonial-card .author { display: flex; align-items: center; gap: 10px; }
+.testimonial-card .author img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.testimonial-card .author .name { font-size: 12px; font-weight: 600; }
+.testimonial-card .author .role { font-size: 10px; color: var(--text-muted); }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  display: none; position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(13, 13, 31, 0.9); backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-color); padding: 8px 0; z-index: 100;
+}
+.bottom-nav-item { flex: 1; text-align: center; color: var(--text-muted); font-size: 10px; cursor: pointer; padding: 4px 0; transition: color 0.2s; }
+.bottom-nav-item i { font-size: 18px; display: block; margin-bottom: 2px; }
+.bottom-nav-item.active { color: var(--accent-violet); }
+.bottom-nav-item .center-btn { width: 48px; height: 48px; background: var(--gradient-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: -20px auto 2px; color: white; font-size: 20px; box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
+
+/* AUTH MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.modal-overlay.active { display: flex; }
+.modal { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; padding: 40px; width: 420px; max-width: 90vw; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.5); }
+.modal .close-btn { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+.modal .close-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
+.modal h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; text-align: center; }
+.modal p { font-size: 14px; color: var(--text-secondary); text-align: center; margin-bottom: 28px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 12px; font-weight: 500; margin-bottom: 6px; color: var(--text-muted); }
+.form-group input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-primary); font-size: 14px; outline: none; transition: all 0.2s; font-family: inherit; }
+.form-group input:focus { border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.08); }
+.form-group input::placeholder { color: var(--text-muted); }
+.modal .btn-primary { width: 100%; justify-content: center; margin-top: 8px; }
+.modal .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text-muted); font-size: 11px; }
+.modal .divider::before, .modal .divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+.social-btn { width: 100%; padding: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; transition: all 0.2s; }
+.social-btn:hover { background: var(--bg-card-hover); border-color: rgba(124,58,237,0.2); }
+.modal .switch-text { text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
+.modal .switch-text a { color: var(--accent-violet); cursor: pointer; font-weight: 600; }
+.modal .error-msg { color: #ef4444; font-size: 12px; margin-top: 8px; text-align: center; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 20px; display: flex; align-items: center; gap: 10px; z-index: 2000; transform: translateY(100px); opacity: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(34,197,94,0.2); }
+.toast.error { border-color: rgba(239,68,68,0.2); }
+.toast i { font-size: 18px; }
+.toast.success i { color: #22c55e; }
+.toast.error i { color: #ef4444; }
+
+/* LOADING */
+.loading-overlay { position: fixed; inset: 0; background: var(--bg-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.6s; }
+.loading-overlay.hidden { opacity: 0; pointer-events: none; }
+.spinner { width: 44px; height: 44px; border: 3px solid rgba(124,58,237,0.15); border-top-color: var(--accent-purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay p { margin-top: 16px; color: var(--text-muted); font-size: 13px; }
+
+/* SKELETON */
+.skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%); background-size: 200% 100%; animation: skeleton 1.5s infinite; border-radius: 8px; }
+@keyframes skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* RESPONSIVE */
+@media (max-width: 1400px) { .courses-grid { grid-template-columns: repeat(4, 1fr); } .categories-grid { grid-template-columns: repeat(6, 1fr); } }
+@media (max-width: 1200px) { .courses-grid { grid-template-columns: repeat(3, 1fr); } .categories-grid { grid-template-columns: repeat(4, 1fr); } .stats-row { grid-template-columns: repeat(2, 1fr); } .dashboard-grid { grid-template-columns: 1fr 1fr; } .testimonials-grid { grid-template-columns: repeat(2, 1fr); } .hero h1 { font-size: 40px; } .hero-visual { width: 240px; height: 220px; right: 30px; } }
+@media (max-width: 900px) { .sidebar { transform: translateX(-100%); width: var(--sidebar-width) !important; } .sidebar.open { transform: translateX(0); } .main-content { margin-left: 0 !important; padding: 0; } .hero { padding: 32px; margin: 0 16px 24px; } .hero-visual { display: none; } .hero-content { max-width: 100%; } .search-box { width: 200px; } .stats-row, .categories-grid, .courses-grid, .dashboard-grid, .testimonials-grid { margin: 0 16px 24px; } .section-header { margin: 0 16px 16px; } .instructors-list { margin: 0 16px 24px; } .bottom-nav { display: flex; } .main-content { padding-bottom: 80px; } .top-bar { margin: 8px 16px 20px; } }
+@media (max-width: 700px) { .courses-grid { grid-template-columns: repeat(2, 1fr); } .categories-grid { grid-template-columns: repeat(3, 1fr); } .stats-row { grid-template-columns: 1fr; } .dashboard-grid { grid-template-columns: 1fr; } .testimonials-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 28px; } .top-bar { flex-wrap: wrap; gap: 10px; padding: 10px 14px; } .search-box { width: 100%; order: 3; } }
+
+/* ANIMATIONS */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+.animate-in { animation: fadeInUp 0.6s cubic-bezier(0.4,0,0.2,1) forwards; opacity: 0; }
+</style>
 </head>
 <body>
-  <div id="app">
-    <!-- Header -->
-    <header class="header" id="header">
-      <div class="header-inner">
-        <div class="logo">
-          <span class="logo-icon">◆</span>
-          Aurex <span style="color:var(--primary)">DESIGNS</span>
-        </div>
-        <nav class="nav-links">
-          <a href="#" class="nav-link active">Home</a>
-          <a href="#" class="nav-link">Projects</a>
-          <a href="#" class="nav-link">Academy</a>
-          <a href="#" class="nav-link">Certificates</a>
-          <a href="#" class="nav-link">Community</a>
-          <a href="#" class="nav-link">Resources</a>
-          <a href="#" class="nav-link nav-link-new">AI Tutor <span class="new-badge">NEW</span></a>
-        </nav>
-        <div class="header-actions">
-          <button class="btn-upgrade">Upgrade to Pro</button>
-          <div class="user-menu" id="userMenu">
-            <img src="https://ui-avatars.com/api/?name=User&background=6C3CE1&color=fff" alt="User" class="user-avatar">
+
+<div class="loading-overlay" id="loadingScreen">
+  <div class="spinner"></div>
+  <p>Loading Aurex Academy...</p>
+</div>
+
+<div class="app-container">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">A</div>
+      <div class="logo-text-wrap">
+        <div class="logo-text">Aurex</div>
+        <div class="logo-sub">DESIGNS</div>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+    </div>
+    <nav>
+      <div class="nav-section">
+        <div class="nav-item" data-page="home"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="nav-item" data-page="projects"><i class="fas fa-folder"></i><span>Projects</span></div>
+        <div class="nav-item active" data-page="academy"><i class="fas fa-graduation-cap"></i><span>Academy</span></div>
+        <div class="nav-item" data-page="certificates"><i class="fas fa-certificate"></i><span>Certificates</span></div>
+        <div class="nav-item" data-page="community"><i class="fas fa-users"></i><span>Community</span></div>
+        <div class="nav-item" data-page="resources"><i class="fas fa-book"></i><span>Resources</span></div>
+        <div class="nav-item" data-page="ai-tutor"><i class="fas fa-robot"></i><span>AI Tutor</span> <span class="badge">NEW</span></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="nav-section">
+        <div class="nav-item" data-page="saved"><i class="fas fa-bookmark"></i><span>Saved</span></div>
+        <div class="nav-item" data-page="my-courses"><i class="fas fa-play-circle"></i><span>My Courses</span></div>
+        <div class="nav-item" data-page="my-quizzes"><i class="fas fa-question-circle"></i><span>My Quizzes</span></div>
+        <div class="nav-item" data-page="achievements"><i class="fas fa-trophy"></i><span>Achievements</span></div>
+        <div class="nav-item" data-page="settings"><i class="fas fa-cog"></i><span>Settings</span></div>
+      </div>
+    </nav>
+    <div class="upgrade-card">
+      <h4>Upgrade to Pro</h4>
+      <p>Unlock all courses, certifications and premium features.</p>
+      <button class="upgrade-btn" onclick="showToast('Pro upgrade coming soon!', 'success')">Upgrade Now</button>
+    </div>
+  </aside>
+
+  <main class="main-content" id="mainContent">
+    <div class="top-bar" id="topBar">
+      <div class="search-box">
+        <i class="fas fa-search" style="color: var(--text-muted); font-size: 13px;"></i>
+        <input type="text" placeholder="Search for courses, topics or skills..." id="searchInput">
+        <span class="kbd">⌘K</span>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="mobileMenuBtn" style="display:none;"><i class="fas fa-bars"></i></button>
+        <button class="icon-btn" id="notifBtn"><i class="fas fa-bell"></i><span class="dot"></span></button>
+        <div class="user-profile" id="userProfile" style="display:none;">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&amp;h=100&amp;fit=crop&amp;crop=face" alt="User" id="userProfileImg">
+          <div class="info">
+            <div class="name" id="userName">John</div>
+            <div class="status">Premium <i class="fas fa-crown" style="font-size:8px;"></i></div>
           </div>
         </div>
+        <button class="btn-primary" id="authBtn" style="padding: 10px 18px; font-size: 12px;" onclick="openAuthModal()">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
       </div>
-    </header>
+    </div>
 
-    <!-- Main Content -->
-    <main id="main-content">
-      <!-- Sections will be rendered by JavaScript -->
-    </main>
+    <section class="hero animate-in" id="heroSection">
+      <div class="hero-content">
+        <div class="hero-label"><i class="fas fa-graduation-cap" style="font-size:11px;"></i> AUREX ACADEMY</div>
+        <h1>Master <span>Creative Skills</span></h1>
+        <p>Learn UI/UX, Branding, Motion Graphics, Web Design, Graphic Design, AI Design and more.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="scrollToCourses()">
+            Start Learning <i class="fas fa-arrow-right" style="font-size:11px;"></i>
+          </button>
+          <button class="btn-secondary" onclick="loadAllCourses()">Browse Courses</button>
+        </div>
+        <div class="hero-students">
+          <div class="avatar-group" id="heroAvatars"></div>
+          <span><strong id="heroStudentCount">--</strong> Students are learning now</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="graduation-cap"><i class="fas fa-graduation-cap"></i></div>
+        <div class="floating-icon"><i class="fab fa-figma"></i></div>
+        <div class="floating-icon"><i class="fas fa-pen-nib"></i></div>
+        <div class="floating-icon"><i class="fas fa-palette"></i></div>
+        <div class="floating-icon"><i class="fas fa-cube"></i></div>
+      </div>
+    </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <!-- Footer content -->
-    </footer>
+    <div class="stats-row animate-in" style="animation-delay: 0.1s;" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon purple"><i class="fas fa-graduation-cap"></i></div>
+          <span class="stat-label">Total Courses</span>
+        </div>
+        <div class="stat-value" id="statCourses"><div class="skeleton" style="width:60px;height:32px;"></div></div>
+        <div class="stat-change"><i class="fas fa-arrow-up" style="font-size:9px;"></i> <span id="statCoursesChange">--</span> this month</div>
+        <div class="stat-chart" id="chart1"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon pink"><i class="fas fa-users"></i></div>
+          <span class="stat-label">Students</span>
+        </div>
+        <div class="stat-value" id="statStudents"><div class="skeleton" style="width:60px;height:32px;"></div></div>
+        <div class="stat-change"><i class="fas fa-arrow-up" style="font-size:9px;"></i> <span id="statStudentsChange">--</span> this month</div>
+        <div class="stat-chart" id="chart2"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon blue"><i class="fas fa-certificate"></i></div>
+          <span class="stat-label">Certificates Issued</span>
+        </div>
+        <div class="stat-value" id="statCerts"><div class="skeleton" style="width:60px;height:32px;"></div></div>
+        <div class="stat-change"><i class="fas fa-arrow-up" style="font-size:9px;"></i> <span id="statCertsChange">--</span> this month</div>
+        <div class="stat-chart" id="chart3"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon cyan"><i class="fas fa-clock"></i></div>
+          <span class="stat-label">Hours of Content</span>
+        </div>
+        <div class="stat-value" id="statHours"><div class="skeleton" style="width:60px;height:32px;"></div></div>
+        <div class="stat-change"><i class="fas fa-arrow-up" style="font-size:9px;"></i> <span id="statHoursChange">--</span> this month</div>
+        <div class="stat-chart" id="chart4"></div>
+      </div>
+    </div>
+
+    <div class="section-header animate-in" style="animation-delay: 0.15s;">
+      <h2>Explore Categories</h2>
+      <a href="#" class="view-all" onclick="loadAllCategories(); return false;">View All <i class="fas fa-chevron-right" style="font-size:9px;"></i></a>
+    </div>
+    <div class="categories-grid animate-in" style="animation-delay: 0.2s;" id="categoriesGrid">
+      <div class="skeleton" style="height:80px;"></div>
+      <div class="skeleton" style="height:80px;"></div>
+      <div class="skeleton" style="height:80px;"></div>
+      <div class="skeleton" style="height:80px;"></div>
+      <div class="skeleton" style="height:80px;"></div>
+      <div class="skeleton" style="height:80px;"></div>
+      <div class="skeleton" style="height:80px;"></div>
+      <div class="skeleton" style="height:80px;"></div>
+    </div>
+
+    <div class="section-header animate-in" style="animation-delay: 0.25s;">
+      <h2>Featured Courses</h2>
+      <a href="#" class="view-all" onclick="loadAllCourses(); return false;">View All Courses <i class="fas fa-chevron-right" style="font-size:9px;"></i></a>
+    </div>
+    <div class="courses-grid animate-in" style="animation-delay: 0.3s;" id="coursesGrid">
+      <div class="skeleton" style="height:280px; border-radius:20px;"></div>
+      <div class="skeleton" style="height:280px; border-radius:20px;"></div>
+      <div class="skeleton" style="height:280px; border-radius:20px;"></div>
+      <div class="skeleton" style="height:280px; border-radius:20px;"></div>
+      <div class="skeleton" style="height:280px; border-radius:20px;"></div>
+    </div>
+
+    <div class="dashboard-grid animate-in" style="animation-delay: 0.35s;">
+      <div class="dash-card" style="grid-row: span 2;">
+        <div class="dash-header">
+          <h3>Continue Learning</h3>
+          <a href="#" onclick="loadMyCourses(); return false;">View All</a>
+        </div>
+        <div id="continueLearning">
+          <div class="skeleton" style="height:60px; margin-bottom:10px;"></div>
+          <div class="skeleton" style="height:60px; margin-bottom:10px;"></div>
+          <div class="skeleton" style="height:60px;"></div>
+        </div>
+      </div>
+      <div class="dash-card streak-card">
+        <div class="dash-header"><h3>Learning Streak</h3></div>
+        <div class="streak-number" id="streakNumber">--</div>
+        <div class="streak-label">Days in a row <i class="fas fa-fire" style="color: var(--accent-orange);"></i></div>
+        <div class="streak-days" id="streakDays"></div>
+      </div>
+      <div class="dash-card xp-card">
+        <div class="level-badge"><i class="fas fa-gem"></i></div>
+        <div class="xp-value" id="xpValue">--</div>
+        <div class="xp-label" id="xpLabel">Next Level: -- XP</div>
+        <div class="xp-bar"><div class="fill" id="xpFill" style="width:0%;"></div></div>
+        <div class="xp-next" id="xpLevel">Level --</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-header"><h3>Certificates Earned</h3><a href="#" onclick="loadCertificates(); return false;">View All</a></div>
+        <div class="certs-grid" id="certsGrid">
+          <div class="skeleton" style="width:44px;height:44px;border-radius:12px;"></div>
+          <div class="skeleton" style="width:44px;height:44px;border-radius:12px;"></div>
+          <div class="skeleton" style="width:44px;height:44px;border-radius:12px;"></div>
+          <div class="skeleton" style="width:44px;height:44px;border-radius:12px;"></div>
+        </div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-header"><h3>Achievements</h3><a href="#" onclick="loadAchievements(); return false;">View All</a></div>
+        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+          <strong style="color: var(--text-primary);" id="achCount">--</strong>/30 Achievements Unlocked
+        </div>
+        <div class="achievements-grid" id="achievementsGrid">
+          <div class="skeleton" style="width:36px;height:36px;border-radius:10px;"></div>
+          <div class="skeleton" style="width:36px;height:36px;border-radius:10px;"></div>
+          <div class="skeleton" style="width:36px;height:36px;border-radius:10px;"></div>
+          <div class="skeleton" style="width:36px;height:36px;border-radius:10px;"></div>
+          <div class="skeleton" style="width:36px;height:36px;border-radius:10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header animate-in" style="animation-delay: 0.4s;">
+      <h2>Top Instructors</h2>
+      <a href="#" class="view-all" onclick="loadAllInstructors(); return false;">View All</a>
+    </div>
+    <div class="dash-card instructors-list animate-in" style="animation-delay: 0.45s;" id="instructorsList">
+      <div class="skeleton" style="height:50px; margin-bottom:10px;"></div>
+      <div class="skeleton" style="height:50px; margin-bottom:10px;"></div>
+      <div class="skeleton" style="height:50px; margin-bottom:10px;"></div>
+      <div class="skeleton" style="height:50px;"></div>
+    </div>
+
+    <div class="section-header animate-in" style="animation-delay: 0.5s;">
+      <h2>What Our Students Say</h2>
+      <a href="#" class="view-all" onclick="loadAllTestimonials(); return false;">View All</a>
+    </div>
+    <div class="testimonials-grid animate-in" style="animation-delay: 0.55s;" id="testimonialsGrid">
+      <div class="skeleton" style="height:200px; border-radius:20px;"></div>
+      <div class="skeleton" style="height:200px; border-radius:20px;"></div>
+      <div class="skeleton" style="height:200px; border-radius:20px;"></div>
+    </div>
+  </main>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-item" data-page="home"><i class="fas fa-home"></i>Home</div>
+  <div class="bottom-nav-item" data-page="projects"><i class="fas fa-folder"></i>Projects</div>
+  <div class="bottom-nav-item active" data-page="academy"><div class="center-btn"><i class="fas fa-graduation-cap"></i></div>Academy</div>
+  <div class="bottom-nav-item" data-page="certificates"><i class="fas fa-certificate"></i>Certs</div>
+  <div class="bottom-nav-item" data-page="profile"><i class="fas fa-user"></i>Profile</div>
+</nav>
+
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
+    <h2 id="authTitle">Welcome Back</h2>
+    <p id="authSubtitle">Sign in to continue your learning journey</p>
+    <form id="authForm" onsubmit="handleAuthSubmit(event)">
+      <div class="form-group" id="nameGroup" style="display:none;">
+        <label>Full Name</label>
+        <input type="text" id="authName" placeholder="Enter your name">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="authEmail" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="authPassword" placeholder="********" required minlength="6">
+      </div>
+      <div class="error-msg" id="authError"></div>
+      <button type="submit" class="btn-primary" id="authSubmitBtn">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </button>
+    </form>
+    <div class="divider">or continue with</div>
+    <button class="social-btn" onclick="socialAuth('google')">
+      <i class="fab fa-google"></i> Google
+    </button>
+    <button class="social-btn" onclick="socialAuth('github')">
+      <i class="fab fa-github"></i> GitHub
+    </button>
+    <div class="switch-text">
+      <span id="switchText">Don't have an account?</span>
+      <a onclick="toggleAuthMode()" id="switchLink">Sign Up</a>
+    </div>
   </div>
+</div>
 
-  <script src="app.js"></script>
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMsg">Success!</span>
+</div>
+
+<script>
+// ============================================
+// SUPABASE CONFIG - REPLACE WITH YOUR CREDENTIALS
+// ============================================
+const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_ANON_KEY = 'your-anon-key';
+
+let supabase = null;
+try {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (e) {
+  console.warn('Supabase not configured:', e.message);
+}
+
+// ============================================
+// STATE
+// ============================================
+let currentUser = null;
+let isSignUp = false;
+let sidebarCollapsed = false;
+
+// ============================================
+// SIDEBAR TOGGLE
+// ============================================
+document.getElementById('sidebarToggle').addEventListener('click', function() {
+  sidebarCollapsed = !sidebarCollapsed;
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('mainContent').classList.toggle('sidebar-collapsed');
+});
+
+// ============================================
+// FLOATING HEADER SCROLL EFFECT
+// ============================================
+window.addEventListener('scroll', function() {
+  const topBar = document.getElementById('topBar');
+  if (window.scrollY > 20) {
+    topBar.classList.add('scrolled');
+  } else {
+    topBar.classList.remove('scrolled');
+  }
+});
+
+// ============================================
+// AUTH FUNCTIONS
+// ============================================
+function openAuthModal() {
+  document.getElementById('authModal').classList.add('active');
+  document.getElementById('authError').textContent = '';
+}
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('active');
+}
+function toggleAuthMode() {
+  isSignUp = !isSignUp;
+  document.getElementById('authTitle').textContent = isSignUp ? 'Create Account' : 'Welcome Back';
+  document.getElementById('authSubtitle').textContent = isSignUp ? 'Start your creative journey today' : 'Sign in to continue your learning journey';
+  document.getElementById('nameGroup').style.display = isSignUp ? 'block' : 'none';
+  document.getElementById('authSubmitBtn').innerHTML = isSignUp ? '<i class="fas fa-user-plus"></i> Sign Up' : '<i class="fas fa-sign-in-alt"></i> Sign In';
+  document.getElementById('switchText').textContent = isSignUp ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('switchLink').textContent = isSignUp ? 'Sign In' : 'Sign Up';
+  document.getElementById('authError').textContent = '';
+}
+
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
+  const name = document.getElementById('authName').value;
+  const errorEl = document.getElementById('authError');
+
+  if (!supabase) {
+    showToast(isSignUp ? 'Account created! (Demo mode - connect Supabase)' : 'Signed in! (Demo mode - connect Supabase)', 'success');
+    closeAuthModal();
+    updateUIForUser({ email: email, user_metadata: { full_name: name || email.split('@')[0], avatar_url: null } });
+    return;
+  }
+
+  try {
+    if (isSignUp) {
+      const { data, error } = await supabase.auth.signUp({
+        email: email, password: password,
+        options: { data: { full_name: name } }
+      });
+      if (error) throw error;
+      showToast('Account created! Check your email.', 'success');
+      closeAuthModal();
+      updateUIForUser(data.user);
+    } else {
+      const { data, error } = await supabase.auth.signInWithPassword({ email: email, password: password });
+      if (error) throw error;
+      showToast('Signed in successfully!', 'success');
+      closeAuthModal();
+      updateUIForUser(data.user);
+    }
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+}
+
+async function socialAuth(provider) {
+  if (!supabase) {
+    showToast(provider + ' auth (Demo mode - connect Supabase)', 'success');
+    closeAuthModal();
+    updateUIForUser({ email: 'user@example.com', user_metadata: { full_name: 'User', avatar_url: null } });
+    return;
+  }
+  const { error } = await supabase.auth.signInWithOAuth({ provider: provider });
+  if (error) showToast(error.message, 'error');
+}
+
+function updateUIForUser(user) {
+  currentUser = user;
+  document.getElementById('authBtn').style.display = 'none';
+  document.getElementById('userProfile').style.display = 'flex';
+  const name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+  document.getElementById('userName').textContent = name;
+  if (user?.user_metadata?.avatar_url) {
+    document.getElementById('userProfileImg').src = user.user_metadata.avatar_url;
+  }
+  // Load user-specific data
+  loadUserData();
+}
+
+async function checkAuth() {
+  if (!supabase) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) updateUIForUser(user);
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session?.user) updateUIForUser(session.user);
+    if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      document.getElementById('authBtn').style.display = 'flex';
+      document.getElementById('userProfile').style.display = 'none';
+    }
+  });
+}
+
+// ============================================
+// DATA LOADING FROM SUPABASE
+// ============================================
+async function loadStats() {
+  if (!supabase) {
+    // Show empty state or demo values when no supabase
+    document.getElementById('statCourses').textContent = '0';
+    document.getElementById('statStudents').textContent = '0';
+    document.getElementById('statCerts').textContent = '0';
+    document.getElementById('statHours').textContent = '0';
+    document.getElementById('statCoursesChange').textContent = '0';
+    document.getElementById('statStudentsChange').textContent = '0';
+    document.getElementById('statCertsChange').textContent = '0';
+    document.getElementById('statHoursChange').textContent = '0';
+    renderCharts();
+    return;
+  }
+  try {
+    // Total courses
+    const { count: courseCount } = await supabase.from('courses').select('*', { count: 'exact', head: true });
+    document.getElementById('statCourses').textContent = (courseCount || 0) + '+';
+
+    // Total students (profiles count)
+    const { count: studentCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+    document.getElementById('statStudents').textContent = formatNumber(studentCount || 0);
+
+    // Certificates issued
+    const { count: certCount } = await supabase.from('certificates').select('*', { count: 'exact', head: true });
+    document.getElementById('statCerts').textContent = formatNumber(certCount || 0);
+
+    // Total hours - sum from courses
+    const { data: hoursData } = await supabase.from('courses').select('duration_hours');
+    const totalHours = hoursData?.reduce((sum, c) => sum + (c.duration_hours || 0), 0) || 0;
+    document.getElementById('statHours').textContent = formatNumber(totalHours);
+
+    // Monthly changes (from analytics or calculate)
+    document.getElementById('statCoursesChange').textContent = '+' + Math.floor((courseCount || 0) * 0.1);
+    document.getElementById('statStudentsChange').textContent = '+' + Math.floor((studentCount || 0) * 0.05);
+    document.getElementById('statCertsChange').textContent = '+' + Math.floor((certCount || 0) * 0.07);
+    document.getElementById('statHoursChange').textContent = '+' + Math.floor(totalHours * 0.1);
+
+    renderCharts();
+  } catch (e) {
+    console.error('Stats load error:', e);
+  }
+}
+
+async function loadCategories() {
+  if (!supabase) {
+    document.getElementById('categoriesGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Connect Supabase to see categories</div>';
+    return;
+  }
+  try {
+    const { data, error } = await supabase.from('categories').select('*').order('name');
+    if (error) throw error;
+    const grid = document.getElementById('categoriesGrid');
+    if (!data || data.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">No categories found</div>';
+      return;
+    }
+    grid.innerHTML = data.map(cat => `
+      <div class="category-card" onclick="filterByCategory('${cat.name}')">
+        <div class="cat-icon" style="background: ${cat.color || '#7c3aed'}15; color: ${cat.color || '#7c3aed'};">
+          <i class="${cat.icon || 'fas fa-circle'}"></i>
+        </div>
+        <div class="cat-name">${cat.name}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Categories load error:', e);
+    showToast('Failed to load categories', 'error');
+  }
+}
+
+async function loadCourses(filter) {
+  if (!supabase) {
+    document.getElementById('coursesGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Connect Supabase to see courses</div>';
+    return;
+  }
+  try {
+    let query = supabase.from('courses').select('*, instructors(name, avatar_url)').limit(10);
+    if (filter) {
+      query = query.or(`title.ilike.%${filter}%,description.ilike.%${filter}%`);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    const grid = document.getElementById('coursesGrid');
+    if (!data || data.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><i class="fas fa-search" style="font-size:32px;margin-bottom:12px;display:block"></i>No courses found</div>';
+      return;
+    }
+    grid.innerHTML = data.map(course => `
+      <div class="course-card" onclick="openCourse(${course.id})">
+        <div class="course-image">
+          <img src="${course.thumbnail_url || 'https://via.placeholder.com/400x250/1a1a3e/7c3aed?text=Course'}" alt="${course.title}" loading="lazy">
+          ${course.badge ? `<span class="course-badge badge-${course.badge.toLowerCase()}">${course.badge}</span>` : ''}
+          <button class="heart-btn" onclick="event.stopPropagation(); toggleFavorite(${course.id})">
+            <i class="far fa-heart"></i>
+          </button>
+        </div>
+        <div class="course-body">
+          <div class="course-title">${course.title}</div>
+          <div class="course-instructor">
+            <img src="${course.instructors?.avatar_url || 'https://via.placeholder.com/40'}" alt="${course.instructors?.name || 'Instructor'}">
+            <span>${course.instructors?.name || 'Instructor'}</span>
+          </div>
+          <div class="course-meta">
+            <div class="rating">
+              <span class="stars"><i class="fas fa-star"></i> ${course.rating || '0.0'}</span>
+              <span class="count">(${formatNumber(course.review_count || 0)})</span>
+            </div>
+            <div class="duration"><i class="far fa-clock" style="margin-right:4px"></i>${course.duration || '0h'}</div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${course.progress || 0}%; background: ${course.progress_color || '#22c55e'};"></div>
+          </div>
+          <div class="progress-text">${course.progress || 0}% Complete</div>
+          <button class="continue-btn">${course.progress > 0 ? 'Continue Learning' : 'Start Learning'}</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Courses load error:', e);
+    showToast('Failed to load courses', 'error');
+  }
+}
+
+async function loadContinueLearning() {
+  if (!supabase || !currentUser) {
+    document.getElementById('continueLearning').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">Sign in to see your progress</div>';
+    return;
+  }
+  try {
+    const { data, error } = await supabase
+      .from('enrollments')
+      .select('progress, courses(title, thumbnail_url, duration)')
+      .eq('user_id', currentUser.id)
+      .gt('progress', 0)
+      .lt('progress', 100)
+      .limit(3);
+    if (error) throw error;
+    const container = document.getElementById('continueLearning');
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">No courses in progress</div>';
+      return;
+    }
+    container.innerHTML = data.map(item => {
+      const course = item.courses;
+      return `
+        <div class="continue-item">
+          <img src="${course?.thumbnail_url || 'https://via.placeholder.com/100'}" alt="${course?.title || 'Course'}">
+          <div class="info">
+            <div class="title">${course?.title || 'Course'}</div>
+            <div class="progress-row">
+              <div class="bar"><div class="fill" style="width: ${item.progress}%; background: #7c3aed;"></div></div>
+              <span>${item.progress}%</span>
+            </div>
+          </div>
+          <button class="play-btn"><i class="fas fa-play"></i></button>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    console.error('Continue learning error:', e);
+  }
+}
+
+async function loadUserData() {
+  if (!supabase || !currentUser) return;
+  try {
+    // Streak
+    const { data: streakData } = await supabase.from('user_streaks').select('*').eq('user_id', currentUser.id).single();
+    document.getElementById('streakNumber').textContent = streakData?.current_streak || 0;
+    renderStreak(streakData?.current_streak || 0);
+
+    // XP
+    const { data: xpData } = await supabase.from('user_xp').select('*').eq('user_id', currentUser.id).single();
+    const xp = xpData?.total_xp || 0;
+    const level = xpData?.level || 1;
+    const nextLevelXp = level * 1000;
+    const progress = Math.min((xp / nextLevelXp) * 100, 100);
+    document.getElementById('xpValue').textContent = xp.toLocaleString() + ' XP';
+    document.getElementById('xpLabel').textContent = 'Next Level: ' + nextLevelXp.toLocaleString() + ' XP';
+    document.getElementById('xpLevel').textContent = 'Level ' + level;
+    setTimeout(() => { document.getElementById('xpFill').style.width = progress + '%'; }, 300);
+
+    // Achievements
+    const { data: achData } = await supabase.from('user_achievements').select('*, achievements(*)').eq('user_id', currentUser.id);
+    const unlocked = achData?.length || 0;
+    document.getElementById('achCount').textContent = unlocked;
+    const achGrid = document.getElementById('achievementsGrid');
+    if (achData && achData.length > 0) {
+      achGrid.innerHTML = achData.map(a => `
+        <div class="ach-item unlocked" title="${a.achievements?.name || ''}">
+          <i class="${a.achievements?.icon || 'fas fa-star'}"></i>
+        </div>
+      `).join('');
+    }
+
+    // Certificates
+    const { data: certData } = await supabase.from('user_certificates').select('*, certificates(*)').eq('user_id', currentUser.id).limit(4);
+    const certGrid = document.getElementById('certsGrid');
+    if (certData && certData.length > 0) {
+      certGrid.innerHTML = certData.map(c => `
+        <div class="cert-item" title="${c.certificates?.name || ''}">
+          <i class="${c.certificates?.icon || 'fas fa-medal'}"></i>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    console.error('User data load error:', e);
+  }
+}
+
+async function loadInstructors() {
+  if (!supabase) {
+    document.getElementById('instructorsList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted)">Connect Supabase to see instructors</div>';
+    return;
+  }
+  try {
+    const { data, error } = await supabase.from('instructors').select('*').limit(4).order('rating', { ascending: false });
+    if (error) throw error;
+    const list = document.getElementById('instructorsList');
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted)">No instructors found</div>';
+      return;
+    }
+    list.innerHTML = data.map(inst => `
+      <div class="instructor-item">
+        <img src="${inst.avatar_url || 'https://via.placeholder.com/40'}" alt="${inst.name}">
+        <div class="info">
+          <div class="name">${inst.name}</div>
+          <div class="role">${inst.specialty || 'Instructor'}</div>
+        </div>
+        <div class="stats">
+          <span class="rating"><i class="fas fa-star"></i> ${inst.rating || '0.0'}</span>
+          <span>(${formatNumber(inst.student_count || 0)})</span>
+          <span>${inst.course_count || 0} Courses</span>
+        </div>
+        <button class="follow-btn"><i class="fas fa-plus"></i></button>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Instructors load error:', e);
+  }
+}
+
+async function loadTestimonials() {
+  if (!supabase) {
+    document.getElementById('testimonialsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted)">Connect Supabase to see testimonials</div>';
+    return;
+  }
+  try {
+    const { data, error } = await supabase.from('testimonials').select('*').limit(3);
+    if (error) throw error;
+    const grid = document.getElementById('testimonialsGrid');
+    if (!data || data.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted)">No testimonials found</div>';
+      return;
+    }
+    grid.innerHTML = data.map(t => {
+      let stars = '';
+      for (let i = 0; i < (t.rating || 5); i++) stars += '<i class="fas fa-star"></i>';
+      return `
+        <div class="testimonial-card">
+          <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+          <p>${t.content}</p>
+          <div class="stars">${stars}</div>
+          <div class="author">
+            <img src="${t.avatar_url || 'https://via.placeholder.com/32'}" alt="${t.author_name}">
+            <div>
+              <div class="name">${t.author_name}</div>
+              <div class="role">${t.author_role}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    console.error('Testimonials load error:', e);
+  }
+}
+
+async function loadHeroAvatars() {
+  if (!supabase) return;
+  try {
+    const { data } = await supabase.from('profiles').select('avatar_url').limit(4);
+    const container = document.getElementById('heroAvatars');
+    if (data && data.length > 0) {
+      container.innerHTML = data.map(p => `
+        <img src="${p.avatar_url || 'https://via.placeholder.com/32'}" alt="">
+      `).join('');
+    }
+    // Student count
+    const { count } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+    document.getElementById('heroStudentCount').textContent = formatNumber(count || 0) + '+';
+  } catch (e) {
+    console.error('Hero avatars error:', e);
+  }
+}
+
+// ============================================
+// RENDER HELPERS
+// ============================================
+function renderStreak(streakDays) {
+  const days = ['S','M','T','W','T','F','S'];
+  const today = new Date().getDay();
+  const container = document.getElementById('streakDays');
+  container.innerHTML = days.map((d, i) => {
+    let cls = 'streak-day ';
+    if (i === today) cls += 'today';
+    else if (i < today && streakDays > 0) cls += 'active';
+    else cls += 'inactive';
+    return '<div class="' + cls + '"><div class="day-label">' + d + '</div><div class="day-dot"><i class="fas fa-check" style="font-size:8px"></i></div></div>';
+  }).join('');
+}
+
+function renderCharts() {
+  for (let i = 1; i <= 4; i++) {
+    const chart = document.getElementById('chart' + i);
+    let bars = '';
+    for (let j = 0; j < 12; j++) {
+      bars += '<div class="bar" style="height:' + (Math.random() * 80 + 20) + '%"></div>';
+    }
+    chart.innerHTML = bars;
+  }
+}
+
+function formatNumber(num) {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+  return num.toString();
+}
+
+// ============================================
+// UI INTERACTIONS
+// ============================================
+function showToast(msg, type) {
+  type = type || 'success';
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toastMsg');
+  toast.className = 'toast ' + type;
+  const icon = toast.querySelector('i');
+  icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function scrollToCourses() {
+  document.getElementById('coursesGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function openCourse(id) {
+  showToast('Opening course ' + id + '...', 'success');
+}
+
+function toggleFavorite(id) {
+  showToast('Added to favorites!', 'success');
+}
+
+function filterByCategory(cat) {
+  document.getElementById('searchInput').value = cat;
+  loadCourses(cat);
+  showToast('Filtered by: ' + cat, 'success');
+}
+
+function loadAllCourses() { loadCourses(); }
+function loadAllCategories() { loadCategories(); }
+function loadAllInstructors() { loadInstructors(); }
+function loadAllTestimonials() { loadTestimonials(); }
+function loadMyCourses() { if (!currentUser) { openAuthModal(); return; } loadContinueLearning(); }
+function loadCertificates() { if (!currentUser) { openAuthModal(); return; } showToast('Certificates page', 'success'); }
+function loadAchievements() { if (!currentUser) { openAuthModal(); return; } showToast('Achievements page', 'success'); }
+
+// Search
+let searchTimeout;
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => loadCourses(e.target.value), 300);
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+  if (e.key === 'Escape') closeAuthModal();
+});
+
+// Mobile menu
+const mobileBtn = document.getElementById('mobileMenuBtn');
+if (window.innerWidth <= 900) mobileBtn.style.display = 'flex';
+mobileBtn.addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+// Navigation
+document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
+  item.addEventListener('click', function() {
+    const page = this.dataset.page;
+    if (!page) return;
+    document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('[data-page="' + page + '"]').forEach(n => n.classList.add('active'));
+    if (page === 'academy') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      showToast(page + ' page loaded', 'success');
+    }
+  });
+});
+
+// ============================================
+// INITIALIZATION
+// ============================================
+async function init() {
+  await checkAuth();
+  await Promise.all([
+    loadStats(),
+    loadCategories(),
+    loadCourses(),
+    loadContinueLearning(),
+    loadInstructors(),
+    loadTestimonials(),
+    loadHeroAvatars()
+  ]);
+
+  // Hide loading screen
+  setTimeout(() => {
+    document.getElementById('loadingScreen').classList.add('hidden');
+  }, 600);
+}
+
+init();
+</script>
+
 </body>
 </html>
