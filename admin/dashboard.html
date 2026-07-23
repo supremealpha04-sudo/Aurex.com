@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#070714">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Aurex Academy - Full Admin Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#070714" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Aurex Academy - Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js">
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        /* ===== RESET & ROOT ===== */
+        /* ——— RESET & ROOT ——— */
         * {
             margin: 0;
             padding: 0;
@@ -43,6 +44,7 @@
         }
         html {
             -webkit-text-size-adjust: 100%;
+            overflow-x: hidden;
         }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -66,9 +68,10 @@
             display: flex;
             min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
         }
 
-        /* ===== SIDEBAR ===== */
+        /* ——— SIDEBAR ——— */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--bg-secondary);
@@ -101,7 +104,6 @@
                 transform: translateX(-100%);
                 width: var(--sidebar-width) !important;
                 box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
-                padding: 16px 12px;
             }
             .sidebar.mobile-open {
                 transform: translateX(0);
@@ -223,6 +225,12 @@
             font-weight: 800;
             font-size: 16px;
             box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        }
+        .logo-icon img {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: contain;
         }
         .logo-text-wrap {
             transition: opacity 0.25s;
@@ -370,7 +378,7 @@
             pointer-events: auto;
         }
 
-        /* ===== MAIN ===== */
+        /* ——— MAIN ——— */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -378,6 +386,8 @@
             min-height: 100vh;
             min-height: 100dvh;
             transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+            max-width: 100vw;
         }
         .main-content.sidebar-collapsed {
             margin-left: var(--sidebar-collapsed);
@@ -388,7 +398,7 @@
             }
         }
 
-        /* ===== TOP BAR ===== */
+        /* ——— TOP BAR ——— */
         .top-bar {
             position: sticky;
             top: 8px;
@@ -405,6 +415,8 @@
             border-radius: 14px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .top-bar.scrolled {
             background: rgba(13, 13, 31, 0.95);
@@ -421,6 +433,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .icon-btn {
             width: 36px;
@@ -481,15 +494,11 @@
         }
         .user-profile .status {
             font-size: 9px;
-            color: var(--accent-orange);
+            color: var(--accent-red);
             display: flex;
             align-items: center;
             gap: 3px;
         }
-        .user-profile .status.premium {
-            color: var(--accent-cyan);
-        }
-
         @media (max-width: 600px) {
             .top-bar {
                 margin: 6px 10px 14px;
@@ -517,7 +526,7 @@
             }
         }
 
-        /* ===== STATS ===== */
+        /* ——— STATS ——— */
         .stats-overview {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -611,10 +620,6 @@
             align-items: center;
             gap: 4px;
         }
-        .stat-card .stat-change.negative {
-            color: var(--accent-red);
-        }
-
         @media (max-width: 1200px) {
             .stats-overview {
                 grid-template-columns: repeat(2, 1fr);
@@ -635,7 +640,7 @@
             }
         }
 
-        /* ===== REVENUE STATS ===== */
+        /* ——— REVENUE STATS ——— */
         .revenue-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -716,7 +721,7 @@
             }
         }
 
-        /* ===== DASHBOARD GRID ===== */
+        /* ——— DASHBOARD GRID ——— */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -729,6 +734,7 @@
             border-radius: 16px;
             padding: 18px;
             transition: all 0.25s;
+            overflow-x: hidden;
         }
         .dash-card:hover {
             border-color: rgba(124, 58, 237, 0.1);
@@ -772,7 +778,6 @@
             color: var(--accent-violet);
             border-color: rgba(124, 58, 237, 0.3);
         }
-
         @media (max-width: 1100px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
@@ -789,12 +794,19 @@
             }
         }
 
-        /* ===== TABLE ===== */
+        /* ——— TABLE ——— */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             margin: 0 -4px;
             padding: 0 4px;
+        }
+        .table-wrapper::-webkit-scrollbar {
+            height: 2px;
+        }
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(124, 58, 237, 0.3);
+            border-radius: 10px;
         }
         .data-table {
             width: 100%;
@@ -863,15 +875,11 @@
             background: rgba(245, 158, 11, 0.1);
             color: var(--accent-orange);
         }
-        .status-pill.banned {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--accent-red);
-        }
         .status-pill.completed {
             background: rgba(34, 197, 94, 0.1);
             color: var(--accent-green);
         }
-        .status-pill.in-progress {
+        .status-pill.scheduled {
             background: rgba(59, 130, 246, 0.1);
             color: var(--accent-blue);
         }
@@ -893,13 +901,10 @@
             background: rgba(6, 182, 212, 0.12);
             color: var(--accent-cyan);
         }
-        .role-badge.superadmin {
-            background: rgba(236, 72, 153, 0.12);
-            color: var(--accent-pink);
-        }
         .table-actions {
             display: flex;
             gap: 5px;
+            flex-wrap: wrap;
         }
         .table-actions button {
             width: 26px;
@@ -931,7 +936,7 @@
             border-color: rgba(59, 130, 246, 0.2);
         }
 
-        /* ===== QUICK ACTIONS ===== */
+        /* ——— QUICK ACTIONS ——— */
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -987,7 +992,7 @@
             }
         }
 
-        /* ===== ACTIVITY ===== */
+        /* ——— ACTIVITY ——— */
         .activity-feed {
             display: flex;
             flex-direction: column;
@@ -1031,7 +1036,63 @@
             margin-top: 2px;
         }
 
-        /* ===== MODAL ===== */
+        /* ——— CHART ——— */
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+        .chart-bar-group {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 160px;
+            gap: 4px;
+            padding: 0 4px;
+        }
+        .chart-bar {
+            flex: 1;
+            background: rgba(124, 58, 237, 0.15);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s;
+            position: relative;
+            min-height: 3px;
+        }
+        .chart-bar:hover {
+            background: var(--accent-violet);
+        }
+        .chart-bar .bar-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-elevated);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            border: 1px solid var(--border-color);
+        }
+        .chart-bar:hover .bar-tooltip {
+            opacity: 1;
+        }
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 4px;
+            margin-top: 6px;
+        }
+        .chart-labels span {
+            font-size: 8px;
+            color: var(--text-muted);
+            flex: 1;
+            text-align: center;
+        }
+
+        /* ——— MODAL ——— */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -1053,7 +1114,7 @@
             border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 24px;
-            width: 460px;
+            width: 500px;
             max-width: 100%;
             position: relative;
             box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
@@ -1179,7 +1240,6 @@
         .btn-warning:hover {
             box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
         }
-
         @media (max-width: 600px) {
             .modal {
                 padding: 20px 16px;
@@ -1193,7 +1253,7 @@
             }
         }
 
-        /* ===== TOAST ===== */
+        /* ——— TOAST ——— */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -1233,7 +1293,7 @@
             color: #ef4444;
         }
 
-        /* ===== LOADING ===== */
+        /* ——— LOADING ——— */
         .loading-overlay {
             position: fixed;
             inset: 0;
@@ -1268,7 +1328,7 @@
             font-size: 12px;
         }
 
-        /* ===== SKELETON ===== */
+        /* ——— SKELETON ——— */
         .skeleton {
             background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.03) 75%);
             background-size: 200% 100%;
@@ -1284,7 +1344,7 @@
             }
         }
 
-        /* ===== EMPTY STATE ===== */
+        /* ——— EMPTY STATE ——— */
         .empty-state {
             text-align: center;
             padding: 32px 16px;
@@ -1299,7 +1359,7 @@
             color: var(--text-muted);
         }
 
-        /* ===== DELETE CONFIRM ===== */
+        /* ——— DELETE CONFIRM ——— */
         .delete-confirm {
             display: flex;
             gap: 8px;
@@ -1331,7 +1391,7 @@
             background: #dc2626;
         }
 
-        /* ===== SEARCH BAR ===== */
+        /* ——— SEARCH BAR ——— */
         .search-bar {
             display: flex;
             align-items: center;
@@ -1359,7 +1419,7 @@
             color: var(--text-muted);
         }
 
-        /* ===== FILTER BAR ===== */
+        /* ——— FILTER BAR ——— */
         .filter-bar {
             display: flex;
             gap: 8px;
@@ -1377,13 +1437,14 @@
             font-family: inherit;
         }
 
-        /* ===== PAGINATION ===== */
+        /* ——— PAGINATION ——— */
         .pagination {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
             margin-top: 16px;
+            flex-wrap: wrap;
         }
         .pagination button {
             width: 32px;
@@ -1414,7 +1475,7 @@
             cursor: not-allowed;
         }
 
-        /* ===== MOBILE BOTTOM NAV ===== */
+        /* ——— MOBILE BOTTOM NAV ——— */
         .mobile-bottom-nav {
             display: none;
             position: fixed;
@@ -1466,7 +1527,6 @@
             justify-content: center;
             font-weight: 700;
         }
-
         @media (max-width: 900px) {
             .mobile-bottom-nav {
                 display: block;
@@ -1476,7 +1536,7 @@
             }
         }
 
-        /* ===== NOTIFICATION PANEL ===== */
+        /* ——— NOTIFICATION PANEL ——— */
         .notif-panel {
             position: fixed;
             top: 60px;
@@ -1537,63 +1597,7 @@
             margin-top: 2px;
         }
 
-        /* ===== CHART ===== */
-        .chart-container {
-            height: 200px;
-            position: relative;
-        }
-        .chart-bar-group {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            height: 160px;
-            gap: 4px;
-            padding: 0 4px;
-        }
-        .chart-bar {
-            flex: 1;
-            background: rgba(124, 58, 237, 0.15);
-            border-radius: 4px 4px 0 0;
-            transition: all 0.3s;
-            position: relative;
-            min-height: 3px;
-        }
-        .chart-bar:hover {
-            background: var(--accent-violet);
-        }
-        .chart-bar .bar-tooltip {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-elevated);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 8px;
-            font-weight: 600;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            border: 1px solid var(--border-color);
-        }
-        .chart-bar:hover .bar-tooltip {
-            opacity: 1;
-        }
-        .chart-labels {
-            display: flex;
-            justify-content: space-between;
-            padding: 0 4px;
-            margin-top: 6px;
-        }
-        .chart-labels span {
-            font-size: 8px;
-            color: var(--text-muted);
-            flex: 1;
-            text-align: center;
-        }
-
-        /* ===== PROGRESS BAR ===== */
+        /* ——— PROGRESS BAR ——— */
         .progress-bar {
             width: 100%;
             height: 6px;
@@ -1608,7 +1612,7 @@
             transition: width 0.5s ease;
         }
 
-        /* ===== SETTINGS TOGGLE ===== */
+        /* ——— SETTINGS TOGGLE ——— */
         .settings-item {
             display: flex;
             align-items: center;
@@ -1674,7 +1678,7 @@
             transform: translateX(18px);
         }
 
-        /* ===== ANIMATIONS ===== */
+        /* ——— ANIMATIONS ——— */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -1688,6 +1692,128 @@
         .animate-in {
             animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             opacity: 0;
+        }
+
+        /* ——— CLASS CARD ——— */
+        .class-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.25s;
+        }
+        .class-card:hover {
+            border-color: rgba(124, 58, 237, 0.15);
+            transform: translateY(-2px);
+        }
+        .class-card .class-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .class-card .class-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .class-card .class-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+        .class-card .class-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .class-card .class-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .class-card .class-links a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: rgba(6, 182, 212, 0.08);
+            border-radius: 6px;
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            transition: all 0.2s;
+        }
+        .class-card .class-links a:hover {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+        .class-card .class-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .class-card .class-actions button {
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .class-card .class-actions button:hover {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--accent-violet);
+            border-color: rgba(124, 58, 237, 0.2);
+        }
+        .class-card .class-actions button.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* ——— RESPONSIVE FIXES ——— */
+        img,
+        video,
+        iframe {
+            max-width: 100%;
+        }
+        .table-wrapper {
+            max-width: 100%;
+        }
+        .data-table td,
+        .data-table th {
+            word-break: break-word;
+        }
+        @media (max-width: 480px) {
+            .data-table {
+                min-width: 400px;
+            }
+            .top-actions .btn-primary {
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+            .top-actions .icon-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            .user-profile {
+                padding: 2px 6px 2px 2px;
+            }
+            .user-profile img {
+                width: 20px;
+                height: 20px;
+            }
         }
     </style>
 </head>
@@ -1704,7 +1830,9 @@
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
-                <div class="logo-icon">A</div>
+                <div class="logo-icon">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%237c3aed'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E" alt="Aurex">
+                </div>
                 <div class="logo-text-wrap">
                     <div class="logo-text">Aurex</div>
                     <div class="logo-sub">ADMIN</div>
@@ -1732,11 +1860,11 @@
                     <div class="nav-item" data-section="courses" onclick="showSection('courses')">
                         <i class="fas fa-graduation-cap"></i><span>Courses</span> <span class="badge" id="courseBadge">0</span>
                     </div>
+                    <div class="nav-item" data-section="classes" onclick="showSection('classes')">
+                        <i class="fas fa-calendar-alt"></i><span>Classes</span> <span class="badge" id="classBadge">0</span>
+                    </div>
                     <div class="nav-item" data-section="tools" onclick="showSection('tools')">
                         <i class="fas fa-tools"></i><span>Tools</span>
-                    </div>
-                    <div class="nav-item" data-section="enrollments" onclick="showSection('enrollments')">
-                        <i class="fas fa-user-check"></i><span>Enrollments</span>
                     </div>
                 </div>
                 <div class="sidebar-divider"></div>
@@ -1778,7 +1906,7 @@
                 </div>
                 <div class="top-actions">
                     <button class="icon-btn" id="notifBtn" onclick="toggleNotifPanel()"><i class="fas fa-bell"></i><span class="dot" id="notifDot"></span></button>
-                    <div class="user-profile" onclick="showToast('Profile settings coming soon', 'success')">
+                    <div class="user-profile" id="adminProfile">
                         <img src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff&size=100" alt="Admin" id="adminProfileImg">
                         <div class="info">
                             <div class="name" id="adminName">Admin</div>
@@ -1794,7 +1922,7 @@
                 <div id="notifList"></div>
             </div>
 
-            <!-- ===== DASHBOARD SECTION ===== -->
+            <!-- ===== DASHBOARD ===== -->
             <div id="section-dashboard">
                 <div class="stats-overview animate-in">
                     <div class="stat-card">
@@ -1825,7 +1953,7 @@
                         <div class="revenue-icon gold"><i class="fas fa-crown"></i></div>
                         <div class="revenue-label">Premium Subscriptions</div>
                         <div class="revenue-value" id="revPremium">₦0</div>
-                        <div class="revenue-sub"><span id="revPremiumCount">0</span> active subscribers</div>
+                        <div class="revenue-sub"><span id="revPremiumCount">0</span> active</div>
                         <div class="revenue-change"><i class="fas fa-arrow-up"></i> <span id="revPremiumGrowth">--</span> this month</div>
                     </div>
                     <div class="revenue-card">
@@ -1872,20 +2000,20 @@
                                 <i class="fas fa-plus-circle" style="background:rgba(124,58,237,0.1);color:var(--accent-violet);"></i>
                                 <div class="info"><div class="label">Add Course</div><div class="desc">Publish new course</div></div>
                             </div>
+                            <div class="quick-action-btn" onclick="openModal('createClassModal')">
+                                <i class="fas fa-calendar-plus" style="background:rgba(6,182,212,0.1);color:var(--accent-cyan);"></i>
+                                <div class="info"><div class="label">Add Class</div><div class="desc">Schedule new class</div></div>
+                            </div>
                             <div class="quick-action-btn" onclick="openModal('createToolModal')">
-                                <i class="fas fa-tools" style="background:rgba(6,182,212,0.1);color:var(--accent-cyan);"></i>
+                                <i class="fas fa-tools" style="background:rgba(34,197,94,0.1);color:var(--accent-green);"></i>
                                 <div class="info"><div class="label">Add Tool</div><div class="desc">Create new tool</div></div>
                             </div>
                             <div class="quick-action-btn" onclick="showSection('premium')">
                                 <i class="fas fa-crown" style="background:rgba(245,158,11,0.1);color:var(--accent-orange);"></i>
-                                <div class="info"><div class="label">Manage Premium</div><div class="desc">View subscribers</div></div>
-                            </div>
-                            <div class="quick-action-btn" onclick="showSection('payments')">
-                                <i class="fas fa-credit-card" style="background:rgba(236,72,153,0.1);color:var(--accent-pink);"></i>
-                                <div class="info"><div class="label">Payments</div><div class="desc">View transactions</div></div>
+                                <div class="info"><div class="label">Premium</div><div class="desc">Manage subscribers</div></div>
                             </div>
                             <div class="quick-action-btn" onclick="showToast('Reports export coming soon', 'success')">
-                                <i class="fas fa-file-export" style="background:rgba(34,197,94,0.1);color:var(--accent-green);"></i>
+                                <i class="fas fa-file-export" style="background:rgba(236,72,153,0.1);color:var(--accent-pink);"></i>
                                 <div class="info"><div class="label">Export Data</div><div class="desc">Download reports</div></div>
                             </div>
                         </div>
@@ -1914,7 +2042,7 @@
                 </div>
             </div>
 
-            <!-- ===== REVENUE SECTION ===== -->
+            <!-- ===== REVENUE ===== -->
             <div id="section-revenue" style="display:none;">
                 <div class="dash-card animate-in" style="margin:0 16px 24px;">
                     <div class="dash-header">
@@ -1947,26 +2075,23 @@
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table" id="revenueTable">
-                            <thead><tr><th>Transaction ID</th><th>User</th><th>Type</th><th>Item</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+                            <thead><tr><th>ID</th><th>User</th><th>Type</th><th>Item</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
                             <tbody id="revenueBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- ===== USERS SECTION ===== -->
+            <!-- ===== USERS ===== -->
             <div id="section-users" style="display:none;">
                 <div class="dash-card animate-in" style="margin:0 16px 24px;">
                     <div class="dash-header">
                         <h3><i class="fas fa-users" style="color:var(--accent-blue);margin-right:6px;"></i>All Users</h3>
                         <div class="actions">
-                            <button onclick="openModal('createUserModal')"><i class="fas fa-plus" style="margin-right:4px;"></i>Add User</button>
+                            <button onclick="openModal('createUserModal')"><i class="fas fa-plus"></i> Add User</button>
                         </div>
                     </div>
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers()">
-                    </div>
+                    <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers()"></div>
                     <div class="filter-bar">
                         <select id="userRoleFilter" onchange="filterUsers()"><option value="">All Roles</option><option value="student">Student</option><option value="instructor">Instructor</option><option value="admin">Admin</option></select>
                         <select id="userStatusFilter" onchange="filterUsers()"><option value="">All Status</option><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option></select>
@@ -1978,83 +2103,65 @@
                             <tbody id="allUsersBody"></tbody>
                         </table>
                     </div>
-                    <div class="pagination" id="userPagination"></div>
                 </div>
             </div>
 
-            <!-- ===== COURSES SECTION ===== -->
+            <!-- ===== COURSES ===== -->
             <div id="section-courses" style="display:none;">
                 <div class="dash-card animate-in" style="margin:0 16px 24px;">
                     <div class="dash-header">
                         <h3><i class="fas fa-graduation-cap" style="color:var(--accent-violet);margin-right:6px;"></i>All Courses</h3>
                         <div class="actions">
-                            <button onclick="openModal('createCourseModal')"><i class="fas fa-plus" style="margin-right:4px;"></i>Add Course</button>
+                            <button onclick="openModal('createCourseModal')"><i class="fas fa-plus"></i> Add Course</button>
                         </div>
                     </div>
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="courseSearch" placeholder="Search courses..." oninput="filterCourses()">
-                    </div>
+                    <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="courseSearch" placeholder="Search courses..." oninput="filterCourses()"></div>
                     <div class="filter-bar">
-                        <select id="courseCategoryFilter" onchange="filterCourses()"><option value="">All Categories</option><option value="ui-ux">UI/UX Design</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion Graphics</option><option value="3d">3D Design</option></select>
+                        <select id="courseCategoryFilter" onchange="filterCourses()"><option value="">All Categories</option><option value="ui-ux">UI/UX Design</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion</option><option value="3d">3D Design</option></select>
                         <select id="courseTypeFilter" onchange="filterCourses()"><option value="">All Types</option><option value="free">Free</option><option value="paid">Paid</option></select>
                     </div>
                     <div id="coursesList"></div>
-                    <div class="pagination" id="coursePagination"></div>
                 </div>
             </div>
 
-            <!-- ===== TOOLS SECTION ===== -->
+            <!-- ===== CLASSES ===== -->
+            <div id="section-classes" style="display:none;">
+                <div class="dash-card animate-in" style="margin:0 16px 24px;">
+                    <div class="dash-header">
+                        <h3><i class="fas fa-calendar-alt" style="color:var(--accent-cyan);margin-right:6px;"></i>All Classes</h3>
+                        <div class="actions">
+                            <button onclick="openModal('createClassModal')"><i class="fas fa-plus"></i> Add Class</button>
+                        </div>
+                    </div>
+                    <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="classSearch" placeholder="Search classes..." oninput="filterClasses()"></div>
+                    <div id="classesList"></div>
+                </div>
+            </div>
+
+            <!-- ===== TOOLS ===== -->
             <div id="section-tools" style="display:none;">
                 <div class="dash-card animate-in" style="margin:0 16px 24px;">
                     <div class="dash-header">
                         <h3><i class="fas fa-tools" style="color:var(--accent-cyan);margin-right:6px;"></i>All Tools</h3>
                         <div class="actions">
-                            <button onclick="openModal('createToolModal')"><i class="fas fa-plus" style="margin-right:4px;"></i>Add Tool</button>
+                            <button onclick="openModal('createToolModal')"><i class="fas fa-plus"></i> Add Tool</button>
                         </div>
                     </div>
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="toolSearch" placeholder="Search tools..." oninput="filterTools()">
-                    </div>
+                    <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="toolSearch" placeholder="Search tools..." oninput="filterTools()"></div>
                     <div class="filter-bar">
                         <select id="toolTypeFilter" onchange="filterTools()"><option value="">All Types</option><option value="free">Free</option><option value="paid">Paid</option></select>
                     </div>
                     <div id="toolsList"></div>
-                    <div class="pagination" id="toolPagination"></div>
                 </div>
             </div>
 
-            <!-- ===== ENROLLMENTS SECTION ===== -->
-            <div id="section-enrollments" style="display:none;">
-                <div class="dash-card animate-in" style="margin:0 16px 24px;">
-                    <div class="dash-header">
-                        <h3><i class="fas fa-user-check" style="color:var(--accent-green);margin-right:6px;"></i>Enrollments</h3>
-                        <div class="actions">
-                            <button onclick="openModal('createEnrollmentModal')"><i class="fas fa-plus" style="margin-right:4px;"></i>Enroll User</button>
-                        </div>
-                    </div>
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="enrollmentSearch" placeholder="Search enrollments..." oninput="filterEnrollments()">
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table" id="enrollmentsTable">
-                            <thead><tr><th>Student</th><th>Course</th><th>Progress</th><th>Status</th><th>Enrolled</th><th>Actions</th></tr></thead>
-                            <tbody id="enrollmentsBody"></tbody>
-                        </table>
-                    </div>
-                    <div class="pagination" id="enrollmentPagination"></div>
-                </div>
-            </div>
-
-            <!-- ===== PREMIUM SECTION ===== -->
+            <!-- ===== PREMIUM ===== -->
             <div id="section-premium" style="display:none;">
                 <div class="dash-card animate-in" style="margin:0 16px 24px;">
                     <div class="dash-header">
                         <h3><i class="fas fa-crown" style="color:var(--accent-orange);margin-right:6px;"></i>Premium Management</h3>
                         <div class="actions">
-                            <button onclick="openModal('premiumConfigModal')"><i class="fas fa-cog" style="margin-right:4px;"></i>Configure</button>
+                            <button onclick="openModal('premiumConfigModal')"><i class="fas fa-cog"></i> Configure</button>
                         </div>
                     </div>
                     <div class="revenue-stats" style="margin:0 0 16px;">
@@ -2086,22 +2193,19 @@
                 </div>
             </div>
 
-            <!-- ===== PAYMENTS SECTION ===== -->
+            <!-- ===== PAYMENTS ===== -->
             <div id="section-payments" style="display:none;">
                 <div class="dash-card animate-in" style="margin:0 16px 24px;">
                     <div class="dash-header">
-                        <h3><i class="fas fa-credit-card" style="color:var(--accent-pink);margin-right:6px;"></i>Payment Transactions</h3>
+                        <h3><i class="fas fa-credit-card" style="color:var(--accent-pink);margin-right:6px;"></i>Payments</h3>
                         <div class="actions">
-                            <button onclick="showToast('Export coming soon', 'success')"><i class="fas fa-download" style="margin-right:4px;"></i>Export</button>
+                            <button onclick="showToast('Export coming soon', 'success')"><i class="fas fa-download"></i> Export</button>
                         </div>
                     </div>
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="paymentSearch" placeholder="Search transactions..." oninput="filterPayments()">
-                    </div>
+                    <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="paymentSearch" placeholder="Search transactions..." oninput="filterPayments()"></div>
                     <div class="filter-bar">
                         <select id="paymentTypeFilter" onchange="filterPayments()"><option value="">All Types</option><option value="premium">Premium</option><option value="course">Course</option><option value="tool">Tool</option></select>
-                        <select id="paymentStatusFilter" onchange="filterPayments()"><option value="">All Status</option><option value="completed">Completed</option><option value="pending">Pending</option><option value="failed">Failed</option></select>
+                        <select id="paymentStatusFilter" onchange="filterPayments()"><option value="">All Status</option><option value="completed">Completed</option><option value="pending">Pending</option></select>
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table" id="paymentsTable">
@@ -2109,17 +2213,16 @@
                             <tbody id="paymentsBody"></tbody>
                         </table>
                     </div>
-                    <div class="pagination" id="paymentPagination"></div>
                 </div>
             </div>
 
-            <!-- ===== MESSAGES SECTION ===== -->
+            <!-- ===== MESSAGES ===== -->
             <div id="section-messages" style="display:none;">
                 <div class="dash-card animate-in" style="margin:0 16px 24px;">
                     <div class="dash-header">
                         <h3><i class="fas fa-envelope" style="color:var(--accent-orange);margin-right:6px;"></i>Messages</h3>
                         <div class="actions">
-                            <button onclick="openModal('sendMessageModal')"><i class="fas fa-paper-plane" style="margin-right:4px;"></i>Send Message</button>
+                            <button onclick="openModal('sendMessageModal')"><i class="fas fa-paper-plane"></i> Send</button>
                         </div>
                     </div>
                     <div class="table-wrapper">
@@ -2131,7 +2234,7 @@
                 </div>
             </div>
 
-            <!-- ===== SETTINGS SECTION ===== -->
+            <!-- ===== SETTINGS ===== -->
             <div id="section-settings" style="display:none;">
                 <div class="dash-card animate-in" style="margin:0 16px 24px;">
                     <div class="dash-header">
@@ -2146,7 +2249,7 @@
                         <label class="toggle-switch" onclick="toggleSetting('premium', this)"><input type="checkbox" id="settingPremium" checked><span class="toggle-slider"></span></label>
                     </div>
                     <div class="settings-item">
-                        <div class="info"><div class="title">Email Notifications</div><div class="desc">Send email alerts to users</div></div>
+                        <div class="info"><div class="title">Email Notifications</div><div class="desc">Send email alerts</div></div>
                         <label class="toggle-switch" onclick="toggleSetting('notifications', this)"><input type="checkbox" id="settingNotifications" checked><span class="toggle-slider"></span></label>
                     </div>
                     <div class="settings-item">
@@ -2197,11 +2300,32 @@
             <div class="form-group"><label>Course Title</label><input type="text" id="newCourseTitle" placeholder="UX Design Fundamentals"></div>
             <div class="form-group"><label>Description</label><textarea id="newCourseDesc" rows="2" placeholder="Course description..."></textarea></div>
             <div class="form-row">
-                <div class="form-group"><label>Category</label><select id="newCourseCategory"><option value="ui-ux">UI/UX Design</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion Graphics</option><option value="3d">3D Design</option></select></div>
+                <div class="form-group"><label>Category</label><select id="newCourseCategory"><option value="ui-ux">UI/UX Design</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion</option><option value="3d">3D Design</option></select></div>
                 <div class="form-group"><label>Price (₦)</label><input type="number" id="newCoursePrice" placeholder="0 for free" value="0"></div>
             </div>
             <div class="form-group"><label>Instructor</label><input type="text" id="newCourseInstructor" placeholder="Instructor name"></div>
+            <div class="form-group"><label>Course Link</label><input type="url" id="newCourseLink" placeholder="https://example.com/course"></div>
             <button class="btn-primary" onclick="createCourse()"><i class="fas fa-plus"></i> Create Course</button>
+        </div>
+    </div>
+
+    <!-- CREATE CLASS -->
+    <div class="modal-overlay" id="createClassModal">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('createClassModal')"><i class="fas fa-times"></i></button>
+            <h2 id="classModalTitle">Create Class</h2>
+            <p id="classModalDesc">Schedule a new class for a course.</p>
+            <input type="hidden" id="editClassId">
+            <div class="form-group"><label>Course</label><select id="classCourseSelect"></select></div>
+            <div class="form-group"><label>Class Title</label><input type="text" id="classTitle" placeholder="Introduction to UX Design"></div>
+            <div class="form-group"><label>Description</label><textarea id="classDesc" rows="2" placeholder="Class description..."></textarea></div>
+            <div class="form-row">
+                <div class="form-group"><label>Date</label><input type="datetime-local" id="classDate"></div>
+                <div class="form-group"><label>Duration (hours)</label><input type="number" id="classDuration" placeholder="2" value="2"></div>
+            </div>
+            <div class="form-group"><label>WhatsApp Group Link</label><input type="url" id="classWhatsApp" placeholder="https://chat.whatsapp.com/..."></div>
+            <div class="form-group"><label>Telegram Group Link</label><input type="url" id="classTelegram" placeholder="https://t.me/..."></div>
+            <button class="btn-primary" id="classSubmitBtn" onclick="saveClass()"><i class="fas fa-save"></i> Save Class</button>
         </div>
     </div>
 
@@ -2217,20 +2341,8 @@
                 <div class="form-group"><label>Price (₦)</label><input type="number" id="newToolPrice" placeholder="0 for free" value="0"></div>
                 <div class="form-group"><label>Category</label><select id="newToolCategory"><option value="design">Design</option><option value="development">Development</option><option value="ai">AI</option><option value="productivity">Productivity</option></select></div>
             </div>
+            <div class="form-group"><label>Tool Link</label><input type="url" id="newToolLink" placeholder="https://example.com/tool"></div>
             <button class="btn-primary" onclick="createTool()"><i class="fas fa-plus"></i> Create Tool</button>
-        </div>
-    </div>
-
-    <!-- CREATE ENROLLMENT -->
-    <div class="modal-overlay" id="createEnrollmentModal">
-        <div class="modal">
-            <button class="close-btn" onclick="closeModal('createEnrollmentModal')"><i class="fas fa-times"></i></button>
-            <h2>Enroll User</h2>
-            <p>Enroll a user in a course.</p>
-            <div class="form-group"><label>User Email</label><input type="email" id="enrollUserEmail" placeholder="user@example.com"></div>
-            <div class="form-group"><label>Course</label><select id="enrollCourseSelect"></select></div>
-            <div class="form-group"><label>Status</label><select id="enrollStatusSelect"><option value="active">Active</option><option value="completed">Completed</option><option value="dropped">Dropped</option></select></div>
-            <button class="btn-primary" onclick="createEnrollment()"><i class="fas fa-user-plus"></i> Enroll</button>
         </div>
     </div>
 
@@ -2243,7 +2355,7 @@
             <div class="form-group"><label>Price (₦)</label><input type="number" id="premiumPriceInput" value="13500"></div>
             <div class="form-group"><label>Duration (months)</label><input type="number" id="premiumDurationInput" value="6"></div>
             <div class="form-group"><label>Discount (%)</label><input type="number" id="premiumDiscountInput" value="45" min="0" max="100"></div>
-            <button class="btn-primary" onclick="savePremiumConfig()"><i class="fas fa-save"></i> Save Configuration</button>
+            <button class="btn-primary" onclick="savePremiumConfig()"><i class="fas fa-save"></i> Save</button>
         </div>
     </div>
 
@@ -2285,7 +2397,7 @@
 
         let supabase = null;
         try {
-            if (SUPABASE_URL.includes('your-project')) throw new Error('Please configure Supabase');
+            if (SUPABASE_URL.includes('your-project')) throw new Error('Configure Supabase');
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (e) {
             console.warn('Supabase not configured. Using demo data.');
@@ -2296,21 +2408,22 @@
         // ============================================================
         let allUsers = [];
         let allCourses = [];
+        let allClasses = [];
         let allTools = [];
-        let allEnrollments = [];
-        let allMessages = [];
         let allRevenue = [];
+        let allMessages = [];
         let allActivities = [];
         let deleteTarget = null;
         let mobileSidebarOpen = false;
         let notifPanelOpen = false;
         let currentChartPeriod = 'weekly';
         let currentRevenuePeriod = 'all';
-        let isPremiumEnabled = true;
+        let isAdmin = false;
+        const ADMIN_EMAILS = ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'];
         let premiumPrice = 13500;
         let premiumDuration = 6;
         let premiumDiscount = 45;
-        let adminUser = { name: 'Admin', isPremium: false };
+        let currentUser = null;
 
         // ============================================================
         // HELPERS
@@ -2349,6 +2462,55 @@
         }
 
         // ============================================================
+        // AUTH
+        // ============================================================
+        async function checkAuth() {
+            if (!supabase) {
+                isAdmin = true;
+                updateAdminUI();
+                return;
+            }
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                currentUser = user;
+                const email = user.email;
+                isAdmin = ADMIN_EMAILS.includes(email);
+                if (isAdmin) {
+                    updateAdminUI();
+                } else {
+                    showToast('Access denied. Admin only.', 'error');
+                    setTimeout(() => window.location.href = 'index.html', 1500);
+                }
+            }
+            supabase.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN' && session?.user) {
+                    currentUser = session.user;
+                    isAdmin = ADMIN_EMAILS.includes(session.user.email);
+                    if (isAdmin) updateAdminUI();
+                }
+                if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    isAdmin = false;
+                }
+            });
+        }
+
+        function updateAdminUI() {
+            document.getElementById('adminName').textContent = 'Admin';
+            document.getElementById('adminStatus').textContent = 'Administrator';
+            document.getElementById('adminProfileImg').src =
+                'https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff&size=100';
+        }
+
+        function handleLogout() {
+            if (supabase) {
+                supabase.auth.signOut();
+            }
+            showToast('Logged out', 'success');
+            setTimeout(() => window.location.href = 'index.html', 800);
+        }
+
+        // ============================================================
         // SIDEBAR / NAV
         // ============================================================
         function showSection(section) {
@@ -2368,8 +2530,8 @@
                 revenue: 'Revenue Analytics',
                 users: 'Users',
                 courses: 'Courses',
+                classes: 'Classes',
                 tools: 'Tools',
-                enrollments: 'Enrollments',
                 premium: 'Premium Management',
                 payments: 'Payments',
                 messages: 'Messages',
@@ -2380,8 +2542,8 @@
 
             if (section === 'users' && allUsers.length === 0) loadAllUsers();
             if (section === 'courses' && allCourses.length === 0) loadAllCourses();
+            if (section === 'classes' && allClasses.length === 0) loadAllClasses();
             if (section === 'tools' && allTools.length === 0) loadAllTools();
-            if (section === 'enrollments' && allEnrollments.length === 0) loadAllEnrollments();
             if (section === 'revenue') loadRevenueSection();
             if (section === 'premium') loadPremiumSection();
             if (section === 'payments') loadAllPayments();
@@ -2429,19 +2591,17 @@
         document.getElementById('sidebarOverlay')?.addEventListener('click', closeMobileSidebar);
 
         // ============================================================
-        // SUPABASE CRUD OPERATIONS
+        // SUPABASE CRUD
         // ============================================================
         async function fetchFromTable(table) {
             if (!supabase) {
-                // Return demo data
                 if (table === 'users') return generateDemoUsers();
                 if (table === 'courses') return generateDemoCourses();
+                if (table === 'classes') return generateDemoClasses();
                 if (table === 'tools') return generateDemoTools();
-                if (table === 'enrollments') return generateDemoEnrollments();
-                if (table === 'messages') return generateDemoMessages();
                 if (table === 'revenue') return generateDemoRevenue();
+                if (table === 'messages') return generateDemoMessages();
                 if (table === 'activities') return generateDemoActivities();
-                if (table === 'profiles') return generateDemoUsers();
                 return [];
             }
             const { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
@@ -2474,46 +2634,50 @@
         }
 
         // ============================================================
-        // DEMO DATA GENERATORS
+        // DEMO DATA
         // ============================================================
         function generateDemoUsers() {
-            const names = ['Emma Wilson', 'Liam Chen', 'Sophia Patel', 'Noah Garcia', 'Olivia Brown', 'Mason Davis',
-                'Isabella Martinez', 'Lucas Anderson', 'Mia Taylor', 'Ethan Thomas', 'Charlotte Lee', 'Alexander Kim'
-            ];
-            const roles = ['student', 'student', 'student', 'instructor', 'admin', 'student'];
-            const statuses = ['active', 'active', 'pending', 'active', 'active', 'inactive'];
-            return names.map((name, i) => ({
+            const names = ['Emma Wilson', 'Liam Chen', 'Sophia Patel', 'Noah Garcia', 'Olivia Brown', 'Mason Davis'];
+            return names.map((n, i) => ({
                 id: 'u' + (i + 1),
-                name: name,
-                email: name.toLowerCase().replace(' ', '.') + '@example.com',
-                role: roles[i % roles.length],
-                status: statuses[i % statuses.length],
-                is_premium: i < 3,
-                premium_start: i < 3 ? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() : null,
-                premium_end: i < 3 ? new Date(Date.now() + 150 * 24 * 60 * 60 * 1000).toISOString() : null,
-                joined: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
-                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=7c3aed&color=fff&size=100`
+                name: n,
+                email: n.toLowerCase().replace(' ', '.') + '@example.com',
+                role: ['student', 'student', 'instructor', 'student', 'admin', 'student'][i],
+                status: ['active', 'active', 'active', 'pending', 'active', 'inactive'][i],
+                is_premium: i < 2,
+                joined: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString()
             }));
         }
 
         function generateDemoCourses() {
             const titles = ['UX Design Mastery', 'Branding Identity Pro', 'Web Design Pro', 'Motion Graphics Mastery',
-                '3D Modeling Essentials', 'Typography Fundamentals', 'Color Theory Pro', 'Design Systems Advanced'
+                '3D Modeling Essentials'
             ];
-            const categories = ['ui-ux', 'branding', 'web', 'motion', '3d', 'ui-ux', 'branding', 'web'];
-            const prices = [25000, 30000, 0, 35000, 40000, 15000, 20000, 45000];
-            return titles.map((title, i) => ({
+            return titles.map((t, i) => ({
                 id: 'c' + (i + 1),
-                title: title,
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                category: categories[i % categories.length],
-                price: prices[i % prices.length],
-                is_free: prices[i % prices.length] === 0,
+                title: t,
+                description: 'Learn the fundamentals of ' + t.toLowerCase(),
+                category: ['ui-ux', 'branding', 'web', 'motion', '3d'][i],
+                price: [25000, 30000, 0, 35000, 40000][i],
+                is_free: [false, false, true, false, false][i],
                 instructor: 'Instructor ' + (i + 1),
-                students: Math.floor(Math.random() * 150),
-                rating: (3 + Math.random() * 2).toFixed(1),
-                created_at: new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000).toISOString(),
-                thumbnail: `https://via.placeholder.com/400x250/1a1a3e/7c3aed?text=${encodeURIComponent(title)}`
+                link: 'https://example.com/course/' + (i + 1),
+                created_at: new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000).toISOString()
+            }));
+        }
+
+        function generateDemoClasses() {
+            const courses = ['UX Design Mastery', 'Branding Identity Pro', 'Web Design Pro'];
+            return courses.map((c, i) => ({
+                id: 'cl' + (i + 1),
+                course: c,
+                title: 'Class ' + (i + 1) + ': ' + c,
+                description: 'Live session covering key concepts',
+                date: new Date(Date.now() + (i + 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+                duration: 2 + i,
+                whatsapp: 'https://chat.whatsapp.com/example' + (i + 1),
+                telegram: 'https://t.me/example' + (i + 1),
+                created_at: new Date().toISOString()
             }));
         }
 
@@ -2521,10 +2685,7 @@
             const tools = [
                 { name: 'AI Design Assistant', price: 5000, category: 'ai' },
                 { name: 'Color Palette Pro', price: 0, category: 'design' },
-                { name: 'Mockup Generator', price: 8000, category: 'design' },
-                { name: 'Font Pairing Tool', price: 3000, category: 'design' },
-                { name: '3D Asset Library', price: 10000, category: 'design' },
-                { name: 'Design System Manager', price: 0, category: 'productivity' }
+                { name: 'Mockup Generator', price: 8000, category: 'design' }
             ];
             return tools.map((t, i) => ({
                 id: 't' + (i + 1),
@@ -2533,123 +2694,83 @@
                 price: t.price,
                 is_free: t.price === 0,
                 category: t.category,
-                created_at: new Date(Date.now() - Math.random() * 120 * 24 * 60 * 60 * 1000).toISOString()
-            }));
-        }
-
-        function generateDemoEnrollments() {
-            const students = ['Emma Wilson', 'Liam Chen', 'Sophia Patel', 'Noah Garcia', 'Olivia Brown'];
-            const courses = ['UX Design Mastery', 'Branding Identity Pro', 'Web Design Pro', 'Motion Graphics Mastery'];
-            const statuses = ['active', 'completed', 'dropped', 'active', 'active'];
-            return students.map((student, i) => ({
-                id: 'e' + (i + 1),
-                student: student,
-                course: courses[i % courses.length],
-                progress: Math.floor(Math.random() * 100),
-                status: statuses[i % statuses.length],
-                enrolled: new Date(Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000).toISOString()
-            }));
-        }
-
-        function generateDemoMessages() {
-            const subjects = ['Course Inquiry', 'Assignment Help', 'Feedback', 'Meeting Request', 'Payment Issue', 'Welcome'];
-            const statuses = ['read', 'unread', 'read', 'unread', 'read', 'unread'];
-            return subjects.map((subject, i) => ({
-                id: 'm' + (i + 1),
-                from: 'User ' + (i + 1),
-                subject: subject,
-                preview: 'Lorem ipsum dolor sit amet...',
-                status: statuses[i % statuses.length],
-                created_at: new Date(Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString()
+                link: 'https://example.com/tool/' + (i + 1),
+                created_at: new Date().toISOString()
             }));
         }
 
         function generateDemoRevenue() {
-            const types = ['premium', 'course', 'tool', 'premium', 'course'];
-            const amounts = [13500, 25000, 5000, 13500, 30000];
-            const statuses = ['completed', 'completed', 'pending', 'completed', 'completed'];
-            const items = ['Premium Subscription', 'UX Design Mastery', 'AI Design Assistant', 'Premium Subscription',
-                'Branding Identity Pro'
+            return [
+                { id: 'r1', user_email: 'emma.wilson@example.com', type: 'premium', item: 'Premium Subscription',
+                    amount: 13500, status: 'completed', created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+                        .toISOString() },
+                { id: 'r2', user_email: 'liam.chen@example.com', type: 'course', item: 'UX Design Mastery',
+                    amount: 25000, status: 'completed', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
+                        .toISOString() },
+                { id: 'r3', user_email: 'sophia.patel@example.com', type: 'tool', item: 'AI Design Assistant',
+                    amount: 5000, status: 'pending', created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+                    .toISOString() }
             ];
-            return types.map((type, i) => ({
-                id: 'r' + (i + 1),
-                user_id: 'u' + (i + 1),
-                user_email: 'user' + (i + 1) + '@example.com',
-                type: type,
-                item: items[i % items.length],
-                amount: amounts[i % amounts.length],
-                status: statuses[i % statuses.length],
-                created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
-            }));
+        }
+
+        function generateDemoMessages() {
+            return [
+                { id: 'm1', from: 'Emma Wilson', subject: 'Course Inquiry', preview: 'I have a question about...',
+                    status: 'unread', created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+                { id: 'm2', from: 'Liam Chen', subject: 'Assignment Help', preview: 'Can you review my work...',
+                    status: 'read', created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() }
+            ];
         }
 
         function generateDemoActivities() {
-            const icons = ['user', 'course', 'premium', 'tool', 'payment'];
-            const texts = [
-                'New user <strong>Emma Wilson</strong> registered',
-                'Course <strong>UX Design</strong> was updated',
-                '<strong>Sophia Patel</strong> upgraded to Premium',
-                'New tool <strong>AI Assistant</strong> added',
-                'Payment of <strong>₦13,500</strong> received'
+            return [
+                { icon: 'user', text: 'New user <strong>Emma Wilson</strong> registered', time: new Date(Date.now() -
+                        15 * 60 * 1000).toISOString() },
+                { icon: 'premium', text: '<strong>Sophia Patel</strong> upgraded to Premium', time: new Date(Date
+                        .now() - 45 * 60 * 1000).toISOString() },
+                { icon: 'course', text: 'Course <strong>UX Design</strong> was updated', time: new Date(Date.now() -
+                        2 * 60 * 60 * 1000).toISOString() }
             ];
-            return texts.map((text, i) => ({
-                icon: icons[i % icons.length],
-                text: text,
-                time: new Date(Date.now() - i * 15 * 60 * 1000).toISOString()
-            }));
         }
 
         // ============================================================
-        // LOAD DATA FUNCTIONS
+        // LOAD DASHBOARD
         // ============================================================
         async function loadDashboardStats() {
             allUsers = await fetchFromTable('users');
             allCourses = await fetchFromTable('courses');
+            allClasses = await fetchFromTable('classes');
             allTools = await fetchFromTable('tools');
             allRevenue = await fetchFromTable('revenue');
-            allEnrollments = await fetchFromTable('enrollments');
 
-            // Stats
-            const totalUsers = allUsers.length;
-            const totalCourses = allCourses.length;
-            const premiumUsers = allUsers.filter(u => u.is_premium).length;
-            const totalRevenue = allRevenue.filter(r => r.status === 'completed').reduce((s, r) => s + r.amount, 0);
+            document.getElementById('statTotalUsers').textContent = allUsers.length;
+            document.getElementById('statTotalCourses').textContent = allCourses.length;
+            document.getElementById('statPremiumUsers').textContent = allUsers.filter(u => u.is_premium).length;
+            const totalRev = allRevenue.filter(r => r.status === 'completed').reduce((s, r) => s + r.amount, 0);
+            document.getElementById('statTotalRevenue').textContent = formatCurrency(totalRev);
 
-            document.getElementById('statTotalUsers').textContent = totalUsers;
-            document.getElementById('statTotalCourses').textContent = totalCourses;
-            document.getElementById('statPremiumUsers').textContent = premiumUsers;
-            document.getElementById('statTotalRevenue').textContent = formatCurrency(totalRevenue);
-
-            // Changes (dummy)
-            document.getElementById('statUsersChange').textContent = '+' + Math.floor(totalUsers * 0.05);
-            document.getElementById('statCoursesChange').textContent = '+' + Math.floor(totalCourses * 0.1);
-            document.getElementById('statPremiumChange').textContent = '+' + Math.floor(premiumUsers * 0.1);
-            document.getElementById('statRevenueChange').textContent = '+' + Math.floor(totalRevenue * 0.08);
-
-            // Badges
-            document.getElementById('userBadge').textContent = totalUsers;
-            document.getElementById('courseBadge').textContent = totalCourses;
+            document.getElementById('userBadge').textContent = allUsers.length;
+            document.getElementById('courseBadge').textContent = allCourses.length;
+            document.getElementById('classBadge').textContent = allClasses.length;
 
             // Revenue stats
-            const premiumRevenue = allRevenue.filter(r => r.type === 'premium' && r.status === 'completed')
+            const premiumRev = allRevenue.filter(r => r.type === 'premium' && r.status === 'completed')
                 .reduce((s, r) => s + r.amount, 0);
-            const courseRevenue = allRevenue.filter(r => r.type === 'course' && r.status === 'completed')
+            const courseRev = allRevenue.filter(r => r.type === 'course' && r.status === 'completed')
                 .reduce((s, r) => s + r.amount, 0);
-            const toolRevenue = allRevenue.filter(r => r.type === 'tool' && r.status === 'completed')
+            const toolRev = allRevenue.filter(r => r.type === 'tool' && r.status === 'completed')
                 .reduce((s, r) => s + r.amount, 0);
 
-            document.getElementById('revPremium').textContent = formatCurrency(premiumRevenue);
-            document.getElementById('revPremiumCount').textContent = premiumUsers;
-            document.getElementById('revCourses').textContent = formatCurrency(courseRevenue);
-            document.getElementById('revCourseCount').textContent = allEnrollments.length;
-            document.getElementById('revTools').textContent = formatCurrency(toolRevenue);
-            document.getElementById('revToolCount').textContent = allTools.filter(t => !t.is_free).length;
+            document.getElementById('revPremium').textContent = formatCurrency(premiumRev);
+            document.getElementById('revPremiumCount').textContent = allUsers.filter(u => u.is_premium).length;
+            document.getElementById('revCourses').textContent = formatCurrency(courseRev);
+            document.getElementById('revCourseCount').textContent = allRevenue.filter(r => r.type === 'course').length;
+            document.getElementById('revTools').textContent = formatCurrency(toolRev);
+            document.getElementById('revToolCount').textContent = allRevenue.filter(r => r.type === 'tool').length;
 
-            // Revenue growth (dummy)
-            document.getElementById('revPremiumGrowth').textContent = '+' + Math.floor(premiumUsers * 0.1);
-            document.getElementById('revCourseGrowth').textContent = '+' + Math.floor(allEnrollments.length * 0.05);
-            document.getElementById('revToolGrowth').textContent = '+' + Math.floor(allTools.filter(t => !t.is_free).length *
-            0.05);
+            document.getElementById('revPremiumGrowth').textContent = '+' + Math.floor(Math.random() * 5);
+            document.getElementById('revCourseGrowth').textContent = '+' + Math.floor(Math.random() * 10);
+            document.getElementById('revToolGrowth').textContent = '+' + Math.floor(Math.random() * 3);
 
             await loadRecentUsers();
             await loadActivity();
@@ -2658,14 +2779,14 @@
         async function loadRecentUsers() {
             const tbody = document.getElementById('recentUsersBody');
             const recent = allUsers.slice(0, 5);
-            if (recent.length === 0) {
+            if (!recent.length) {
                 tbody.innerHTML =
-                    '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div></td></tr>';
+                    '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users"></i><p>No users</p></div></td></tr>';
                 return;
             }
             tbody.innerHTML = recent.map(u => `
                 <tr>
-                    <td><div class="user-cell"><img src="${u.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.name)+'&background=7c3aed&color=fff&size=100'}" alt="${u.name}"><div class="user-info"><div class="name">${u.name}</div><div class="email">${u.email}</div></div></div></td>
+                    <td><div class="user-cell"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=7c3aed&color=fff&size=100" alt="${u.name}"><div class="user-info"><div class="name">${u.name}</div><div class="email">${u.email}</div></div></div></td>
                     <td><span class="role-badge ${u.role}">${u.role}</span></td>
                     <td><span class="status-pill ${u.status}">${u.status}</span></td>
                     <td>${formatDate(u.joined)}</td>
@@ -2677,90 +2798,17 @@
         async function loadActivity() {
             const feed = document.getElementById('activityFeed');
             allActivities = await fetchFromTable('activities');
-            if (allActivities.length === 0) {
-                feed.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>No recent activity</p></div>';
+            if (!allActivities.length) {
+                feed.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>No activity</p></div>';
                 return;
             }
             const iconMap = { user: 'user', course: 'graduation-cap', premium: 'crown', tool: 'tools', payment: 'credit-card' };
             feed.innerHTML = allActivities.slice(0, 8).map(a => `
                 <div class="activity-item">
                     <div class="icon ${a.icon || 'user'}"><i class="fas fa-${iconMap[a.icon] || 'user'}"></i></div>
-                    <div class="content"><div class="text">${a.text || a.message || ''}</div><div class="time">${a.time ? formatTime(a.time) : formatDate(a.created_at)}</div></div>
+                    <div class="content"><div class="text">${a.text || ''}</div><div class="time">${formatTime(a.time || a.created_at)}</div></div>
                 </div>
             `).join('');
-        }
-
-        // ============================================================
-        // REVENUE SECTION
-        // ============================================================
-        async function loadRevenueSection() {
-            allRevenue = await fetchFromTable('revenue');
-            const completed = allRevenue.filter(r => r.status === 'completed');
-
-            const premiumTotal = completed.filter(r => r.type === 'premium').reduce((s, r) => s + r.amount, 0);
-            const courseTotal = completed.filter(r => r.type === 'course').reduce((s, r) => s + r.amount, 0);
-            const toolTotal = completed.filter(r => r.type === 'tool').reduce((s, r) => s + r.amount, 0);
-
-            document.getElementById('revPremiumTotal').textContent = formatCurrency(premiumTotal);
-            document.getElementById('revPremiumTotalCount').textContent = completed.filter(r => r.type === 'premium').length;
-            document.getElementById('revCourseTotal').textContent = formatCurrency(courseTotal);
-            document.getElementById('revCourseTotalCount').textContent = completed.filter(r => r.type === 'course').length;
-            document.getElementById('revToolTotal').textContent = formatCurrency(toolTotal);
-            document.getElementById('revToolTotalCount').textContent = completed.filter(r => r.type === 'tool').length;
-
-            renderRevenueTable(completed);
-            updateRevenueChart('all', document.querySelector('#section-revenue .actions button'));
-        }
-
-        function renderRevenueTable(revenue) {
-            const tbody = document.getElementById('revenueBody');
-            if (!revenue || revenue.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-chart-simple"></i><p>No revenue data</p></div></td></tr>';
-                return;
-            }
-            const typeMap = { premium: 'Premium', course: 'Course', tool: 'Tool' };
-            tbody.innerHTML = revenue.map(r => `
-                <tr>
-                    <td>#${r.id.slice(0, 8)}</td>
-                    <td>${r.user_email || '—'}</td>
-                    <td><span class="status-pill ${r.type}">${typeMap[r.type] || r.type}</span></td>
-                    <td>${r.item || '—'}</td>
-                    <td><strong>${formatCurrency(r.amount)}</strong></td>
-                    <td><span class="status-pill ${r.status}">${r.status}</span></td>
-                    <td>${formatDate(r.created_at)}</td>
-                </tr>
-            `).join('');
-        }
-
-        function updateRevenueChart(period, btn) {
-            currentRevenuePeriod = period;
-            if (btn) {
-                document.querySelectorAll('#section-revenue .actions button').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-
-            const chart = document.getElementById('revenueChart');
-            const labels = document.getElementById('chartLabels');
-
-            let data;
-            if (period === 'week') {
-                data = { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], values: [2000, 3500, 2800, 4200, 5600,
-                        3900, 2500
-                    ] };
-            } else if (period === 'month') {
-                data = { labels: ['W1', 'W2', 'W3', 'W4'], values: [12500, 18200, 16800, 21000] };
-            } else {
-                data = { labels: ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov'], values: [35000, 42000, 38000, 51000, 48000,
-                        62000
-                    ] };
-            }
-
-            const max = Math.max(...data.values, 1);
-            chart.innerHTML = data.values.map(v =>
-                `<div class="chart-bar" style="height:${(v/max)*100}%"><div class="bar-tooltip">${formatCurrency(v)}</div></div>`
-                ).join('');
-            labels.innerHTML = data.labels.map(l => `<span>${l}</span>`).join('');
         }
 
         // ============================================================
@@ -2773,20 +2821,20 @@
 
         function renderUsers(users) {
             const tbody = document.getElementById('allUsersBody');
-            if (!users || users.length === 0) {
+            if (!users || !users.length) {
                 tbody.innerHTML =
                     '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-users"></i><p>No users</p></div></td></tr>';
                 return;
             }
             tbody.innerHTML = users.map(u => `
                 <tr>
-                    <td><div class="user-cell"><img src="${u.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.name)+'&background=7c3aed&color=fff&size=100'}" alt="${u.name}"><div class="user-info"><div class="name">${u.name}</div></div></div></td>
+                    <td><div class="user-cell"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=7c3aed&color=fff&size=100" alt="${u.name}"><div class="user-info"><div class="name">${u.name}</div></div></div></td>
                     <td>${u.email}</td>
                     <td><span class="role-badge ${u.role}">${u.role}</span></td>
                     <td><span class="status-pill ${u.status}">${u.status}</span></td>
                     <td>${u.is_premium ? '✅ Premium' : 'Free'}</td>
                     <td>${formatDate(u.joined)}</td>
-                    <td><div class="table-actions"><button onclick="editUser('${u.id}')" class="edit"><i class="fas fa-edit"></i></button><button onclick="togglePremium('${u.id}')" class="edit"><i class="fas fa-crown"></i></button><button onclick="confirmDelete('user','${u.id}','${u.name}')" class="danger"><i class="fas fa-trash"></i></button></div></td>
+                    <td><div class="table-actions"><button onclick="togglePremium('${u.id}')" class="edit"><i class="fas fa-crown"></i></button><button onclick="confirmDelete('user','${u.id}','${u.name}')" class="danger"><i class="fas fa-trash"></i></button></div></td>
                 </tr>
             `).join('');
         }
@@ -2797,11 +2845,11 @@
             const status = document.getElementById('userStatusFilter').value;
             const premium = document.getElementById('userPremiumFilter').value;
             let filtered = allUsers.filter(u => {
-                const matchName = u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+                const match = u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
                 const matchRole = !role || u.role === role;
                 const matchStatus = !status || u.status === status;
                 const matchPremium = premium === '' || String(u.is_premium) === premium;
-                return matchName && matchRole && matchStatus && matchPremium;
+                return match && matchRole && matchStatus && matchPremium;
             });
             renderUsers(filtered);
         }
@@ -2813,16 +2861,7 @@
             const status = document.getElementById('newUserStatus').value;
             const password = document.getElementById('newUserPassword').value;
             if (!name || !email || !password) { showToast('Please fill all fields', 'error'); return; }
-
-            const newUser = {
-                name,
-                email,
-                role,
-                status,
-                is_premium: false,
-                joined: new Date().toISOString(),
-                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=7c3aed&color=fff&size=100`
-            };
+            const newUser = { name, email, role, status, is_premium: false, joined: new Date().toISOString() };
             const ok = await insertIntoTable('users', newUser);
             if (ok) {
                 showToast('User created!', 'success');
@@ -2835,13 +2874,6 @@
             }
         }
 
-        async function editUser(id) {
-            const user = allUsers.find(u => u.id === id);
-            if (!user) return;
-            // For simplicity, just toggle premium or show edit
-            showToast(`Editing ${user.name} - Full edit coming soon`, 'success');
-        }
-
         async function togglePremium(id) {
             const user = allUsers.find(u => u.id === id);
             if (!user) return;
@@ -2849,14 +2881,13 @@
             const ok = await updateTable('users', id, {
                 is_premium: newPremium,
                 premium_start: newPremium ? new Date().toISOString() : null,
-                premium_end: newPremium ? new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString() : null
+                premium_end: newPremium ? new Date(Date.now() + premiumDuration * 30 * 24 * 60 * 60 * 1000).toISOString() :
+                    null
             });
             if (ok) {
                 showToast(`${user.name} is now ${newPremium ? 'Premium' : 'Free'}`, 'success');
                 if (newPremium) {
-                    // Add to revenue
                     await insertIntoTable('revenue', {
-                        user_id: id,
                         user_email: user.email,
                         type: 'premium',
                         item: 'Premium Subscription',
@@ -2877,24 +2908,24 @@
         async function loadAllCourses() {
             allCourses = await fetchFromTable('courses');
             renderCourses(allCourses);
+            populateCourseSelect();
         }
 
         function renderCourses(courses) {
             const container = document.getElementById('coursesList');
-            if (!courses || courses.length === 0) {
+            if (!courses || !courses.length) {
                 container.innerHTML =
                     '<div class="empty-state"><i class="fas fa-graduation-cap"></i><p>No courses</p></div>';
                 return;
             }
             container.innerHTML = courses.map(c => `
-                <div class="course-row" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
-                    <img src="${c.thumbnail || 'https://via.placeholder.com/60x60/1a1a3e/7c3aed'}" alt="${c.title}" style="width:50px;height:50px;border-radius:10px;object-fit:cover;flex-shrink:0;">
-                    <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
+                    <div style="flex:1;min-width:150px;">
                         <div style="font-size:13px;font-weight:600;">${c.title}</div>
                         <div style="font-size:10px;color:var(--text-muted);">${c.category} • ${c.instructor}</div>
+                        ${c.link ? `<a href="${c.link}" target="_blank" style="font-size:10px;color:var(--accent-cyan);text-decoration:none;">🔗 Course Link</a>` : ''}
                     </div>
-                    <div style="font-size:12px;font-weight:700;color:var(--accent-cyan);">${c.is_free ? 'Free' : formatCurrency(c.price)}</div>
-                    <div style="font-size:11px;color:var(--text-muted);">${c.students || 0} students</div>
+                    <div style="font-size:12px;font-weight:700;color:${c.is_free ? 'var(--accent-green)' : 'var(--accent-cyan)'};">${c.is_free ? 'Free' : formatCurrency(c.price)}</div>
                     <div class="table-actions">
                         <button onclick="confirmDelete('course','${c.id}','${c.title}')" class="danger"><i class="fas fa-trash"></i></button>
                     </div>
@@ -2907,10 +2938,10 @@
             const cat = document.getElementById('courseCategoryFilter').value;
             const type = document.getElementById('courseTypeFilter').value;
             let filtered = allCourses.filter(c => {
-                const matchTitle = c.title.toLowerCase().includes(q);
+                const match = c.title.toLowerCase().includes(q);
                 const matchCat = !cat || c.category === cat;
                 const matchType = !type || (type === 'free' ? c.is_free : !c.is_free);
-                return matchTitle && matchCat && matchType;
+                return match && matchCat && matchType;
             });
             renderCourses(filtered);
         }
@@ -2921,19 +2952,17 @@
             const cat = document.getElementById('newCourseCategory').value;
             const price = parseFloat(document.getElementById('newCoursePrice').value) || 0;
             const instructor = document.getElementById('newCourseInstructor').value.trim();
+            const link = document.getElementById('newCourseLink').value.trim();
             if (!title) { showToast('Please enter a title', 'error'); return; }
-
             const newCourse = {
                 title,
                 description: desc,
                 category: cat,
-                price: price,
+                price,
                 is_free: price === 0,
                 instructor: instructor || 'Admin',
-                students: 0,
-                rating: 0,
-                created_at: new Date().toISOString(),
-                thumbnail: `https://via.placeholder.com/400x250/1a1a3e/7c3aed?text=${encodeURIComponent(title)}`
+                link: link || '',
+                created_at: new Date().toISOString()
             };
             const ok = await insertIntoTable('courses', newCourse);
             if (ok) {
@@ -2944,7 +2973,134 @@
                 document.getElementById('newCourseTitle').value = '';
                 document.getElementById('newCourseDesc').value = '';
                 document.getElementById('newCoursePrice').value = '0';
+                document.getElementById('newCourseLink').value = '';
             }
+        }
+
+        function populateCourseSelect() {
+            const select = document.getElementById('classCourseSelect');
+            if (select && allCourses.length) {
+                select.innerHTML = allCourses.map(c =>
+                    `<option value="${c.title}">${c.title}</option>`
+                ).join('');
+            }
+        }
+
+        // ============================================================
+        // CLASSES
+        // ============================================================
+        async function loadAllClasses() {
+            allClasses = await fetchFromTable('classes');
+            renderClasses(allClasses);
+            populateCourseSelect();
+        }
+
+        function renderClasses(classes) {
+            const container = document.getElementById('classesList');
+            if (!classes || !classes.length) {
+                container.innerHTML =
+                    '<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>No classes scheduled</p></div>';
+                return;
+            }
+            container.innerHTML = classes.map(c => `
+                <div class="class-card">
+                    <div class="class-header">
+                        <div>
+                            <div class="class-title">${c.title}</div>
+                            <div class="class-meta">
+                                <span><i class="fas fa-graduation-cap"></i> ${c.course}</span>
+                                <span><i class="fas fa-calendar"></i> ${formatDate(c.date)}</span>
+                                <span><i class="fas fa-clock"></i> ${c.duration}h</span>
+                            </div>
+                        </div>
+                        <div class="class-actions">
+                            <button onclick="editClass('${c.id}')"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="danger" onclick="confirmDelete('class','${c.id}','${c.title}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">${c.description || ''}</div>
+                    <div class="class-links">
+                        ${c.whatsapp ? `<a href="${c.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Group</a>` : ''}
+                        ${c.telegram ? `<a href="${c.telegram}" target="_blank"><i class="fab fa-telegram"></i> Telegram Group</a>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterClasses() {
+            const q = document.getElementById('classSearch').value.toLowerCase();
+            let filtered = allClasses.filter(c => {
+                const match = c.title.toLowerCase().includes(q) || c.course.toLowerCase().includes(q);
+                return match;
+            });
+            renderClasses(filtered);
+        }
+
+        function editClass(id) {
+            const cls = allClasses.find(c => c.id === id);
+            if (!cls) return;
+            document.getElementById('editClassId').value = id;
+            document.getElementById('classCourseSelect').value = cls.course;
+            document.getElementById('classTitle').value = cls.title;
+            document.getElementById('classDesc').value = cls.description || '';
+            document.getElementById('classDate').value = cls.date ? new Date(cls.date).toISOString().slice(0, 16) : '';
+            document.getElementById('classDuration').value = cls.duration || 2;
+            document.getElementById('classWhatsApp').value = cls.whatsapp || '';
+            document.getElementById('classTelegram').value = cls.telegram || '';
+            document.getElementById('classModalTitle').textContent = 'Edit Class';
+            document.getElementById('classModalDesc').textContent = 'Update class details.';
+            document.getElementById('classSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Update Class';
+            openModal('createClassModal');
+        }
+
+        async function saveClass() {
+            const id = document.getElementById('editClassId').value;
+            const course = document.getElementById('classCourseSelect').value;
+            const title = document.getElementById('classTitle').value.trim();
+            const desc = document.getElementById('classDesc').value.trim();
+            const date = document.getElementById('classDate').value;
+            const duration = parseInt(document.getElementById('classDuration').value) || 2;
+            const whatsapp = document.getElementById('classWhatsApp').value.trim();
+            const telegram = document.getElementById('classTelegram').value.trim();
+
+            if (!title || !course) { showToast('Please fill in title and course', 'error'); return; }
+
+            const payload = { course, title, description: desc, date, duration, whatsapp, telegram,
+            updated_at: new Date().toISOString() };
+
+            if (id) {
+                const ok = await updateTable('classes', id, payload);
+                if (ok) {
+                    showToast('Class updated!', 'success');
+                    closeModal('createClassModal');
+                    resetClassForm();
+                    await loadAllClasses();
+                    await loadDashboardStats();
+                }
+            } else {
+                const newClass = { ...payload, created_at: new Date().toISOString() };
+                const ok = await insertIntoTable('classes', newClass);
+                if (ok) {
+                    showToast('Class created!', 'success');
+                    closeModal('createClassModal');
+                    resetClassForm();
+                    await loadAllClasses();
+                    await loadDashboardStats();
+                }
+            }
+        }
+
+        function resetClassForm() {
+            document.getElementById('editClassId').value = '';
+            document.getElementById('classTitle').value = '';
+            document.getElementById('classDesc').value = '';
+            document.getElementById('classDate').value = '';
+            document.getElementById('classDuration').value = '2';
+            document.getElementById('classWhatsApp').value = '';
+            document.getElementById('classTelegram').value = '';
+            document.getElementById('classModalTitle').textContent = 'Create Class';
+            document.getElementById('classModalDesc').textContent = 'Schedule a new class for a course.';
+            document.getElementById('classSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Save Class';
         }
 
         // ============================================================
@@ -2957,19 +3113,20 @@
 
         function renderTools(tools) {
             const container = document.getElementById('toolsList');
-            if (!tools || tools.length === 0) {
+            if (!tools || !tools.length) {
                 container.innerHTML =
                     '<div class="empty-state"><i class="fas fa-tools"></i><p>No tools</p></div>';
                 return;
             }
             container.innerHTML = tools.map(t => `
-                <div class="course-row" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
-                    <div style="width:44px;height:44px;border-radius:10px;background:rgba(6,182,212,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--accent-cyan);flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
+                    <div style="width:40px;height:40px;border-radius:10px;background:rgba(6,182,212,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--accent-cyan);flex-shrink:0;">
                         <i class="fas fa-tools"></i>
                     </div>
-                    <div style="flex:1;min-width:0;">
+                    <div style="flex:1;min-width:150px;">
                         <div style="font-size:13px;font-weight:600;">${t.name}</div>
                         <div style="font-size:10px;color:var(--text-muted);">${t.category || 'General'}</div>
+                        ${t.link ? `<a href="${t.link}" target="_blank" style="font-size:10px;color:var(--accent-cyan);text-decoration:none;">🔗 Tool Link</a>` : ''}
                     </div>
                     <div style="font-size:12px;font-weight:700;color:${t.is_free ? 'var(--accent-green)' : 'var(--accent-cyan)'};">${t.is_free ? 'Free' : formatCurrency(t.price)}</div>
                     <div class="table-actions">
@@ -2983,9 +3140,9 @@
             const q = document.getElementById('toolSearch').value.toLowerCase();
             const type = document.getElementById('toolTypeFilter').value;
             let filtered = allTools.filter(t => {
-                const matchName = t.name.toLowerCase().includes(q);
+                const match = t.name.toLowerCase().includes(q);
                 const matchType = !type || (type === 'free' ? t.is_free : !t.is_free);
-                return matchName && matchType;
+                return match && matchType;
             });
             renderTools(filtered);
         }
@@ -2995,14 +3152,15 @@
             const desc = document.getElementById('newToolDesc').value.trim();
             const price = parseFloat(document.getElementById('newToolPrice').value) || 0;
             const category = document.getElementById('newToolCategory').value;
+            const link = document.getElementById('newToolLink').value.trim();
             if (!name) { showToast('Please enter a name', 'error'); return; }
-
             const newTool = {
                 name,
                 description: desc,
-                price: price,
+                price,
                 is_free: price === 0,
-                category: category,
+                category,
+                link: link || '',
                 created_at: new Date().toISOString()
             };
             const ok = await insertIntoTable('tools', newTool);
@@ -3014,83 +3172,81 @@
                 document.getElementById('newToolName').value = '';
                 document.getElementById('newToolDesc').value = '';
                 document.getElementById('newToolPrice').value = '0';
+                document.getElementById('newToolLink').value = '';
             }
         }
 
         // ============================================================
-        // ENROLLMENTS
+        // REVENUE
         // ============================================================
-        async function loadAllEnrollments() {
-            allEnrollments = await fetchFromTable('enrollments');
-            renderEnrollments(allEnrollments);
-            populateCourseSelect();
+        async function loadRevenueSection() {
+            allRevenue = await fetchFromTable('revenue');
+            const completed = allRevenue.filter(r => r.status === 'completed');
+
+            document.getElementById('revPremiumTotal').textContent = formatCurrency(completed.filter(r => r.type === 'premium')
+                .reduce((s, r) => s + r.amount, 0));
+            document.getElementById('revPremiumTotalCount').textContent = completed.filter(r => r.type === 'premium').length;
+            document.getElementById('revCourseTotal').textContent = formatCurrency(completed.filter(r => r.type === 'course')
+                .reduce((s, r) => s + r.amount, 0));
+            document.getElementById('revCourseTotalCount').textContent = completed.filter(r => r.type === 'course').length;
+            document.getElementById('revToolTotal').textContent = formatCurrency(completed.filter(r => r.type === 'tool')
+                .reduce((s, r) => s + r.amount, 0));
+            document.getElementById('revToolTotalCount').textContent = completed.filter(r => r.type === 'tool').length;
+
+            renderRevenueTable(completed);
+            updateRevenueChart('all', document.querySelector('#section-revenue .actions button'));
         }
 
-        function renderEnrollments(enrollments) {
-            const tbody = document.getElementById('enrollmentsBody');
-            if (!enrollments || enrollments.length === 0) {
+        function renderRevenueTable(revenue) {
+            const tbody = document.getElementById('revenueBody');
+            if (!revenue || !revenue.length) {
                 tbody.innerHTML =
-                    '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-user-check"></i><p>No enrollments</p></div></td></tr>';
+                    '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-chart-simple"></i><p>No revenue</p></div></td></tr>';
                 return;
             }
-            tbody.innerHTML = enrollments.map(e => `
+            const typeMap = { premium: 'Premium', course: 'Course', tool: 'Tool' };
+            tbody.innerHTML = revenue.map(r => `
                 <tr>
-                    <td>${e.student}</td>
-                    <td>${e.course}</td>
-                    <td><div class="progress-bar"><div class="fill" style="width:${e.progress || 0}%"></div></div> ${e.progress || 0}%</td>
-                    <td><span class="status-pill ${e.status}">${e.status}</span></td>
-                    <td>${formatDate(e.enrolled)}</td>
-                    <td><div class="table-actions"><button onclick="confirmDelete('enrollment','${e.id}','${e.student}')" class="danger"><i class="fas fa-trash"></i></button></div></td>
+                    <td>#${r.id.slice(0, 6)}</td>
+                    <td>${r.user_email || '—'}</td>
+                    <td><span class="status-pill ${r.type}">${typeMap[r.type] || r.type}</span></td>
+                    <td>${r.item || '—'}</td>
+                    <td><strong>${formatCurrency(r.amount)}</strong></td>
+                    <td><span class="status-pill ${r.status}">${r.status}</span></td>
+                    <td>${formatDate(r.created_at)}</td>
                 </tr>
             `).join('');
         }
 
-        function filterEnrollments() {
-            const q = document.getElementById('enrollmentSearch').value.toLowerCase();
-            let filtered = allEnrollments.filter(e => {
-                const match = e.student.toLowerCase().includes(q) || e.course.toLowerCase().includes(q);
-                return match;
-            });
-            renderEnrollments(filtered);
-        }
-
-        function populateCourseSelect() {
-            const select = document.getElementById('enrollCourseSelect');
-            if (select && allCourses.length > 0) {
-                select.innerHTML = allCourses.map(c =>
-                    `<option value="${c.title}">${c.title}</option>`
+        function updateRevenueChart(period, btn) {
+            currentRevenuePeriod = period;
+            if (btn) {
+                document.querySelectorAll('#section-revenue .actions button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            const chart = document.getElementById('revenueChart');
+            const labels = document.getElementById('chartLabels');
+            let data;
+            if (period === 'week') {
+                data = { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], values: [2000, 3500, 2800, 4200, 5600,
+                        3900, 2500
+                    ] };
+            } else if (period === 'month') {
+                data = { labels: ['W1', 'W2', 'W3', 'W4'], values: [12500, 18200, 16800, 21000] };
+            } else {
+                data = { labels: ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov'], values: [35000, 42000, 38000, 51000, 48000,
+                        62000
+                    ] };
+            }
+            const max = Math.max(...data.values, 1);
+            chart.innerHTML = data.values.map(v =>
+                `<div class="chart-bar" style="height:${(v/max)*100}%"><div class="bar-tooltip">${formatCurrency(v)}</div></div>`
                 ).join('');
-            }
-        }
-
-        async function createEnrollment() {
-            const email = document.getElementById('enrollUserEmail').value.trim();
-            const course = document.getElementById('enrollCourseSelect').value;
-            const status = document.getElementById('enrollStatusSelect').value;
-            if (!email || !course) { showToast('Please fill all fields', 'error'); return; }
-
-            const user = allUsers.find(u => u.email === email);
-            const studentName = user ? user.name : email;
-
-            const newEnrollment = {
-                student: studentName,
-                course: course,
-                progress: 0,
-                status: status,
-                enrolled: new Date().toISOString()
-            };
-            const ok = await insertIntoTable('enrollments', newEnrollment);
-            if (ok) {
-                showToast('Enrollment created!', 'success');
-                closeModal('createEnrollmentModal');
-                await loadAllEnrollments();
-                await loadDashboardStats();
-                document.getElementById('enrollUserEmail').value = '';
-            }
+            labels.innerHTML = data.labels.map(l => `<span>${l}</span>`).join('');
         }
 
         // ============================================================
-        // PREMIUM SECTION
+        // PREMIUM
         // ============================================================
         async function loadPremiumSection() {
             allUsers = await fetchFromTable('users');
@@ -3101,9 +3257,9 @@
             document.getElementById('premiumDiscountDisplay').textContent = premiumDiscount + '%';
 
             const tbody = document.getElementById('premiumBody');
-            if (premiumUsers.length === 0) {
+            if (!premiumUsers.length) {
                 tbody.innerHTML =
-                    '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-crown"></i><p>No premium subscribers</p></div></td></tr>';
+                    '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-crown"></i><p>No premium users</p></div></td></tr>';
                 return;
             }
             tbody.innerHTML = premiumUsers.map(u => `
@@ -3113,20 +3269,15 @@
                     <td>${formatDate(u.premium_start)}</td>
                     <td>${formatDate(u.premium_end)}</td>
                     <td><span class="status-pill active">Active</span></td>
-                    <td><div class="table-actions"><button onclick="togglePremium('${u.id}')" class="danger"><i class="fas fa-crown" style="color:var(--accent-orange);"></i></button></div></td>
+                    <td><button onclick="togglePremium('${u.id}')" class="danger" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);cursor:pointer;"><i class="fas fa-crown" style="color:var(--accent-orange);"></i> Revoke</button></td>
                 </tr>
             `).join('');
         }
 
         function savePremiumConfig() {
-            const price = parseInt(document.getElementById('premiumPriceInput').value) || 13500;
-            const duration = parseInt(document.getElementById('premiumDurationInput').value) || 6;
-            const discount = parseInt(document.getElementById('premiumDiscountInput').value) || 45;
-
-            premiumPrice = price;
-            premiumDuration = duration;
-            premiumDiscount = discount;
-
+            premiumPrice = parseInt(document.getElementById('premiumPriceInput').value) || 13500;
+            premiumDuration = parseInt(document.getElementById('premiumDurationInput').value) || 6;
+            premiumDiscount = parseInt(document.getElementById('premiumDiscountInput').value) || 45;
             showToast('Premium configuration saved!', 'success');
             closeModal('premiumConfigModal');
             loadPremiumSection();
@@ -3142,7 +3293,7 @@
 
         function renderPayments(payments) {
             const tbody = document.getElementById('paymentsBody');
-            if (!payments || payments.length === 0) {
+            if (!payments || !payments.length) {
                 tbody.innerHTML =
                     '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-credit-card"></i><p>No payments</p></div></td></tr>';
                 return;
@@ -3150,14 +3301,14 @@
             const typeMap = { premium: 'Premium', course: 'Course', tool: 'Tool' };
             tbody.innerHTML = payments.map(p => `
                 <tr>
-                    <td>#${p.id.slice(0, 8)}</td>
+                    <td>#${p.id.slice(0, 6)}</td>
                     <td>${p.user_email || '—'}</td>
                     <td><span class="status-pill ${p.type}">${typeMap[p.type] || p.type}</span></td>
                     <td>${p.item || '—'}</td>
                     <td><strong>${formatCurrency(p.amount)}</strong></td>
                     <td><span class="status-pill ${p.status}">${p.status}</span></td>
                     <td>${formatDate(p.created_at)}</td>
-                    <td><div class="table-actions"><button onclick="showToast('Refund processed', 'success')"><i class="fas fa-undo"></i></button></div></td>
+                    <td><button onclick="showToast('Refund processed', 'success')" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);cursor:pointer;"><i class="fas fa-undo"></i></button></td>
                 </tr>
             `).join('');
         }
@@ -3167,10 +3318,10 @@
             const type = document.getElementById('paymentTypeFilter').value;
             const status = document.getElementById('paymentStatusFilter').value;
             let filtered = allRevenue.filter(p => {
-                const matchQ = (p.user_email || '').toLowerCase().includes(q) || (p.item || '').toLowerCase().includes(q);
+                const match = (p.user_email || '').toLowerCase().includes(q) || (p.item || '').toLowerCase().includes(q);
                 const matchType = !type || p.type === type;
                 const matchStatus = !status || p.status === status;
-                return matchQ && matchType && matchStatus;
+                return match && matchType && matchStatus;
             });
             renderPayments(filtered);
         }
@@ -3185,7 +3336,7 @@
 
         function renderMessages(messages) {
             const tbody = document.getElementById('messagesBody');
-            if (!messages || messages.length === 0) {
+            if (!messages || !messages.length) {
                 tbody.innerHTML =
                     '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-envelope"></i><p>No messages</p></div></td></tr>';
                 return;
@@ -3197,7 +3348,7 @@
                     <td>${m.preview || ''}</td>
                     <td><span class="status-pill ${m.status === 'unread' ? 'pending' : 'active'}">${m.status}</span></td>
                     <td>${formatDate(m.created_at)}</td>
-                    <td><div class="table-actions"><button onclick="confirmDelete('message','${m.id}','${m.subject}')" class="danger"><i class="fas fa-trash"></i></button></div></td>
+                    <td><button onclick="confirmDelete('message','${m.id}','${m.subject}')" class="danger" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);cursor:pointer;"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
@@ -3207,11 +3358,10 @@
             const subject = document.getElementById('msgSubject').value.trim();
             const body = document.getElementById('msgBody').value.trim();
             if (!to || !subject || !body) { showToast('Please fill all fields', 'error'); return; }
-
             const newMsg = {
                 from: 'Admin',
-                to: to,
-                subject: subject,
+                to,
+                subject,
                 preview: body.slice(0, 50),
                 status: 'unread',
                 created_at: new Date().toISOString()
@@ -3236,7 +3386,6 @@
                 document.querySelectorAll('.dash-card .actions button').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             }
-
             const data = {
                 weekly: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], values: [12000, 18000, 15000,
                         21000, 26000, 19000, 14000
@@ -3273,18 +3422,17 @@
             let ok = false;
             if (type === 'user') ok = await deleteFromTable('users', id);
             else if (type === 'course') ok = await deleteFromTable('courses', id);
+            else if (type === 'class') ok = await deleteFromTable('classes', id);
             else if (type === 'tool') ok = await deleteFromTable('tools', id);
-            else if (type === 'enrollment') ok = await deleteFromTable('enrollments', id);
             else if (type === 'message') ok = await deleteFromTable('messages', id);
             else if (type === 'revenue') ok = await deleteFromTable('revenue', id);
-
             if (ok) {
                 showToast('Deleted successfully', 'success');
                 if (type === 'user') { await loadAllUsers();
                     await loadDashboardStats();
                     await loadPremiumSection(); } else if (type === 'course') { await loadAllCourses();
+                    await loadDashboardStats(); } else if (type === 'class') { await loadAllClasses();
                     await loadDashboardStats(); } else if (type === 'tool') { await loadAllTools();
-                    await loadDashboardStats(); } else if (type === 'enrollment') { await loadAllEnrollments();
                     await loadDashboardStats(); } else if (type === 'message') { await loadAllMessages(); } else if (type ===
                     'revenue') { await loadRevenueSection();
                     await loadDashboardStats(); }
@@ -3298,21 +3446,7 @@
         function toggleSetting(key, label) {
             const cb = label.querySelector('input');
             cb.checked = !cb.checked;
-            if (key === 'premium') {
-                isPremiumEnabled = cb.checked;
-                showToast(`Premium ${isPremiumEnabled ? 'enabled' : 'disabled'}`, 'success');
-            } else {
-                showToast(key.charAt(0).toUpperCase() + key.slice(1) + ' ' + (cb.checked ? 'enabled' : 'disabled'),
-                    'success');
-            }
-        }
-
-        // ============================================================
-        // AUTH / LOGOUT
-        // ============================================================
-        function handleLogout() {
-            showToast('Logged out', 'success');
-            setTimeout(() => window.location.href = 'index.html', 800);
+            showToast(key.charAt(0).toUpperCase() + key.slice(1) + ' ' + (cb.checked ? 'enabled' : 'disabled'), 'success');
         }
 
         // ============================================================
@@ -3346,20 +3480,25 @@
         // ============================================================
         async function init() {
             autoDetectDevice();
+            await checkAuth();
+
+            if (!isAdmin && supabase) {
+                showToast('Access denied. Admin only.', 'error');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+                return;
+            }
 
             await loadDashboardStats();
             await loadAllUsers();
             await loadAllCourses();
+            await loadAllClasses();
             await loadAllTools();
-            await loadAllEnrollments();
             await loadAllMessages();
             await loadPremiumSection();
             await loadRevenueSection();
 
-            // Set default chart
             updateChart('weekly', document.querySelector('#section-dashboard .actions button'));
-
-            document.getElementById('adminName').textContent = 'Admin';
+            populateCourseSelect();
 
             setTimeout(() => {
                 document.getElementById('loadingScreen').classList.add('hidden');
@@ -3377,24 +3516,23 @@
         window.updateRevenueChart = updateRevenueChart;
         window.createUser = createUser;
         window.createCourse = createCourse;
+        window.saveClass = saveClass;
+        window.editClass = editClass;
         window.createTool = createTool;
-        window.createEnrollment = createEnrollment;
         window.sendMessage = sendMessage;
         window.filterUsers = filterUsers;
         window.filterCourses = filterCourses;
+        window.filterClasses = filterClasses;
         window.filterTools = filterTools;
-        window.filterEnrollments = filterEnrollments;
         window.filterPayments = filterPayments;
         window.toggleNotifPanel = toggleNotifPanel;
         window.toggleMobileSidebar = toggleMobileSidebar;
         window.showToast = showToast;
         window.handleLogout = handleLogout;
-        window.editUser = editUser;
         window.togglePremium = togglePremium;
         window.savePremiumConfig = savePremiumConfig;
 
         init();
     </script>
-
 </body>
 </html>
