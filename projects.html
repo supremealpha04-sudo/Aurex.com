@@ -1294,6 +1294,49 @@
             margin-top: 4px;
             text-align: center;
         }
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-card);
+        }
+        .file-upload-area:hover {
+            border-color: var(--accent-purple);
+            background: rgba(124, 58, 237, 0.03);
+        }
+        .file-upload-area i {
+            font-size: 28px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+        }
+        .file-upload-area p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        .file-upload-area .file-name {
+            font-size: 11px;
+            color: var(--accent-cyan);
+            margin-top: 4px;
+        }
+        .file-upload-area input[type="file"] {
+            display: none;
+        }
+        .image-preview {
+            margin-top: 10px;
+            max-width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .image-preview img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+        }
         @media (max-width: 600px) {
             .modal {
                 padding: 20px 16px;
@@ -1685,8 +1728,14 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Image URL</label>
-                    <input type="url" id="projectImage" placeholder="https://example.com/image.jpg">
+                    <label>Project Image</label>
+                    <div class="file-upload-area" onclick="document.getElementById('projectImageInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload an image</p>
+                        <div class="file-name" id="fileNameDisplay">No file selected</div>
+                        <input type="file" id="projectImageInput" accept="image/*" onchange="handleImageUpload(event)">
+                    </div>
+                    <div class="image-preview" id="imagePreview"></div>
                 </div>
                 <div class="form-group">
                     <label>Tags (comma separated)</label>
@@ -1754,9 +1803,13 @@
         // ============================================================
         const SUPABASE_URL = 'https://your-project.supabase.co';
         const SUPABASE_ANON_KEY = 'your-anon-key';
+        const STORAGE_BUCKET = 'aurex-assets';
 
         let supabase = null;
         let supabaseConfigured = false;
+        let selectedFile = null;
+        let uploadedImageUrl = null;
+
         try {
             if (SUPABASE_URL.includes('your-project')) throw new Error('Configure Supabase');
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1766,16 +1819,80 @@
         }
 
         // ============================================================
-        // STATE
+        // STORAGE HELPERS
         // ============================================================
-        let currentUser = null;
-        let isPremium = false;
-        let isSignUp = false;
-        let mobileSidebarOpen = false;
-        let currentFilter = 'all';
-        let allProjects = [];
-        let currentProjectId = null;
-        let currentComments = [];
+        async function uploadFile(file, path) {
+            if (!supabaseConfigured) {
+                // In offline mode, create a fake URL
+                const reader = new FileReader();
+                return new Promise((resolve) => {
+                    reader.onload = function(e) {
+                        resolve({ publicUrl: e.target.result, error: null });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            try {
+                // Ensure bucket exists
+                const { data: buckets } = await supabase.storage.listBuckets();
+                const bucketExists = buckets.some(b => b.name === STORAGE_BUCKET);
+                if (!bucketExists) {
+                    await supabase.storage.createBucket(STORAGE_BUCKET, { public: true });
+                }
+
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${path}/${Date.now()}.${fileExt}`;
+
+                const { data, error } = await supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .upload(fileName, file);
+
+                if (error) throw error;
+
+                const { data: urlData } = supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .getPublicUrl(fileName);
+
+                return { publicUrl: urlData.publicUrl, error: null };
+            } catch (error) {
+                console.error('Upload error:', error);
+                return { publicUrl: null, error: error.message };
+            }
+        }
+
+        async function deleteFile(path) {
+            if (!supabaseConfigured) return;
+
+            try {
+                const { error } = await supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .remove([path]);
+                if (error) throw error;
+            } catch (error) {
+                console.error('Delete error:', error);
+            }
+        }
+
+        // ============================================================
+        // IMAGE UPLOAD HANDLING
+        // ============================================================
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            selectedFile = file;
+            const display = document.getElementById('fileNameDisplay');
+            display.textContent = file.name;
+
+            // Preview
+            const preview = document.getElementById('imagePreview');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
 
         // ============================================================
         // AUTH
@@ -1894,7 +2011,6 @@
 
         async function checkAuth() {
             if (!supabaseConfigured) {
-                // Offline mode - create a demo user
                 updateUIForUser({
                     id: 'demo-user',
                     email: 'demo@example.com',
@@ -1968,7 +2084,6 @@
         // ============================================================
         async function loadProjects() {
             if (!supabaseConfigured) {
-                // Offline demo projects
                 allProjects = [{
                     id: 'demo-1',
                     title: 'Brand Identity Redesign',
@@ -2001,7 +2116,6 @@
                 if (data && data.length > 0) {
                     allProjects = data;
                 } else {
-                    // Seed with a demo project
                     const demoProject = {
                         title: 'Welcome Project',
                         description: 'This is a sample project to get started. Premium users can create their own projects!',
@@ -2145,7 +2259,6 @@
 
             document.getElementById('commentCount').textContent = project.comments_count || 0;
 
-            // Load comments
             await loadComments(project.id);
             document.getElementById('projectModal').classList.add('active');
         }
@@ -2201,7 +2314,6 @@
             if (!project) return;
 
             if (!supabaseConfigured) {
-                // Demo comments
                 currentComments = [
                     { id: '1', author: 'Demo User', text: 'Great project!', created_at: new Date().toISOString() }
                 ];
@@ -2284,7 +2396,6 @@
 
                     if (error) throw error;
 
-                    // Update project comment count
                     await supabase
                         .from('projects')
                         .update({ comments_count: (project.comments_count || 0) + 1 })
@@ -2347,7 +2458,6 @@
                 navigator.clipboard.writeText(url).then(() => {
                     showToast('Link copied to clipboard!', 'success');
                 }).catch(() => {
-                    // Fallback
                     const input = document.createElement('input');
                     input.value = url;
                     document.body.appendChild(input);
@@ -2376,6 +2486,10 @@
 
             document.getElementById('createModal').classList.add('active');
             document.getElementById('createError').textContent = '';
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('fileNameDisplay').textContent = 'No file selected';
+            selectedFile = null;
+            uploadedImageUrl = null;
         }
 
         function closeCreateModal() {
@@ -2394,12 +2508,23 @@
             const desc = document.getElementById('projectDesc').value.trim();
             const category = document.getElementById('projectCategory').value;
             const status = document.getElementById('projectStatus').value;
-            const image = document.getElementById('projectImage').value.trim();
             const tags = document.getElementById('projectTags').value.split(',').map(t => t.trim()).filter(t => t);
 
             if (!name) {
                 document.getElementById('createError').textContent = 'Please enter a project name.';
                 return;
+            }
+
+            // Upload image if selected
+            let imageUrl = '';
+            if (selectedFile) {
+                const path = `projects/${currentUser.id}`;
+                const result = await uploadFile(selectedFile, path);
+                if (result.error) {
+                    document.getElementById('createError').textContent = 'Error uploading image: ' + result.error;
+                    return;
+                }
+                imageUrl = result.publicUrl;
             }
 
             const newProject = {
@@ -2409,7 +2534,7 @@
                 category: category,
                 progress: status === 'completed' ? 100 : (status === 'in-progress' ? 10 : 0),
                 tags: tags.length ? tags : ['new'],
-                image: image || 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop',
+                image: imageUrl || 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop',
                 author_name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
                 author_id: currentUser.id,
                 author_avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.user_metadata?.full_name || 'User')}&background=7c3aed&color=fff&size=100`,
@@ -2526,7 +2651,6 @@
             await checkAuth();
             await loadProjects();
 
-            // Apply initial filter
             filterProjects('all');
 
             setTimeout(() => {
@@ -2551,6 +2675,7 @@
         window.submitComment = submitComment;
         window.deleteComment = deleteComment;
         window.shareProject = shareProject;
+        window.handleImageUpload = handleImageUpload;
 
         init();
     </script>
