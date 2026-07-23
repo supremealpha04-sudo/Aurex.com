@@ -35,7 +35,6 @@
             --text-muted: #64748b;
             --border-color: rgba(148, 163, 184, 0.08);
             --gradient-purple: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #3b82f6 100%);
-            --gradient-hero: linear-gradient(135deg, #0f0c29 0%, #1a1647 40%, #0f0c29 100%);
             --shadow-glow: 0 0 60px rgba(124, 58, 237, 0.12);
             --sidebar-width: 260px;
             --sidebar-collapsed: 72px;
@@ -256,6 +255,7 @@
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.15);
             margin: 0 8px 12px;
+            display: none;
         }
         .admin-badge i {
             color: var(--accent-red);
@@ -321,6 +321,7 @@
             position: relative;
             margin-bottom: 2px;
             white-space: nowrap;
+            text-decoration: none;
         }
         .nav-item:hover {
             background: rgba(124, 58, 237, 0.08);
@@ -375,6 +376,41 @@
         .sidebar-overlay.active {
             opacity: 1;
             pointer-events: auto;
+        }
+        .upgrade-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.08));
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            border-radius: 16px;
+            padding: 18px;
+            margin-top: auto;
+            text-align: center;
+            transition: opacity 0.25s;
+        }
+        .upgrade-card h4 {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .upgrade-card p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .upgrade-btn {
+            background: var(--gradient-purple);
+            border: none;
+            color: white;
+            padding: 9px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .upgrade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
         }
 
         /* ===== MAIN ===== */
@@ -498,6 +534,9 @@
             align-items: center;
             gap: 3px;
         }
+        .user-profile .status.premium {
+            color: var(--accent-cyan);
+        }
         .btn-primary {
             display: inline-flex;
             align-items: center;
@@ -517,6 +556,11 @@
         .btn-primary:hover {
             transform: translateY(-1px);
             box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
         .btn-secondary {
             background: rgba(255, 255, 255, 0.04);
@@ -661,7 +705,7 @@
         /* ===== PROJECTS GRID ===== */
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 16px;
             margin: 0 16px 32px;
         }
@@ -671,7 +715,6 @@
             border-radius: 16px;
             overflow: hidden;
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
         }
         .project-card:hover {
             transform: translateY(-4px);
@@ -679,7 +722,7 @@
             border-color: rgba(124, 58, 237, 0.15);
         }
         .project-card .project-image {
-            height: 160px;
+            height: 180px;
             position: relative;
             overflow: hidden;
         }
@@ -733,16 +776,26 @@
             padding: 14px;
         }
         .project-card .project-title {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             margin-bottom: 6px;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        }
+        .project-card .project-author {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .project-card .project-author img {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
         }
         .project-card .project-desc {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
             line-height: 1.5;
             margin-bottom: 10px;
@@ -784,32 +837,36 @@
             color: var(--accent-violet);
             border: 1px solid rgba(124, 58, 237, 0.1);
         }
-        .project-card .progress-section {
-            margin-bottom: 10px;
-        }
-        .project-card .progress-section .progress-header {
+        .project-card .project-stats {
             display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            margin-bottom: 4px;
+            gap: 14px;
+            padding: 10px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 6px;
+        }
+        .project-card .project-stats .stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
             color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .project-card .progress-section .progress-bar {
-            height: 4px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 2px;
-            overflow: hidden;
+        .project-card .project-stats .stat:hover {
+            color: var(--text-primary);
         }
-        .project-card .progress-section .progress-bar .fill {
-            height: 100%;
-            border-radius: 2px;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        .project-card .project-stats .stat.liked {
+            color: var(--accent-pink);
+        }
+        .project-card .project-stats .stat i {
+            font-size: 13px;
         }
         .project-card .project-footer {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-top: 10px;
+            padding-top: 8px;
             border-top: 1px solid var(--border-color);
         }
         .project-card .project-footer .team {
@@ -865,11 +922,6 @@
             border-color: rgba(124, 58, 237, 0.2);
         }
 
-        @media (max-width: 1200px) {
-            .projects-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-        }
         @media (max-width: 700px) {
             .projects-grid {
                 grid-template-columns: 1fr;
@@ -964,10 +1016,24 @@
         .modal-large .modal-content h2 {
             font-size: 22px;
             font-weight: 800;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+        .modal-large .modal-content .modal-author {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-large .modal-content .modal-author img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
         }
         .modal-large .modal-content .modal-desc {
             font-size: 13px;
@@ -1016,102 +1082,99 @@
         .modal-section h3 i {
             color: var(--accent-violet);
         }
-        .task-list {
+        .comment-item {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .task-item {
-            display: flex;
-            align-items: center;
             gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+        .comment-item img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .comment-item .comment-content {
+            flex: 1;
+        }
+        .comment-item .comment-content .comment-author {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .comment-item .comment-content .comment-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            line-height: 1.5;
+        }
+        .comment-item .comment-content .comment-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .comment-item .comment-content .comment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .comment-item .comment-content .comment-actions button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            cursor: pointer;
+            transition: color 0.2s;
+            font-family: inherit;
+        }
+        .comment-item .comment-content .comment-actions button:hover {
+            color: var(--text-primary);
+        }
+        .comment-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .comment-input input {
+            flex: 1;
             padding: 10px 14px;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            transition: all 0.2s;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            font-family: inherit;
         }
-        .task-item:hover {
-            border-color: rgba(124, 58, 237, 0.15);
+        .comment-input input:focus {
+            border-color: var(--accent-purple);
         }
-        .task-item .task-check {
-            width: 18px;
-            height: 18px;
-            border-radius: 4px;
-            border: 2px solid var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            color: transparent;
-            transition: all 0.2s;
-            flex-shrink: 0;
+        .comment-input input::placeholder {
+            color: var(--text-muted);
         }
-        .task-item .task-check.checked {
-            background: var(--accent-green);
-            border-color: var(--accent-green);
+        .comment-input button {
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: none;
+            background: var(--gradient-purple);
             color: white;
-        }
-        .task-item .task-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .task-item .task-info .task-title {
             font-size: 12px;
             font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
         }
-        .task-item .task-info .task-title.completed {
-            text-decoration: line-through;
-            color: var(--text-muted);
+        .comment-input button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
         }
-        .task-item .task-info .task-meta {
-            font-size: 9px;
-            color: var(--text-muted);
-            margin-top: 1px;
-        }
-        .task-item .task-priority {
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 8px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .priority-high {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--accent-red);
-        }
-        .priority-medium {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--accent-orange);
-        }
-        .priority-low {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--accent-green);
-        }
-        .team-list {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .team-list .team-member {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 6px 12px 6px 6px;
-        }
-        .team-list .team-member img {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            object-fit: cover;
-        }
-        .team-list .team-member span {
-            font-size: 11px;
-            font-weight: 600;
+        .comment-input button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         @media (max-width: 700px) {
@@ -1403,6 +1466,7 @@
             cursor: pointer;
             padding: 4px 0;
             transition: color 0.2s;
+            text-decoration: none;
         }
         .bottom-nav-item i {
             font-size: 18px;
@@ -1477,27 +1541,22 @@
             </div>
             <nav>
                 <div class="nav-section">
-                    <div class="nav-item" data-page="home"><i class="fas fa-home"></i><span>Home</span></div>
-                    <div class="nav-item active" data-page="projects"><i class="fas fa-folder"></i><span>Projects</span></div>
-                    <div class="nav-item" data-page="academy"><i class="fas fa-graduation-cap"></i><span>Academy</span></div>
-                    <div class="nav-item" data-page="certificates"><i class="fas fa-certificate"></i><span>Certificates</span></div>
-                    <div class="nav-item" data-page="community"><i class="fas fa-users"></i><span>Community</span></div>
-                    <div class="nav-item" data-page="resources"><i class="fas fa-book"></i><span>Resources</span></div>
-                    <div class="nav-item" data-page="ai-tutor"><i class="fas fa-robot"></i><span>AI Tutor</span> <span class="badge">NEW</span></div>
+                    <div class="nav-section-title">Main</div>
+                    <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+                    <a href="projects.html" class="nav-item active"><i class="fas fa-folder"></i><span>Projects</span></a>
+                    <a href="academy.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span>Academy</span></a>
+                    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
                 </div>
                 <div class="sidebar-divider"></div>
                 <div class="nav-section">
-                    <div class="nav-item" data-page="saved"><i class="fas fa-bookmark"></i><span>Saved</span></div>
-                    <div class="nav-item" data-page="my-courses"><i class="fas fa-play-circle"></i><span>My Courses</span></div>
-                    <div class="nav-item" data-page="my-quizzes"><i class="fas fa-question-circle"></i><span>My Quizzes</span></div>
-                    <div class="nav-item" data-page="achievements"><i class="fas fa-trophy"></i><span>Achievements</span></div>
-                    <div class="nav-item" data-page="settings"><i class="fas fa-cog"></i><span>Settings</span></div>
+                    <div class="nav-section-title">Account</div>
+                    <a href="profile.html" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
                 </div>
             </nav>
-            <div class="upgrade-card" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(59,130,246,0.08));border:1px solid rgba(124,58,237,0.15);border-radius:16px;padding:18px;margin-top:auto;text-align:center;transition:opacity 0.25s;">
-                <h4 style="font-size:13px;margin-bottom:6px;">Upgrade to Pro</h4>
-                <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Unlock all courses, certifications and premium features.</p>
-                <button class="upgrade-btn" onclick="showToast('Pro upgrade coming soon!', 'success')" style="background:var(--gradient-purple);border:none;color:white;padding:9px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;width:100%;transition:all 0.2s;">Upgrade Now</button>
+            <div class="upgrade-card">
+                <h4>Upgrade to Pro</h4>
+                <p>Unlock all courses, certifications and premium features.</p>
+                <button class="upgrade-btn" onclick="showToast('Pro upgrade coming soon!', 'success')">Upgrade Now</button>
             </div>
         </aside>
 
@@ -1515,7 +1574,7 @@
                         <img src="https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=100" alt="User" id="userProfileImg">
                         <div class="info">
                             <div class="name" id="userName">User</div>
-                            <div class="status">Free</div>
+                            <div class="status" id="userStatus">Free</div>
                         </div>
                     </div>
                     <button class="btn-primary" id="authBtn" onclick="openAuthModal()">
@@ -1528,13 +1587,11 @@
             <div class="page-header animate-in">
                 <div class="left">
                     <h1>Projects</h1>
-                    <p>Manage your creative projects, track progress, collaborate with your team, and deliver exceptional work.</p>
+                    <p>Browse creative projects from the community. Premium users can create and share their own projects.</p>
                 </div>
                 <div class="right">
-                    <button class="btn-secondary" onclick="showToast('Filter coming soon', 'success')">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
-                    <button class="btn-primary" onclick="openCreateModal()">
+                    <button class="btn-secondary" onclick="filterProjects('all')"><i class="fas fa-sync"></i> Refresh</button>
+                    <button class="btn-primary" id="createProjectBtn" onclick="openCreateModal()">
                         <i class="fas fa-plus"></i> New Project
                     </button>
                 </div>
@@ -1546,14 +1603,10 @@
                 <button class="tab-btn" data-tab="in-progress" onclick="filterProjects('in-progress')">In Progress</button>
                 <button class="tab-btn" data-tab="completed" onclick="filterProjects('completed')">Completed</button>
                 <button class="tab-btn" data-tab="pending" onclick="filterProjects('pending')">Pending</button>
-                <button class="tab-btn" data-tab="archived" onclick="filterProjects('archived')">Archived</button>
             </div>
 
             <!-- PROJECTS GRID -->
             <div class="projects-grid animate-in" style="animation-delay:0.1s;" id="projectsGrid">
-                <div class="skeleton" style="height:340px; border-radius:16px;"></div>
-                <div class="skeleton" style="height:340px; border-radius:16px;"></div>
-                <div class="skeleton" style="height:340px; border-radius:16px;"></div>
                 <div class="skeleton" style="height:340px; border-radius:16px;"></div>
                 <div class="skeleton" style="height:340px; border-radius:16px;"></div>
                 <div class="skeleton" style="height:340px; border-radius:16px;"></div>
@@ -1563,11 +1616,10 @@
 
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
-        <div class="bottom-nav-item" data-page="home"><i class="fas fa-home"></i>Home</div>
-        <div class="bottom-nav-item active" data-page="projects"><div class="center-btn"><i class="fas fa-folder"></i></div>Projects</div>
-        <div class="bottom-nav-item" data-page="academy"><i class="fas fa-graduation-cap"></i>Academy</div>
-        <div class="bottom-nav-item" data-page="certificates"><i class="fas fa-certificate"></i>Certs</div>
-        <div class="bottom-nav-item" data-page="profile"><i class="fas fa-user"></i>Profile</div>
+        <a href="index.html" class="bottom-nav-item"><i class="fas fa-home"></i>Home</a>
+        <a href="projects.html" class="bottom-nav-item active"><div class="center-btn"><i class="fas fa-folder"></i></div>Projects</a>
+        <a href="academy.html" class="bottom-nav-item"><i class="fas fa-graduation-cap"></i>Academy</a>
+        <a href="profile.html" class="bottom-nav-item"><i class="fas fa-user"></i>Profile</a>
     </nav>
 
     <!-- PROJECT DETAIL MODAL -->
@@ -1581,15 +1633,16 @@
             </div>
             <div class="modal-content">
                 <h2 id="modalTitle">Project Title</h2>
+                <div class="modal-author" id="modalAuthor"></div>
                 <p class="modal-desc" id="modalDesc">Description</p>
                 <div class="detail-grid" id="modalDetails"></div>
                 <div class="modal-section">
-                    <h3><i class="fas fa-tasks"></i> Tasks</h3>
-                    <div class="task-list" id="modalTasks"></div>
-                </div>
-                <div class="modal-section">
-                    <h3><i class="fas fa-users"></i> Team Members</h3>
-                    <div class="team-list" id="modalTeam"></div>
+                    <h3><i class="fas fa-comments"></i> Comments (<span id="commentCount">0</span>)</h3>
+                    <div id="commentsList"></div>
+                    <div class="comment-input">
+                        <input type="text" id="commentInput" placeholder="Write a comment..." onkeydown="if(event.key==='Enter') submitComment()">
+                        <button id="commentSubmitBtn" onclick="submitComment()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1600,7 +1653,7 @@
         <div class="modal">
             <button class="close-btn" onclick="closeCreateModal()"><i class="fas fa-times"></i></button>
             <h2>Create New Project</h2>
-            <p>Start a new creative project and invite your team.</p>
+            <p id="createModalMsg">Share your creative project with the community.</p>
             <form id="createForm" onsubmit="handleCreateProject(event)">
                 <div class="form-group">
                     <label>Project Name</label>
@@ -1608,7 +1661,7 @@
                 </div>
                 <div class="form-group">
                     <label>Description</label>
-                    <textarea id="projectDesc" placeholder="Brief description of the project..." required></textarea>
+                    <textarea id="projectDesc" placeholder="Brief description of your project..." required></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1631,15 +1684,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Start Date</label>
-                        <input type="date" id="projectStartDate">
-                    </div>
-                    <div class="form-group">
-                        <label>Due Date</label>
-                        <input type="date" id="projectDueDate">
-                    </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="projectImage" placeholder="https://example.com/image.jpg">
                 </div>
                 <div class="form-group">
                     <label>Tags (comma separated)</label>
@@ -1709,21 +1756,26 @@
         const SUPABASE_ANON_KEY = 'your-anon-key';
 
         let supabase = null;
+        let supabaseConfigured = false;
         try {
             if (SUPABASE_URL.includes('your-project')) throw new Error('Configure Supabase');
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseConfigured = true;
         } catch (e) {
-            console.warn('Supabase not configured. Using demo data.');
+            console.warn('Supabase not configured. Using offline mode.');
         }
 
         // ============================================================
         // STATE
         // ============================================================
         let currentUser = null;
+        let isPremium = false;
         let isSignUp = false;
         let mobileSidebarOpen = false;
         let currentFilter = 'all';
         let allProjects = [];
+        let currentProjectId = null;
+        let currentComments = [];
 
         // ============================================================
         // AUTH
@@ -1758,8 +1810,8 @@
             const name = document.getElementById('authName').value;
             const errorEl = document.getElementById('authError');
 
-            if (!supabase) {
-                showToast(isSignUp ? 'Account created! (Demo mode)' : 'Signed in! (Demo mode)', 'success');
+            if (!supabaseConfigured) {
+                showToast(isSignUp ? 'Account created! (Offline mode)' : 'Signed in! (Offline mode)', 'success');
                 closeAuthModal();
                 updateUIForUser({ email: email, user_metadata: { full_name: name || email.split('@')[0] } });
                 return;
@@ -1770,7 +1822,7 @@
                     const { data, error } = await supabase.auth.signUp({
                         email: email,
                         password: password,
-                        options: { data: { full_name: name } }
+                        options: { data: { full_name: name, is_premium: false } }
                     });
                     if (error) throw error;
                     showToast('Account created! Check your email.', 'success');
@@ -1789,8 +1841,8 @@
         }
 
         async function socialAuth(provider) {
-            if (!supabase) {
-                showToast(provider + ' auth (Demo mode)', 'success');
+            if (!supabaseConfigured) {
+                showToast(provider + ' auth (Offline mode)', 'success');
                 closeAuthModal();
                 updateUIForUser({ email: 'user@example.com', user_metadata: { full_name: 'User' } });
                 return;
@@ -1799,7 +1851,7 @@
             if (error) showToast(error.message, 'error');
         }
 
-        function updateUIForUser(user) {
+        async function updateUIForUser(user) {
             currentUser = user;
             document.getElementById('authBtn').style.display = 'none';
             document.getElementById('userProfile').style.display = 'flex';
@@ -1807,19 +1859,60 @@
             document.getElementById('userName').textContent = name;
             document.getElementById('userProfileImg').src =
                 `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=7c3aed&color=fff&size=100`;
+
+            // Check premium status
+            if (supabaseConfigured) {
+                const { data: profile } = await supabase.from('profiles').select('is_premium').eq('id', user.id).single();
+                isPremium = profile?.is_premium || false;
+            } else {
+                isPremium = user?.user_metadata?.is_premium || false;
+            }
+
+            const statusEl = document.getElementById('userStatus');
+            if (isPremium) {
+                statusEl.textContent = 'Premium';
+                statusEl.className = 'status premium';
+                statusEl.innerHTML = 'Premium <i class="fas fa-crown" style="font-size:8px;"></i>';
+            } else {
+                statusEl.textContent = 'Free';
+                statusEl.className = 'status';
+            }
+
+            // Update create button
+            const createBtn = document.getElementById('createProjectBtn');
+            if (isPremium) {
+                createBtn.disabled = false;
+                createBtn.textContent = 'New Project';
+            } else {
+                createBtn.disabled = true;
+                createBtn.textContent = 'Premium Only';
+                createBtn.title = 'Only premium users can create projects';
+            }
+
             loadProjects();
         }
 
         async function checkAuth() {
-            if (!supabase) return;
+            if (!supabaseConfigured) {
+                // Offline mode - create a demo user
+                updateUIForUser({
+                    id: 'demo-user',
+                    email: 'demo@example.com',
+                    user_metadata: { full_name: 'Demo User', is_premium: true }
+                });
+                return;
+            }
             const { data: { user } } = await supabase.auth.getUser();
             if (user) updateUIForUser(user);
             supabase.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session?.user) updateUIForUser(session.user);
                 if (event === 'SIGNED_OUT') {
                     currentUser = null;
+                    isPremium = false;
                     document.getElementById('authBtn').style.display = 'flex';
                     document.getElementById('userProfile').style.display = 'none';
+                    document.getElementById('createProjectBtn').disabled = true;
+                    document.getElementById('createProjectBtn').textContent = 'Premium Only';
                 }
             });
         }
@@ -1839,6 +1932,18 @@
             if (!dateStr) return 'N/A';
             const d = new Date(dateStr);
             return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatTimeAgo(dateStr) {
+            if (!dateStr) return 'N/A';
+            const d = new Date(dateStr);
+            const now = new Date();
+            const diff = Math.floor((now - d) / 1000);
+            if (diff < 60) return 'just now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+            return formatDate(dateStr);
         }
 
         function getStatusClass(status) {
@@ -1862,39 +1967,24 @@
         // PROJECTS CRUD
         // ============================================================
         async function loadProjects() {
-            if (!supabase) {
-                showToast('Supabase not configured. Using demo data.', 'success');
-                // Create a single demo project to show the UI works
+            if (!supabaseConfigured) {
+                // Offline demo projects
                 allProjects = [{
-                    id: 1,
+                    id: 'demo-1',
                     title: 'Brand Identity Redesign',
                     description: 'Complete rebrand for TechFlow including logo, color palette, typography, and brand guidelines.',
                     status: 'in-progress',
                     category: 'branding',
                     progress: 65,
-                    start_date: '2026-06-01',
-                    due_date: '2026-08-15',
+                    created_at: new Date().toISOString(),
+                    user_id: 'demo-user',
+                    author_name: 'Demo User',
+                    author_avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=7c3aed&color=fff&size=100',
                     tags: ['branding', 'logo', 'guidelines'],
-                    thumbnail: 'https://images.unsplash.com/photo-1634942537034-2531766767d1?w=600&h=400&fit=crop',
-                    team: [
-                        { name: 'Alex Chen',
-                            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face' },
-                        { name: 'Sarah Kim',
-                            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face' },
-                        { name: 'Mike Ross',
-                            avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face' }
-                    ],
-                    tasks: [
-                        { title: 'Logo Concepts', completed: true, assignee: 'Alex Chen', priority: 'high',
-                        due: 'Jul 10' },
-                        { title: 'Color Palette', completed: true, assignee: 'Sarah Kim', priority: 'medium',
-                            due: 'Jul 15' },
-                        { title: 'Typography System', completed: false, assignee: 'Mike Ross', priority: 'high',
-                            due: 'Jul 20' },
-                        { title: 'Brand Guidelines Doc', completed: false, assignee: 'Alex Chen',
-                            priority: 'medium', due: 'Aug 1' }
-                    ],
-                    created_at: new Date().toISOString()
+                    image: 'https://images.unsplash.com/photo-1634942537034-2531766767d1?w=600&h=400&fit=crop',
+                    likes: 12,
+                    comments_count: 4,
+                    liked_by: []
                 }];
                 renderProjects(allProjects);
                 return;
@@ -1911,29 +2001,20 @@
                 if (data && data.length > 0) {
                     allProjects = data;
                 } else {
-                    // Insert a demo project if table is empty
+                    // Seed with a demo project
                     const demoProject = {
-                        title: 'Brand Identity Redesign',
-                        description: 'Complete rebrand for TechFlow including logo, color palette, typography, and brand guidelines.',
-                        status: 'in-progress',
-                        category: 'branding',
-                        progress: 65,
-                        start_date: '2026-06-01',
-                        due_date: '2026-08-15',
-                        tags: ['branding', 'logo', 'guidelines'],
-                        thumbnail: 'https://images.unsplash.com/photo-1634942537034-2531766767d1?w=600&h=400&fit=crop',
-                        team: [
-                            { name: 'Alex Chen',
-                                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face' },
-                            { name: 'Sarah Kim',
-                                avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face' }
-                        ],
-                        tasks: [
-                            { title: 'Logo Concepts', completed: true, assignee: 'Alex Chen', priority: 'high',
-                                due: 'Jul 10' },
-                            { title: 'Color Palette', completed: false, assignee: 'Sarah Kim', priority: 'medium',
-                                due: 'Jul 15' }
-                        ]
+                        title: 'Welcome Project',
+                        description: 'This is a sample project to get started. Premium users can create their own projects!',
+                        status: 'completed',
+                        category: 'ui-ux',
+                        progress: 100,
+                        tags: ['sample', 'welcome'],
+                        image: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop',
+                        author_name: 'Aurex Team',
+                        author_avatar: 'https://ui-avatars.com/api/?name=Aurex+Team&background=7c3aed&color=fff&size=100',
+                        likes: 5,
+                        comments_count: 2,
+                        liked_by: []
                     };
                     const { data: inserted } = await supabase.from('projects').insert([demoProject]).select();
                     allProjects = inserted || [];
@@ -1952,74 +2033,59 @@
                 grid.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-folder-open"></i>
-                        <h3>No projects found</h3>
-                        <p>Get started by creating your first project.</p>
-                        <button class="btn-primary" onclick="openCreateModal()">
-                            <i class="fas fa-plus"></i> Create Project
-                        </button>
+                        <h3>No projects yet</h3>
+                        <p>Be the first to share your creative project with the community.</p>
+                        ${isPremium ? '<button class="btn-primary" onclick="openCreateModal()"><i class="fas fa-plus"></i> Create Project</button>' : '<p style="font-size:12px;color:var(--text-muted);">Premium users can create projects</p>'}
                     </div>
                 `;
                 return;
             }
 
             grid.innerHTML = projects.map(p => {
-                const teamHTML = (p.team || []).slice(0, 3).map(m =>
-                    `<img src="${m.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(m.name)+'&background=7c3aed&color=fff&size=100'}" alt="${m.name}" title="${m.name}">`
-                ).join('');
-                const moreCount = (p.team || []).length > 3 ?
-                    `<div class="more">+${(p.team || []).length - 3}</div>` : '';
                 const tagsHTML = (p.tags || []).slice(0, 3).map(t =>
                     `<span class="tag">${t}</span>`
                 ).join('');
-                const progressColor = getProgressColor(p.progress || 0);
+                const isLiked = p.liked_by && p.liked_by.includes(currentUser?.id);
 
                 return `
                     <div class="project-card" onclick="openProjectModal('${p.id}')">
                         <div class="project-image">
-                            <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop'}" alt="${p.title}" loading="lazy">
+                            <img src="${p.image || 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop'}" alt="${p.title}" loading="lazy">
                             <div class="overlay">
                                 <span class="status-badge ${getStatusClass(p.status)}">${(p.status || 'pending').replace('-', ' ')}</span>
                             </div>
                         </div>
                         <div class="project-body">
                             <div class="project-title">${p.title}</div>
-                            <div class="project-desc">${p.description || ''}</div>
-                            <div class="project-meta">
-                                <div class="meta-item"><i class="far fa-calendar"></i> ${formatDate(p.due_date)}</div>
-                                <div class="meta-item"><i class="far fa-clock"></i> ${p.due_date ? daysUntil(p.due_date) : 'N/A'}</div>
+                            <div class="project-author">
+                                <img src="${p.author_avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(p.author_name || 'User')+'&background=7c3aed&color=fff&size=100'}" alt="${p.author_name || 'User'}">
+                                <span>${p.author_name || 'Anonymous'}</span>
                             </div>
+                            <div class="project-desc">${p.description || ''}</div>
                             <div class="project-tags">${tagsHTML}</div>
-                            <div class="progress-section">
-                                <div class="progress-header">
-                                    <span>Progress</span>
-                                    <span>${p.progress || 0}%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="fill" style="width: ${p.progress || 0}%; background: ${progressColor};"></div>
-                                </div>
+                            <div class="project-stats">
+                                <span class="stat ${isLiked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${p.id}')">
+                                    <i class="fas fa-heart"></i> ${p.likes || 0}
+                                </span>
+                                <span class="stat" onclick="event.stopPropagation(); openProjectModal('${p.id}')">
+                                    <i class="fas fa-comment"></i> ${p.comments_count || 0}
+                                </span>
+                                <span class="stat" onclick="event.stopPropagation(); shareProject('${p.id}')">
+                                    <i class="fas fa-share-alt"></i> Share
+                                </span>
                             </div>
                             <div class="project-footer">
-                                <div class="team">${teamHTML}${moreCount}</div>
+                                <div class="team">
+                                    <img src="${p.author_avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(p.author_name || 'User')+'&background=7c3aed&color=fff&size=100'}" alt="${p.author_name || 'User'}">
+                                </div>
                                 <div class="actions">
-                                    <button onclick="event.stopPropagation(); showToast('Project favorited', 'success')"><i class="far fa-heart"></i></button>
-                                    <button onclick="event.stopPropagation(); showToast('More options', 'success')"><i class="fas fa-ellipsis-h"></i></button>
+                                    <button onclick="event.stopPropagation(); showToast('Project saved', 'success')"><i class="far fa-bookmark"></i></button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
-        }
-
-        function daysUntil(dateStr) {
-            if (!dateStr) return 'N/A';
-            const due = new Date(dateStr);
-            const now = new Date();
-            const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
-            if (diff < 0) return 'Overdue';
-            if (diff === 0) return 'Due today';
-            if (diff === 1) return '1 day left';
-            return diff + ' days left';
         }
 
         function filterProjects(filter) {
@@ -2036,76 +2102,278 @@
         }
 
         // ============================================================
-        // PROJECT MODAL
+        // PROJECT DETAIL MODAL
         // ============================================================
-        function openProjectModal(id) {
+        async function openProjectModal(id) {
+            currentProjectId = id;
             const project = allProjects.find(p => p.id == id);
             if (!project) return;
 
-            document.getElementById('modalHeroImg').src = project.thumbnail ||
+            document.getElementById('modalHeroImg').src = project.image ||
                 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop';
             document.getElementById('modalStatus').className = 'modal-status ' + getStatusClass(project.status);
             document.getElementById('modalStatus').textContent = (project.status || 'pending').replace('-', ' ');
             document.getElementById('modalTitle').textContent = project.title;
+            document.getElementById('modalAuthor').innerHTML = `
+                <img src="${project.author_avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(project.author_name || 'User')+'&background=7c3aed&color=fff&size=100'}" alt="${project.author_name || 'User'}">
+                <span>${project.author_name || 'Anonymous'} • ${formatDate(project.created_at)}</span>
+            `;
             document.getElementById('modalDesc').textContent = project.description || '';
-
-            const tasks = project.tasks || [];
-            const completedTasks = tasks.filter(t => t.completed).length;
 
             document.getElementById('modalDetails').innerHTML = `
                 <div class="detail-item">
-                    <i class="fas fa-tasks" style="color:var(--accent-violet)"></i>
-                    <div class="label">Tasks</div>
-                    <div class="value">${completedTasks}/${tasks.length}</div>
+                    <i class="fas fa-tag" style="color:var(--accent-violet)"></i>
+                    <div class="label">Category</div>
+                    <div class="value">${project.category || 'General'}</div>
                 </div>
                 <div class="detail-item">
-                    <i class="fas fa-users" style="color:var(--accent-blue)"></i>
-                    <div class="label">Team</div>
-                    <div class="value">${(project.team || []).length}</div>
+                    <i class="fas fa-heart" style="color:var(--accent-pink)"></i>
+                    <div class="label">Likes</div>
+                    <div class="value">${project.likes || 0}</div>
                 </div>
                 <div class="detail-item">
-                    <i class="fas fa-chart-line" style="color:var(--accent-green)"></i>
-                    <div class="label">Progress</div>
-                    <div class="value">${project.progress || 0}%</div>
+                    <i class="fas fa-comment" style="color:var(--accent-blue)"></i>
+                    <div class="label">Comments</div>
+                    <div class="value">${project.comments_count || 0}</div>
                 </div>
                 <div class="detail-item">
-                    <i class="far fa-calendar" style="color:var(--accent-orange)"></i>
-                    <div class="label">Due Date</div>
-                    <div class="value">${formatDate(project.due_date)}</div>
+                    <i class="fas fa-share-alt" style="color:var(--accent-green)"></i>
+                    <div class="label">Share</div>
+                    <div class="value"><button onclick="shareProject('${project.id}')" style="background:none;border:none;color:var(--accent-green);cursor:pointer;font-size:12px;">Share</button></div>
                 </div>
             `;
 
-            document.getElementById('modalTasks').innerHTML = tasks.map(t => `
-                <div class="task-item">
-                    <div class="task-check ${t.completed ? 'checked' : ''}" onclick="this.classList.toggle('checked'); this.nextElementSibling.querySelector('.task-title').classList.toggle('completed')">
-                        ${t.completed ? '<i class="fas fa-check"></i>' : ''}
-                    </div>
-                    <div class="task-info">
-                        <div class="task-title ${t.completed ? 'completed' : ''}">${t.title}</div>
-                        <div class="task-meta">${t.assignee || 'Unassigned'} &bull; Due ${t.due || 'TBD'}</div>
-                    </div>
-                    <span class="task-priority priority-${t.priority || 'low'}">${t.priority || 'low'}</span>
-                </div>
-            `).join('');
+            document.getElementById('commentCount').textContent = project.comments_count || 0;
 
-            document.getElementById('modalTeam').innerHTML = (project.team || []).map(m => `
-                <div class="team-member">
-                    <img src="${m.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(m.name)+'&background=7c3aed&color=fff&size=100'}" alt="${m.name}">
-                    <span>${m.name}</span>
-                </div>
-            `).join('');
-
+            // Load comments
+            await loadComments(project.id);
             document.getElementById('projectModal').classList.add('active');
         }
 
         function closeProjectModal() {
             document.getElementById('projectModal').classList.remove('active');
+            currentProjectId = null;
+        }
+
+        // ============================================================
+        // LIKES
+        // ============================================================
+        async function toggleLike(id) {
+            if (!currentUser) {
+                showToast('Please sign in to like projects', 'error');
+                openAuthModal();
+                return;
+            }
+
+            const project = allProjects.find(p => p.id == id);
+            if (!project) return;
+
+            const isLiked = project.liked_by && project.liked_by.includes(currentUser.id);
+            let liked_by = project.liked_by || [];
+            let likes = project.likes || 0;
+
+            if (isLiked) {
+                liked_by = liked_by.filter(uid => uid !== currentUser.id);
+                likes--;
+            } else {
+                liked_by.push(currentUser.id);
+                likes++;
+            }
+
+            if (supabaseConfigured) {
+                await supabase
+                    .from('projects')
+                    .update({ likes: likes, liked_by: liked_by })
+                    .eq('id', id);
+            }
+
+            project.likes = likes;
+            project.liked_by = liked_by;
+            renderProjects(allProjects);
+        }
+
+        // ============================================================
+        // COMMENTS
+        // ============================================================
+        async function loadComments(projectId) {
+            const container = document.getElementById('commentsList');
+            const project = allProjects.find(p => p.id == projectId);
+            if (!project) return;
+
+            if (!supabaseConfigured) {
+                // Demo comments
+                currentComments = [
+                    { id: '1', author: 'Demo User', text: 'Great project!', created_at: new Date().toISOString() }
+                ];
+                renderComments(currentComments);
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('project_comments')
+                    .select('*')
+                    .eq('project_id', projectId)
+                    .order('created_at', { ascending: true });
+
+                if (error) throw error;
+                currentComments = data || [];
+                renderComments(currentComments);
+            } catch (e) {
+                console.error('Load comments error:', e);
+            }
+        }
+
+        function renderComments(comments) {
+            const container = document.getElementById('commentsList');
+            if (!comments || comments.length === 0) {
+                container.innerHTML =
+                    '<p style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px;">No comments yet. Be the first!</p>';
+                return;
+            }
+
+            container.innerHTML = comments.map(c => `
+                <div class="comment-item">
+                    <img src="${c.author_avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(c.author || 'User')+'&background=7c3aed&color=fff&size=100'}" alt="${c.author || 'User'}">
+                    <div class="comment-content">
+                        <div class="comment-author">${c.author || 'Anonymous'}</div>
+                        <div class="comment-text">${c.text}</div>
+                        <div class="comment-time">${formatTimeAgo(c.created_at)}</div>
+                        ${currentUser && c.author_id === currentUser.id ? `
+                            <div class="comment-actions">
+                                <button onclick="deleteComment('${c.id}')">Delete</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function submitComment() {
+            if (!currentUser) {
+                showToast('Please sign in to comment', 'error');
+                openAuthModal();
+                return;
+            }
+
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            if (!text || !currentProjectId) return;
+
+            const submitBtn = document.getElementById('commentSubmitBtn');
+            submitBtn.disabled = true;
+
+            const project = allProjects.find(p => p.id == currentProjectId);
+            if (!project) return;
+
+            const newComment = {
+                project_id: currentProjectId,
+                author: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
+                author_id: currentUser.id,
+                author_avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.user_metadata?.full_name || 'User')}&background=7c3aed&color=fff&size=100`,
+                text: text,
+                created_at: new Date().toISOString()
+            };
+
+            if (supabaseConfigured) {
+                try {
+                    const { data, error } = await supabase
+                        .from('project_comments')
+                        .insert([newComment])
+                        .select();
+
+                    if (error) throw error;
+
+                    // Update project comment count
+                    await supabase
+                        .from('projects')
+                        .update({ comments_count: (project.comments_count || 0) + 1 })
+                        .eq('id', currentProjectId);
+
+                    project.comments_count = (project.comments_count || 0) + 1;
+                    document.getElementById('commentCount').textContent = project.comments_count;
+
+                    if (data && data.length > 0) {
+                        currentComments.push(data[0]);
+                    }
+                } catch (e) {
+                    console.error('Submit comment error:', e);
+                    showToast('Error posting comment', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
+            } else {
+                newComment.id = 'c' + Date.now();
+                currentComments.push(newComment);
+                project.comments_count = (project.comments_count || 0) + 1;
+                document.getElementById('commentCount').textContent = project.comments_count;
+            }
+
+            renderComments(currentComments);
+            input.value = '';
+            submitBtn.disabled = false;
+            showToast('Comment posted!', 'success');
+        }
+
+        async function deleteComment(id) {
+            if (!supabaseConfigured) {
+                currentComments = currentComments.filter(c => c.id !== id);
+                renderComments(currentComments);
+                return;
+            }
+
+            try {
+                await supabase.from('project_comments').delete().eq('id', id);
+                currentComments = currentComments.filter(c => c.id !== id);
+                renderComments(currentComments);
+                showToast('Comment deleted', 'success');
+            } catch (e) {
+                console.error('Delete comment error:', e);
+                showToast('Error deleting comment', 'error');
+            }
+        }
+
+        // ============================================================
+        // SHARE
+        // ============================================================
+        function shareProject(id) {
+            const url = window.location.href + '?project=' + id;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out this project on Aurex',
+                    url: url
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('Link copied to clipboard!', 'success');
+                }).catch(() => {
+                    // Fallback
+                    const input = document.createElement('input');
+                    input.value = url;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                    showToast('Link copied!', 'success');
+                });
+            }
         }
 
         // ============================================================
         // CREATE PROJECT
         // ============================================================
         function openCreateModal() {
+            if (!currentUser) {
+                showToast('Please sign in first', 'error');
+                openAuthModal();
+                return;
+            }
+
+            if (!isPremium) {
+                showToast('Only premium users can create projects', 'error');
+                return;
+            }
+
             document.getElementById('createModal').classList.add('active');
             document.getElementById('createError').textContent = '';
         }
@@ -2116,12 +2384,17 @@
 
         async function handleCreateProject(e) {
             e.preventDefault();
+
+            if (!currentUser || !isPremium) {
+                showToast('Premium required to create projects', 'error');
+                return;
+            }
+
             const name = document.getElementById('projectName').value.trim();
             const desc = document.getElementById('projectDesc').value.trim();
             const category = document.getElementById('projectCategory').value;
             const status = document.getElementById('projectStatus').value;
-            const startDate = document.getElementById('projectStartDate').value;
-            const dueDate = document.getElementById('projectDueDate').value;
+            const image = document.getElementById('projectImage').value.trim();
             const tags = document.getElementById('projectTags').value.split(',').map(t => t.trim()).filter(t => t);
 
             if (!name) {
@@ -2135,27 +2408,21 @@
                 status: status,
                 category: category,
                 progress: status === 'completed' ? 100 : (status === 'in-progress' ? 10 : 0),
-                start_date: startDate || new Date().toISOString().split('T')[0],
-                due_date: dueDate || '',
                 tags: tags.length ? tags : ['new'],
-                thumbnail: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop',
-                team: [{
-                    name: currentUser?.user_metadata?.full_name || 'You',
-                    avatar: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentUser?.user_metadata
-                        ?.full_name || 'You') + '&background=7c3aed&color=fff&size=100'
-                }],
-                tasks: [{
-                    title: "Project Setup",
-                    completed: false,
-                    assignee: "You",
-                    priority: "high",
-                    due: "TBD"
-                }]
+                image: image || 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop',
+                author_name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
+                author_id: currentUser.id,
+                author_avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.user_metadata?.full_name || 'User')}&background=7c3aed&color=fff&size=100`,
+                likes: 0,
+                comments_count: 0,
+                liked_by: [],
+                created_at: new Date().toISOString()
             };
 
-            if (!supabase) {
-                allProjects.unshift({ ...newProject, id: Date.now(), created_at: new Date().toISOString() });
-                showToast('Project created! (Demo mode)', 'success');
+            if (!supabaseConfigured) {
+                newProject.id = 'p' + Date.now();
+                allProjects.unshift(newProject);
+                showToast('Project created! (Offline mode)', 'success');
                 closeCreateModal();
                 filterProjects(currentFilter);
                 document.getElementById('createForm').reset();
@@ -2209,50 +2476,10 @@
             mobileSidebarOpen = false;
         });
 
-        document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const page = this.dataset.page;
-                if (!page) return;
-                document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelectorAll('[data-page="' + page + '"]').forEach(n => n.classList.add('active'));
-                if (page === 'projects') {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else if (page === 'home') {
-                    showToast('Home page', 'success');
-                } else if (page === 'academy') {
-                    showToast('Academy page', 'success');
-                } else {
-                    showToast(page + ' page', 'success');
-                }
-            });
-        });
-
-        // ============================================================
-        // SEARCH
-        // ============================================================
-        let searchTimeout;
-        document.getElementById('searchInput')?.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const term = e.target.value.toLowerCase();
-                if (!term) { filterProjects(currentFilter); return; }
-                const filtered = allProjects.filter(p =>
-                    p.title?.toLowerCase().includes(term) ||
-                    p.description?.toLowerCase().includes(term) ||
-                    (p.tags || []).some(t => t.toLowerCase().includes(term))
-                );
-                renderProjects(filtered);
-            }, 300);
-        });
-
         // ============================================================
         // KEYBOARD
         // ============================================================
         document.addEventListener('keydown', (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                e.preventDefault();
-                document.getElementById('searchInput')?.focus();
-            }
             if (e.key === 'Escape') {
                 closeAuthModal();
                 closeProjectModal();
@@ -2320,6 +2547,10 @@
         window.openCreateModal = openCreateModal;
         window.closeCreateModal = closeCreateModal;
         window.handleCreateProject = handleCreateProject;
+        window.toggleLike = toggleLike;
+        window.submitComment = submitComment;
+        window.deleteComment = deleteComment;
+        window.shareProject = shareProject;
 
         init();
     </script>
