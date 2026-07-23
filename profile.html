@@ -1567,11 +1567,11 @@
         let supabaseConfigured = false;
 
         try {
-            if (SUPABASE_URL.includes('your-project')) throw new Error('Configure Supabase');
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             supabaseConfigured = true;
+            console.log('Supabase connected successfully!');
         } catch (e) {
-            console.warn('Supabase not configured. Using demo data.');
+            console.warn('Supabase connection error:', e.message);
         }
 
         // ============================================================
