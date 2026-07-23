@@ -324,6 +324,7 @@
             position: relative;
             margin-bottom: 2px;
             white-space: nowrap;
+            text-decoration: none;
         }
         .nav-item:hover {
             background: rgba(124, 58, 237, 0.08);
@@ -540,7 +541,6 @@
             background: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.12);
         }
-
         @media (max-width: 600px) {
             .top-bar {
                 margin: 6px 10px 14px;
@@ -1664,6 +1664,7 @@
             cursor: pointer;
             padding: 4px 0;
             transition: color 0.2s;
+            text-decoration: none;
         }
         .bottom-nav-item i {
             font-size: 18px;
@@ -1743,26 +1744,23 @@
             <nav>
                 <div class="nav-section">
                     <div class="nav-section-title">Main</div>
-                    <div class="nav-item active" data-page="home"><i class="fas fa-home"></i><span>Home</span></div>
-                    <div class="nav-item" data-page="courses"><i class="fas fa-graduation-cap"></i><span>Courses</span></div>
-                    <div class="nav-item" data-page="classes"><i class="fas fa-calendar-alt"></i><span>Classes</span> <span class="badge" id="classBadge">0</span></div>
-                    <div class="nav-item" data-page="tools"><i class="fas fa-tools"></i><span>Tools</span></div>
-                    <div class="nav-item" data-page="my-learning"><i class="fas fa-play-circle"></i><span>My Learning</span></div>
+                    <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+                    <a href="projects.html" class="nav-item"><i class="fas fa-folder"></i><span>Projects</span></a>
+                    <a href="academy.html" class="nav-item active"><i class="fas fa-graduation-cap"></i><span>Academy</span></a>
+                    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
                 </div>
                 <div class="sidebar-divider"></div>
                 <div class="nav-section">
                     <div class="nav-section-title">Account</div>
-                    <div class="nav-item" data-page="profile"><i class="fas fa-user"></i><span>Profile</span></div>
-                    <div class="nav-item" data-page="certificates"><i class="fas fa-certificate"></i><span>Certificates</span></div>
-                    <div class="nav-item" data-page="settings"><i class="fas fa-cog"></i><span>Settings</span></div>
-                </div>
-                <div class="sidebar-divider"></div>
-                <div class="nav-section">
-                    <div class="nav-item" onclick="window.location.href='admin.html'">
-                        <i class="fas fa-shield-alt"></i><span>Admin Dashboard</span>
-                    </div>
+                    <a href="profile.html" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
                 </div>
             </nav>
+            <div class="upgrade-card" id="upgradeCard">
+                <h3><i class="fas fa-crown"></i> Upgrade to Premium</h3>
+                <p>Get <strong>45% off</strong> all courses, access premium tools, and join exclusive classes.</p>
+                <div class="price">₦13,500 <small>/ 6 months</small></div>
+                <button class="upgrade-btn" id="upgradeBtn" onclick="openPremiumModal()">Upgrade Now</button>
+            </div>
         </aside>
 
         <!-- MAIN CONTENT -->
@@ -1866,14 +1864,6 @@
                 <div class="skeleton" style="height:80px;"></div>
             </div>
 
-            <!-- UPGRADE CARD -->
-            <div class="upgrade-card animate-in" style="animation-delay:0.25s;" id="upgradeCard">
-                <h3><i class="fas fa-crown"></i> Upgrade to Premium</h3>
-                <p>Get <strong>45% off</strong> all courses, access premium tools, and join exclusive classes.</p>
-                <div class="price">₦13,500 <small>/ 6 months</small></div>
-                <button class="upgrade-btn" id="upgradeBtn" onclick="openPremiumModal()">Upgrade Now</button>
-            </div>
-
             <!-- COURSES -->
             <div class="section-header animate-in" style="animation-delay:0.3s;">
                 <h2>Featured Courses</h2>
@@ -1913,11 +1903,10 @@
 
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
-        <div class="bottom-nav-item active" data-page="home"><i class="fas fa-home"></i>Home</div>
-        <div class="bottom-nav-item" data-page="courses"><i class="fas fa-graduation-cap"></i>Courses</div>
-        <div class="bottom-nav-item" data-page="classes"><div class="center-btn"><i class="fas fa-calendar-alt"></i></div>Classes</div>
-        <div class="bottom-nav-item" data-page="tools"><i class="fas fa-tools"></i>Tools</div>
-        <div class="bottom-nav-item" data-page="profile"><i class="fas fa-user"></i>Profile</div>
+        <a href="index.html" class="bottom-nav-item"><i class="fas fa-home"></i>Home</a>
+        <a href="projects.html" class="bottom-nav-item"><i class="fas fa-folder"></i>Projects</a>
+        <a href="academy.html" class="bottom-nav-item active"><div class="center-btn"><i class="fas fa-graduation-cap"></i></div>Academy</a>
+        <a href="profile.html" class="bottom-nav-item"><i class="fas fa-user"></i>Profile</a>
     </nav>
 
     <!-- AUTH MODAL -->
@@ -2008,11 +1997,15 @@
         // ============================================================
         const SUPABASE_URL = 'https://your-project.supabase.co';
         const SUPABASE_ANON_KEY = 'your-anon-key';
+        const STORAGE_BUCKET = 'aurex-assets';
 
         let supabase = null;
+        let supabaseConfigured = false;
+
         try {
             if (SUPABASE_URL.includes('your-project')) throw new Error('Configure Supabase');
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseConfigured = true;
         } catch (e) {
             console.warn('Supabase not configured. Using demo data.');
         }
@@ -2089,7 +2082,8 @@
             document.getElementById('nameGroup').style.display = isSignUp ? 'block' : 'none';
             document.getElementById('authSubmitBtn').innerHTML = isSignUp ? '<i class="fas fa-user-plus"></i> Sign Up' :
                 '<i class="fas fa-sign-in-alt"></i> Sign In';
-            document.getElementById('switchText').textContent = isSignUp ? 'Already have an account?' : "Don't have an account?";
+            document.getElementById('switchText').textContent = isSignUp ? 'Already have an account?' :
+                "Don't have an account?";
             document.getElementById('switchLink').textContent = isSignUp ? 'Sign In' : 'Sign Up';
             document.getElementById('authError').textContent = '';
         }
@@ -2101,7 +2095,7 @@
             const name = document.getElementById('authName').value;
             const errorEl = document.getElementById('authError');
 
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 showToast(isSignUp ? 'Account created! (Demo)' : 'Signed in! (Demo)', 'success');
                 closeAuthModal();
                 updateUIForUser({ email: email, user_metadata: { full_name: name || email.split('@')[0] } });
@@ -2132,7 +2126,7 @@
         }
 
         async function socialAuth(provider) {
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 showToast(provider + ' auth (Demo)', 'success');
                 closeAuthModal();
                 updateUIForUser({ email: 'user@example.com', user_metadata: { full_name: 'User' } });
@@ -2152,7 +2146,7 @@
                 `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=7c3aed&color=fff&size=100`;
 
             // Check premium status
-            if (supabase) {
+            if (supabaseConfigured) {
                 const { data: profile } = await supabase.from('profiles').select('is_premium').eq('id', user.id).single();
                 isPremium = profile?.is_premium || false;
                 user.user_metadata.is_premium = isPremium;
@@ -2185,11 +2179,10 @@
         }
 
         async function checkAuth() {
-            if (!supabase) return;
+            if (!supabaseConfigured) return;
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 updateUIForUser(user);
-                // Check premium status from DB
                 const { data: profile } = await supabase.from('profiles').select('is_premium').eq('id', user.id).single();
                 if (profile) {
                     isPremium = profile.is_premium || false;
@@ -2241,7 +2234,6 @@
 
             showToast('Please complete payment on WhatsApp. Your account will be upgraded after confirmation.', 'success');
 
-            // Simulate confirmation
             setTimeout(async () => {
                 if (confirm('Has payment been confirmed? (In production, this will be automatic)')) {
                     await upgradeUserToPremium();
@@ -2250,7 +2242,7 @@
         }
 
         async function upgradeUserToPremium() {
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 isPremium = true;
                 showToast('Premium activated! (Demo)', 'success');
                 const statusEl = document.getElementById('userStatus');
@@ -2331,7 +2323,7 @@
         // LOAD DATA
         // ============================================================
         async function loadStats() {
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 document.getElementById('statCourses').textContent = '24';
                 document.getElementById('statStudents').textContent = '1,284';
                 document.getElementById('statCerts').textContent = '342';
@@ -2367,7 +2359,7 @@
         }
 
         async function loadHeroAvatars() {
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 document.getElementById('heroStudentCount').textContent = '1,284+';
                 return;
             }
@@ -2389,7 +2381,7 @@
         }
 
         async function loadCategories() {
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 const demo = [
                     { name: 'UI/UX', icon: 'fa-pencil-ruler', color: '#7c3aed' },
                     { name: 'Branding', icon: 'fa-tag', color: '#ec4899' },
@@ -2432,7 +2424,7 @@
         }
 
         async function loadCourses() {
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 const demo = [{
                     id: 1,
                     title: 'UX Design Fundamentals',
@@ -2445,7 +2437,8 @@
                     review_count: 156,
                     duration: '8h',
                     badge: 'bestseller',
-                    link: 'https://example.com/course/ux-design'
+                    link: 'https://example.com/course/ux-design',
+                    image: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop'
                 }, {
                     id: 2,
                     title: 'Branding Identity Mastery',
@@ -2458,7 +2451,8 @@
                     review_count: 89,
                     duration: '12h',
                     badge: 'popular',
-                    link: 'https://example.com/course/branding'
+                    link: 'https://example.com/course/branding',
+                    image: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&h=250&fit=crop'
                 }, {
                     id: 3,
                     title: 'Web Design Pro',
@@ -2471,7 +2465,8 @@
                     review_count: 234,
                     duration: '6h',
                     badge: 'free',
-                    link: 'https://example.com/course/web-design'
+                    link: 'https://example.com/course/web-design',
+                    image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&h=250&fit=crop'
                 }, {
                     id: 4,
                     title: 'Motion Graphics Pro',
@@ -2484,7 +2479,8 @@
                     review_count: 78,
                     duration: '15h',
                     badge: 'trending',
-                    link: 'https://example.com/course/motion'
+                    link: 'https://example.com/course/motion',
+                    image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop'
                 }, {
                     id: 5,
                     title: '3D Design with Blender',
@@ -2497,7 +2493,8 @@
                     review_count: 45,
                     duration: '20h',
                     badge: 'new',
-                    link: 'https://example.com/course/3d'
+                    link: 'https://example.com/course/3d',
+                    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=250&fit=crop'
                 }];
 
                 const processed = demo.map(c => ({
@@ -2506,6 +2503,7 @@
                     originalPrice: getOriginalPrice(c)
                 }));
                 renderCourses(processed);
+                allCourses = processed;
                 return;
             }
 
@@ -2548,7 +2546,7 @@
                 return `
                     <div class="course-card" onclick="enrollCourse('${c.id}')">
                         <div class="course-image">
-                            <img src="${c.thumbnail || 'https://via.placeholder.com/400x250/1a1a3e/7c3aed?text='+encodeURIComponent(c.title)}" alt="${c.title}" loading="lazy">
+                            <img src="${c.image || 'https://via.placeholder.com/400x250/1a1a3e/7c3aed?text='+encodeURIComponent(c.title)}" alt="${c.title}" loading="lazy">
                             ${c.badge ? `<span class="course-badge badge-${c.badge.toLowerCase()}">${c.badge}</span>` : ''}
                             <div class="price-tag">
                                 ${originalPriceDisplay}
@@ -2581,7 +2579,7 @@
         }
 
         async function loadClasses() {
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 const demo = [{
                     id: 'cl1',
                     course: 'UX Design Fundamentals',
@@ -2645,7 +2643,7 @@
         }
 
         async function loadTools() {
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 const demo = [{
                     id: 1,
                     name: 'AI Design Assistant',
@@ -2800,21 +2798,6 @@
         // ============================================================
         // SIDEBAR / NAV
         // ============================================================
-        function toggleMobileSidebar() {
-            const s = document.getElementById('sidebar');
-            const o = document.getElementById('sidebarOverlay');
-            mobileSidebarOpen = !mobileSidebarOpen;
-            s.classList.toggle('mobile-open', mobileSidebarOpen);
-            o.classList.toggle('active', mobileSidebarOpen);
-        }
-
-        function closeMobileSidebar() {
-            document.getElementById('sidebar').classList.remove('mobile-open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
-            mobileSidebarOpen = false;
-        }
-
-        // Sidebar toggle
         document.getElementById('sidebarToggle')?.addEventListener('click', function() {
             const s = document.getElementById('sidebar');
             const mc = document.getElementById('mainContent');
@@ -2822,52 +2805,21 @@
             mc.classList.toggle('sidebar-collapsed');
         });
 
-        // Mobile menu
         const mmb = document.getElementById('mobileMenuBtn');
         if (mmb) {
             mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
-            mmb.addEventListener('click', toggleMobileSidebar);
-        }
-        document.getElementById('sidebarOverlay')?.addEventListener('click', closeMobileSidebar);
-
-        // Navigation
-        document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const page = this.dataset.page;
-                if (!page) return;
-                document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelectorAll('[data-page="' + page + '"]').forEach(n => n.classList.add('active'));
-
-                if (page === 'home') {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else if (page === 'courses') {
-                    document.getElementById('coursesGrid').scrollIntoView({ behavior: 'smooth' });
-                } else if (page === 'classes') {
-                    document.getElementById('classesGrid').scrollIntoView({ behavior: 'smooth' });
-                } else if (page === 'tools') {
-                    document.getElementById('toolsGrid').scrollIntoView({ behavior: 'smooth' });
-                } else if (page === 'profile') {
-                    if (!currentUser) {
-                        openAuthModal();
-                        return;
-                    }
-                    showToast('Profile page', 'success');
-                } else if (page === 'my-learning') {
-                    if (!currentUser) {
-                        openAuthModal();
-                        return;
-                    }
-                    showToast('My Learning', 'success');
-                } else if (page === 'certificates') {
-                    if (!currentUser) {
-                        openAuthModal();
-                        return;
-                    }
-                    showToast('Certificates', 'success');
-                } else {
-                    showToast(page + ' page', 'success');
-                }
+            mmb.addEventListener('click', function() {
+                const s = document.getElementById('sidebar');
+                const o = document.getElementById('sidebarOverlay');
+                mobileSidebarOpen = !mobileSidebarOpen;
+                s.classList.toggle('mobile-open', mobileSidebarOpen);
+                o.classList.toggle('active', mobileSidebarOpen);
             });
+        }
+        document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            mobileSidebarOpen = false;
         });
 
         // ============================================================
@@ -2898,7 +2850,7 @@
         // ============================================================
         function autoDetectDevice() {
             const isMobile = window.innerWidth <= 900;
-            document.getElementById('mobileMenuBtn').style.display = isMobile ? 'flex' : 'none';
+            if (mmb) mmb.style.display = isMobile ? 'flex' : 'none';
             if (!isMobile) {
                 document.getElementById('sidebar').classList.remove('mobile-open');
                 document.getElementById('sidebarOverlay').classList.remove('active');
@@ -2952,5 +2904,6 @@
 
         init();
     </script>
+
 </body>
 </html>
