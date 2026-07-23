@@ -1854,14 +1854,7 @@
                 <a class="view-all" onclick="loadCategories()">View All <i class="fas fa-chevron-right"></i></a>
             </div>
             <div class="categories-grid animate-in" style="animation-delay:0.2s;" id="categoriesGrid">
-                <div class="skeleton" style="height:80px;"></div>
-                <div class="skeleton" style="height:80px;"></div>
-                <div class="skeleton" style="height:80px;"></div>
-                <div class="skeleton" style="height:80px;"></div>
-                <div class="skeleton" style="height:80px;"></div>
-                <div class="skeleton" style="height:80px;"></div>
-                <div class="skeleton" style="height:80px;"></div>
-                <div class="skeleton" style="height:80px;"></div>
+                <!-- Will be populated by JavaScript -->
             </div>
 
             <!-- COURSES -->
@@ -1870,11 +1863,7 @@
                 <a class="view-all" onclick="loadCourses()">View All <i class="fas fa-chevron-right"></i></a>
             </div>
             <div class="courses-grid animate-in" style="animation-delay:0.35s;" id="coursesGrid">
-                <div class="skeleton" style="height:280px; border-radius:20px;"></div>
-                <div class="skeleton" style="height:280px; border-radius:20px;"></div>
-                <div class="skeleton" style="height:280px; border-radius:20px;"></div>
-                <div class="skeleton" style="height:280px; border-radius:20px;"></div>
-                <div class="skeleton" style="height:280px; border-radius:20px;"></div>
+                <!-- Will be populated by JavaScript -->
             </div>
 
             <!-- CLASSES -->
@@ -1883,8 +1872,7 @@
                 <a class="view-all" onclick="loadClasses()">View All <i class="fas fa-chevron-right"></i></a>
             </div>
             <div class="classes-grid animate-in" style="animation-delay:0.45s;" id="classesGrid">
-                <div class="skeleton" style="height:200px; border-radius:16px;"></div>
-                <div class="skeleton" style="height:200px; border-radius:16px;"></div>
+                <!-- Will be populated by JavaScript -->
             </div>
 
             <!-- TOOLS -->
@@ -1893,10 +1881,7 @@
                 <a class="view-all" onclick="loadTools()">View All <i class="fas fa-chevron-right"></i></a>
             </div>
             <div class="tools-grid animate-in" style="animation-delay:0.55s;" id="toolsGrid">
-                <div class="skeleton" style="height:160px; border-radius:16px;"></div>
-                <div class="skeleton" style="height:160px; border-radius:16px;"></div>
-                <div class="skeleton" style="height:160px; border-radius:16px;"></div>
-                <div class="skeleton" style="height:160px; border-radius:16px;"></div>
+                <!-- Will be populated by JavaScript -->
             </div>
         </main>
     </div>
@@ -2025,6 +2010,146 @@
         let allClasses = [];
         let allTools = [];
         let allCategories = [];
+
+        // ============================================================
+        // DEMO DATA (Fallback when Supabase tables are empty)
+        // ============================================================
+        const DEMO_CATEGORIES = [
+            { name: 'UI/UX', icon: 'fa-pencil-ruler', color: '#7c3aed' },
+            { name: 'Branding', icon: 'fa-tag', color: '#ec4899' },
+            { name: 'Web Design', icon: 'fa-globe', color: '#3b82f6' },
+            { name: 'Motion', icon: 'fa-film', color: '#06b6d4' },
+            { name: '3D Design', icon: 'fa-cube', color: '#f59e0b' },
+            { name: 'Graphic Design', icon: 'fa-paint-brush', color: '#22c55e' },
+            { name: 'AI Design', icon: 'fa-brain', color: '#a855f7' },
+            { name: 'Typography', icon: 'fa-font', color: '#ec4899' }
+        ];
+
+        const DEMO_COURSES = [{
+            id: 1,
+            title: 'UX Design Fundamentals',
+            description: 'Learn the core principles of user experience design',
+            category: 'UI/UX',
+            price: 25000,
+            is_free: false,
+            instructor: 'Sarah Johnson',
+            rating: 4.8,
+            review_count: 156,
+            duration: '8h',
+            badge: 'bestseller',
+            link: 'https://example.com/course/ux-design',
+            image: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop'
+        }, {
+            id: 2,
+            title: 'Branding Identity Mastery',
+            description: 'Build powerful brand identities from scratch',
+            category: 'Branding',
+            price: 30000,
+            is_free: false,
+            instructor: 'Michael Chen',
+            rating: 4.9,
+            review_count: 89,
+            duration: '12h',
+            badge: 'popular',
+            link: 'https://example.com/course/branding',
+            image: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&h=250&fit=crop'
+        }, {
+            id: 3,
+            title: 'Web Design Pro',
+            description: 'Master modern web design with Figma and Framer',
+            category: 'Web Design',
+            price: 0,
+            is_free: true,
+            instructor: 'Emily Rodriguez',
+            rating: 4.7,
+            review_count: 234,
+            duration: '6h',
+            badge: 'free',
+            link: 'https://example.com/course/web-design',
+            image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&h=250&fit=crop'
+        }, {
+            id: 4,
+            title: 'Motion Graphics Pro',
+            description: 'Create stunning motion graphics with After Effects',
+            category: 'Motion',
+            price: 35000,
+            is_free: false,
+            instructor: 'David Kim',
+            rating: 4.6,
+            review_count: 78,
+            duration: '15h',
+            badge: 'trending',
+            link: 'https://example.com/course/motion',
+            image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop'
+        }, {
+            id: 5,
+            title: '3D Design with Blender',
+            description: 'Learn 3D modeling and animation from zero to hero',
+            category: '3D',
+            price: 40000,
+            is_free: false,
+            instructor: 'Alex Turner',
+            rating: 4.5,
+            review_count: 45,
+            duration: '20h',
+            badge: 'new',
+            link: 'https://example.com/course/3d',
+            image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=250&fit=crop'
+        }];
+
+        const DEMO_CLASSES = [{
+            id: 'cl1',
+            course: 'UX Design Fundamentals',
+            title: 'Class 1: Introduction to UX',
+            description: 'Live session covering UX fundamentals and best practices.',
+            date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            duration: 2,
+            whatsapp: 'https://chat.whatsapp.com/example1',
+            telegram: 'https://t.me/example1'
+        }, {
+            id: 'cl2',
+            course: 'Branding Identity Mastery',
+            title: 'Class 1: Brand Strategy 101',
+            description: 'Learn the foundations of brand strategy and positioning.',
+            date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+            duration: 2.5,
+            whatsapp: 'https://chat.whatsapp.com/example2',
+            telegram: 'https://t.me/example2'
+        }];
+
+        const DEMO_TOOLS = [{
+            id: 1,
+            name: 'AI Design Assistant',
+            description: 'Generate designs with AI',
+            price: 5000,
+            is_free: false,
+            category: 'ai',
+            link: 'https://example.com/tool/ai-assistant'
+        }, {
+            id: 2,
+            name: 'Color Palette Pro',
+            description: 'Create stunning color schemes',
+            price: 0,
+            is_free: true,
+            category: 'design',
+            link: 'https://example.com/tool/color-palette'
+        }, {
+            id: 3,
+            name: 'Mockup Generator',
+            description: 'Create realistic mockups',
+            price: 8000,
+            is_free: false,
+            category: 'design',
+            link: 'https://example.com/tool/mockup'
+        }, {
+            id: 4,
+            name: 'Font Pairing Tool',
+            description: 'Find perfect font combinations',
+            price: 3000,
+            is_free: false,
+            category: 'design',
+            link: 'https://example.com/tool/font-pairing'
+        }];
 
         // ============================================================
         // HELPERS
@@ -2381,27 +2506,19 @@
         }
 
         async function loadCategories() {
-            if (!supabaseConfigured) {
-                const demo = [
-                    { name: 'UI/UX', icon: 'fa-pencil-ruler', color: '#7c3aed' },
-                    { name: 'Branding', icon: 'fa-tag', color: '#ec4899' },
-                    { name: 'Web Design', icon: 'fa-globe', color: '#3b82f6' },
-                    { name: 'Motion', icon: 'fa-film', color: '#06b6d4' },
-                    { name: '3D Design', icon: 'fa-cube', color: '#f59e0b' },
-                    { name: 'Graphic Design', icon: 'fa-paint-brush', color: '#22c55e' },
-                    { name: 'AI Design', icon: 'fa-brain', color: '#a855f7' },
-                    { name: 'Typography', icon: 'fa-font', color: '#ec4899' }
-                ];
-                renderCategories(demo);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase.from('categories').select('*').order('name');
-                if (error) throw error;
-                renderCategories(data || []);
+                if (supabaseConfigured) {
+                    const { data, error } = await supabase.from('categories').select('*').order('name');
+                    if (!error && data && data.length > 0) {
+                        renderCategories(data);
+                        return;
+                    }
+                }
+                // Fallback to demo data
+                renderCategories(DEMO_CATEGORIES);
             } catch (e) {
                 console.error('Categories load error:', e);
+                renderCategories(DEMO_CATEGORIES);
             }
         }
 
@@ -2424,93 +2541,21 @@
         }
 
         async function loadCourses() {
-            if (!supabaseConfigured) {
-                const demo = [{
-                    id: 1,
-                    title: 'UX Design Fundamentals',
-                    description: 'Learn the core principles of user experience design',
-                    category: 'UI/UX',
-                    price: 25000,
-                    is_free: false,
-                    instructor: 'Sarah Johnson',
-                    rating: 4.8,
-                    review_count: 156,
-                    duration: '8h',
-                    badge: 'bestseller',
-                    link: 'https://example.com/course/ux-design',
-                    image: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop'
-                }, {
-                    id: 2,
-                    title: 'Branding Identity Mastery',
-                    description: 'Build powerful brand identities from scratch',
-                    category: 'Branding',
-                    price: 30000,
-                    is_free: false,
-                    instructor: 'Michael Chen',
-                    rating: 4.9,
-                    review_count: 89,
-                    duration: '12h',
-                    badge: 'popular',
-                    link: 'https://example.com/course/branding',
-                    image: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&h=250&fit=crop'
-                }, {
-                    id: 3,
-                    title: 'Web Design Pro',
-                    description: 'Master modern web design with Figma and Framer',
-                    category: 'Web Design',
-                    price: 0,
-                    is_free: true,
-                    instructor: 'Emily Rodriguez',
-                    rating: 4.7,
-                    review_count: 234,
-                    duration: '6h',
-                    badge: 'free',
-                    link: 'https://example.com/course/web-design',
-                    image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&h=250&fit=crop'
-                }, {
-                    id: 4,
-                    title: 'Motion Graphics Pro',
-                    description: 'Create stunning motion graphics with After Effects',
-                    category: 'Motion',
-                    price: 35000,
-                    is_free: false,
-                    instructor: 'David Kim',
-                    rating: 4.6,
-                    review_count: 78,
-                    duration: '15h',
-                    badge: 'trending',
-                    link: 'https://example.com/course/motion',
-                    image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop'
-                }, {
-                    id: 5,
-                    title: '3D Design with Blender',
-                    description: 'Learn 3D modeling and animation from zero to hero',
-                    category: '3D',
-                    price: 40000,
-                    is_free: false,
-                    instructor: 'Alex Turner',
-                    rating: 4.5,
-                    review_count: 45,
-                    duration: '20h',
-                    badge: 'new',
-                    link: 'https://example.com/course/3d',
-                    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=250&fit=crop'
-                }];
-
-                const processed = demo.map(c => ({
-                    ...c,
-                    displayPrice: getFormattedPrice(c),
-                    originalPrice: getOriginalPrice(c)
-                }));
-                renderCourses(processed);
-                allCourses = processed;
-                return;
-            }
-
             try {
-                const { data, error } = await supabase.from('courses').select('*').limit(10);
-                if (error) throw error;
-                const processed = (data || []).map(c => ({
+                let coursesData = [];
+                if (supabaseConfigured) {
+                    const { data, error } = await supabase.from('courses').select('*').limit(10);
+                    if (!error && data && data.length > 0) {
+                        coursesData = data;
+                    }
+                }
+
+                // If no data from Supabase, use demo data
+                if (!coursesData || coursesData.length === 0) {
+                    coursesData = DEMO_COURSES;
+                }
+
+                const processed = coursesData.map(c => ({
                     ...c,
                     displayPrice: getFormattedPrice(c),
                     originalPrice: getOriginalPrice(c)
@@ -2519,6 +2564,13 @@
                 allCourses = processed;
             } catch (e) {
                 console.error('Courses load error:', e);
+                const processed = DEMO_COURSES.map(c => ({
+                    ...c,
+                    displayPrice: getFormattedPrice(c),
+                    originalPrice: getOriginalPrice(c)
+                }));
+                renderCourses(processed);
+                allCourses = processed;
             }
         }
 
@@ -2579,37 +2631,24 @@
         }
 
         async function loadClasses() {
-            if (!supabaseConfigured) {
-                const demo = [{
-                    id: 'cl1',
-                    course: 'UX Design Fundamentals',
-                    title: 'Class 1: Introduction to UX',
-                    description: 'Live session covering UX fundamentals and best practices.',
-                    date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    duration: 2,
-                    whatsapp: 'https://chat.whatsapp.com/example1',
-                    telegram: 'https://t.me/example1'
-                }, {
-                    id: 'cl2',
-                    course: 'Branding Identity Mastery',
-                    title: 'Class 1: Brand Strategy 101',
-                    description: 'Learn the foundations of brand strategy and positioning.',
-                    date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-                    duration: 2.5,
-                    whatsapp: 'https://chat.whatsapp.com/example2',
-                    telegram: 'https://t.me/example2'
-                }];
-                renderClasses(demo);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase.from('classes').select('*').order('date', { ascending: true });
-                if (error) throw error;
-                renderClasses(data || []);
-                document.getElementById('classBadge').textContent = (data || []).length;
+                let classesData = [];
+                if (supabaseConfigured) {
+                    const { data, error } = await supabase.from('classes').select('*').order('date', { ascending: true });
+                    if (!error && data && data.length > 0) {
+                        classesData = data;
+                    }
+                }
+
+                if (!classesData || classesData.length === 0) {
+                    classesData = DEMO_CLASSES;
+                }
+
+                renderClasses(classesData);
+                document.getElementById('classBadge').textContent = classesData.length;
             } catch (e) {
                 console.error('Classes load error:', e);
+                renderClasses(DEMO_CLASSES);
             }
         }
 
@@ -2643,50 +2682,23 @@
         }
 
         async function loadTools() {
-            if (!supabaseConfigured) {
-                const demo = [{
-                    id: 1,
-                    name: 'AI Design Assistant',
-                    description: 'Generate designs with AI',
-                    price: 5000,
-                    is_free: false,
-                    category: 'ai',
-                    link: 'https://example.com/tool/ai-assistant'
-                }, {
-                    id: 2,
-                    name: 'Color Palette Pro',
-                    description: 'Create stunning color schemes',
-                    price: 0,
-                    is_free: true,
-                    category: 'design',
-                    link: 'https://example.com/tool/color-palette'
-                }, {
-                    id: 3,
-                    name: 'Mockup Generator',
-                    description: 'Create realistic mockups',
-                    price: 8000,
-                    is_free: false,
-                    category: 'design',
-                    link: 'https://example.com/tool/mockup'
-                }, {
-                    id: 4,
-                    name: 'Font Pairing Tool',
-                    description: 'Find perfect font combinations',
-                    price: 3000,
-                    is_free: false,
-                    category: 'design',
-                    link: 'https://example.com/tool/font-pairing'
-                }];
-                renderTools(demo);
-                return;
-            }
-
             try {
-                const { data, error } = await supabase.from('tools').select('*').limit(8);
-                if (error) throw error;
-                renderTools(data || []);
+                let toolsData = [];
+                if (supabaseConfigured) {
+                    const { data, error } = await supabase.from('tools').select('*').limit(8);
+                    if (!error && data && data.length > 0) {
+                        toolsData = data;
+                    }
+                }
+
+                if (!toolsData || toolsData.length === 0) {
+                    toolsData = DEMO_TOOLS;
+                }
+
+                renderTools(toolsData);
             } catch (e) {
                 console.error('Tools load error:', e);
+                renderTools(DEMO_TOOLS);
             }
         }
 
@@ -2728,7 +2740,6 @@
 
         function filterByCategory(cat) {
             showToast('Filtered by: ' + cat, 'success');
-            // In production, this would filter the courses grid
         }
 
         function toggleFavorite(id) {
