@@ -377,41 +377,6 @@
             opacity: 1;
             pointer-events: auto;
         }
-        .upgrade-card {
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.08));
-            border: 1px solid rgba(124, 58, 237, 0.15);
-            border-radius: 16px;
-            padding: 18px;
-            margin-top: auto;
-            text-align: center;
-            transition: opacity 0.25s;
-        }
-        .upgrade-card h4 {
-            font-size: 13px;
-            margin-bottom: 6px;
-        }
-        .upgrade-card p {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            line-height: 1.5;
-        }
-        .upgrade-btn {
-            background: var(--gradient-purple);
-            border: none;
-            color: white;
-            padding: 9px 20px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s;
-        }
-        .upgrade-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
-        }
 
         /* ===== MAIN ===== */
         .main-content {
@@ -715,6 +680,7 @@
             border-radius: 16px;
             overflow: hidden;
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
         .project-card:hover {
             transform: translateY(-4px);
@@ -1596,10 +1562,10 @@
                     <a href="profile.html" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
                 </div>
             </nav>
-            <div class="upgrade-card">
-                <h4>Upgrade to Pro</h4>
-                <p>Unlock all courses, certifications and premium features.</p>
-                <button class="upgrade-btn" onclick="showToast('Pro upgrade coming soon!', 'success')">Upgrade Now</button>
+            <div class="upgrade-card" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(59,130,246,0.08));border:1px solid rgba(124,58,237,0.15);border-radius:16px;padding:18px;margin-top:auto;text-align:center;transition:opacity 0.25s;">
+                <h4 style="font-size:13px;margin-bottom:6px;">Upgrade to Pro</h4>
+                <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Unlock all courses, certifications and premium features.</p>
+                <button class="upgrade-btn" onclick="showToast('Pro upgrade coming soon!', 'success')" style="background:var(--gradient-purple);border:none;color:white;padding:9px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;width:100%;transition:all 0.2s;">Upgrade Now</button>
             </div>
         </aside>
 
@@ -1801,98 +1767,33 @@
         // ============================================================
         // SUPABASE CONFIG
         // ============================================================
-        const SUPABASE_URL = 'https://nkbtqfytavsugfnxotit.supabase.co;
+        const SUPABASE_URL = 'https://nkbtqfytavsugfnxotit.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rYnRxZnl0YXZzdWdmbnhvdGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MDYyMzksImV4cCI6MjEwMDM4MjIzOX0.gZ3SbNtLxaal7_1J81pRPOfA9ivlmHGdA6BgQF2po84';
         const STORAGE_BUCKET = 'aurex-assets';
 
         let supabase = null;
         let supabaseConfigured = false;
-        let selectedFile = null;
-        let uploadedImageUrl = null;
 
         try {
-            if (SUPABASE_URL.includes('your-project')) throw new Error('Configure Supabase');
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             supabaseConfigured = true;
+            console.log('Supabase connected successfully!');
         } catch (e) {
-            console.warn('Supabase not configured. Using offline mode.');
+            console.warn('Supabase connection error:', e.message);
         }
 
         // ============================================================
-        // STORAGE HELPERS
+        // STATE
         // ============================================================
-        async function uploadFile(file, path) {
-            if (!supabaseConfigured) {
-                // In offline mode, create a fake URL
-                const reader = new FileReader();
-                return new Promise((resolve) => {
-                    reader.onload = function(e) {
-                        resolve({ publicUrl: e.target.result, error: null });
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            try {
-                // Ensure bucket exists
-                const { data: buckets } = await supabase.storage.listBuckets();
-                const bucketExists = buckets.some(b => b.name === STORAGE_BUCKET);
-                if (!bucketExists) {
-                    await supabase.storage.createBucket(STORAGE_BUCKET, { public: true });
-                }
-
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${path}/${Date.now()}.${fileExt}`;
-
-                const { data, error } = await supabase.storage
-                    .from(STORAGE_BUCKET)
-                    .upload(fileName, file);
-
-                if (error) throw error;
-
-                const { data: urlData } = supabase.storage
-                    .from(STORAGE_BUCKET)
-                    .getPublicUrl(fileName);
-
-                return { publicUrl: urlData.publicUrl, error: null };
-            } catch (error) {
-                console.error('Upload error:', error);
-                return { publicUrl: null, error: error.message };
-            }
-        }
-
-        async function deleteFile(path) {
-            if (!supabaseConfigured) return;
-
-            try {
-                const { error } = await supabase.storage
-                    .from(STORAGE_BUCKET)
-                    .remove([path]);
-                if (error) throw error;
-            } catch (error) {
-                console.error('Delete error:', error);
-            }
-        }
-
-        // ============================================================
-        // IMAGE UPLOAD HANDLING
-        // ============================================================
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            selectedFile = file;
-            const display = document.getElementById('fileNameDisplay');
-            display.textContent = file.name;
-
-            // Preview
-            const preview = document.getElementById('imagePreview');
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-            };
-            reader.readAsDataURL(file);
-        }
+        let currentUser = null;
+        let isPremium = false;
+        let isSignUp = false;
+        let mobileSidebarOpen = false;
+        let currentFilter = 'all';
+        let allProjects = [];
+        let currentProjectId = null;
+        let currentComments = [];
+        let selectedFile = null;
 
         // ============================================================
         // AUTH
@@ -2034,6 +1935,48 @@
         }
 
         // ============================================================
+        // STORAGE HELPERS
+        // ============================================================
+        async function uploadFile(file, path) {
+            if (!supabaseConfigured) {
+                const reader = new FileReader();
+                return new Promise((resolve) => {
+                    reader.onload = function(e) {
+                        resolve({ publicUrl: e.target.result, error: null });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            try {
+                // Check if bucket exists
+                const { data: buckets } = await supabase.storage.listBuckets();
+                const bucketExists = buckets.some(b => b.name === STORAGE_BUCKET);
+                if (!bucketExists) {
+                    await supabase.storage.createBucket(STORAGE_BUCKET, { public: true });
+                }
+
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${path}/${Date.now()}.${fileExt}`;
+
+                const { error } = await supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .upload(fileName, file);
+
+                if (error) throw error;
+
+                const { data: urlData } = supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .getPublicUrl(fileName);
+
+                return { publicUrl: urlData.publicUrl, error: null };
+            } catch (error) {
+                console.error('Upload error:', error);
+                return { publicUrl: null, error: error.message };
+            }
+        }
+
+        // ============================================================
         // HELPERS
         // ============================================================
         function showToast(msg, type = 'success') {
@@ -2080,6 +2023,25 @@
         }
 
         // ============================================================
+        // IMAGE UPLOAD HANDLING
+        // ============================================================
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            selectedFile = file;
+            const display = document.getElementById('fileNameDisplay');
+            display.textContent = file.name;
+
+            const preview = document.getElementById('imagePreview');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ============================================================
         // PROJECTS CRUD
         // ============================================================
         async function loadProjects() {
@@ -2116,6 +2078,7 @@
                 if (data && data.length > 0) {
                     allProjects = data;
                 } else {
+                    // Insert a demo project if table is empty
                     const demoProject = {
                         title: 'Welcome Project',
                         description: 'This is a sample project to get started. Premium users can create their own projects!',
@@ -2489,7 +2452,6 @@
             document.getElementById('imagePreview').innerHTML = '';
             document.getElementById('fileNameDisplay').textContent = 'No file selected';
             selectedFile = null;
-            uploadedImageUrl = null;
         }
 
         function closeCreateModal() {
