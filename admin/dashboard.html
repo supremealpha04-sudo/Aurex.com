@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#070714" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>Aurex Academy - Admin</title>
+    <title>Aurex Academy - Admin Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js">
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        /* ——— RESET & ROOT ——— */
+        /* ===== RESET & ROOT ===== */
         * {
             margin: 0;
             padding: 0;
@@ -71,7 +70,7 @@
             overflow-x: hidden;
         }
 
-        /* ——— SIDEBAR ——— */
+        /* ===== SIDEBAR ===== */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--bg-secondary);
@@ -104,6 +103,7 @@
                 transform: translateX(-100%);
                 width: var(--sidebar-width) !important;
                 box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
+                padding: 16px 12px;
             }
             .sidebar.mobile-open {
                 transform: translateX(0);
@@ -378,7 +378,7 @@
             pointer-events: auto;
         }
 
-        /* ——— MAIN ——— */
+        /* ===== MAIN ===== */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -398,7 +398,7 @@
             }
         }
 
-        /* ——— TOP BAR ——— */
+        /* ===== TOP BAR ===== */
         .top-bar {
             position: sticky;
             top: 8px;
@@ -499,6 +499,77 @@
             align-items: center;
             gap: 3px;
         }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: var(--gradient-purple);
+            color: white;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        .btn-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: var(--accent-green);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-success:hover {
+            background: rgba(34, 197, 94, 0.2);
+        }
         @media (max-width: 600px) {
             .top-bar {
                 margin: 6px 10px 14px;
@@ -526,7 +597,7 @@
             }
         }
 
-        /* ——— STATS ——— */
+        /* ===== STATS ===== */
         .stats-overview {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -620,6 +691,9 @@
             align-items: center;
             gap: 4px;
         }
+        .stat-card .stat-change.negative {
+            color: var(--accent-red);
+        }
         @media (max-width: 1200px) {
             .stats-overview {
                 grid-template-columns: repeat(2, 1fr);
@@ -640,7 +714,7 @@
             }
         }
 
-        /* ——— REVENUE STATS ——— */
+        /* ===== REVENUE STATS ===== */
         .revenue-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -721,7 +795,7 @@
             }
         }
 
-        /* ——— DASHBOARD GRID ——— */
+        /* ===== DASHBOARD GRID ===== */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -794,7 +868,7 @@
             }
         }
 
-        /* ——— TABLE ——— */
+        /* ===== TABLE ===== */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -875,11 +949,15 @@
             background: rgba(245, 158, 11, 0.1);
             color: var(--accent-orange);
         }
+        .status-pill.banned {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+        }
         .status-pill.completed {
             background: rgba(34, 197, 94, 0.1);
             color: var(--accent-green);
         }
-        .status-pill.scheduled {
+        .status-pill.in-progress {
             background: rgba(59, 130, 246, 0.1);
             color: var(--accent-blue);
         }
@@ -900,6 +978,10 @@
         .role-badge.student {
             background: rgba(6, 182, 212, 0.12);
             color: var(--accent-cyan);
+        }
+        .role-badge.superadmin {
+            background: rgba(236, 72, 153, 0.12);
+            color: var(--accent-pink);
         }
         .table-actions {
             display: flex;
@@ -936,7 +1018,7 @@
             border-color: rgba(59, 130, 246, 0.2);
         }
 
-        /* ——— QUICK ACTIONS ——— */
+        /* ===== QUICK ACTIONS ===== */
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -992,7 +1074,7 @@
             }
         }
 
-        /* ——— ACTIVITY ——— */
+        /* ===== ACTIVITY ===== */
         .activity-feed {
             display: flex;
             flex-direction: column;
@@ -1036,7 +1118,7 @@
             margin-top: 2px;
         }
 
-        /* ——— CHART ——— */
+        /* ===== CHART ===== */
         .chart-container {
             height: 200px;
             position: relative;
@@ -1092,7 +1174,7 @@
             text-align: center;
         }
 
-        /* ——— MODAL ——— */
+        /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -1203,42 +1285,48 @@
             margin-top: 4px;
             text-align: center;
         }
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 10px 20px;
-            border-radius: 10px;
-            background: var(--gradient-purple);
-            color: white;
-            border: none;
-            font-size: 12px;
-            font-weight: 600;
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
+            transition: all 0.3s;
+            background: var(--bg-card);
         }
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+        .file-upload-area:hover {
+            border-color: var(--accent-purple);
+            background: rgba(124, 58, 237, 0.03);
         }
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        .file-upload-area i {
+            font-size: 28px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
         }
-        .btn-success {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
+        .file-upload-area p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 0;
         }
-        .btn-success:hover {
-            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+        .file-upload-area .file-name {
+            font-size: 11px;
+            color: var(--accent-cyan);
+            margin-top: 4px;
         }
-        .btn-warning {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
+        .file-upload-area input[type="file"] {
+            display: none;
         }
-        .btn-warning:hover {
-            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+        .image-preview {
+            margin-top: 10px;
+            max-width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .image-preview img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
         }
         @media (max-width: 600px) {
             .modal {
@@ -1253,7 +1341,7 @@
             }
         }
 
-        /* ——— TOAST ——— */
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -1293,7 +1381,7 @@
             color: #ef4444;
         }
 
-        /* ——— LOADING ——— */
+        /* ===== LOADING ===== */
         .loading-overlay {
             position: fixed;
             inset: 0;
@@ -1328,7 +1416,7 @@
             font-size: 12px;
         }
 
-        /* ——— SKELETON ——— */
+        /* ===== SKELETON ===== */
         .skeleton {
             background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.03) 75%);
             background-size: 200% 100%;
@@ -1344,7 +1432,7 @@
             }
         }
 
-        /* ——— EMPTY STATE ——— */
+        /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
             padding: 32px 16px;
@@ -1359,7 +1447,7 @@
             color: var(--text-muted);
         }
 
-        /* ——— DELETE CONFIRM ——— */
+        /* ===== DELETE CONFIRM ===== */
         .delete-confirm {
             display: flex;
             gap: 8px;
@@ -1391,7 +1479,7 @@
             background: #dc2626;
         }
 
-        /* ——— SEARCH BAR ——— */
+        /* ===== SEARCH BAR ===== */
         .search-bar {
             display: flex;
             align-items: center;
@@ -1419,7 +1507,7 @@
             color: var(--text-muted);
         }
 
-        /* ——— FILTER BAR ——— */
+        /* ===== FILTER BAR ===== */
         .filter-bar {
             display: flex;
             gap: 8px;
@@ -1437,7 +1525,7 @@
             font-family: inherit;
         }
 
-        /* ——— PAGINATION ——— */
+        /* ===== PAGINATION ===== */
         .pagination {
             display: flex;
             align-items: center;
@@ -1475,7 +1563,7 @@
             cursor: not-allowed;
         }
 
-        /* ——— MOBILE BOTTOM NAV ——— */
+        /* ===== MOBILE BOTTOM NAV ===== */
         .mobile-bottom-nav {
             display: none;
             position: fixed;
@@ -1536,7 +1624,7 @@
             }
         }
 
-        /* ——— NOTIFICATION PANEL ——— */
+        /* ===== NOTIFICATION PANEL ===== */
         .notif-panel {
             position: fixed;
             top: 60px;
@@ -1597,7 +1685,7 @@
             margin-top: 2px;
         }
 
-        /* ——— PROGRESS BAR ——— */
+        /* ===== PROGRESS BAR ===== */
         .progress-bar {
             width: 100%;
             height: 6px;
@@ -1612,7 +1700,7 @@
             transition: width 0.5s ease;
         }
 
-        /* ——— SETTINGS TOGGLE ——— */
+        /* ===== SETTINGS TOGGLE ===== */
         .settings-item {
             display: flex;
             align-items: center;
@@ -1678,7 +1766,7 @@
             transform: translateX(18px);
         }
 
-        /* ——— ANIMATIONS ——— */
+        /* ===== ANIMATIONS ===== */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -1692,128 +1780,6 @@
         .animate-in {
             animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             opacity: 0;
-        }
-
-        /* ——— CLASS CARD ——— */
-        .class-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: all 0.25s;
-        }
-        .class-card:hover {
-            border-color: rgba(124, 58, 237, 0.15);
-            transform: translateY(-2px);
-        }
-        .class-card .class-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .class-card .class-title {
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .class-card .class-meta {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-        .class-card .class-meta span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .class-card .class-links {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        .class-card .class-links a {
-            color: var(--accent-cyan);
-            text-decoration: none;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            background: rgba(6, 182, 212, 0.08);
-            border-radius: 6px;
-            border: 1px solid rgba(6, 182, 212, 0.15);
-            transition: all 0.2s;
-        }
-        .class-card .class-links a:hover {
-            background: rgba(6, 182, 212, 0.15);
-            border-color: rgba(6, 182, 212, 0.3);
-        }
-        .class-card .class-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .class-card .class-actions button {
-            padding: 4px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .class-card .class-actions button:hover {
-            background: rgba(124, 58, 237, 0.1);
-            color: var(--accent-violet);
-            border-color: rgba(124, 58, 237, 0.2);
-        }
-        .class-card .class-actions button.danger:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--accent-red);
-            border-color: rgba(239, 68, 68, 0.2);
-        }
-
-        /* ——— RESPONSIVE FIXES ——— */
-        img,
-        video,
-        iframe {
-            max-width: 100%;
-        }
-        .table-wrapper {
-            max-width: 100%;
-        }
-        .data-table td,
-        .data-table th {
-            word-break: break-word;
-        }
-        @media (max-width: 480px) {
-            .data-table {
-                min-width: 400px;
-            }
-            .top-actions .btn-primary {
-                padding: 6px 12px;
-                font-size: 10px;
-            }
-            .top-actions .icon-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
-            .user-profile {
-                padding: 2px 6px 2px 2px;
-            }
-            .user-profile img {
-                width: 20px;
-                height: 20px;
-            }
         }
     </style>
 </head>
@@ -1856,6 +1822,9 @@
                     </div>
                     <div class="nav-item" data-section="users" onclick="showSection('users')">
                         <i class="fas fa-users"></i><span>Users</span> <span class="badge" id="userBadge">0</span>
+                    </div>
+                    <div class="nav-item" data-section="projects" onclick="showSection('projects')">
+                        <i class="fas fa-folder"></i><span>Projects</span> <span class="badge" id="projectBadge">0</span>
                     </div>
                     <div class="nav-item" data-section="courses" onclick="showSection('courses')">
                         <i class="fas fa-graduation-cap"></i><span>Courses</span> <span class="badge" id="courseBadge">0</span>
@@ -1931,9 +1900,9 @@
                         <div class="stat-change"><i class="fas fa-arrow-up"></i> <span id="statUsersChange">--</span> this week</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-header"><span class="stat-label">Total Courses</span><div class="stat-icon blue"><i class="fas fa-graduation-cap"></i></div></div>
-                        <div class="stat-value" id="statTotalCourses">0</div>
-                        <div class="stat-change"><i class="fas fa-arrow-up"></i> <span id="statCoursesChange">--</span> this week</div>
+                        <div class="stat-header"><span class="stat-label">Total Projects</span><div class="stat-icon blue"><i class="fas fa-folder"></i></div></div>
+                        <div class="stat-value" id="statTotalProjects">0</div>
+                        <div class="stat-change"><i class="fas fa-arrow-up"></i> <span id="statProjectsChange">--</span> this week</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-header"><span class="stat-label">Premium Users</span><div class="stat-icon orange"><i class="fas fa-crown"></i></div></div>
@@ -1996,23 +1965,23 @@
                                 <i class="fas fa-user-plus" style="background:rgba(59,130,246,0.1);color:var(--accent-blue);"></i>
                                 <div class="info"><div class="label">Add User</div><div class="desc">Create new account</div></div>
                             </div>
+                            <div class="quick-action-btn" onclick="openModal('createProjectModal')">
+                                <i class="fas fa-folder-plus" style="background:rgba(124,58,237,0.1);color:var(--accent-violet);"></i>
+                                <div class="info"><div class="label">Add Project</div><div class="desc">Create new project</div></div>
+                            </div>
                             <div class="quick-action-btn" onclick="openModal('createCourseModal')">
-                                <i class="fas fa-plus-circle" style="background:rgba(124,58,237,0.1);color:var(--accent-violet);"></i>
+                                <i class="fas fa-plus-circle" style="background:rgba(6,182,212,0.1);color:var(--accent-cyan);"></i>
                                 <div class="info"><div class="label">Add Course</div><div class="desc">Publish new course</div></div>
                             </div>
                             <div class="quick-action-btn" onclick="openModal('createClassModal')">
-                                <i class="fas fa-calendar-plus" style="background:rgba(6,182,212,0.1);color:var(--accent-cyan);"></i>
+                                <i class="fas fa-calendar-plus" style="background:rgba(34,197,94,0.1);color:var(--accent-green);"></i>
                                 <div class="info"><div class="label">Add Class</div><div class="desc">Schedule new class</div></div>
                             </div>
                             <div class="quick-action-btn" onclick="openModal('createToolModal')">
-                                <i class="fas fa-tools" style="background:rgba(34,197,94,0.1);color:var(--accent-green);"></i>
+                                <i class="fas fa-tools" style="background:rgba(245,158,11,0.1);color:var(--accent-orange);"></i>
                                 <div class="info"><div class="label">Add Tool</div><div class="desc">Create new tool</div></div>
                             </div>
-                            <div class="quick-action-btn" onclick="showSection('premium')">
-                                <i class="fas fa-crown" style="background:rgba(245,158,11,0.1);color:var(--accent-orange);"></i>
-                                <div class="info"><div class="label">Premium</div><div class="desc">Manage subscribers</div></div>
-                            </div>
-                            <div class="quick-action-btn" onclick="showToast('Reports export coming soon', 'success')">
+                            <div class="quick-action-btn" onclick="showToast('Export reports coming soon', 'success')">
                                 <i class="fas fa-file-export" style="background:rgba(236,72,153,0.1);color:var(--accent-pink);"></i>
                                 <div class="info"><div class="label">Export Data</div><div class="desc">Download reports</div></div>
                             </div>
@@ -2103,6 +2072,24 @@
                             <tbody id="allUsersBody"></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- ===== PROJECTS ===== -->
+            <div id="section-projects" style="display:none;">
+                <div class="dash-card animate-in" style="margin:0 16px 24px;">
+                    <div class="dash-header">
+                        <h3><i class="fas fa-folder" style="color:var(--accent-violet);margin-right:6px;"></i>All Projects</h3>
+                        <div class="actions">
+                            <button onclick="openModal('createProjectModal')"><i class="fas fa-plus"></i> Add Project</button>
+                        </div>
+                    </div>
+                    <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="projectSearch" placeholder="Search projects..." oninput="filterProjects()"></div>
+                    <div class="filter-bar">
+                        <select id="projectCategoryFilter" onchange="filterProjects()"><option value="">All Categories</option><option value="ui-ux">UI/UX</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion</option><option value="3d">3D</option></select>
+                        <select id="projectStatusFilter" onchange="filterProjects()"><option value="">All Status</option><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select>
+                    </div>
+                    <div id="projectsList"></div>
                 </div>
             </div>
 
@@ -2265,8 +2252,8 @@
     <div class="mobile-bottom-nav">
         <div class="nav-items">
             <div class="nav-item-mobile active" onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i>Dashboard</div>
-            <div class="nav-item-mobile" onclick="showSection('revenue')"><i class="fas fa-chart-simple"></i>Revenue</div>
             <div class="nav-item-mobile" onclick="showSection('users')"><i class="fas fa-users"></i>Users</div>
+            <div class="nav-item-mobile" onclick="showSection('projects')"><i class="fas fa-folder"></i>Projects</div>
             <div class="nav-item-mobile" onclick="showSection('courses')"><i class="fas fa-graduation-cap"></i>Courses</div>
             <div class="nav-item-mobile" onclick="showSection('settings')"><i class="fas fa-cog"></i>Settings</div>
         </div>
@@ -2274,29 +2261,59 @@
 
     <!-- ===== MODALS ===== -->
 
-    <!-- CREATE USER -->
+    <!-- CREATE / EDIT USER -->
     <div class="modal-overlay" id="createUserModal">
         <div class="modal">
             <button class="close-btn" onclick="closeModal('createUserModal')"><i class="fas fa-times"></i></button>
-            <h2>Create User</h2>
-            <p>Add a new user to the platform.</p>
+            <h2 id="userModalTitle">Create User</h2>
+            <p id="userModalDesc">Add a new user to the platform.</p>
+            <input type="hidden" id="editUserId">
             <div class="form-group"><label>Full Name</label><input type="text" id="newUserName" placeholder="John Doe"></div>
             <div class="form-group"><label>Email</label><input type="email" id="newUserEmail" placeholder="john@example.com"></div>
             <div class="form-row">
                 <div class="form-group"><label>Role</label><select id="newUserRole"><option value="student">Student</option><option value="instructor">Instructor</option><option value="admin">Admin</option></select></div>
                 <div class="form-group"><label>Status</label><select id="newUserStatus"><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option></select></div>
             </div>
-            <div class="form-group"><label>Password</label><input type="password" id="newUserPassword" placeholder="••••••••"></div>
-            <button class="btn-primary" onclick="createUser()"><i class="fas fa-plus"></i> Create User</button>
+            <div class="form-group" id="passwordGroup"><label>Password</label><input type="password" id="newUserPassword" placeholder="••••••••"></div>
+            <button class="btn-primary" id="userSubmitBtn" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
         </div>
     </div>
 
-    <!-- CREATE COURSE -->
+    <!-- CREATE / EDIT PROJECT -->
+    <div class="modal-overlay" id="createProjectModal">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('createProjectModal')"><i class="fas fa-times"></i></button>
+            <h2 id="projectModalTitle">Create Project</h2>
+            <p id="projectModalDesc">Add a new project to the platform.</p>
+            <input type="hidden" id="editProjectId">
+            <div class="form-group"><label>Project Name</label><input type="text" id="newProjectName" placeholder="Project name"></div>
+            <div class="form-group"><label>Description</label><textarea id="newProjectDesc" rows="2" placeholder="Project description..."></textarea></div>
+            <div class="form-row">
+                <div class="form-group"><label>Category</label><select id="newProjectCategory"><option value="ui-ux">UI/UX</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion</option><option value="3d">3D</option></select></div>
+                <div class="form-group"><label>Status</label><select id="newProjectStatus"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select></div>
+            </div>
+            <div class="form-group">
+                <label>Project Image</label>
+                <div class="file-upload-area" onclick="document.getElementById('projectImageInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click to upload an image</p>
+                    <div class="file-name" id="projectFileNameDisplay">No file selected</div>
+                    <input type="file" id="projectImageInput" accept="image/*" onchange="handleProjectImageUpload(event)">
+                </div>
+                <div class="image-preview" id="projectImagePreview"></div>
+            </div>
+            <div class="form-group"><label>Tags (comma separated)</label><input type="text" id="newProjectTags" placeholder="branding, logo, design"></div>
+            <button class="btn-primary" id="projectSubmitBtn" onclick="saveProject()"><i class="fas fa-save"></i> Save Project</button>
+        </div>
+    </div>
+
+    <!-- CREATE / EDIT COURSE -->
     <div class="modal-overlay" id="createCourseModal">
         <div class="modal">
             <button class="close-btn" onclick="closeModal('createCourseModal')"><i class="fas fa-times"></i></button>
-            <h2>Create Course</h2>
-            <p>Add a new course to the catalog.</p>
+            <h2 id="courseModalTitle">Create Course</h2>
+            <p id="courseModalDesc">Add a new course to the catalog.</p>
+            <input type="hidden" id="editCourseId">
             <div class="form-group"><label>Course Title</label><input type="text" id="newCourseTitle" placeholder="UX Design Fundamentals"></div>
             <div class="form-group"><label>Description</label><textarea id="newCourseDesc" rows="2" placeholder="Course description..."></textarea></div>
             <div class="form-row">
@@ -2305,11 +2322,21 @@
             </div>
             <div class="form-group"><label>Instructor</label><input type="text" id="newCourseInstructor" placeholder="Instructor name"></div>
             <div class="form-group"><label>Course Link</label><input type="url" id="newCourseLink" placeholder="https://example.com/course"></div>
-            <button class="btn-primary" onclick="createCourse()"><i class="fas fa-plus"></i> Create Course</button>
+            <div class="form-group">
+                <label>Course Image</label>
+                <div class="file-upload-area" onclick="document.getElementById('courseImageInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click to upload an image</p>
+                    <div class="file-name" id="courseFileNameDisplay">No file selected</div>
+                    <input type="file" id="courseImageInput" accept="image/*" onchange="handleCourseImageUpload(event)">
+                </div>
+                <div class="image-preview" id="courseImagePreview"></div>
+            </div>
+            <button class="btn-primary" id="courseSubmitBtn" onclick="saveCourse()"><i class="fas fa-save"></i> Save Course</button>
         </div>
     </div>
 
-    <!-- CREATE CLASS -->
+    <!-- CREATE / EDIT CLASS -->
     <div class="modal-overlay" id="createClassModal">
         <div class="modal">
             <button class="close-btn" onclick="closeModal('createClassModal')"><i class="fas fa-times"></i></button>
@@ -2320,7 +2347,7 @@
             <div class="form-group"><label>Class Title</label><input type="text" id="classTitle" placeholder="Introduction to UX Design"></div>
             <div class="form-group"><label>Description</label><textarea id="classDesc" rows="2" placeholder="Class description..."></textarea></div>
             <div class="form-row">
-                <div class="form-group"><label>Date</label><input type="datetime-local" id="classDate"></div>
+                <div class="form-group"><label>Date & Time</label><input type="datetime-local" id="classDate"></div>
                 <div class="form-group"><label>Duration (hours)</label><input type="number" id="classDuration" placeholder="2" value="2"></div>
             </div>
             <div class="form-group"><label>WhatsApp Group Link</label><input type="url" id="classWhatsApp" placeholder="https://chat.whatsapp.com/..."></div>
@@ -2329,12 +2356,13 @@
         </div>
     </div>
 
-    <!-- CREATE TOOL -->
+    <!-- CREATE / EDIT TOOL -->
     <div class="modal-overlay" id="createToolModal">
         <div class="modal">
             <button class="close-btn" onclick="closeModal('createToolModal')"><i class="fas fa-times"></i></button>
-            <h2>Create Tool</h2>
-            <p>Add a new tool to the marketplace.</p>
+            <h2 id="toolModalTitle">Create Tool</h2>
+            <p id="toolModalDesc">Add a new tool to the marketplace.</p>
+            <input type="hidden" id="editToolId">
             <div class="form-group"><label>Tool Name</label><input type="text" id="newToolName" placeholder="Tool name"></div>
             <div class="form-group"><label>Description</label><textarea id="newToolDesc" rows="2" placeholder="Tool description..."></textarea></div>
             <div class="form-row">
@@ -2342,7 +2370,7 @@
                 <div class="form-group"><label>Category</label><select id="newToolCategory"><option value="design">Design</option><option value="development">Development</option><option value="ai">AI</option><option value="productivity">Productivity</option></select></div>
             </div>
             <div class="form-group"><label>Tool Link</label><input type="url" id="newToolLink" placeholder="https://example.com/tool"></div>
-            <button class="btn-primary" onclick="createTool()"><i class="fas fa-plus"></i> Create Tool</button>
+            <button class="btn-primary" id="toolSubmitBtn" onclick="saveTool()"><i class="fas fa-save"></i> Save Tool</button>
         </div>
     </div>
 
@@ -2394,19 +2422,17 @@
         // ============================================================
         const SUPABASE_URL = 'https://your-project.supabase.co';
         const SUPABASE_ANON_KEY = 'your-anon-key';
+        const STORAGE_BUCKET = 'aurex-assets';
 
         let supabase = null;
-        try {
-            if (SUPABASE_URL.includes('your-project')) throw new Error('Configure Supabase');
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch (e) {
-            console.warn('Supabase not configured. Using demo data.');
-        }
+        let supabaseConfigured = false;
+        let currentUser = null;
+        let isAdmin = false;
+        const ADMIN_EMAILS = ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'];
 
-        // ============================================================
-        // STATE
-        // ============================================================
+        // State
         let allUsers = [];
+        let allProjects = [];
         let allCourses = [];
         let allClasses = [];
         let allTools = [];
@@ -2418,63 +2444,111 @@
         let notifPanelOpen = false;
         let currentChartPeriod = 'weekly';
         let currentRevenuePeriod = 'all';
-        let isAdmin = false;
-        const ADMIN_EMAILS = ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'];
         let premiumPrice = 13500;
         let premiumDuration = 6;
         let premiumDiscount = 45;
-        let currentUser = null;
+
+        // Upload state
+        let projectSelectedFile = null;
+        let courseSelectedFile = null;
 
         // ============================================================
-        // HELPERS
+        // SUPABASE INIT
         // ============================================================
-        function formatDate(d) {
-            if (!d) return '—';
-            const dt = new Date(d);
-            return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        try {
+            if (SUPABASE_URL.includes('your-project')) throw new Error('Configure Supabase');
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseConfigured = true;
+        } catch (e) {
+            console.warn('Supabase not configured. Using demo mode.');
         }
 
-        function formatTime(d) {
-            if (!d) return '—';
-            const dt = new Date(d);
-            return dt.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        // ============================================================
+        // STORAGE HELPERS
+        // ============================================================
+        async function uploadFile(file, path) {
+            if (!supabaseConfigured) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        resolve({ publicUrl: e.target.result, error: null });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            try {
+                const { data: buckets } = await supabase.storage.listBuckets();
+                const bucketExists = buckets.some(b => b.name === STORAGE_BUCKET);
+                if (!bucketExists) {
+                    await supabase.storage.createBucket(STORAGE_BUCKET, { public: true });
+                }
+
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${path}/${Date.now()}.${fileExt}`;
+
+                const { error } = await supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .upload(fileName, file);
+
+                if (error) throw error;
+
+                const { data: urlData } = supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .getPublicUrl(fileName);
+
+                return { publicUrl: urlData.publicUrl, error: null };
+            } catch (error) {
+                console.error('Upload error:', error);
+                return { publicUrl: null, error: error.message };
+            }
         }
 
-        function formatCurrency(amount) {
-            if (!amount) return '₦0';
-            return '₦' + amount.toLocaleString();
+        // ============================================================
+        // IMAGE UPLOAD HANDLERS
+        // ============================================================
+        function handleProjectImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            projectSelectedFile = file;
+            document.getElementById('projectFileNameDisplay').textContent = file.name;
+
+            const preview = document.getElementById('projectImagePreview');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
         }
 
-        function showToast(msg, type = 'success') {
-            const t = document.getElementById('toast');
-            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
-            t.className = 'toast ' + type + ' show';
-            clearTimeout(t._hide);
-            t._hide = setTimeout(() => t.classList.remove('show'), 3500);
-        }
+        function handleCourseImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            courseSelectedFile = file;
+            document.getElementById('courseFileNameDisplay').textContent = file.name;
 
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+            const preview = document.getElementById('courseImagePreview');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
         }
 
         // ============================================================
         // AUTH
         // ============================================================
         async function checkAuth() {
-            if (!supabase) {
+            if (!supabaseConfigured) {
                 isAdmin = true;
                 updateAdminUI();
                 return;
             }
+
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 currentUser = user;
-                const email = user.email;
-                isAdmin = ADMIN_EMAILS.includes(email);
+                isAdmin = ADMIN_EMAILS.includes(user.email);
                 if (isAdmin) {
                     updateAdminUI();
                 } else {
@@ -2482,6 +2556,7 @@
                     setTimeout(() => window.location.href = 'index.html', 1500);
                 }
             }
+
             supabase.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session?.user) {
                     currentUser = session.user;
@@ -2503,7 +2578,7 @@
         }
 
         function handleLogout() {
-            if (supabase) {
+            if (supabaseConfigured) {
                 supabase.auth.signOut();
             }
             showToast('Logged out', 'success');
@@ -2529,6 +2604,7 @@
                 dashboard: 'Admin Dashboard',
                 revenue: 'Revenue Analytics',
                 users: 'Users',
+                projects: 'Projects',
                 courses: 'Courses',
                 classes: 'Classes',
                 tools: 'Tools',
@@ -2540,14 +2616,15 @@
             document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
             if (mobileSidebarOpen) closeMobileSidebar();
 
-            if (section === 'users' && allUsers.length === 0) loadAllUsers();
-            if (section === 'courses' && allCourses.length === 0) loadAllCourses();
-            if (section === 'classes' && allClasses.length === 0) loadAllClasses();
-            if (section === 'tools' && allTools.length === 0) loadAllTools();
+            if (section === 'users') loadAllUsers();
+            if (section === 'projects') loadAllProjects();
+            if (section === 'courses') loadAllCourses();
+            if (section === 'classes') loadAllClasses();
+            if (section === 'tools') loadAllTools();
             if (section === 'revenue') loadRevenueSection();
             if (section === 'premium') loadPremiumSection();
             if (section === 'payments') loadAllPayments();
-            if (section === 'messages' && allMessages.length === 0) loadAllMessages();
+            if (section === 'messages') loadAllMessages();
         }
 
         function toggleMobileSidebar() {
@@ -2591,17 +2668,47 @@
         document.getElementById('sidebarOverlay')?.addEventListener('click', closeMobileSidebar);
 
         // ============================================================
-        // SUPABASE CRUD
+        // HELPERS
+        // ============================================================
+        function formatDate(d) {
+            if (!d) return '—';
+            const dt = new Date(d);
+            return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatCurrency(amount) {
+            if (!amount) return '₦0';
+            return '₦' + amount.toLocaleString();
+        }
+
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+            t.className = 'toast ' + type + ' show';
+            clearTimeout(t._hide);
+            t._hide = setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ============================================================
+        // SUPABASE CRUD HELPERS
         // ============================================================
         async function fetchFromTable(table) {
-            if (!supabase) {
-                if (table === 'users') return generateDemoUsers();
-                if (table === 'courses') return generateDemoCourses();
-                if (table === 'classes') return generateDemoClasses();
-                if (table === 'tools') return generateDemoTools();
-                if (table === 'revenue') return generateDemoRevenue();
-                if (table === 'messages') return generateDemoMessages();
-                if (table === 'activities') return generateDemoActivities();
+            if (!supabaseConfigured) {
+                if (table === 'users') return [];
+                if (table === 'projects') return [];
+                if (table === 'courses') return [];
+                if (table === 'classes') return [];
+                if (table === 'tools') return [];
+                if (table === 'revenue') return [];
+                if (table === 'messages') return [];
                 return [];
             }
             const { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
@@ -2610,7 +2717,7 @@
         }
 
         async function insertIntoTable(table, payload) {
-            if (!supabase) { showToast('Supabase not configured. Demo mode.', 'success'); return true; }
+            if (!supabaseConfigured) { showToast('Supabase not configured. Demo mode.', 'success'); return true; }
             const { error } = await supabase.from(table).insert(payload);
             if (error) { console.error(error);
                 showToast('Error: ' + error.message, 'error'); return false; }
@@ -2618,7 +2725,7 @@
         }
 
         async function updateTable(table, id, payload) {
-            if (!supabase) { showToast('Supabase not configured. Demo mode.', 'success'); return true; }
+            if (!supabaseConfigured) { showToast('Supabase not configured. Demo mode.', 'success'); return true; }
             const { error } = await supabase.from(table).update(payload).eq('id', id);
             if (error) { console.error(error);
                 showToast('Error: ' + error.message, 'error'); return false; }
@@ -2626,7 +2733,7 @@
         }
 
         async function deleteFromTable(table, id) {
-            if (!supabase) { showToast('Supabase not configured. Demo mode.', 'success'); return true; }
+            if (!supabaseConfigured) { showToast('Supabase not configured. Demo mode.', 'success'); return true; }
             const { error } = await supabase.from(table).delete().eq('id', id);
             if (error) { console.error(error);
                 showToast('Error: ' + error.message, 'error'); return false; }
@@ -2634,126 +2741,27 @@
         }
 
         // ============================================================
-        // DEMO DATA
-        // ============================================================
-        function generateDemoUsers() {
-            const names = ['Emma Wilson', 'Liam Chen', 'Sophia Patel', 'Noah Garcia', 'Olivia Brown', 'Mason Davis'];
-            return names.map((n, i) => ({
-                id: 'u' + (i + 1),
-                name: n,
-                email: n.toLowerCase().replace(' ', '.') + '@example.com',
-                role: ['student', 'student', 'instructor', 'student', 'admin', 'student'][i],
-                status: ['active', 'active', 'active', 'pending', 'active', 'inactive'][i],
-                is_premium: i < 2,
-                joined: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString()
-            }));
-        }
-
-        function generateDemoCourses() {
-            const titles = ['UX Design Mastery', 'Branding Identity Pro', 'Web Design Pro', 'Motion Graphics Mastery',
-                '3D Modeling Essentials'
-            ];
-            return titles.map((t, i) => ({
-                id: 'c' + (i + 1),
-                title: t,
-                description: 'Learn the fundamentals of ' + t.toLowerCase(),
-                category: ['ui-ux', 'branding', 'web', 'motion', '3d'][i],
-                price: [25000, 30000, 0, 35000, 40000][i],
-                is_free: [false, false, true, false, false][i],
-                instructor: 'Instructor ' + (i + 1),
-                link: 'https://example.com/course/' + (i + 1),
-                created_at: new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000).toISOString()
-            }));
-        }
-
-        function generateDemoClasses() {
-            const courses = ['UX Design Mastery', 'Branding Identity Pro', 'Web Design Pro'];
-            return courses.map((c, i) => ({
-                id: 'cl' + (i + 1),
-                course: c,
-                title: 'Class ' + (i + 1) + ': ' + c,
-                description: 'Live session covering key concepts',
-                date: new Date(Date.now() + (i + 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
-                duration: 2 + i,
-                whatsapp: 'https://chat.whatsapp.com/example' + (i + 1),
-                telegram: 'https://t.me/example' + (i + 1),
-                created_at: new Date().toISOString()
-            }));
-        }
-
-        function generateDemoTools() {
-            const tools = [
-                { name: 'AI Design Assistant', price: 5000, category: 'ai' },
-                { name: 'Color Palette Pro', price: 0, category: 'design' },
-                { name: 'Mockup Generator', price: 8000, category: 'design' }
-            ];
-            return tools.map((t, i) => ({
-                id: 't' + (i + 1),
-                name: t.name,
-                description: 'Professional tool for creative work.',
-                price: t.price,
-                is_free: t.price === 0,
-                category: t.category,
-                link: 'https://example.com/tool/' + (i + 1),
-                created_at: new Date().toISOString()
-            }));
-        }
-
-        function generateDemoRevenue() {
-            return [
-                { id: 'r1', user_email: 'emma.wilson@example.com', type: 'premium', item: 'Premium Subscription',
-                    amount: 13500, status: 'completed', created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
-                        .toISOString() },
-                { id: 'r2', user_email: 'liam.chen@example.com', type: 'course', item: 'UX Design Mastery',
-                    amount: 25000, status: 'completed', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
-                        .toISOString() },
-                { id: 'r3', user_email: 'sophia.patel@example.com', type: 'tool', item: 'AI Design Assistant',
-                    amount: 5000, status: 'pending', created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-                    .toISOString() }
-            ];
-        }
-
-        function generateDemoMessages() {
-            return [
-                { id: 'm1', from: 'Emma Wilson', subject: 'Course Inquiry', preview: 'I have a question about...',
-                    status: 'unread', created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-                { id: 'm2', from: 'Liam Chen', subject: 'Assignment Help', preview: 'Can you review my work...',
-                    status: 'read', created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() }
-            ];
-        }
-
-        function generateDemoActivities() {
-            return [
-                { icon: 'user', text: 'New user <strong>Emma Wilson</strong> registered', time: new Date(Date.now() -
-                        15 * 60 * 1000).toISOString() },
-                { icon: 'premium', text: '<strong>Sophia Patel</strong> upgraded to Premium', time: new Date(Date
-                        .now() - 45 * 60 * 1000).toISOString() },
-                { icon: 'course', text: 'Course <strong>UX Design</strong> was updated', time: new Date(Date.now() -
-                        2 * 60 * 60 * 1000).toISOString() }
-            ];
-        }
-
-        // ============================================================
-        // LOAD DASHBOARD
+        // LOAD DASHBOARD STATS
         // ============================================================
         async function loadDashboardStats() {
             allUsers = await fetchFromTable('users');
+            allProjects = await fetchFromTable('projects');
             allCourses = await fetchFromTable('courses');
             allClasses = await fetchFromTable('classes');
             allTools = await fetchFromTable('tools');
             allRevenue = await fetchFromTable('revenue');
 
             document.getElementById('statTotalUsers').textContent = allUsers.length;
-            document.getElementById('statTotalCourses').textContent = allCourses.length;
+            document.getElementById('statTotalProjects').textContent = allProjects.length;
             document.getElementById('statPremiumUsers').textContent = allUsers.filter(u => u.is_premium).length;
             const totalRev = allRevenue.filter(r => r.status === 'completed').reduce((s, r) => s + r.amount, 0);
             document.getElementById('statTotalRevenue').textContent = formatCurrency(totalRev);
 
             document.getElementById('userBadge').textContent = allUsers.length;
+            document.getElementById('projectBadge').textContent = allProjects.length;
             document.getElementById('courseBadge').textContent = allCourses.length;
             document.getElementById('classBadge').textContent = allClasses.length;
 
-            // Revenue stats
             const premiumRev = allRevenue.filter(r => r.type === 'premium' && r.status === 'completed')
                 .reduce((s, r) => s + r.amount, 0);
             const courseRev = allRevenue.filter(r => r.type === 'course' && r.status === 'completed')
@@ -2768,6 +2776,11 @@
             document.getElementById('revTools').textContent = formatCurrency(toolRev);
             document.getElementById('revToolCount').textContent = allRevenue.filter(r => r.type === 'tool').length;
 
+            // Dummy changes
+            document.getElementById('statUsersChange').textContent = '+' + Math.floor(Math.random() * 10);
+            document.getElementById('statProjectsChange').textContent = '+' + Math.floor(Math.random() * 5);
+            document.getElementById('statPremiumChange').textContent = '+' + Math.floor(Math.random() * 3);
+            document.getElementById('statRevenueChange').textContent = '+' + Math.floor(Math.random() * 100);
             document.getElementById('revPremiumGrowth').textContent = '+' + Math.floor(Math.random() * 5);
             document.getElementById('revCourseGrowth').textContent = '+' + Math.floor(Math.random() * 10);
             document.getElementById('revToolGrowth').textContent = '+' + Math.floor(Math.random() * 3);
@@ -2787,9 +2800,9 @@
             tbody.innerHTML = recent.map(u => `
                 <tr>
                     <td><div class="user-cell"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=7c3aed&color=fff&size=100" alt="${u.name}"><div class="user-info"><div class="name">${u.name}</div><div class="email">${u.email}</div></div></div></td>
-                    <td><span class="role-badge ${u.role}">${u.role}</span></td>
-                    <td><span class="status-pill ${u.status}">${u.status}</span></td>
-                    <td>${formatDate(u.joined)}</td>
+                    <td><span class="role-badge ${u.role || 'student'}">${u.role || 'student'}</span></td>
+                    <td><span class="status-pill ${u.status || 'active'}">${u.status || 'active'}</span></td>
+                    <td>${formatDate(u.created_at)}</td>
                     <td><div class="table-actions"><button onclick="confirmDelete('user','${u.id}','${u.name}')" class="danger"><i class="fas fa-trash"></i></button></div></td>
                 </tr>
             `).join('');
@@ -2802,17 +2815,18 @@
                 feed.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>No activity</p></div>';
                 return;
             }
-            const iconMap = { user: 'user', course: 'graduation-cap', premium: 'crown', tool: 'tools', payment: 'credit-card' };
+            const iconMap = { user: 'user', project: 'folder', course: 'graduation-cap', premium: 'crown', tool: 'tools',
+                payment: 'credit-card' };
             feed.innerHTML = allActivities.slice(0, 8).map(a => `
                 <div class="activity-item">
                     <div class="icon ${a.icon || 'user'}"><i class="fas fa-${iconMap[a.icon] || 'user'}"></i></div>
-                    <div class="content"><div class="text">${a.text || ''}</div><div class="time">${formatTime(a.time || a.created_at)}</div></div>
+                    <div class="content"><div class="text">${a.text || ''}</div><div class="time">${formatDate(a.created_at)}</div></div>
                 </div>
             `).join('');
         }
 
         // ============================================================
-        // USERS
+        // USERS CRUD
         // ============================================================
         async function loadAllUsers() {
             allUsers = await fetchFromTable('users');
@@ -2830,11 +2844,11 @@
                 <tr>
                     <td><div class="user-cell"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=7c3aed&color=fff&size=100" alt="${u.name}"><div class="user-info"><div class="name">${u.name}</div></div></div></td>
                     <td>${u.email}</td>
-                    <td><span class="role-badge ${u.role}">${u.role}</span></td>
-                    <td><span class="status-pill ${u.status}">${u.status}</span></td>
+                    <td><span class="role-badge ${u.role || 'student'}">${u.role || 'student'}</span></td>
+                    <td><span class="status-pill ${u.status || 'active'}">${u.status || 'active'}</span></td>
                     <td>${u.is_premium ? '✅ Premium' : 'Free'}</td>
-                    <td>${formatDate(u.joined)}</td>
-                    <td><div class="table-actions"><button onclick="togglePremium('${u.id}')" class="edit"><i class="fas fa-crown"></i></button><button onclick="confirmDelete('user','${u.id}','${u.name}')" class="danger"><i class="fas fa-trash"></i></button></div></td>
+                    <td>${formatDate(u.created_at)}</td>
+                    <td><div class="table-actions"><button onclick="editUser('${u.id}')" class="edit"><i class="fas fa-edit"></i></button><button onclick="togglePremium('${u.id}')" class="edit"><i class="fas fa-crown"></i></button><button onclick="confirmDelete('user','${u.id}','${u.name}')" class="danger"><i class="fas fa-trash"></i></button></div></td>
                 </tr>
             `).join('');
         }
@@ -2854,24 +2868,65 @@
             renderUsers(filtered);
         }
 
-        async function createUser() {
+        function editUser(id) {
+            const user = allUsers.find(u => u.id === id);
+            if (!user) return;
+            document.getElementById('editUserId').value = id;
+            document.getElementById('newUserName').value = user.name;
+            document.getElementById('newUserEmail').value = user.email;
+            document.getElementById('newUserRole').value = user.role || 'student';
+            document.getElementById('newUserStatus').value = user.status || 'active';
+            document.getElementById('userModalTitle').textContent = 'Edit User';
+            document.getElementById('userModalDesc').textContent = 'Update user information.';
+            document.getElementById('passwordGroup').style.display = 'none';
+            document.getElementById('userSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Update User';
+            openModal('createUserModal');
+        }
+
+        async function saveUser() {
+            const id = document.getElementById('editUserId').value;
             const name = document.getElementById('newUserName').value.trim();
             const email = document.getElementById('newUserEmail').value.trim();
             const role = document.getElementById('newUserRole').value;
             const status = document.getElementById('newUserStatus').value;
-            const password = document.getElementById('newUserPassword').value;
-            if (!name || !email || !password) { showToast('Please fill all fields', 'error'); return; }
-            const newUser = { name, email, role, status, is_premium: false, joined: new Date().toISOString() };
-            const ok = await insertIntoTable('users', newUser);
-            if (ok) {
-                showToast('User created!', 'success');
-                closeModal('createUserModal');
-                await loadAllUsers();
-                await loadDashboardStats();
-                document.getElementById('newUserName').value = '';
-                document.getElementById('newUserEmail').value = '';
-                document.getElementById('newUserPassword').value = '';
+
+            if (!name || !email) { showToast('Please fill in name and email', 'error'); return; }
+
+            const payload = { name, email, role, status, updated_at: new Date().toISOString() };
+
+            if (id) {
+                const ok = await updateTable('users', id, payload);
+                if (ok) {
+                    showToast('User updated!', 'success');
+                    closeModal('createUserModal');
+                    resetUserForm();
+                    await loadAllUsers();
+                    await loadDashboardStats();
+                }
+            } else {
+                const password = document.getElementById('newUserPassword').value;
+                if (!password) { showToast('Please enter a password', 'error'); return; }
+                const newUser = { ...payload, password, is_premium: false, created_at: new Date().toISOString() };
+                const ok = await insertIntoTable('users', newUser);
+                if (ok) {
+                    showToast('User created!', 'success');
+                    closeModal('createUserModal');
+                    resetUserForm();
+                    await loadAllUsers();
+                    await loadDashboardStats();
+                }
             }
+        }
+
+        function resetUserForm() {
+            document.getElementById('editUserId').value = '';
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserEmail').value = '';
+            document.getElementById('newUserPassword').value = '';
+            document.getElementById('userModalTitle').textContent = 'Create User';
+            document.getElementById('userModalDesc').textContent = 'Add a new user to the platform.';
+            document.getElementById('passwordGroup').style.display = 'block';
+            document.getElementById('userSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Save User';
         }
 
         async function togglePremium(id) {
@@ -2903,7 +2958,146 @@
         }
 
         // ============================================================
-        // COURSES
+        // PROJECTS CRUD
+        // ============================================================
+        async function loadAllProjects() {
+            allProjects = await fetchFromTable('projects');
+            renderProjects(allProjects);
+        }
+
+        function renderProjects(projects) {
+            const container = document.getElementById('projectsList');
+            if (!projects || !projects.length) {
+                container.innerHTML =
+                    '<div class="empty-state"><i class="fas fa-folder"></i><p>No projects</p></div>';
+                return;
+            }
+            container.innerHTML = projects.map(p => `
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
+                    ${p.image ? `<img src="${p.image}" alt="${p.title}" style="width:60px;height:60px;border-radius:10px;object-fit:cover;flex-shrink:0;">` : `<div style="width:60px;height:60px;border-radius:10px;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--accent-violet);flex-shrink:0;"><i class="fas fa-folder"></i></div>`}
+                    <div style="flex:1;min-width:150px;">
+                        <div style="font-size:13px;font-weight:600;">${p.title}</div>
+                        <div style="font-size:10px;color:var(--text-muted);">${p.category || 'General'} • ${p.author_name || 'Unknown'}</div>
+                        <div style="font-size:10px;color:var(--text-muted);">❤️ ${p.likes || 0} • 💬 ${p.comments_count || 0}</div>
+                    </div>
+                    <div><span class="status-pill ${p.status || 'pending'}">${p.status || 'pending'}</span></div>
+                    <div class="table-actions">
+                        <button onclick="editProject('${p.id}')" class="edit"><i class="fas fa-edit"></i></button>
+                        <button onclick="confirmDelete('project','${p.id}','${p.title}')" class="danger"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterProjects() {
+            const q = document.getElementById('projectSearch').value.toLowerCase();
+            const cat = document.getElementById('projectCategoryFilter').value;
+            const status = document.getElementById('projectStatusFilter').value;
+            let filtered = allProjects.filter(p => {
+                const match = p.title.toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q);
+                const matchCat = !cat || p.category === cat;
+                const matchStatus = !status || p.status === status;
+                return match && matchCat && matchStatus;
+            });
+            renderProjects(filtered);
+        }
+
+        function editProject(id) {
+            const project = allProjects.find(p => p.id === id);
+            if (!project) return;
+            document.getElementById('editProjectId').value = id;
+            document.getElementById('newProjectName').value = project.title;
+            document.getElementById('newProjectDesc').value = project.description || '';
+            document.getElementById('newProjectCategory').value = project.category || 'ui-ux';
+            document.getElementById('newProjectStatus').value = project.status || 'pending';
+            document.getElementById('newProjectTags').value = (project.tags || []).join(', ');
+            document.getElementById('projectModalTitle').textContent = 'Edit Project';
+            document.getElementById('projectModalDesc').textContent = 'Update project information.';
+            document.getElementById('projectSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Update Project';
+            // Clear preview
+            document.getElementById('projectImagePreview').innerHTML = '';
+            document.getElementById('projectFileNameDisplay').textContent = 'No file selected';
+            projectSelectedFile = null;
+            openModal('createProjectModal');
+        }
+
+        async function saveProject() {
+            const id = document.getElementById('editProjectId').value;
+            const name = document.getElementById('newProjectName').value.trim();
+            const desc = document.getElementById('newProjectDesc').value.trim();
+            const category = document.getElementById('newProjectCategory').value;
+            const status = document.getElementById('newProjectStatus').value;
+            const tags = document.getElementById('newProjectTags').value.split(',').map(t => t.trim()).filter(t => t);
+
+            if (!name) { showToast('Please enter a project name', 'error'); return; }
+
+            let imageUrl = '';
+            if (projectSelectedFile) {
+                const result = await uploadFile(projectSelectedFile, 'projects/admin');
+                if (result.error) {
+                    showToast('Error uploading image: ' + result.error, 'error');
+                    return;
+                }
+                imageUrl = result.publicUrl;
+            }
+
+            const payload = {
+                title: name,
+                description: desc || '',
+                category: category,
+                status: status,
+                tags: tags,
+                updated_at: new Date().toISOString()
+            };
+
+            if (imageUrl) payload.image = imageUrl;
+
+            if (id) {
+                const ok = await updateTable('projects', id, payload);
+                if (ok) {
+                    showToast('Project updated!', 'success');
+                    closeModal('createProjectModal');
+                    resetProjectForm();
+                    await loadAllProjects();
+                    await loadDashboardStats();
+                }
+            } else {
+                const newProject = {
+                    ...payload,
+                    author_name: 'Admin',
+                    author_id: 'admin',
+                    author_avatar: 'https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff&size=100',
+                    likes: 0,
+                    comments_count: 0,
+                    liked_by: [],
+                    created_at: new Date().toISOString()
+                };
+                const ok = await insertIntoTable('projects', newProject);
+                if (ok) {
+                    showToast('Project created!', 'success');
+                    closeModal('createProjectModal');
+                    resetProjectForm();
+                    await loadAllProjects();
+                    await loadDashboardStats();
+                }
+            }
+        }
+
+        function resetProjectForm() {
+            document.getElementById('editProjectId').value = '';
+            document.getElementById('newProjectName').value = '';
+            document.getElementById('newProjectDesc').value = '';
+            document.getElementById('newProjectTags').value = '';
+            document.getElementById('projectImagePreview').innerHTML = '';
+            document.getElementById('projectFileNameDisplay').textContent = 'No file selected';
+            projectSelectedFile = null;
+            document.getElementById('projectModalTitle').textContent = 'Create Project';
+            document.getElementById('projectModalDesc').textContent = 'Add a new project to the platform.';
+            document.getElementById('projectSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Save Project';
+        }
+
+        // ============================================================
+        // COURSES CRUD
         // ============================================================
         async function loadAllCourses() {
             allCourses = await fetchFromTable('courses');
@@ -2920,13 +3114,15 @@
             }
             container.innerHTML = courses.map(c => `
                 <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
+                    ${c.image ? `<img src="${c.image}" alt="${c.title}" style="width:60px;height:60px;border-radius:10px;object-fit:cover;flex-shrink:0;">` : `<div style="width:60px;height:60px;border-radius:10px;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--accent-violet);flex-shrink:0;"><i class="fas fa-graduation-cap"></i></div>`}
                     <div style="flex:1;min-width:150px;">
                         <div style="font-size:13px;font-weight:600;">${c.title}</div>
-                        <div style="font-size:10px;color:var(--text-muted);">${c.category} • ${c.instructor}</div>
+                        <div style="font-size:10px;color:var(--text-muted);">${c.category || 'General'} • ${c.instructor || 'Unknown'}</div>
                         ${c.link ? `<a href="${c.link}" target="_blank" style="font-size:10px;color:var(--accent-cyan);text-decoration:none;">🔗 Course Link</a>` : ''}
                     </div>
                     <div style="font-size:12px;font-weight:700;color:${c.is_free ? 'var(--accent-green)' : 'var(--accent-cyan)'};">${c.is_free ? 'Free' : formatCurrency(c.price)}</div>
                     <div class="table-actions">
+                        <button onclick="editCourse('${c.id}')" class="edit"><i class="fas fa-edit"></i></button>
                         <button onclick="confirmDelete('course','${c.id}','${c.title}')" class="danger"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
@@ -2946,48 +3142,98 @@
             renderCourses(filtered);
         }
 
-        async function createCourse() {
+        function editCourse(id) {
+            const course = allCourses.find(c => c.id === id);
+            if (!course) return;
+            document.getElementById('editCourseId').value = id;
+            document.getElementById('newCourseTitle').value = course.title;
+            document.getElementById('newCourseDesc').value = course.description || '';
+            document.getElementById('newCourseCategory').value = course.category || 'ui-ux';
+            document.getElementById('newCoursePrice').value = course.price || 0;
+            document.getElementById('newCourseInstructor').value = course.instructor || '';
+            document.getElementById('newCourseLink').value = course.link || '';
+            document.getElementById('courseModalTitle').textContent = 'Edit Course';
+            document.getElementById('courseModalDesc').textContent = 'Update course information.';
+            document.getElementById('courseSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Update Course';
+            document.getElementById('courseImagePreview').innerHTML = '';
+            document.getElementById('courseFileNameDisplay').textContent = 'No file selected';
+            courseSelectedFile = null;
+            openModal('createCourseModal');
+        }
+
+        async function saveCourse() {
+            const id = document.getElementById('editCourseId').value;
             const title = document.getElementById('newCourseTitle').value.trim();
             const desc = document.getElementById('newCourseDesc').value.trim();
             const cat = document.getElementById('newCourseCategory').value;
             const price = parseFloat(document.getElementById('newCoursePrice').value) || 0;
             const instructor = document.getElementById('newCourseInstructor').value.trim();
             const link = document.getElementById('newCourseLink').value.trim();
+
             if (!title) { showToast('Please enter a title', 'error'); return; }
-            const newCourse = {
+
+            let imageUrl = '';
+            if (courseSelectedFile) {
+                const result = await uploadFile(courseSelectedFile, 'courses/admin');
+                if (result.error) {
+                    showToast('Error uploading image: ' + result.error, 'error');
+                    return;
+                }
+                imageUrl = result.publicUrl;
+            }
+
+            const payload = {
                 title,
-                description: desc,
+                description: desc || '',
                 category: cat,
                 price,
                 is_free: price === 0,
                 instructor: instructor || 'Admin',
                 link: link || '',
-                created_at: new Date().toISOString()
+                updated_at: new Date().toISOString()
             };
-            const ok = await insertIntoTable('courses', newCourse);
-            if (ok) {
-                showToast('Course created!', 'success');
-                closeModal('createCourseModal');
-                await loadAllCourses();
-                await loadDashboardStats();
-                document.getElementById('newCourseTitle').value = '';
-                document.getElementById('newCourseDesc').value = '';
-                document.getElementById('newCoursePrice').value = '0';
-                document.getElementById('newCourseLink').value = '';
+
+            if (imageUrl) payload.image = imageUrl;
+
+            if (id) {
+                const ok = await updateTable('courses', id, payload);
+                if (ok) {
+                    showToast('Course updated!', 'success');
+                    closeModal('createCourseModal');
+                    resetCourseForm();
+                    await loadAllCourses();
+                    await loadDashboardStats();
+                }
+            } else {
+                const newCourse = { ...payload, created_at: new Date().toISOString() };
+                const ok = await insertIntoTable('courses', newCourse);
+                if (ok) {
+                    showToast('Course created!', 'success');
+                    closeModal('createCourseModal');
+                    resetCourseForm();
+                    await loadAllCourses();
+                    await loadDashboardStats();
+                }
             }
         }
 
-        function populateCourseSelect() {
-            const select = document.getElementById('classCourseSelect');
-            if (select && allCourses.length) {
-                select.innerHTML = allCourses.map(c =>
-                    `<option value="${c.title}">${c.title}</option>`
-                ).join('');
-            }
+        function resetCourseForm() {
+            document.getElementById('editCourseId').value = '';
+            document.getElementById('newCourseTitle').value = '';
+            document.getElementById('newCourseDesc').value = '';
+            document.getElementById('newCoursePrice').value = '0';
+            document.getElementById('newCourseInstructor').value = '';
+            document.getElementById('newCourseLink').value = '';
+            document.getElementById('courseImagePreview').innerHTML = '';
+            document.getElementById('courseFileNameDisplay').textContent = 'No file selected';
+            courseSelectedFile = null;
+            document.getElementById('courseModalTitle').textContent = 'Create Course';
+            document.getElementById('courseModalDesc').textContent = 'Add a new course to the catalog.';
+            document.getElementById('courseSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Save Course';
         }
 
         // ============================================================
-        // CLASSES
+        // CLASSES CRUD
         // ============================================================
         async function loadAllClasses() {
             allClasses = await fetchFromTable('classes');
@@ -3003,25 +3249,17 @@
                 return;
             }
             container.innerHTML = classes.map(c => `
-                <div class="class-card">
-                    <div class="class-header">
-                        <div>
-                            <div class="class-title">${c.title}</div>
-                            <div class="class-meta">
-                                <span><i class="fas fa-graduation-cap"></i> ${c.course}</span>
-                                <span><i class="fas fa-calendar"></i> ${formatDate(c.date)}</span>
-                                <span><i class="fas fa-clock"></i> ${c.duration}h</span>
-                            </div>
-                        </div>
-                        <div class="class-actions">
-                            <button onclick="editClass('${c.id}')"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="danger" onclick="confirmDelete('class','${c.id}','${c.title}')"><i class="fas fa-trash"></i></button>
-                        </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
+                    <div style="width:60px;height:60px;border-radius:10px;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--accent-cyan);flex-shrink:0;"><i class="fas fa-calendar-alt"></i></div>
+                    <div style="flex:1;min-width:150px;">
+                        <div style="font-size:13px;font-weight:600;">${c.title}</div>
+                        <div style="font-size:10px;color:var(--text-muted);">${c.course} • ${formatDate(c.date)} • ${c.duration}h</div>
+                        ${c.whatsapp ? `<a href="${c.whatsapp}" target="_blank" style="font-size:10px;color:#25D366;text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : ''}
+                        ${c.telegram ? `<a href="${c.telegram}" target="_blank" style="font-size:10px;color:#26A5E4;text-decoration:none;"><i class="fab fa-telegram"></i> Telegram</a>` : ''}
                     </div>
-                    <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">${c.description || ''}</div>
-                    <div class="class-links">
-                        ${c.whatsapp ? `<a href="${c.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Group</a>` : ''}
-                        ${c.telegram ? `<a href="${c.telegram}" target="_blank"><i class="fab fa-telegram"></i> Telegram Group</a>` : ''}
+                    <div class="table-actions">
+                        <button onclick="editClass('${c.id}')" class="edit"><i class="fas fa-edit"></i></button>
+                        <button onclick="confirmDelete('class','${c.id}','${c.title}')" class="danger"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -3065,8 +3303,16 @@
 
             if (!title || !course) { showToast('Please fill in title and course', 'error'); return; }
 
-            const payload = { course, title, description: desc, date, duration, whatsapp, telegram,
-            updated_at: new Date().toISOString() };
+            const payload = {
+                course,
+                title,
+                description: desc,
+                date,
+                duration,
+                whatsapp,
+                telegram,
+                updated_at: new Date().toISOString()
+            };
 
             if (id) {
                 const ok = await updateTable('classes', id, payload);
@@ -3103,8 +3349,17 @@
             document.getElementById('classSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Save Class';
         }
 
+        function populateCourseSelect() {
+            const select = document.getElementById('classCourseSelect');
+            if (select && allCourses.length) {
+                select.innerHTML = allCourses.map(c =>
+                    `<option value="${c.title}">${c.title}</option>`
+                ).join('');
+            }
+        }
+
         // ============================================================
-        // TOOLS
+        // TOOLS CRUD
         // ============================================================
         async function loadAllTools() {
             allTools = await fetchFromTable('tools');
@@ -3120,9 +3375,7 @@
             }
             container.innerHTML = tools.map(t => `
                 <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
-                    <div style="width:40px;height:40px;border-radius:10px;background:rgba(6,182,212,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--accent-cyan);flex-shrink:0;">
-                        <i class="fas fa-tools"></i>
-                    </div>
+                    <div style="width:60px;height:60px;border-radius:10px;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--accent-cyan);flex-shrink:0;"><i class="fas fa-tools"></i></div>
                     <div style="flex:1;min-width:150px;">
                         <div style="font-size:13px;font-weight:600;">${t.name}</div>
                         <div style="font-size:10px;color:var(--text-muted);">${t.category || 'General'}</div>
@@ -3130,6 +3383,7 @@
                     </div>
                     <div style="font-size:12px;font-weight:700;color:${t.is_free ? 'var(--accent-green)' : 'var(--accent-cyan)'};">${t.is_free ? 'Free' : formatCurrency(t.price)}</div>
                     <div class="table-actions">
+                        <button onclick="editTool('${t.id}')" class="edit"><i class="fas fa-edit"></i></button>
                         <button onclick="confirmDelete('tool','${t.id}','${t.name}')" class="danger"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
@@ -3147,37 +3401,76 @@
             renderTools(filtered);
         }
 
-        async function createTool() {
+        function editTool(id) {
+            const tool = allTools.find(t => t.id === id);
+            if (!tool) return;
+            document.getElementById('editToolId').value = id;
+            document.getElementById('newToolName').value = tool.name;
+            document.getElementById('newToolDesc').value = tool.description || '';
+            document.getElementById('newToolPrice').value = tool.price || 0;
+            document.getElementById('newToolCategory').value = tool.category || 'design';
+            document.getElementById('newToolLink').value = tool.link || '';
+            document.getElementById('toolModalTitle').textContent = 'Edit Tool';
+            document.getElementById('toolModalDesc').textContent = 'Update tool information.';
+            document.getElementById('toolSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Update Tool';
+            openModal('createToolModal');
+        }
+
+        async function saveTool() {
+            const id = document.getElementById('editToolId').value;
             const name = document.getElementById('newToolName').value.trim();
             const desc = document.getElementById('newToolDesc').value.trim();
             const price = parseFloat(document.getElementById('newToolPrice').value) || 0;
             const category = document.getElementById('newToolCategory').value;
             const link = document.getElementById('newToolLink').value.trim();
+
             if (!name) { showToast('Please enter a name', 'error'); return; }
-            const newTool = {
+
+            const payload = {
                 name,
                 description: desc,
                 price,
                 is_free: price === 0,
                 category,
                 link: link || '',
-                created_at: new Date().toISOString()
+                updated_at: new Date().toISOString()
             };
-            const ok = await insertIntoTable('tools', newTool);
-            if (ok) {
-                showToast('Tool created!', 'success');
-                closeModal('createToolModal');
-                await loadAllTools();
-                await loadDashboardStats();
-                document.getElementById('newToolName').value = '';
-                document.getElementById('newToolDesc').value = '';
-                document.getElementById('newToolPrice').value = '0';
-                document.getElementById('newToolLink').value = '';
+
+            if (id) {
+                const ok = await updateTable('tools', id, payload);
+                if (ok) {
+                    showToast('Tool updated!', 'success');
+                    closeModal('createToolModal');
+                    resetToolForm();
+                    await loadAllTools();
+                    await loadDashboardStats();
+                }
+            } else {
+                const newTool = { ...payload, created_at: new Date().toISOString() };
+                const ok = await insertIntoTable('tools', newTool);
+                if (ok) {
+                    showToast('Tool created!', 'success');
+                    closeModal('createToolModal');
+                    resetToolForm();
+                    await loadAllTools();
+                    await loadDashboardStats();
+                }
             }
         }
 
+        function resetToolForm() {
+            document.getElementById('editToolId').value = '';
+            document.getElementById('newToolName').value = '';
+            document.getElementById('newToolDesc').value = '';
+            document.getElementById('newToolPrice').value = '0';
+            document.getElementById('newToolLink').value = '';
+            document.getElementById('toolModalTitle').textContent = 'Create Tool';
+            document.getElementById('toolModalDesc').textContent = 'Add a new tool to the marketplace.';
+            document.getElementById('toolSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Save Tool';
+        }
+
         // ============================================================
-        // REVENUE
+        // REVENUE SECTION
         // ============================================================
         async function loadRevenueSection() {
             allRevenue = await fetchFromTable('revenue');
@@ -3246,7 +3539,7 @@
         }
 
         // ============================================================
-        // PREMIUM
+        // PREMIUM SECTION
         // ============================================================
         async function loadPremiumSection() {
             allUsers = await fetchFromTable('users');
@@ -3421,16 +3714,19 @@
             closeModal('deleteConfirmModal');
             let ok = false;
             if (type === 'user') ok = await deleteFromTable('users', id);
+            else if (type === 'project') ok = await deleteFromTable('projects', id);
             else if (type === 'course') ok = await deleteFromTable('courses', id);
             else if (type === 'class') ok = await deleteFromTable('classes', id);
             else if (type === 'tool') ok = await deleteFromTable('tools', id);
             else if (type === 'message') ok = await deleteFromTable('messages', id);
             else if (type === 'revenue') ok = await deleteFromTable('revenue', id);
+
             if (ok) {
                 showToast('Deleted successfully', 'success');
                 if (type === 'user') { await loadAllUsers();
                     await loadDashboardStats();
-                    await loadPremiumSection(); } else if (type === 'course') { await loadAllCourses();
+                    await loadPremiumSection(); } else if (type === 'project') { await loadAllProjects();
+                    await loadDashboardStats(); } else if (type === 'course') { await loadAllCourses();
                     await loadDashboardStats(); } else if (type === 'class') { await loadAllClasses();
                     await loadDashboardStats(); } else if (type === 'tool') { await loadAllTools();
                     await loadDashboardStats(); } else if (type === 'message') { await loadAllMessages(); } else if (type ===
@@ -3482,7 +3778,7 @@
             autoDetectDevice();
             await checkAuth();
 
-            if (!isAdmin && supabase) {
+            if (!isAdmin && supabaseConfigured) {
                 showToast('Access denied. Admin only.', 'error');
                 setTimeout(() => window.location.href = 'index.html', 2000);
                 return;
@@ -3490,6 +3786,7 @@
 
             await loadDashboardStats();
             await loadAllUsers();
+            await loadAllProjects();
             await loadAllCourses();
             await loadAllClasses();
             await loadAllTools();
@@ -3514,13 +3811,20 @@
         window.toggleSetting = toggleSetting;
         window.updateChart = updateChart;
         window.updateRevenueChart = updateRevenueChart;
-        window.createUser = createUser;
-        window.createCourse = createCourse;
+        window.saveUser = saveUser;
+        window.editUser = editUser;
+        window.togglePremium = togglePremium;
+        window.saveProject = saveProject;
+        window.editProject = editProject;
+        window.saveCourse = saveCourse;
+        window.editCourse = editCourse;
         window.saveClass = saveClass;
         window.editClass = editClass;
-        window.createTool = createTool;
+        window.saveTool = saveTool;
+        window.editTool = editTool;
         window.sendMessage = sendMessage;
         window.filterUsers = filterUsers;
+        window.filterProjects = filterProjects;
         window.filterCourses = filterCourses;
         window.filterClasses = filterClasses;
         window.filterTools = filterTools;
@@ -3529,10 +3833,12 @@
         window.toggleMobileSidebar = toggleMobileSidebar;
         window.showToast = showToast;
         window.handleLogout = handleLogout;
-        window.togglePremium = togglePremium;
         window.savePremiumConfig = savePremiumConfig;
+        window.handleProjectImageUpload = handleProjectImageUpload;
+        window.handleCourseImageUpload = handleCourseImageUpload;
 
         init();
     </script>
+
 </body>
 </html>
