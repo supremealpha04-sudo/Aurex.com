@@ -540,21 +540,6 @@
             background: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.12);
         }
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: var(--accent-red);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .btn-danger:hover {
-            background: rgba(239, 68, 68, 0.2);
-        }
         .btn-success {
             background: rgba(34, 197, 94, 0.1);
             border: 1px solid rgba(34, 197, 94, 0.2);
@@ -569,6 +554,21 @@
         }
         .btn-success:hover {
             background: rgba(34, 197, 94, 0.2);
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
         }
         @media (max-width: 600px) {
             .top-bar {
@@ -1016,6 +1016,11 @@
             background: rgba(59, 130, 246, 0.1);
             color: var(--accent-blue);
             border-color: rgba(59, 130, 246, 0.2);
+        }
+        .table-actions button.success:hover {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+            border-color: rgba(34, 197, 94, 0.2);
         }
 
         /* ===== QUICK ACTIONS ===== */
@@ -1840,7 +1845,7 @@
                 <div class="nav-section">
                     <div class="nav-section-title">Management</div>
                     <div class="nav-item" data-section="premium" onclick="showSection('premium')">
-                        <i class="fas fa-crown"></i><span>Premium</span>
+                        <i class="fas fa-crown"></i><span>Premium</span> <span class="badge" id="premiumBadge">0</span>
                     </div>
                     <div class="nav-item" data-section="payments" onclick="showSection('payments')">
                         <i class="fas fa-credit-card"></i><span>Payments</span>
@@ -2142,40 +2147,84 @@
                 </div>
             </div>
 
-            <!-- ===== PREMIUM ===== -->
+            <!-- ===== PREMIUM MANAGEMENT (UPDATED) ===== -->
             <div id="section-premium" style="display:none;">
                 <div class="dash-card animate-in" style="margin:0 16px 24px;">
                     <div class="dash-header">
                         <h3><i class="fas fa-crown" style="color:var(--accent-orange);margin-right:6px;"></i>Premium Management</h3>
                         <div class="actions">
                             <button onclick="openModal('premiumConfigModal')"><i class="fas fa-cog"></i> Configure</button>
+                            <button onclick="loadPremiumSection()" class="btn-secondary"><i class="fas fa-sync"></i> Refresh</button>
                         </div>
                     </div>
+
+                    <!-- Stats -->
                     <div class="revenue-stats" style="margin:0 0 16px;">
                         <div class="revenue-card">
                             <div class="revenue-icon gold"><i class="fas fa-crown"></i></div>
-                            <div class="revenue-label">Premium Price</div>
-                            <div class="revenue-value" id="premiumPriceDisplay">₦13,500</div>
-                            <div class="revenue-sub">6 months access</div>
+                            <div class="revenue-label">Active Premium Users</div>
+                            <div class="revenue-value" id="premiumActiveCount">0</div>
+                            <div class="revenue-sub">Currently subscribed</div>
+                        </div>
+                        <div class="revenue-card">
+                            <div class="revenue-icon orange"><i class="fas fa-clock"></i></div>
+                            <div class="revenue-label">Pending Requests</div>
+                            <div class="revenue-value" id="premiumPendingCount">0</div>
+                            <div class="revenue-sub">Awaiting confirmation</div>
                         </div>
                         <div class="revenue-card">
                             <div class="revenue-icon purple"><i class="fas fa-users"></i></div>
-                            <div class="revenue-label">Total Subscribers</div>
-                            <div class="revenue-value" id="premiumSubscribers">0</div>
-                            <div class="revenue-sub">Active premium users</div>
-                        </div>
-                        <div class="revenue-card">
-                            <div class="revenue-icon green"><i class="fas fa-percentage"></i></div>
-                            <div class="revenue-label">Premium Discount</div>
-                            <div class="revenue-value" id="premiumDiscountDisplay">45%</div>
-                            <div class="revenue-sub">Off all courses</div>
+                            <div class="revenue-label">Total Premium</div>
+                            <div class="revenue-value" id="premiumTotalCount">0</div>
+                            <div class="revenue-sub">All time subscribers</div>
                         </div>
                     </div>
-                    <div class="table-wrapper">
-                        <table class="data-table" id="premiumTable">
-                            <thead><tr><th>User</th><th>Email</th><th>Started</th><th>Expires</th><th>Status</th><th>Actions</th></tr></thead>
-                            <tbody id="premiumBody"></tbody>
-                        </table>
+
+                    <!-- Pending Requests Table -->
+                    <div style="margin-bottom:16px;">
+                        <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                            <i class="fas fa-clock" style="color:var(--accent-orange);"></i>
+                            Pending Requests
+                            <span id="pendingCountBadge" style="background:var(--accent-orange);color:white;font-size:10px;padding:2px 10px;border-radius:20px;">0</span>
+                        </h4>
+                        <div class="table-wrapper">
+                            <table class="data-table" id="pendingRequestsTable">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Amount</th>
+                                        <th>Requested</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingRequestsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- All Premium Users Table -->
+                    <div>
+                        <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                            <i class="fas fa-crown" style="color:var(--accent-orange);"></i>
+                            All Premium Users
+                        </h4>
+                        <div class="table-wrapper">
+                            <table class="data-table" id="premiumTable">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Email</th>
+                                        <th>Started</th>
+                                        <th>Expires</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="premiumBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2439,6 +2488,7 @@
         let allRevenue = [];
         let allMessages = [];
         let allActivities = [];
+        let allPremiumRequests = [];
         let deleteTarget = null;
         let mobileSidebarOpen = false;
         let notifPanelOpen = false;
@@ -2456,11 +2506,11 @@
         // SUPABASE INIT
         // ============================================================
         try {
-            if (SUPABASE_URL.includes('your-project')) throw new Error('Configure Supabase');
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             supabaseConfigured = true;
+            console.log('Supabase connected successfully!');
         } catch (e) {
-            console.warn('Supabase not configured. Using demo mode.');
+            console.warn('Supabase connection error:', e.message);
         }
 
         // ============================================================
@@ -2702,13 +2752,6 @@
         // ============================================================
         async function fetchFromTable(table) {
             if (!supabaseConfigured) {
-                if (table === 'users') return [];
-                if (table === 'projects') return [];
-                if (table === 'courses') return [];
-                if (table === 'classes') return [];
-                if (table === 'tools') return [];
-                if (table === 'revenue') return [];
-                if (table === 'messages') return [];
                 return [];
             }
             const { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
@@ -2750,10 +2793,14 @@
             allClasses = await fetchFromTable('classes');
             allTools = await fetchFromTable('tools');
             allRevenue = await fetchFromTable('revenue');
+            allPremiumRequests = await fetchFromTable('premium_requests');
+
+            const activePremium = allUsers.filter(u => u.is_premium).length;
+            const pendingRequests = allPremiumRequests.filter(r => r.status === 'pending').length;
 
             document.getElementById('statTotalUsers').textContent = allUsers.length;
             document.getElementById('statTotalProjects').textContent = allProjects.length;
-            document.getElementById('statPremiumUsers').textContent = allUsers.filter(u => u.is_premium).length;
+            document.getElementById('statPremiumUsers').textContent = activePremium;
             const totalRev = allRevenue.filter(r => r.status === 'completed').reduce((s, r) => s + r.amount, 0);
             document.getElementById('statTotalRevenue').textContent = formatCurrency(totalRev);
 
@@ -2761,6 +2808,7 @@
             document.getElementById('projectBadge').textContent = allProjects.length;
             document.getElementById('courseBadge').textContent = allCourses.length;
             document.getElementById('classBadge').textContent = allClasses.length;
+            document.getElementById('premiumBadge').textContent = pendingRequests;
 
             const premiumRev = allRevenue.filter(r => r.type === 'premium' && r.status === 'completed')
                 .reduce((s, r) => s + r.amount, 0);
@@ -2770,7 +2818,7 @@
                 .reduce((s, r) => s + r.amount, 0);
 
             document.getElementById('revPremium').textContent = formatCurrency(premiumRev);
-            document.getElementById('revPremiumCount').textContent = allUsers.filter(u => u.is_premium).length;
+            document.getElementById('revPremiumCount').textContent = activePremium;
             document.getElementById('revCourses').textContent = formatCurrency(courseRev);
             document.getElementById('revCourseCount').textContent = allRevenue.filter(r => r.type === 'course').length;
             document.getElementById('revTools').textContent = formatCurrency(toolRev);
@@ -2826,7 +2874,7 @@
         }
 
         // ============================================================
-        // USERS CRUD
+        // USERS CRUD (simplified - keep existing)
         // ============================================================
         async function loadAllUsers() {
             allUsers = await fetchFromTable('users');
@@ -2937,7 +2985,8 @@
                 is_premium: newPremium,
                 premium_start: newPremium ? new Date().toISOString() : null,
                 premium_end: newPremium ? new Date(Date.now() + premiumDuration * 30 * 24 * 60 * 60 * 1000).toISOString() :
-                    null
+                    null,
+                payment_status: newPremium ? 'confirmed' : 'none'
             });
             if (ok) {
                 showToast(`${user.name} is now ${newPremium ? 'Premium' : 'Free'}`, 'success');
@@ -2958,7 +3007,145 @@
         }
 
         // ============================================================
-        // PROJECTS CRUD
+        // PREMIUM MANAGEMENT (UPDATED)
+        // ============================================================
+        async function loadPremiumSection() {
+            allUsers = await fetchFromTable('users');
+            allPremiumRequests = await fetchFromTable('premium_requests');
+
+            const activePremium = allUsers.filter(u => u.is_premium).length;
+            const pendingRequests = allPremiumRequests.filter(r => r.status === 'pending').length;
+            const totalPremium = allPremiumRequests.filter(r => r.status === 'confirmed').length;
+
+            document.getElementById('premiumActiveCount').textContent = activePremium;
+            document.getElementById('premiumPendingCount').textContent = pendingRequests;
+            document.getElementById('premiumTotalCount').textContent = totalPremium;
+            document.getElementById('pendingCountBadge').textContent = pendingRequests;
+
+            // Render pending requests
+            renderPendingRequests(allPremiumRequests.filter(r => r.status === 'pending'));
+
+            // Render all premium users
+            const premiumUsers = allUsers.filter(u => u.is_premium);
+            renderPremiumUsers(premiumUsers);
+        }
+
+        function renderPendingRequests(requests) {
+            const tbody = document.getElementById('pendingRequestsBody');
+            if (!requests || requests.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-clock"></i><p>No pending requests</p></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = requests.map(r => `
+                <tr>
+                    <td><strong>${r.user_name || 'Unknown'}</strong></td>
+                    <td>${r.user_email}</td>
+                    <td>${r.phone || 'N/A'}</td>
+                    <td><strong>${formatCurrency(r.amount || 13500)}</strong></td>
+                    <td>${formatDate(r.created_at)}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button onclick="confirmPremium('${r.id}', 'confirm')" class="success" title="Confirm">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button onclick="confirmPremium('${r.id}', 'reject')" class="danger" title="Reject">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPremiumUsers(users) {
+            const tbody = document.getElementById('premiumBody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-crown"></i><p>No premium users</p></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map(u => `
+                <tr>
+                    <td><strong>${u.name}</strong></td>
+                    <td>${u.email}</td>
+                    <td>${formatDate(u.premium_start)}</td>
+                    <td>${formatDate(u.premium_end)}</td>
+                    <td><span class="status-pill active">Active</span></td>
+                    <td>
+                        <div class="table-actions">
+                            <button onclick="togglePremium('${u.id}')" class="danger" title="Revoke Premium">
+                                <i class="fas fa-crown" style="color:var(--accent-orange);"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function confirmPremium(requestId, action) {
+            const request = allPremiumRequests.find(r => r.id === requestId);
+            if (!request) return;
+
+            const user = allUsers.find(u => u.id === request.user_id);
+            if (!user) {
+                showToast('User not found', 'error');
+                return;
+            }
+
+            if (action === 'confirm') {
+                // Confirm premium
+                const ok = await updateTable('users', request.user_id, {
+                    is_premium: true,
+                    premium_start: new Date().toISOString(),
+                    premium_end: new Date(Date.now() + premiumDuration * 30 * 24 * 60 * 60 * 1000).toISOString(),
+                    payment_status: 'confirmed',
+                    payment_confirmed_by: currentUser?.id,
+                    payment_confirmed_at: new Date().toISOString()
+                });
+
+                if (ok) {
+                    await updateTable('premium_requests', requestId, {
+                        status: 'confirmed',
+                        confirmed_by: currentUser?.id,
+                        confirmed_at: new Date().toISOString()
+                    });
+
+                    await insertIntoTable('revenue', {
+                        user_id: request.user_id,
+                        user_email: request.user_email,
+                        type: 'premium',
+                        item: 'Premium Subscription',
+                        amount: request.amount || premiumPrice,
+                        status: 'completed',
+                        created_at: new Date().toISOString()
+                    });
+
+                    showToast(`${user.name} is now a premium user!`, 'success');
+                    await loadPremiumSection();
+                    await loadDashboardStats();
+                }
+            } else {
+                // Reject premium
+                const ok = await updateTable('premium_requests', requestId, {
+                    status: 'rejected',
+                    confirmed_by: currentUser?.id,
+                    confirmed_at: new Date().toISOString()
+                });
+
+                if (ok) {
+                    await updateTable('users', request.user_id, {
+                        payment_status: 'rejected'
+                    });
+
+                    showToast(`${user.name}'s premium request was rejected`, 'warning');
+                    await loadPremiumSection();
+                }
+            }
+        }
+
+        // ============================================================
+        // PROJECTS CRUD (simplified - keep existing)
         // ============================================================
         async function loadAllProjects() {
             allProjects = await fetchFromTable('projects');
@@ -3014,7 +3201,6 @@
             document.getElementById('projectModalTitle').textContent = 'Edit Project';
             document.getElementById('projectModalDesc').textContent = 'Update project information.';
             document.getElementById('projectSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Update Project';
-            // Clear preview
             document.getElementById('projectImagePreview').innerHTML = '';
             document.getElementById('projectFileNameDisplay').textContent = 'No file selected';
             projectSelectedFile = null;
@@ -3097,7 +3283,7 @@
         }
 
         // ============================================================
-        // COURSES CRUD
+        // COURSES CRUD (simplified - keep existing)
         // ============================================================
         async function loadAllCourses() {
             allCourses = await fetchFromTable('courses');
@@ -3233,7 +3419,7 @@
         }
 
         // ============================================================
-        // CLASSES CRUD
+        // CLASSES CRUD (simplified - keep existing)
         // ============================================================
         async function loadAllClasses() {
             allClasses = await fetchFromTable('classes');
@@ -3359,7 +3545,7 @@
         }
 
         // ============================================================
-        // TOOLS CRUD
+        // TOOLS CRUD (simplified - keep existing)
         // ============================================================
         async function loadAllTools() {
             allTools = await fetchFromTable('tools');
@@ -3470,7 +3656,7 @@
         }
 
         // ============================================================
-        // REVENUE SECTION
+        // REVENUE SECTION (simplified - keep existing)
         // ============================================================
         async function loadRevenueSection() {
             allRevenue = await fetchFromTable('revenue');
@@ -3539,45 +3725,7 @@
         }
 
         // ============================================================
-        // PREMIUM SECTION
-        // ============================================================
-        async function loadPremiumSection() {
-            allUsers = await fetchFromTable('users');
-            const premiumUsers = allUsers.filter(u => u.is_premium);
-
-            document.getElementById('premiumSubscribers').textContent = premiumUsers.length;
-            document.getElementById('premiumPriceDisplay').textContent = formatCurrency(premiumPrice);
-            document.getElementById('premiumDiscountDisplay').textContent = premiumDiscount + '%';
-
-            const tbody = document.getElementById('premiumBody');
-            if (!premiumUsers.length) {
-                tbody.innerHTML =
-                    '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-crown"></i><p>No premium users</p></div></td></tr>';
-                return;
-            }
-            tbody.innerHTML = premiumUsers.map(u => `
-                <tr>
-                    <td><strong>${u.name}</strong></td>
-                    <td>${u.email}</td>
-                    <td>${formatDate(u.premium_start)}</td>
-                    <td>${formatDate(u.premium_end)}</td>
-                    <td><span class="status-pill active">Active</span></td>
-                    <td><button onclick="togglePremium('${u.id}')" class="danger" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);cursor:pointer;"><i class="fas fa-crown" style="color:var(--accent-orange);"></i> Revoke</button></td>
-                </tr>
-            `).join('');
-        }
-
-        function savePremiumConfig() {
-            premiumPrice = parseInt(document.getElementById('premiumPriceInput').value) || 13500;
-            premiumDuration = parseInt(document.getElementById('premiumDurationInput').value) || 6;
-            premiumDiscount = parseInt(document.getElementById('premiumDiscountInput').value) || 45;
-            showToast('Premium configuration saved!', 'success');
-            closeModal('premiumConfigModal');
-            loadPremiumSection();
-        }
-
-        // ============================================================
-        // PAYMENTS
+        // PAYMENTS (simplified - keep existing)
         // ============================================================
         async function loadAllPayments() {
             allRevenue = await fetchFromTable('revenue');
@@ -3620,7 +3768,7 @@
         }
 
         // ============================================================
-        // MESSAGES
+        // MESSAGES (simplified - keep existing)
         // ============================================================
         async function loadAllMessages() {
             allMessages = await fetchFromTable('messages');
@@ -3745,6 +3893,15 @@
             showToast(key.charAt(0).toUpperCase() + key.slice(1) + ' ' + (cb.checked ? 'enabled' : 'disabled'), 'success');
         }
 
+        function savePremiumConfig() {
+            premiumPrice = parseInt(document.getElementById('premiumPriceInput').value) || 13500;
+            premiumDuration = parseInt(document.getElementById('premiumDurationInput').value) || 6;
+            premiumDiscount = parseInt(document.getElementById('premiumDiscountInput').value) || 45;
+            showToast('Premium configuration saved!', 'success');
+            closeModal('premiumConfigModal');
+            loadPremiumSection();
+        }
+
         // ============================================================
         // KEYBOARD
         // ============================================================
@@ -3834,6 +3991,8 @@
         window.showToast = showToast;
         window.handleLogout = handleLogout;
         window.savePremiumConfig = savePremiumConfig;
+        window.confirmPremium = confirmPremium;
+        window.loadPremiumSection = loadPremiumSection;
         window.handleProjectImageUpload = handleProjectImageUpload;
         window.handleCourseImageUpload = handleCourseImageUpload;
 
