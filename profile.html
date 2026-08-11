@@ -8,6 +8,7 @@
     <title>Aurex Academy - Profile</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js">
     </script>
+    <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -1081,6 +1082,30 @@
             }
         }
 
+        /* ===== AUTH MODAL ===== */
+        .social-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .social-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(124, 58, 237, 0.2);
+        }
+
         /* ===== TOAST ===== */
         .toast {
             position: fixed;
@@ -1317,7 +1342,7 @@
             <div class="upgrade-card">
                 <h4>Upgrade to Pro</h4>
                 <p>Unlock all courses, certifications and premium features.</p>
-                <button class="upgrade-btn" onclick="showToast('Pro upgrade coming soon!', 'success')">Upgrade Now</button>
+                <button class="upgrade-btn" id="upgradeBtn" onclick="openPremiumModal()">Upgrade Now</button>
             </div>
         </aside>
 
@@ -1378,7 +1403,7 @@
                     <button class="btn-secondary" onclick="openEditProfileModal()">
                         <i class="fas fa-edit"></i> Edit Profile
                     </button>
-                    <button class="btn-secondary" onclick="handleLogout()">
+                    <button class="btn-danger" onclick="handleLogout()">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </div>
@@ -1498,6 +1523,10 @@
                     <label>Bio</label>
                     <textarea id="editBio" placeholder="Tell us about yourself..." rows="3"></textarea>
                 </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="editPhone" placeholder="+234 80 0000 0000">
+                </div>
                 <div class="error-msg" id="editError"></div>
                 <div class="success-msg" id="editSuccess"></div>
                 <button type="submit" class="btn-primary">
@@ -1549,6 +1578,44 @@
         </div>
     </div>
 
+    <!-- PREMIUM MODAL -->
+    <div class="modal-overlay" id="premiumModal">
+        <div class="modal">
+            <button class="close-btn" onclick="closePremiumModal()"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-crown" style="color:var(--accent-orange);margin-right:10px;"></i>Premium Account</h2>
+            <p>Unlock all courses with 45% discount and premium tools</p>
+            <div style="background:var(--bg-card);border-radius:16px;padding:20px;margin-bottom:20px;text-align:center;">
+                <div style="font-size:14px;color:var(--text-secondary);margin-bottom:8px;">6 Months Access</div>
+                <div style="font-size:32px;font-weight:800;color:var(--accent-orange);">₦13,500</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">~ $8 USD • Pay via WhatsApp</div>
+            </div>
+            <div style="margin-bottom:20px;">
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-color);">
+                    <i class="fas fa-check-circle" style="color:var(--accent-green);"></i>
+                    <span style="font-size:13px;">45% discount on all courses</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-color);">
+                    <i class="fas fa-check-circle" style="color:var(--accent-green);"></i>
+                    <span style="font-size:13px;">Access to premium tools</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-color);">
+                    <i class="fas fa-check-circle" style="color:var(--accent-green);"></i>
+                    <span style="font-size:13px;">Exclusive class access</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
+                    <i class="fas fa-check-circle" style="color:var(--accent-green);"></i>
+                    <span style="font-size:13px;">Priority support</span>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="initiatePremiumPayment()" style="width:100%;justify-content:center;background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 8px 30px rgba(245,158,11,0.25);">
+                <i class="fab fa-whatsapp"></i> Pay via WhatsApp
+            </button>
+            <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--text-muted);">
+                Confirmation via WhatsApp • Instant access after payment
+            </div>
+        </div>
+    </div>
+
     <!-- TOAST -->
     <div class="toast" id="toast">
         <i class="fas fa-check-circle"></i>
@@ -1557,19 +1624,27 @@
 
     <script>
         // ============================================================
-        // SUPABASE CONFIG
+        // PROFILE APP - Uses config.js for all settings
         // ============================================================
-        const SUPABASE_URL = 'https://nkbtqfytavsugfnxotit.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rYnRxZnl0YXZzdWdmbnhvdGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MDYyMzksImV4cCI6MjEwMDM4MjIzOX0.gZ3SbNtLxaal7_1J81pRPOfA9ivlmHGdA6BgQF2po84';
-        const STORAGE_BUCKET = 'aurex-assets';
 
-        let supabase = null;
-        let supabaseConfigured = false;
+        var CONFIG = window.AUREX_CONFIG || {};
+
+        // Initialize Supabase from config
+        var supabase = null;
+        var supabaseConfigured = false;
+        var ADMIN_EMAILS = CONFIG.adminEmails || [];
 
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            supabaseConfigured = true;
-            console.log('Supabase connected successfully!');
+            if (CONFIG.supabase && CONFIG.supabase.url && CONFIG.supabase.anonKey) {
+                supabase = window.supabase.createClient(
+                    CONFIG.supabase.url,
+                    CONFIG.supabase.anonKey
+                );
+                supabaseConfigured = true;
+                console.log('Supabase connected successfully!');
+            } else {
+                console.warn('Supabase config missing. Check environment variables.');
+            }
         } catch (e) {
             console.warn('Supabase connection error:', e.message);
         }
@@ -1577,41 +1652,44 @@
         // ============================================================
         // STATE
         // ============================================================
-        let currentUser = null;
-        let isPremium = false;
-        let isSignUp = false;
-        let mobileSidebarOpen = false;
-        let userProfile = null;
-        const ADMIN_EMAILS = ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'];
+        var currentUser = null;
+        var isPremium = false;
+        var isSignUp = false;
+        var mobileSidebarOpen = false;
+        var userProfile = null;
 
-        let allEnrollments = [];
-        let allCertificates = [];
-        let allAchievements = [];
-        let selectedAvatarFile = null;
+        var allEnrollments = [];
+        var allCertificates = [];
+        var allAchievements = [];
+        var selectedAvatarFile = null;
 
         // ============================================================
         // HELPERS
         // ============================================================
-        function showToast(msg, type = 'success') {
-            const t = document.getElementById('toast');
-            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+        function showToast(msg, type) {
+            type = type || 'success';
+            var t = document.getElementById('toast');
+            if (!t) return;
+            t.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i> ' + msg;
             t.className = 'toast ' + type + ' show';
             clearTimeout(t._hide);
-            t._hide = setTimeout(() => t.classList.remove('show'), 3500);
+            t._hide = setTimeout(function() { t.classList.remove('show'); }, 3500);
         }
 
         function formatDate(d) {
             if (!d) return '—';
-            const dt = new Date(d);
+            var dt = new Date(d);
             return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
 
         function openModal(id) {
             document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // ============================================================
@@ -1619,8 +1697,8 @@
         // ============================================================
         async function uploadAvatar(file, userId) {
             if (!supabaseConfigured) {
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
+                return new Promise(function(resolve) {
+                    var reader = new FileReader();
                     reader.onload = function(e) {
                         resolve({ publicUrl: e.target.result, error: null });
                     };
@@ -1629,23 +1707,18 @@
             }
 
             try {
-                const { data: buckets } = await supabase.storage.listBuckets();
-                const bucketExists = buckets.some(b => b.name === STORAGE_BUCKET);
-                if (!bucketExists) {
-                    await supabase.storage.createBucket(STORAGE_BUCKET, { public: true });
-                }
+                var bucket = CONFIG.storageBucket || 'aurex-assets';
+                var fileExt = file.name.split('.').pop();
+                var fileName = 'avatars/' + userId + '/profile.' + fileExt;
 
-                const fileExt = file.name.split('.').pop();
-                const fileName = `avatars/${userId}/profile.${fileExt}`;
-
-                const { error } = await supabase.storage
-                    .from(STORAGE_BUCKET)
+                var { error } = await supabase.storage
+                    .from(bucket)
                     .upload(fileName, file, { upsert: true });
 
                 if (error) throw error;
 
-                const { data: urlData } = supabase.storage
-                    .from(STORAGE_BUCKET)
+                var { data: urlData } = supabase.storage
+                    .from(bucket)
                     .getPublicUrl(fileName);
 
                 return { publicUrl: urlData.publicUrl, error: null };
@@ -1683,13 +1756,13 @@
 
         async function handleAuthSubmit(e) {
             e.preventDefault();
-            const email = document.getElementById('authEmail').value;
-            const password = document.getElementById('authPassword').value;
-            const name = document.getElementById('authName').value;
-            const errorEl = document.getElementById('authError');
+            var email = document.getElementById('authEmail').value;
+            var password = document.getElementById('authPassword').value;
+            var name = document.getElementById('authName').value;
+            var errorEl = document.getElementById('authError');
 
             if (!supabaseConfigured) {
-                showToast(isSignUp ? 'Account created! (Demo)' : 'Signed in! (Demo)', 'success');
+                showToast(isSignUp ? 'Account created! (Offline mode)' : 'Signed in! (Offline mode)', 'success');
                 closeAuthModal();
                 updateUIForUser({ email: email, user_metadata: { full_name: name || email.split('@')[0] } });
                 return;
@@ -1697,7 +1770,7 @@
 
             try {
                 if (isSignUp) {
-                    const { data, error } = await supabase.auth.signUp({
+                    var { data, error } = await supabase.auth.signUp({
                         email: email,
                         password: password,
                         options: { data: { full_name: name, is_premium: false } }
@@ -1707,7 +1780,7 @@
                     closeAuthModal();
                     updateUIForUser(data.user);
                 } else {
-                    const { data, error } = await supabase.auth.signInWithPassword({ email: email, password: password });
+                    var { data, error } = await supabase.auth.signInWithPassword({ email: email, password: password });
                     if (error) throw error;
                     showToast('Signed in successfully!', 'success');
                     closeAuthModal();
@@ -1720,12 +1793,12 @@
 
         async function socialAuth(provider) {
             if (!supabaseConfigured) {
-                showToast(provider + ' auth (Demo)', 'success');
+                showToast(provider + ' auth (Offline mode)', 'success');
                 closeAuthModal();
                 updateUIForUser({ email: 'user@example.com', user_metadata: { full_name: 'User' } });
                 return;
             }
-            const { error } = await supabase.auth.signInWithOAuth({ provider: provider });
+            var { error } = await supabase.auth.signInWithOAuth({ provider: provider });
             if (error) showToast(error.message, 'error');
         }
 
@@ -1734,12 +1807,12 @@
             document.getElementById('authBtn').style.display = 'none';
             document.getElementById('userProfile').style.display = 'flex';
 
-            const name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+            var name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
             document.getElementById('userName').textContent = name;
             document.getElementById('profileName').textContent = name;
 
-            const avatar = user?.user_metadata?.avatar_url ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=7c3aed&color=fff&size=200`;
+            var avatar = user?.user_metadata?.avatar_url ||
+                'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=7c3aed&color=fff&size=200';
             document.getElementById('profileAvatar').src = avatar;
             document.getElementById('userProfileImg').src = avatar.replace('size=200', 'size=100');
 
@@ -1747,34 +1820,45 @@
 
             // Check premium status
             if (supabaseConfigured) {
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-                if (profile) {
-                    isPremium = profile.is_premium || false;
-                    userProfile = profile;
-                    if (profile.bio) {
-                        document.getElementById('editBio').value = profile.bio || '';
+                try {
+                    var { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
+                    if (profile) {
+                        isPremium = profile.is_premium || false;
+                        userProfile = profile;
+                        if (profile.bio) {
+                            document.getElementById('editBio').value = profile.bio || '';
+                        }
+                        if (profile.phone) {
+                            document.getElementById('editPhone').value = profile.phone || '';
+                        }
                     }
+                } catch (e) {
+                    isPremium = user?.user_metadata?.is_premium || false;
                 }
             } else {
                 isPremium = user?.user_metadata?.is_premium || false;
             }
 
             // Update badges
-            const badgeRow = document.getElementById('badgeRow');
-            let badges = '';
+            var badgeRow = document.getElementById('badgeRow');
+            var badges = '';
             if (isPremium) {
-                badges += `<span class="badge badge-premium">Premium</span>`;
+                badges += '<span class="badge badge-premium">Premium</span>';
                 document.getElementById('userStatus').textContent = 'Premium';
                 document.getElementById('userStatus').className = 'status premium';
                 document.getElementById('userStatus').innerHTML = 'Premium <i class="fas fa-crown" style="font-size:8px;"></i>';
+                document.getElementById('upgradeBtn').disabled = true;
+                document.getElementById('upgradeBtn').textContent = '✓ Premium Active';
             } else {
-                badges += `<span class="badge badge-free">Free</span>`;
+                badges += '<span class="badge badge-free">Free</span>';
                 document.getElementById('userStatus').textContent = 'Free';
                 document.getElementById('userStatus').className = 'status';
+                document.getElementById('upgradeBtn').disabled = false;
+                document.getElementById('upgradeBtn').textContent = 'Upgrade Now';
             }
 
             if (ADMIN_EMAILS.includes(user?.email)) {
-                badges += `<span class="badge badge-admin">Admin</span>`;
+                badges += '<span class="badge badge-admin">Admin</span>';
                 document.getElementById('adminBadge').style.display = 'flex';
             }
 
@@ -1793,23 +1877,29 @@
                 });
                 return;
             }
-            const { data: { user } } = await supabase.auth.getUser();
+            var { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 // Fetch full profile
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-                if (profile) {
-                    user.user_metadata = { ...user.user_metadata, ...profile };
-                    userProfile = profile;
+                try {
+                    var { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
+                    if (profile) {
+                        user.user_metadata = { ...user.user_metadata, ...profile };
+                        userProfile = profile;
+                    }
+                } catch (e) {
+                    console.warn('Profile fetch error:', e);
                 }
                 updateUIForUser(user);
             }
-            supabase.auth.onAuthStateChange((event, session) => {
+            supabase.auth.onAuthStateChange(function(event, session) {
                 if (event === 'SIGNED_IN' && session?.user) updateUIForUser(session.user);
                 if (event === 'SIGNED_OUT') {
                     currentUser = null;
                     isPremium = false;
                     document.getElementById('authBtn').style.display = 'flex';
                     document.getElementById('userProfile').style.display = 'none';
+                    document.getElementById('upgradeBtn').disabled = false;
+                    document.getElementById('upgradeBtn').textContent = 'Upgrade Now';
                 }
             });
         }
@@ -1819,7 +1909,7 @@
                 supabase.auth.signOut();
             }
             showToast('Logged out', 'success');
-            setTimeout(() => window.location.href = 'index.html', 800);
+            setTimeout(function() { window.location.href = 'index.html'; }, 800);
         }
 
         // ============================================================
@@ -1833,6 +1923,7 @@
             }
             document.getElementById('editName').value = currentUser?.user_metadata?.full_name || '';
             document.getElementById('editBio').value = userProfile?.bio || '';
+            document.getElementById('editPhone').value = userProfile?.phone || '';
             document.getElementById('editError').textContent = '';
             document.getElementById('editSuccess').textContent = '';
             openModal('editProfileModal');
@@ -1844,8 +1935,9 @@
 
         async function handleEditProfile(e) {
             e.preventDefault();
-            const name = document.getElementById('editName').value.trim();
-            const bio = document.getElementById('editBio').value.trim();
+            var name = document.getElementById('editName').value.trim();
+            var bio = document.getElementById('editBio').value.trim();
+            var phone = document.getElementById('editPhone').value.trim();
 
             if (!name) {
                 document.getElementById('editError').textContent = 'Please enter your name.';
@@ -1853,18 +1945,19 @@
             }
 
             if (!supabaseConfigured) {
-                showToast('Profile updated! (Demo)', 'success');
+                showToast('Profile updated! (Offline mode)', 'success');
                 closeEditProfileModal();
                 document.getElementById('profileName').textContent = name;
                 return;
             }
 
             try {
-                const { error } = await supabase
-                    .from('profiles')
+                var { error } = await supabase
+                    .from('users')
                     .update({
                         full_name: name,
                         bio: bio,
+                        phone: phone,
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', currentUser.id);
@@ -1889,7 +1982,7 @@
         // AVATAR UPLOAD
         // ============================================================
         function handleAvatarUpload(event) {
-            const file = event.target.files[0];
+            var file = event.target.files[0];
             if (!file) return;
 
             if (file.size > 2 * 1024 * 1024) {
@@ -1900,7 +1993,7 @@
             selectedAvatarFile = file;
 
             // Preview
-            const reader = new FileReader();
+            var reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('profileAvatar').src = e.target.result;
             };
@@ -1917,19 +2010,19 @@
             }
 
             if (!supabaseConfigured) {
-                showToast('Avatar updated! (Demo)', 'success');
+                showToast('Avatar updated! (Offline mode)', 'success');
                 return;
             }
 
-            const result = await uploadAvatar(file, currentUser.id);
+            var result = await uploadAvatar(file, currentUser.id);
             if (result.error) {
                 showToast('Error uploading avatar: ' + result.error, 'error');
                 return;
             }
 
             // Update profile with new avatar URL
-            const { error } = await supabase
-                .from('profiles')
+            var { error } = await supabase
+                .from('users')
                 .update({
                     avatar_url: result.publicUrl,
                     updated_at: new Date().toISOString()
@@ -1949,6 +2042,93 @@
             document.getElementById('profileAvatar').src = result.publicUrl;
             document.getElementById('userProfileImg').src = result.publicUrl;
             showToast('Avatar updated successfully!', 'success');
+        }
+
+        // ============================================================
+        // PREMIUM
+        // ============================================================
+        function openPremiumModal() {
+            if (!currentUser) {
+                showToast('Please sign in first', 'error');
+                openAuthModal();
+                return;
+            }
+            openModal('premiumModal');
+        }
+
+        function closePremiumModal() {
+            closeModal('premiumModal');
+        }
+
+        function initiatePremiumPayment() {
+            if (!currentUser) {
+                showToast('Please sign in first', 'error');
+                return;
+            }
+
+            var phone = '2349127161200';
+            var message = 'I want to upgrade to Premium Account (6 months) - ₦13,500\n' +
+                'Email: ' + currentUser.email + '\n' +
+                'User: ' + (currentUser.user_metadata?.full_name || currentUser.email) +
+                '\n\nPayment via Moniepoint\n' +
+                'Account Name: Mustapha Iman Oniyangi\n' +
+                'Account Number: 8028741731';
+
+            var url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
+            window.open(url, '_blank');
+
+            showToast('Please complete payment on WhatsApp. Your account will be upgraded after confirmation.', 'success');
+
+            // After a delay, offer to confirm payment
+            setTimeout(function() {
+                if (confirm('Has payment been confirmed? (Click OK to confirm)')) {
+                    upgradeUserToPremium();
+                }
+            }, 5000);
+        }
+
+        async function upgradeUserToPremium() {
+            if (!supabaseConfigured) {
+                isPremium = true;
+                showToast('Premium activated! (Offline mode)', 'success');
+                updateUIForUser(currentUser);
+                return;
+            }
+
+            try {
+                var { error } = await supabase
+                    .from('users')
+                    .update({
+                        is_premium: true,
+                        premium_start: new Date().toISOString(),
+                        premium_end: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
+                        subscription_status: 'active',
+                        payment_status: 'confirmed'
+                    })
+                    .eq('id', currentUser.id);
+
+                if (error) throw error;
+
+                // Create payment record
+                await supabase.from('payments').insert({
+                    user_id: currentUser.id,
+                    user_email: currentUser.email,
+                    amount: 13500,
+                    payment_type: 'premium',
+                    item: 'Premium Subscription',
+                    status: 'completed',
+                    created_at: new Date().toISOString()
+                });
+
+                isPremium = true;
+                currentUser.user_metadata.is_premium = true;
+                showToast('Premium activated! 🎉', 'success');
+                closePremiumModal();
+                updateUIForUser(currentUser);
+            } catch (e) {
+                console.error('Premium upgrade error:', e);
+                showToast('Error upgrading: ' + e.message, 'error');
+            }
         }
 
         // ============================================================
@@ -1979,14 +2159,15 @@
                     { name: 'Premium Member', icon: 'fa-crown', unlocked: isPremium }
                 ];
                 document.getElementById('totalCourses').textContent = allEnrollments.length;
-                document.getElementById('completedCourses').textContent = allEnrollments.filter(e => e.progress === 100)
-                    .length;
+                document.getElementById('completedCourses').textContent = allEnrollments.filter(function(e) { return e
+                        .progress === 100; }).length;
                 document.getElementById('totalXP').textContent = '1,250';
                 document.getElementById('streakDays').textContent = '7';
                 document.getElementById('statCourses').textContent = allEnrollments.length;
                 document.getElementById('statCerts').textContent = allCertificates.length;
                 document.getElementById('statXP').textContent = '1,250';
-                document.getElementById('achCount').textContent = allAchievements.filter(a => a.unlocked).length;
+                document.getElementById('achCount').textContent = allAchievements.filter(function(a) { return a
+                        .unlocked; }).length;
                 document.getElementById('completionPercent').textContent = '75%';
                 document.getElementById('completionFill').style.width = '75%';
 
@@ -1998,8 +2179,8 @@
 
             try {
                 // Get user profile
-                const { data: profile } = await supabase
-                    .from('profiles')
+                var { data: profile } = await supabase
+                    .from('users')
                     .select('*')
                     .eq('id', currentUser.id)
                     .single();
@@ -2007,10 +2188,11 @@
                 if (profile) {
                     userProfile = profile;
                     document.getElementById('editBio').value = profile.bio || '';
+                    document.getElementById('editPhone').value = profile.phone || '';
                 }
 
                 // Get enrollments
-                const { data: enrollments } = await supabase
+                var { data: enrollments } = await supabase
                     .from('enrollments')
                     .select('*, courses(*)')
                     .eq('user_id', currentUser.id);
@@ -2018,7 +2200,7 @@
                 allEnrollments = enrollments || [];
 
                 // Get certificates
-                const { data: certificates } = await supabase
+                var { data: certificates } = await supabase
                     .from('user_certificates')
                     .select('*, certificates(*)')
                     .eq('user_id', currentUser.id);
@@ -2026,7 +2208,7 @@
                 allCertificates = certificates || [];
 
                 // Get achievements
-                const { data: achievements } = await supabase
+                var { data: achievements } = await supabase
                     .from('user_achievements')
                     .select('*, achievements(*)')
                     .eq('user_id', currentUser.id);
@@ -2035,24 +2217,25 @@
 
                 // Update stats
                 document.getElementById('totalCourses').textContent = allEnrollments.length;
-                document.getElementById('completedCourses').textContent = allEnrollments.filter(e => e.progress === 100)
-                    .length;
+                document.getElementById('completedCourses').textContent = allEnrollments.filter(function(e) { return e
+                        .progress === 100; }).length;
                 document.getElementById('totalXP').textContent = userProfile?.total_xp || 0;
                 document.getElementById('streakDays').textContent = userProfile?.streak_days || 0;
                 document.getElementById('statCourses').textContent = allEnrollments.length;
                 document.getElementById('statCerts').textContent = allCertificates.length;
                 document.getElementById('statXP').textContent = userProfile?.total_xp || 0;
-                document.getElementById('achCount').textContent = allAchievements.filter(a => a.unlocked).length;
+                document.getElementById('achCount').textContent = allAchievements.filter(function(a) { return a
+                        .is_complete; }).length;
 
                 // Profile completion
-                const fields = [
+                var fields = [
                     profile?.full_name,
                     profile?.avatar_url,
                     profile?.bio,
                     profile?.total_xp > 0
                 ];
-                const completed = fields.filter(Boolean).length;
-                const percent = Math.round((completed / fields.length) * 100);
+                var completed = fields.filter(Boolean).length;
+                var percent = Math.round((completed / fields.length) * 100);
                 document.getElementById('completionPercent').textContent = percent + '%';
                 document.getElementById('completionFill').style.width = percent + '%';
 
@@ -2069,7 +2252,7 @@
         // RENDER FUNCTIONS
         // ============================================================
         function renderEnrollments(enrollments) {
-            const container = document.getElementById('enrollmentsList');
+            var container = document.getElementById('enrollmentsList');
             if (!enrollments || enrollments.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
@@ -2080,8 +2263,8 @@
                 return;
             }
 
-            container.innerHTML = enrollments.slice(0, 4).map(e => {
-                const course = e.courses || e;
+            container.innerHTML = enrollments.slice(0, 4).map(function(e) {
+                var course = e.courses || e;
                 return `
                     <div class="enrollment-item">
                         <img src="${course.image || 'https://via.placeholder.com/60/1a1a3e/7c3aed?text=Course'}" alt="${course.title || 'Course'}">
@@ -2099,7 +2282,7 @@
         }
 
         function renderCertificates(certificates) {
-            const container = document.getElementById('certGrid');
+            var container = document.getElementById('certGrid');
             if (!certificates || certificates.length === 0) {
                 container.innerHTML = `
                     <div style="grid-column:1/-1;">
@@ -2112,8 +2295,8 @@
                 return;
             }
 
-            container.innerHTML = certificates.slice(0, 4).map(c => {
-                const cert = c.certificates || c;
+            container.innerHTML = certificates.slice(0, 4).map(function(c) {
+                var cert = c.certificates || c;
                 return `
                     <div class="cert-item">
                         <i class="fas ${cert.icon || 'fa-medal'}"></i>
@@ -2125,7 +2308,7 @@
         }
 
         function renderAchievements(achievements) {
-            const container = document.getElementById('achGrid');
+            var container = document.getElementById('achGrid');
             if (!achievements || achievements.length === 0) {
                 container.innerHTML = `
                     <div style="grid-column:1/-1;">
@@ -2139,44 +2322,51 @@
             }
 
             // Show up to 8 achievements
-            const allAchievements = [
-                { name: 'First Course', icon: 'fa-star', unlocked: achievements.some(a => a.achievement_id === 1) },
-                { name: '5 Courses', icon: 'fa-star', unlocked: achievements.some(a => a.achievement_id === 2) },
-                { name: '10 Courses', icon: 'fa-star', unlocked: achievements.some(a => a.achievement_id === 3) },
-                { name: '100 XP', icon: 'fa-bolt', unlocked: achievements.some(a => a.achievement_id === 4) },
-                { name: '500 XP', icon: 'fa-bolt', unlocked: achievements.some(a => a.achievement_id === 5) },
-                { name: 'Perfect Score', icon: 'fa-check-circle', unlocked: achievements.some(a => a.achievement_id ===
-                        6) },
-                { name: 'Community Member', icon: 'fa-users', unlocked: achievements.some(a => a.achievement_id ===
-                        7) },
-                { name: 'Premium Member', icon: 'fa-crown', unlocked: achievements.some(a => a.achievement_id === 8) ||
-                        isPremium }
+            var allAchievements = [
+                { name: 'First Course', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
+                        .achievement_id === 1 && a.is_complete; }) },
+                { name: '5 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
+                        .achievement_id === 2 && a.is_complete; }) },
+                { name: '10 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
+                        .achievement_id === 3 && a.is_complete; }) },
+                { name: '100 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id ===
+                        4 && a.is_complete; }) },
+                { name: '500 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id ===
+                        5 && a.is_complete; }) },
+                { name: 'Perfect Score', icon: 'fa-check-circle', unlocked: achievements.some(function(a) { return a
+                        .achievement_id === 6 && a.is_complete; }) },
+                { name: 'Community Member', icon: 'fa-users', unlocked: achievements.some(function(a) { return a
+                        .achievement_id === 7 && a.is_complete; }) },
+                { name: 'Premium Member', icon: 'fa-crown', unlocked: achievements.some(function(a) { return a
+                        .achievement_id === 8 && a.is_complete; }) || isPremium }
             ];
 
-            container.innerHTML = allAchievements.map(a => `
-                <div class="ach-item ${a.unlocked ? 'unlocked' : 'locked'}">
-                    <i class="fas ${a.icon}" style="color:${a.unlocked ? 'var(--accent-orange)' : 'var(--text-muted)'};"></i>
-                    <div class="ach-name">${a.name}</div>
-                </div>
-            `).join('');
+            container.innerHTML = allAchievements.map(function(a) {
+                return `
+                    <div class="ach-item ${a.unlocked ? 'unlocked' : 'locked'}">
+                        <i class="fas ${a.icon}" style="color:${a.unlocked ? 'var(--accent-orange)' : 'var(--text-muted)'};"></i>
+                        <div class="ach-name">${a.name}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // ============================================================
         // SIDEBAR / NAV
         // ============================================================
         document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-            const s = document.getElementById('sidebar');
-            const mc = document.getElementById('mainContent');
+            var s = document.getElementById('sidebar');
+            var mc = document.getElementById('mainContent');
             s.classList.toggle('collapsed');
             mc.classList.toggle('sidebar-collapsed');
         });
 
-        const mmb = document.getElementById('mobileMenuBtn');
+        var mmb = document.getElementById('mobileMenuBtn');
         if (mmb) {
             mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
             mmb.addEventListener('click', function() {
-                const s = document.getElementById('sidebar');
-                const o = document.getElementById('sidebarOverlay');
+                var s = document.getElementById('sidebar');
+                var o = document.getElementById('sidebarOverlay');
                 mobileSidebarOpen = !mobileSidebarOpen;
                 s.classList.toggle('mobile-open', mobileSidebarOpen);
                 o.classList.toggle('active', mobileSidebarOpen);
@@ -2191,10 +2381,11 @@
         // ============================================================
         // KEYBOARD
         // ============================================================
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeAuthModal();
                 closeEditProfileModal();
+                closePremiumModal();
                 if (mobileSidebarOpen) {
                     document.getElementById('sidebar').classList.remove('mobile-open');
                     document.getElementById('sidebarOverlay').classList.remove('active');
@@ -2207,7 +2398,7 @@
         // SCROLL EFFECT
         // ============================================================
         window.addEventListener('scroll', function() {
-            const topBar = document.getElementById('topBar');
+            var topBar = document.getElementById('topBar');
             if (window.scrollY > 20) {
                 topBar.classList.add('scrolled');
             } else {
@@ -2219,7 +2410,7 @@
         // AUTO DETECT DEVICE
         // ============================================================
         function autoDetectDevice() {
-            const isMobile = window.innerWidth <= 900;
+            var isMobile = window.innerWidth <= 900;
             if (mmb) mmb.style.display = isMobile ? 'flex' : 'none';
             if (!isMobile) {
                 document.getElementById('sidebar').classList.remove('mobile-open');
@@ -2238,9 +2429,10 @@
 
             if (!currentUser) {
                 document.getElementById('authBtn').style.display = 'flex';
+                document.getElementById('userProfile').style.display = 'none';
             }
 
-            setTimeout(() => {
+            setTimeout(function() {
                 document.getElementById('loadingScreen').classList.add('hidden');
             }, 600);
         }
@@ -2257,9 +2449,15 @@
         window.closeEditProfileModal = closeEditProfileModal;
         window.handleEditProfile = handleEditProfile;
         window.handleAvatarUpload = handleAvatarUpload;
-        window.toggleMobileSidebar = toggleMobileSidebar;
+        window.openPremiumModal = openPremiumModal;
+        window.closePremiumModal = closePremiumModal;
+        window.initiatePremiumPayment = initiatePremiumPayment;
 
-        init();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 
 </body>
