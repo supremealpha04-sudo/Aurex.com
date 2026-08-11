@@ -1,5 +1,5 @@
-// config.js - Reads directly from environment variables (Vercel)
-// NO FALLBACK VALUES - Must be set in .env or Vercel Environment Variables
+// config.js - Reads directly from environment variables
+// NO FALLBACK VALUES - Must be set in Vercel Environment Variables
 
 const CONFIG = {
     // Primary Supabase
@@ -37,4 +37,9 @@ const CONFIG = {
 // Export for browser
 if (typeof window !== 'undefined') {
     window.AUREX_CONFIG = CONFIG;
+}
+
+// Export for modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = CONFIG;
 }
