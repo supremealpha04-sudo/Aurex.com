@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* ===== RESET & ROOT ===== */
+        /* ===== COMPLETE STYLES ===== */
         * {
             margin: 0;
             padding: 0;
@@ -414,6 +414,11 @@
         .upgrade-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+        }
+        .upgrade-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* ===== MAIN ===== */
@@ -914,7 +919,7 @@
             color: var(--text-muted);
         }
 
-        /* ===== EDIT PROFILE MODAL ===== */
+        /* ===== MODALS ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -1072,17 +1077,8 @@
             height: 100%;
             object-fit: cover;
         }
-        @media (max-width: 600px) {
-            .modal {
-                padding: 20px 16px;
-                border-radius: 16px;
-            }
-            .modal h2 {
-                font-size: 16px;
-            }
-        }
 
-        /* ===== AUTH MODAL ===== */
+        /* ===== SOCIAL AUTH ===== */
         .social-btn {
             width: 100%;
             padding: 10px;
@@ -1266,7 +1262,6 @@
             }
         }
 
-        /* ===== ANIMATIONS ===== */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -1420,9 +1415,7 @@
                             <a onclick="showToast('View all courses', 'success')">View All</a>
                         </div>
                         <div id="enrollmentsList">
-                            <div class="skeleton" style="height:52px;margin-bottom:8px;"></div>
-                            <div class="skeleton" style="height:52px;margin-bottom:8px;"></div>
-                            <div class="skeleton" style="height:52px;"></div>
+                            <!-- Will be populated by JavaScript -->
                         </div>
                     </div>
 
@@ -1433,10 +1426,7 @@
                             <a onclick="showToast('View all certificates', 'success')">View All</a>
                         </div>
                         <div class="cert-grid" id="certGrid">
-                            <div class="skeleton" style="height:70px;"></div>
-                            <div class="skeleton" style="height:70px;"></div>
-                            <div class="skeleton" style="height:70px;"></div>
-                            <div class="skeleton" style="height:70px;"></div>
+                            <!-- Will be populated by JavaScript -->
                         </div>
                     </div>
                 </div>
@@ -1453,14 +1443,7 @@
                             <strong style="color:var(--text-primary);" id="achCount">0</strong>/30 Unlocked
                         </div>
                         <div class="ach-grid" id="achGrid">
-                            <div class="skeleton" style="height:60px;"></div>
-                            <div class="skeleton" style="height:60px;"></div>
-                            <div class="skeleton" style="height:60px;"></div>
-                            <div class="skeleton" style="height:60px;"></div>
-                            <div class="skeleton" style="height:60px;"></div>
-                            <div class="skeleton" style="height:60px;"></div>
-                            <div class="skeleton" style="height:60px;"></div>
-                            <div class="skeleton" style="height:60px;"></div>
+                            <!-- Will be populated by JavaScript -->
                         </div>
                     </div>
 
@@ -1624,12 +1607,11 @@
 
     <script>
         // ============================================================
-        // PROFILE APP - Uses config.js for all settings
+        // PROFILE APP - Full Working Version
         // ============================================================
 
         var CONFIG = window.AUREX_CONFIG || {};
 
-        // Initialize Supabase from config
         var supabase = null;
         var supabaseConfigured = false;
         var ADMIN_EMAILS = CONFIG.adminEmails || [];
@@ -1641,12 +1623,12 @@
                     CONFIG.supabase.anonKey
                 );
                 supabaseConfigured = true;
-                console.log('Supabase connected successfully!');
+                console.log('✅ Supabase connected');
             } else {
-                console.warn('Supabase config missing. Check environment variables.');
+                console.warn('⚠️ Supabase config missing. Check environment variables.');
             }
         } catch (e) {
-            console.warn('Supabase connection error:', e.message);
+            console.warn('❌ Supabase connection error:', e.message);
         }
 
         // ============================================================
@@ -1657,11 +1639,6 @@
         var isSignUp = false;
         var mobileSidebarOpen = false;
         var userProfile = null;
-
-        var allEnrollments = [];
-        var allCertificates = [];
-        var allAchievements = [];
-        var selectedAvatarFile = null;
 
         // ============================================================
         // HELPERS
@@ -1762,7 +1739,7 @@
             var errorEl = document.getElementById('authError');
 
             if (!supabaseConfigured) {
-                showToast(isSignUp ? 'Account created! (Offline mode)' : 'Signed in! (Offline mode)', 'success');
+                showToast(isSignUp ? 'Account created! (Demo)' : 'Signed in! (Demo)', 'success');
                 closeAuthModal();
                 updateUIForUser({ email: email, user_metadata: { full_name: name || email.split('@')[0] } });
                 return;
@@ -1793,7 +1770,7 @@
 
         async function socialAuth(provider) {
             if (!supabaseConfigured) {
-                showToast(provider + ' auth (Offline mode)', 'success');
+                showToast(provider + ' auth (Demo)', 'success');
                 closeAuthModal();
                 updateUIForUser({ email: 'user@example.com', user_metadata: { full_name: 'User' } });
                 return;
@@ -1818,19 +1795,15 @@
 
             document.getElementById('profileEmail').textContent = user?.email || 'user@example.com';
 
-            // Check premium status
+            // Check premium status from users table
             if (supabaseConfigured) {
                 try {
                     var { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
                     if (profile) {
                         isPremium = profile.is_premium || false;
                         userProfile = profile;
-                        if (profile.bio) {
-                            document.getElementById('editBio').value = profile.bio || '';
-                        }
-                        if (profile.phone) {
-                            document.getElementById('editPhone').value = profile.phone || '';
-                        }
+                        document.getElementById('editBio').value = profile.bio || '';
+                        document.getElementById('editPhone').value = profile.phone || '';
                     }
                 } catch (e) {
                     isPremium = user?.user_metadata?.is_premium || false;
@@ -1843,7 +1816,7 @@
             var badgeRow = document.getElementById('badgeRow');
             var badges = '';
             if (isPremium) {
-                badges += '<span class="badge badge-premium">Premium</span>';
+                badges += '<span class="badge badge-premium"><i class="fas fa-crown"></i> Premium</span>';
                 document.getElementById('userStatus').textContent = 'Premium';
                 document.getElementById('userStatus').className = 'status premium';
                 document.getElementById('userStatus').innerHTML = 'Premium <i class="fas fa-crown" style="font-size:8px;"></i>';
@@ -1879,7 +1852,6 @@
             }
             var { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                // Fetch full profile
                 try {
                     var { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
                     if (profile) {
@@ -1945,7 +1917,7 @@
             }
 
             if (!supabaseConfigured) {
-                showToast('Profile updated! (Offline mode)', 'success');
+                showToast('Profile updated! (Demo)', 'success');
                 closeEditProfileModal();
                 document.getElementById('profileName').textContent = name;
                 return;
@@ -1964,7 +1936,6 @@
 
                 if (error) throw error;
 
-                // Update user metadata
                 await supabase.auth.updateUser({
                     data: { full_name: name }
                 });
@@ -1990,8 +1961,6 @@
                 return;
             }
 
-            selectedAvatarFile = file;
-
             // Preview
             var reader = new FileReader();
             reader.onload = function(e) {
@@ -2010,7 +1979,7 @@
             }
 
             if (!supabaseConfigured) {
-                showToast('Avatar updated! (Offline mode)', 'success');
+                showToast('Avatar updated! (Demo)', 'success');
                 return;
             }
 
@@ -2020,7 +1989,6 @@
                 return;
             }
 
-            // Update profile with new avatar URL
             var { error } = await supabase
                 .from('users')
                 .update({
@@ -2034,7 +2002,6 @@
                 return;
             }
 
-            // Update user metadata
             await supabase.auth.updateUser({
                 data: { avatar_url: result.publicUrl }
             });
@@ -2045,7 +2012,7 @@
         }
 
         // ============================================================
-        // PREMIUM
+        // PREMIUM UPGRADE - REAL IMPLEMENTATION
         // ============================================================
         function openPremiumModal() {
             if (!currentUser) {
@@ -2053,6 +2020,12 @@
                 openAuthModal();
                 return;
             }
+
+            if (isPremium) {
+                showToast('You are already a premium member! 🎉', 'success');
+                return;
+            }
+
             openModal('premiumModal');
         }
 
@@ -2070,16 +2043,18 @@
             var message = 'I want to upgrade to Premium Account (6 months) - ₦13,500\n' +
                 'Email: ' + currentUser.email + '\n' +
                 'User: ' + (currentUser.user_metadata?.full_name || currentUser.email) +
-                '\n\nPayment via Moniepoint\n' +
+                '\n\nPayment Details:\n' +
+                'Bank: Moniepoint\n' +
                 'Account Name: Mustapha Iman Oniyangi\n' +
-                'Account Number: 8028741731';
+                'Account Number: 8028741731\n\n' +
+                'Please confirm my payment. Thank you! 🙏';
 
             var url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
             window.open(url, '_blank');
 
-            showToast('Please complete payment on WhatsApp. Your account will be upgraded after confirmation.', 'success');
+            showToast('Please complete payment on WhatsApp. Your account will be upgraded after confirmation.', 'info');
 
-            // After a delay, offer to confirm payment
+            // After 5 seconds, offer to confirm payment
             setTimeout(function() {
                 if (confirm('Has payment been confirmed? (Click OK to confirm)')) {
                     upgradeUserToPremium();
@@ -2088,14 +2063,21 @@
         }
 
         async function upgradeUserToPremium() {
+            if (!currentUser) {
+                showToast('Please sign in first', 'error');
+                return;
+            }
+
             if (!supabaseConfigured) {
                 isPremium = true;
-                showToast('Premium activated! (Offline mode)', 'success');
+                showToast('Premium activated! (Demo)', 'success');
                 updateUIForUser(currentUser);
+                closePremiumModal();
                 return;
             }
 
             try {
+                // Update user to premium
                 var { error } = await supabase
                     .from('users')
                     .update({
@@ -2120,11 +2102,21 @@
                     created_at: new Date().toISOString()
                 });
 
+                // Create notification
+                await supabase.from('notifications').insert({
+                    user_id: currentUser.id,
+                    type: 'success',
+                    title: 'Premium Activated! 🎉',
+                    message: 'Your premium account has been activated. Enjoy all premium features!',
+                    created_at: new Date().toISOString()
+                });
+
                 isPremium = true;
                 currentUser.user_metadata.is_premium = true;
-                showToast('Premium activated! 🎉', 'success');
+                showToast('Premium activated successfully! 🎉', 'success');
                 closePremiumModal();
                 updateUIForUser(currentUser);
+
             } catch (e) {
                 console.error('Premium upgrade error:', e);
                 showToast('Error upgrading: ' + e.message, 'error');
@@ -2132,48 +2124,39 @@
         }
 
         // ============================================================
-        // LOAD USER DATA
+        // LOAD USER DATA - REAL SUPABASE QUERIES
         // ============================================================
         async function loadUserData() {
             if (!currentUser) return;
 
             if (!supabaseConfigured) {
-                // Demo data
-                allEnrollments = [
+                showToast('Supabase not configured. Using demo data.', 'warning');
+                // Demo data for testing
+                renderEnrollments([
                     { course: 'UX Design Fundamentals', progress: 75, image: 'https://via.placeholder.com/60' },
                     { course: 'Branding Identity Mastery', progress: 40, image: 'https://via.placeholder.com/60' },
                     { course: 'Web Design Pro', progress: 100, image: 'https://via.placeholder.com/60' }
-                ];
-                allCertificates = [
+                ]);
+                renderCertificates([
                     { name: 'UX Design Fundamentals', icon: 'fa-medal', date: new Date().toISOString() },
                     { name: 'Web Design Pro', icon: 'fa-certificate', date: new Date().toISOString() }
-                ];
-                allAchievements = [
+                ]);
+                renderAchievements([
                     { name: 'First Course', icon: 'fa-star', unlocked: true },
                     { name: '5 Courses', icon: 'fa-star', unlocked: true },
                     { name: '10 Courses', icon: 'fa-star', unlocked: false },
-                    { name: '100 XP', icon: 'fa-bolt', unlocked: true },
-                    { name: '500 XP', icon: 'fa-bolt', unlocked: false },
-                    { name: 'Perfect Score', icon: 'fa-check-circle', unlocked: false },
-                    { name: 'Community Member', icon: 'fa-users', unlocked: true },
                     { name: 'Premium Member', icon: 'fa-crown', unlocked: isPremium }
-                ];
-                document.getElementById('totalCourses').textContent = allEnrollments.length;
-                document.getElementById('completedCourses').textContent = allEnrollments.filter(function(e) { return e
-                        .progress === 100; }).length;
+                ]);
+                document.getElementById('totalCourses').textContent = '3';
+                document.getElementById('completedCourses').textContent = '1';
                 document.getElementById('totalXP').textContent = '1,250';
                 document.getElementById('streakDays').textContent = '7';
-                document.getElementById('statCourses').textContent = allEnrollments.length;
-                document.getElementById('statCerts').textContent = allCertificates.length;
+                document.getElementById('statCourses').textContent = '3';
+                document.getElementById('statCerts').textContent = '2';
                 document.getElementById('statXP').textContent = '1,250';
-                document.getElementById('achCount').textContent = allAchievements.filter(function(a) { return a
-                        .unlocked; }).length;
+                document.getElementById('achCount').textContent = '3';
                 document.getElementById('completionPercent').textContent = '75%';
                 document.getElementById('completionFill').style.width = '75%';
-
-                renderEnrollments(allEnrollments);
-                renderCertificates(allCertificates);
-                renderAchievements(allAchievements);
                 return;
             }
 
@@ -2191,13 +2174,11 @@
                     document.getElementById('editPhone').value = profile.phone || '';
                 }
 
-                // Get enrollments
+                // Get enrollments with course details
                 var { data: enrollments } = await supabase
                     .from('enrollments')
                     .select('*, courses(*)')
                     .eq('user_id', currentUser.id);
-
-                allEnrollments = enrollments || [];
 
                 // Get certificates
                 var { data: certificates } = await supabase
@@ -2205,27 +2186,23 @@
                     .select('*, certificates(*)')
                     .eq('user_id', currentUser.id);
 
-                allCertificates = certificates || [];
-
                 // Get achievements
                 var { data: achievements } = await supabase
                     .from('user_achievements')
                     .select('*, achievements(*)')
                     .eq('user_id', currentUser.id);
 
-                allAchievements = achievements || [];
-
                 // Update stats
-                document.getElementById('totalCourses').textContent = allEnrollments.length;
-                document.getElementById('completedCourses').textContent = allEnrollments.filter(function(e) { return e
+                document.getElementById('totalCourses').textContent = (enrollments || []).length;
+                document.getElementById('completedCourses').textContent = (enrollments || []).filter(function(e) { return e
                         .progress === 100; }).length;
-                document.getElementById('totalXP').textContent = userProfile?.total_xp || 0;
-                document.getElementById('streakDays').textContent = userProfile?.streak_days || 0;
-                document.getElementById('statCourses').textContent = allEnrollments.length;
-                document.getElementById('statCerts').textContent = allCertificates.length;
-                document.getElementById('statXP').textContent = userProfile?.total_xp || 0;
-                document.getElementById('achCount').textContent = allAchievements.filter(function(a) { return a
-                        .is_complete; }).length;
+                document.getElementById('totalXP').textContent = profile?.total_xp || 0;
+                document.getElementById('streakDays').textContent = profile?.streak_days || 0;
+                document.getElementById('statCourses').textContent = (enrollments || []).length;
+                document.getElementById('statCerts').textContent = (certificates || []).length;
+                document.getElementById('statXP').textContent = profile?.total_xp || 0;
+                document.getElementById('achCount').textContent = (achievements || []).filter(function(a) { return a
+                        .is_complete; }).length || 0;
 
                 // Profile completion
                 var fields = [
@@ -2239,12 +2216,13 @@
                 document.getElementById('completionPercent').textContent = percent + '%';
                 document.getElementById('completionFill').style.width = percent + '%';
 
-                renderEnrollments(allEnrollments);
-                renderCertificates(allCertificates);
-                renderAchievements(allAchievements);
+                renderEnrollments(enrollments || []);
+                renderCertificates(certificates || []);
+                renderAchievements(achievements || []);
 
             } catch (e) {
                 console.error('Load user data error:', e);
+                showToast('Error loading user data', 'error');
             }
         }
 
@@ -2258,6 +2236,9 @@
                     <div class="empty-state">
                         <i class="fas fa-play-circle"></i>
                         <p>No courses enrolled yet. Start learning today!</p>
+                        <button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href='academy.html'">
+                            Browse Courses
+                        </button>
                     </div>
                 `;
                 return;
@@ -2289,6 +2270,9 @@
                         <div class="empty-state">
                             <i class="fas fa-certificate"></i>
                             <p>No certificates yet</p>
+                            <button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href='academy.html'">
+                                Start Learning
+                            </button>
                         </div>
                     </div>
                 `;
@@ -2321,29 +2305,28 @@
                 return;
             }
 
-            // Show up to 8 achievements
             var allAchievements = [
-                { name: 'First Course', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
+                { id: 1, name: 'First Course', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
                         .achievement_id === 1 && a.is_complete; }) },
-                { name: '5 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
+                { id: 2, name: '5 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
                         .achievement_id === 2 && a.is_complete; }) },
-                { name: '10 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
+                { id: 3, name: '10 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
                         .achievement_id === 3 && a.is_complete; }) },
-                { name: '100 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id ===
-                        4 && a.is_complete; }) },
-                { name: '500 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id ===
-                        5 && a.is_complete; }) },
-                { name: 'Perfect Score', icon: 'fa-check-circle', unlocked: achievements.some(function(a) { return a
+                { id: 4, name: '100 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a
+                        .achievement_id === 4 && a.is_complete; }) },
+                { id: 5, name: '500 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a
+                        .achievement_id === 5 && a.is_complete; }) },
+                { id: 6, name: 'Perfect Score', icon: 'fa-check-circle', unlocked: achievements.some(function(a) { return a
                         .achievement_id === 6 && a.is_complete; }) },
-                { name: 'Community Member', icon: 'fa-users', unlocked: achievements.some(function(a) { return a
+                { id: 7, name: 'Community Member', icon: 'fa-users', unlocked: achievements.some(function(a) { return a
                         .achievement_id === 7 && a.is_complete; }) },
-                { name: 'Premium Member', icon: 'fa-crown', unlocked: achievements.some(function(a) { return a
+                { id: 8, name: 'Premium Member', icon: 'fa-crown', unlocked: achievements.some(function(a) { return a
                         .achievement_id === 8 && a.is_complete; }) || isPremium }
             ];
 
             container.innerHTML = allAchievements.map(function(a) {
                 return `
-                    <div class="ach-item ${a.unlocked ? 'unlocked' : 'locked'}">
+                    <div class="ach-item ${a.unlocked ? 'unlocked' : 'locked'}" title="${a.name}">
                         <i class="fas ${a.icon}" style="color:${a.unlocked ? 'var(--accent-orange)' : 'var(--text-muted)'};"></i>
                         <div class="ach-name">${a.name}</div>
                     </div>
@@ -2452,6 +2435,7 @@
         window.openPremiumModal = openPremiumModal;
         window.closePremiumModal = closePremiumModal;
         window.initiatePremiumPayment = initiatePremiumPayment;
+        window.upgradeUserToPremium = upgradeUserToPremium;
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
