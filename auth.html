@@ -4,26 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auth | Aurex Designs</title>
+    <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== AUTH PAGE STYLES ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --bg-primary: #0f0f1a;
-            --bg-secondary: #1a1a2e;
-            --bg-card: #16162a;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border: rgba(255, 255, 255, 0.08);
-            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #ec4899;
+            --bg-primary: #0f0f1a; --bg-secondary: #1a1a2e; --bg-card: #16162a;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border: rgba(255,255,255,0.08); --shadow-glow: 0 0 40px rgba(99,102,241,0.3);
         }
-
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-primary);
@@ -34,357 +25,58 @@
             justify-content: center;
             padding: 20px;
         }
-
-        .auth-container {
-            width: 100%;
-            max-width: 440px;
-        }
-
+        .auth-container { width: 100%; max-width: 440px; }
         .auth-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 48px 40px;
-            box-shadow: var(--shadow-glow);
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+            padding: 48px 40px; box-shadow: var(--shadow-glow);
         }
+        .auth-header { text-align: center; margin-bottom: 32px; }
+        .auth-logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
+        .auth-logo img { width: 48px; height: 48px; border-radius: 12px; border: 2px solid var(--primary); }
+        .auth-logo span { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .auth-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; margin-bottom: 8px; }
+        .auth-header p { color: var(--text-secondary); font-size: 0.95rem; }
 
-        .auth-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
+        .auth-tabs { display: flex; gap: 8px; margin-bottom: 32px; background: var(--bg-secondary); border-radius: 12px; padding: 4px; }
+        .auth-tab { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-secondary); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.9rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
+        .auth-tab.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+        .auth-tab:hover:not(.active) { color: var(--text-primary); }
 
-        .auth-logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary); }
+        .form-control { width: 100%; padding: 12px 16px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: all 0.3s ease; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+        .form-control::placeholder { color: var(--text-muted); }
 
-        .auth-logo img {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            border: 2px solid var(--primary);
-        }
+        .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: 12px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        .auth-logo span {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .btn-google { width: 100%; padding: 12px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-google:hover { border-color: var(--primary); background: rgba(99,102,241,0.1); }
 
-        .auth-header h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.75rem;
-            margin-bottom: 8px;
-        }
+        .divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; color: var(--text-muted); font-size: 0.85rem; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-        .auth-header p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
+        .auth-footer { text-align: center; margin-top: 24px; color: var(--text-secondary); font-size: 0.9rem; }
+        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .auth-footer a:hover { text-decoration: underline; }
 
-        .auth-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 4px;
-        }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 14px 20px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.9rem; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); max-width: 320px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        .toast.show { transform: translateX(0); opacity: 1; }
+        .toast-success { background: rgba(16,185,129,0.95); }
+        .toast-error { background: rgba(239,68,68,0.95); }
+        .toast-warning { background: rgba(245,158,11,0.95); }
 
-        .auth-tab {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .auth-tab.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        }
-
-        .auth-tab:hover:not(.active) {
-            color: var(--text-primary);
-        }
-
-        .auth-form {
-            display: none;
-        }
-
-        .auth-form.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-        }
-
-        .form-control::placeholder {
-            color: var(--text-muted);
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-google {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-google:hover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin: 24px 0;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 24px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .auth-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Payment Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px;
-            max-width: 420px;
-            width: 100%;
-            animation: modalIn 0.3s ease;
-        }
-
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .modal h3 {
-            font-family: 'Space Grotesk', sans-serif;
-            margin-bottom: 16px;
-        }
-
-        .payment-details {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 16px 0;
-        }
-
-        .payment-details p {
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-        }
-
-        .payment-details strong {
-            color: var(--primary);
-        }
-
-        .payment-note {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border);
-        }
-
-        /* Toast */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10001;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            padding: 14px 20px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transform: translateX(120%);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 320px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
-        .toast-success { background: rgba(16, 185, 129, 0.95); }
-        .toast-error { background: rgba(239, 68, 68, 0.95); }
-        .toast-warning { background: rgba(245, 158, 11, 0.95); }
-        .toast-info { background: rgba(99, 102, 241, 0.95); }
-
-        @media (max-width: 480px) {
-            .auth-card {
-                padding: 32px 24px;
-            }
-        }
+        @media (max-width: 480px) { .auth-card { padding: 32px 24px; } }
     </style>
-<base target="_blank">
 </head>
 <body>
 
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Payment Modal -->
-    <div class="modal-overlay" id="paymentModal">
-        <div class="modal">
-            <h3><i class="fas fa-credit-card" style="color: var(--primary);"></i> Complete Your Payment</h3>
-            <p style="color: var(--text-secondary); margin-bottom: 16px;">Your premium account is created! Complete payment to activate all features.</p>
-
-            <div class="payment-details">
-                <p><strong>Amount:</strong> ₦13,500</p>
-                <p><strong>Bank:</strong> Moniepoint</p>
-                <p><strong>Account Name:</strong> Mustapha Iman Oniyangi</p>
-                <p><strong>Account Number:</strong> 8028741731</p>
-                <div class="payment-note">
-                    After payment, click the button below to send your payment screenshot via WhatsApp for verification.
-                </div>
-            </div>
-
-            <button class="btn-primary" onclick="completePayment()" style="margin-top: 16px;">
-                <i class="fab fa-whatsapp"></i> Send Payment Proof via WhatsApp
-            </button>
-            <button class="btn-google" onclick="closePaymentModal()" style="margin-top: 12px;">
-                I'll Pay Later
-            </button>
-        </div>
-    </div>
 
     <div class="auth-container">
         <div class="auth-card">
@@ -397,13 +89,11 @@
                 <p>Sign in to access the Aurex Community</p>
             </div>
 
-            <!-- Tabs -->
             <div class="auth-tabs" id="authTabs">
                 <button class="auth-tab active" data-tab="login">Sign In</button>
                 <button class="auth-tab" data-tab="register">Sign Up</button>
             </div>
 
-            <!-- Login Form -->
             <form class="auth-form active" id="loginForm">
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
@@ -413,22 +103,12 @@
                     <label class="form-label">Password</label>
                     <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn-primary" id="loginBtn">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
-                </button>
-
+                <button type="submit" class="btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
                 <div class="divider">or continue with</div>
-
-                <button type="button" class="btn-google" id="googleLoginBtn">
-                    <i class="fab fa-google"></i> Google Sign In
-                </button>
-
-                <div class="auth-footer">
-                    Don't have an account? <a id="switchToRegister">Sign Up</a>
-                </div>
+                <button type="button" class="btn-google" id="googleLoginBtn"><i class="fab fa-google"></i> Google Sign In</button>
+                <div class="auth-footer">Don't have an account? <a id="switchToRegister">Sign Up</a></div>
             </form>
 
-            <!-- Register Form -->
             <form class="auth-form" id="registerForm">
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
@@ -442,303 +122,151 @@
                     <label class="form-label">Password</label>
                     <input type="password" class="form-control" id="registerPassword" placeholder="Min 6 characters" required minlength="6">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Account Type</label>
-                    <select class="form-control" id="registerType">
-                        <option value="free">Free Account</option>
-                        <option value="premium">Premium Account (₦13,500)</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary" id="registerBtn">
-                    <i class="fas fa-user-plus"></i> Create Account
-                </button>
-
+                <button type="submit" class="btn-primary" id="registerBtn"><i class="fas fa-user-plus"></i> Create Account</button>
                 <div class="divider">or continue with</div>
-
-                <button type="button" class="btn-google" id="googleRegisterBtn">
-                    <i class="fab fa-google"></i> Google Sign Up
-                </button>
-
-                <div class="auth-footer">
-                    Already have an account? <a id="switchToLogin">Sign In</a>
-                </div>
+                <button type="button" class="btn-google" id="googleRegisterBtn"><i class="fab fa-google"></i> Google Sign Up</button>
+                <div class="auth-footer">Already have an account? <a id="switchToLogin">Sign In</a></div>
             </form>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ============================================
-        // SUPABASE CONFIGURATION
-        // ============================================
-        // TODO: Replace these with your actual Supabase credentials
-        const SUPABASE_URL = 'https://alkiqshnscudgqymtwli.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsa2lxc2huc2N1ZGdxeW10d2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NzYxMTUsImV4cCI6MjA5OTQ1MjExNX0.WM0tuufu8OGEsdWlJAmk5RpPSa7SslaIsYntRyKl0NM';
+        var CONFIG = window.AUREX_CONFIG || {};
+        
+        var supabaseClient = null;
+        
+        try {
+            if (CONFIG.supabase && CONFIG.supabase.url && CONFIG.supabase.anonKey) {
+                var { createClient } = window.supabase;
+                supabaseClient = createClient(
+                    CONFIG.supabase.url,
+                    CONFIG.supabase.anonKey
+                );
+            }
+        } catch (e) { console.warn('Supabase error:', e.message); }
 
-        // Initialize Supabase client (fixed naming conflict)
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        var loginForm = document.getElementById('loginForm');
+        var registerForm = document.getElementById('registerForm');
+        var loginBtn = document.getElementById('loginBtn');
+        var registerBtn = document.getElementById('registerBtn');
+        var toastContainer = document.getElementById('toastContainer');
 
-        // DOM Elements
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
-        const googleLoginBtn = document.getElementById('googleLoginBtn');
-        const googleRegisterBtn = document.getElementById('googleRegisterBtn');
-        const toastContainer = document.getElementById('toastContainer');
-        const paymentModal = document.getElementById('paymentModal');
-
-        // ============================================
-        // TOAST SYSTEM
-        // ============================================
         function showToast(message, type) {
             type = type || 'success';
-            const icons = {
-                success: '<i class="fas fa-check-circle"></i>',
-                error: '<i class="fas fa-times-circle"></i>',
-                warning: '<i class="fas fa-exclamation-triangle"></i>',
-                info: '<i class="fas fa-info-circle"></i>'
-            };
-
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.innerHTML = `${icons[type] || icons.success} ${message}`;
+            var icons = { success: '<i class="fas fa-check-circle"></i>', error: '<i class="fas fa-times-circle"></i>', warning: '<i class="fas fa-exclamation-triangle"></i>', info: '<i class="fas fa-info-circle"></i>' };
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            toast.innerHTML = (icons[type] || icons.success) + ' ' + message;
             toastContainer.appendChild(toast);
-
-            requestAnimationFrame(() => toast.classList.add('show'));
-
-            setTimeout(() => {
+            requestAnimationFrame(function() { toast.classList.add('show'); });
+            setTimeout(function() {
                 toast.classList.remove('show');
-                setTimeout(() => {
-                    if (toast.parentNode) toast.parentNode.removeChild(toast);
-                }, 400);
+                setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
             }, 3000);
         }
 
-        // ============================================
-        // TAB SWITCHING
-        // ============================================
-        const tabs = document.querySelectorAll('.auth-tab');
-        const forms = document.querySelectorAll('.auth-form');
-
+        var tabs = document.querySelectorAll('.auth-tab');
+        var forms = document.querySelectorAll('.auth-form');
         function switchTab(target) {
-            tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === target));
-            forms.forEach(f => f.classList.toggle('active', f.id === target + 'Form'));
+            tabs.forEach(function(t) { t.classList.toggle('active', t.dataset.tab === target); });
+            forms.forEach(function(f) { f.classList.toggle('active', f.id === target + 'Form'); });
         }
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function() { switchTab(tab.dataset.tab); });
         });
+        document.getElementById('switchToRegister').addEventListener('click', function(e) { e.preventDefault(); switchTab('register'); });
+        document.getElementById('switchToLogin').addEventListener('click', function(e) { e.preventDefault(); switchTab('login'); });
 
-        document.getElementById('switchToRegister').addEventListener('click', (e) => {
-            e.preventDefault();
-            switchTab('register');
-        });
-
-        document.getElementById('switchToLogin').addEventListener('click', (e) => {
-            e.preventDefault();
-            switchTab('login');
-        });
-
-        // ============================================
-        // LOADING STATE
-        // ============================================
         function setLoading(button, loading) {
             if (loading) {
                 button.disabled = true;
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
             } else {
                 button.disabled = false;
-                const isLogin = button.id === 'loginBtn';
-                button.innerHTML = isLogin 
-                    ? '<i class="fas fa-sign-in-alt"></i> Sign In'
-                    : '<i class="fas fa-user-plus"></i> Create Account';
+                button.innerHTML = button.id === 'loginBtn' ? '<i class="fas fa-sign-in-alt"></i> Sign In' : '<i class="fas fa-user-plus"></i> Create Account';
             }
         }
 
-        // ============================================
-        // LOGIN
-        // ============================================
-        loginForm.addEventListener('submit', async (e) => {
+        loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-
-            if (!email || !password) {
-                showToast('Please fill in all fields', 'warning');
-                return;
-            }
-
+            var email = document.getElementById('loginEmail').value.trim();
+            var password = document.getElementById('loginPassword').value;
+            if (!email || !password) { showToast('Please fill in all fields', 'warning'); return; }
             setLoading(loginBtn, true);
-
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email,
-                    password
-                });
-
-                if (error) throw error;
-
-                showToast('Welcome back! Redirecting...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'academy.html';
-                }, 1500);
-
-            } catch (error) {
-                showToast(error.message || 'Login failed. Please try again.', 'error');
+            
+            if (!supabaseClient) {
+                showToast('Supabase not configured. Check environment variables.', 'error');
                 setLoading(loginBtn, false);
+                return;
             }
+            
+            supabaseClient.auth.signInWithPassword({ email: email, password: password })
+                .then(function(result) {
+                    if (result.error) throw result.error;
+                    showToast('Welcome back! Redirecting...', 'success');
+                    setTimeout(function() { window.location.href = 'academy.html'; }, 1500);
+                })
+                .catch(function(error) {
+                    showToast(error.message || 'Login failed', 'error');
+                    setLoading(loginBtn, false);
+                });
         });
 
-        // ============================================
-        // REGISTER
-        // ============================================
-        registerForm.addEventListener('submit', async (e) => {
+        registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const name = document.getElementById('registerName').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value;
-            const userType = document.getElementById('registerType').value;
-
-            if (!name || !email || !password) {
-                showToast('Please fill in all fields', 'warning');
-                return;
-            }
-
-            if (password.length < 6) {
-                showToast('Password must be at least 6 characters', 'warning');
-                return;
-            }
-
+            var name = document.getElementById('registerName').value.trim();
+            var email = document.getElementById('registerEmail').value.trim();
+            var password = document.getElementById('registerPassword').value;
+            if (!name || !email || !password) { showToast('Please fill in all fields', 'warning'); return; }
+            if (password.length < 6) { showToast('Password must be at least 6 characters', 'warning'); return; }
             setLoading(registerBtn, true);
-
-            try {
-                // Sign up user with Supabase Auth
-                const { data, error } = await supabaseClient.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            full_name: name,
-                            user_type: userType
-                        }
-                    }
-                });
-
-                if (error) throw error;
-
-                const userId = data.user.id;
-
-                // Create user profile in users table
-                const { error: profileError } = await supabaseClient
-                    .from('users')
-                    .insert({
-                        auth_id: userId,
-                        email: email,
-                        full_name: name,
-                        user_type: userType,
-                        subscription_status: userType === 'premium' ? 'pending' : 'inactive'
-                    });
-
-                if (profileError) {
-                    console.error('Profile creation error:', profileError);
-                }
-
-                // If premium, create subscription payment record
-                if (userType === 'premium') {
-                    const { error: subError } = await supabaseClient
-                        .from('subscription_payments')
-                        .insert({
-                            user_id: userId,
-                            amount: 13500,
-                            payment_type: 'new_premium',
-                            payment_status: 'pending'
-                        });
-
-                    if (subError) console.error('Subscription record error:', subError);
-
-                    setLoading(registerBtn, false);
-                    showToast('Account created! Complete payment to activate premium.', 'info');
-
-                    // Show payment modal
-                    setTimeout(() => {
-                        paymentModal.classList.add('active');
-                    }, 500);
-                } else {
-                    setLoading(registerBtn, false);
-                    showToast('Account created! Please check your email to verify.', 'success');
-
-                    setTimeout(() => {
-                        window.location.href = 'academy.html';
-                    }, 2000);
-                }
-
-            } catch (error) {
-                showToast(error.message || 'Registration failed. Please try again.', 'error');
+            
+            if (!supabaseClient) {
+                showToast('Supabase not configured. Check environment variables.', 'error');
                 setLoading(registerBtn, false);
+                return;
             }
+            
+            supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+                options: { data: { full_name: name, user_type: 'free' } }
+            })
+            .then(function(result) {
+                if (result.error) throw result.error;
+                showToast('Account created! Please check your email to verify.', 'success');
+                setTimeout(function() { window.location.href = 'academy.html'; }, 2000);
+            })
+            .catch(function(error) {
+                showToast(error.message || 'Registration failed', 'error');
+                setLoading(registerBtn, false);
+            });
         });
 
-        // ============================================
-        // GOOGLE AUTH
-        // ============================================
-        async function handleGoogleAuth() {
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: window.location.origin + '/academy.html'
-                    }
-                });
-
-                if (error) throw error;
-            } catch (error) {
+        function handleGoogleAuth() {
+            if (!supabaseClient) {
+                showToast('Supabase not configured. Check environment variables.', 'error');
+                return;
+            }
+            supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin + '/academy.html' }
+            }).catch(function(error) {
                 showToast(error.message || 'Google authentication failed.', 'error');
-            }
+            });
         }
+        document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleAuth);
+        document.getElementById('googleRegisterBtn').addEventListener('click', handleGoogleAuth);
 
-        googleLoginBtn.addEventListener('click', handleGoogleAuth);
-        googleRegisterBtn.addEventListener('click', handleGoogleAuth);
-
-        // ============================================
-        // PAYMENT COMPLETION
-        // ============================================
-        window.completePayment = function() {
-            const message = encodeURIComponent(
-                'Payment Completed! ✅\n\n' +
-                'Account Name: Mustapha Iman Oniyangi\n' +
-                'Account Number: 8028741731\n' +
-                'Bank: Moniepoint\n' +
-                'Amount: ₦13,500\n\n' +
-                'Please find my payment screenshot attached.\n' +
-                'Thank you! 🙏'
-            );
-            window.open(`https://wa.me/2349127161200?text=${message}`, '_blank');
-            showToast('Redirecting to WhatsApp...', 'info');
-        };
-
-        window.closePaymentModal = function() {
-            paymentModal.classList.remove('active');
-            window.location.href = 'academy.html';
-        };
-
-        // ============================================
-        // CHECK AUTH STATUS (redirect if already logged in)
-        // ============================================
-        async function checkAuthStatus() {
-            try {
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-                if (error) throw error;
-                if (session) {
-                    window.location.href = 'academy.html';
-                }
-            } catch (error) {
-                console.error('Auth check error:', error);
-            }
+        function checkAuthStatus() {
+            if (!supabaseClient) return;
+            supabaseClient.auth.getSession()
+                .then(function(result) {
+                    if (result.data.session) window.location.href = 'academy.html';
+                })
+                .catch(function(e) { console.error('Auth check error:', e); });
         }
-
-        // Run on page load
         checkAuthStatus();
     </script>
 </body>
