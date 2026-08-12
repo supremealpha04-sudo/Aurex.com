@@ -266,6 +266,9 @@
         .toast-warning {
             background: rgba(245, 158, 11, 0.95);
         }
+        .toast-info {
+            background: rgba(99, 102, 241, 0.95);
+        }
 
         @media (max-width: 480px) {
             .auth-card {
@@ -352,202 +355,228 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        var CONFIG = window.AUREX_CONFIG || {};
+        (function() {
+            // Wait for config to load
+            var CONFIG = window.AUREX_CONFIG || {};
 
-        var supabaseClient = null;
-
-        try {
-            if (CONFIG.supabase && CONFIG.supabase.url && CONFIG.supabase.anonKey) {
-                var { createClient } = window.supabase;
-                supabaseClient = createClient(
-                    CONFIG.supabase.url,
-                    CONFIG.supabase.anonKey
-                );
-                console.log('Supabase connected');
-            } else {
-                console.warn('Supabase config missing');
-            }
-        } catch (e) {
-            console.warn('Supabase error:', e.message);
-        }
-
-        var loginForm = document.getElementById('loginForm');
-        var registerForm = document.getElementById('registerForm');
-        var loginBtn = document.getElementById('loginBtn');
-        var registerBtn = document.getElementById('registerBtn');
-        var toastContainer = document.getElementById('toastContainer');
-
-        function showToast(message, type) {
-            type = type || 'success';
-            var icons = {
-                success: '<i class="fas fa-check-circle"></i>',
-                error: '<i class="fas fa-times-circle"></i>',
-                warning: '<i class="fas fa-exclamation-triangle"></i>',
-                info: '<i class="fas fa-info-circle"></i>'
-            };
-            var toast = document.createElement('div');
-            toast.className = 'toast toast-' + type;
-            toast.innerHTML = (icons[type] || icons.success) + ' ' + message;
-            toastContainer.appendChild(toast);
-            requestAnimationFrame(function() {
-                toast.classList.add('show');
+            console.log('🔍 Auth page loaded. Config:', {
+                supabaseUrl: CONFIG.supabase ? (CONFIG.supabase.url ? '✅ Set' : '❌ Missing') : '❌ Config missing',
+                supabaseKey: CONFIG.supabase ? (CONFIG.supabase.anonKey ? '✅ Set' : '❌ Missing') : '❌ Config missing'
             });
-            setTimeout(function() {
-                toast.classList.remove('show');
+
+            var supabaseClient = null;
+
+            try {
+                if (CONFIG.supabase && CONFIG.supabase.url && CONFIG.supabase.anonKey) {
+                    var { createClient } = window.supabase;
+                    supabaseClient = createClient(
+                        CONFIG.supabase.url,
+                        CONFIG.supabase.anonKey
+                    );
+                    console.log('✅ Supabase connected');
+                } else {
+                    console.warn('⚠️ Supabase config missing. Check Vercel environment variables.');
+                    // Show a more helpful error
+                    setTimeout(function() {
+                        showToast('⚠️ Supabase not configured. Please check Vercel environment variables.', 'error');
+                    }, 500);
+                }
+            } catch (e) {
+                console.warn('❌ Supabase error:', e.message);
                 setTimeout(function() {
-                    if (toast.parentNode) toast.parentNode.removeChild(toast);
-                }, 400);
-            }, 3000);
-        }
-
-        var tabs = document.querySelectorAll('.auth-tab');
-        var forms = document.querySelectorAll('.auth-form');
-
-        function switchTab(target) {
-            tabs.forEach(function(t) {
-                t.classList.toggle('active', t.dataset.tab === target);
-            });
-            forms.forEach(function(f) {
-                f.classList.toggle('active', f.id === target + 'Form');
-            });
-        }
-
-        tabs.forEach(function(tab) {
-            tab.addEventListener('click', function() {
-                switchTab(tab.dataset.tab);
-            });
-        });
-
-        document.getElementById('switchToRegister').addEventListener('click', function(e) {
-            e.preventDefault();
-            switchTab('register');
-        });
-
-        document.getElementById('switchToLogin').addEventListener('click', function(e) {
-            e.preventDefault();
-            switchTab('login');
-        });
-
-        function setLoading(button, loading) {
-            if (loading) {
-                button.disabled = true;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
-            } else {
-                button.disabled = false;
-                button.innerHTML = button.id === 'loginBtn' ?
-                    '<i class="fas fa-sign-in-alt"></i> Sign In' :
-                    '<i class="fas fa-user-plus"></i> Create Account';
-            }
-        }
-
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            var email = document.getElementById('loginEmail').value.trim();
-            var password = document.getElementById('loginPassword').value;
-
-            if (!email || !password) {
-                showToast('Please fill in all fields', 'warning');
-                return;
+                    showToast('❌ Error connecting to Supabase: ' + e.message, 'error');
+                }, 500);
             }
 
-            setLoading(loginBtn, true);
+            // DOM Elements
+            var loginForm = document.getElementById('loginForm');
+            var registerForm = document.getElementById('registerForm');
+            var loginBtn = document.getElementById('loginBtn');
+            var registerBtn = document.getElementById('registerBtn');
+            var toastContainer = document.getElementById('toastContainer');
 
-            if (!supabaseClient) {
-                showToast('Supabase not configured. Check environment variables.', 'error');
-                setLoading(loginBtn, false);
-                return;
-            }
-
-            supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password
-            }).then(function(result) {
-                if (result.error) throw result.error;
-                showToast('Welcome back! Redirecting...', 'success');
+            function showToast(message, type) {
+                type = type || 'success';
+                var icons = {
+                    success: '<i class="fas fa-check-circle"></i>',
+                    error: '<i class="fas fa-times-circle"></i>',
+                    warning: '<i class="fas fa-exclamation-triangle"></i>',
+                    info: '<i class="fas fa-info-circle"></i>'
+                };
+                var toast = document.createElement('div');
+                toast.className = 'toast toast-' + type;
+                toast.innerHTML = (icons[type] || icons.success) + ' ' + message;
+                toastContainer.appendChild(toast);
+                requestAnimationFrame(function() {
+                    toast.classList.add('show');
+                });
                 setTimeout(function() {
-                    window.location.href = 'academy.html';
-                }, 1500);
-            }).catch(function(error) {
-                showToast(error.message || 'Login failed', 'error');
-                setLoading(loginBtn, false);
+                    toast.classList.remove('show');
+                    setTimeout(function() {
+                        if (toast.parentNode) toast.parentNode.removeChild(toast);
+                    }, 400);
+                }, 4000);
+            }
+
+            // Tabs
+            var tabs = document.querySelectorAll('.auth-tab');
+            var forms = document.querySelectorAll('.auth-form');
+
+            function switchTab(target) {
+                tabs.forEach(function(t) {
+                    t.classList.toggle('active', t.dataset.tab === target);
+                });
+                forms.forEach(function(f) {
+                    f.classList.toggle('active', f.id === target + 'Form');
+                });
+            }
+
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    switchTab(tab.dataset.tab);
+                });
             });
-        });
 
-        registerForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            var name = document.getElementById('registerName').value.trim();
-            var email = document.getElementById('registerEmail').value.trim();
-            var password = document.getElementById('registerPassword').value;
+            document.getElementById('switchToRegister').addEventListener('click', function(e) {
+                e.preventDefault();
+                switchTab('register');
+            });
 
-            if (!name || !email || !password) {
-                showToast('Please fill in all fields', 'warning');
-                return;
+            document.getElementById('switchToLogin').addEventListener('click', function(e) {
+                e.preventDefault();
+                switchTab('login');
+            });
+
+            function setLoading(button, loading) {
+                if (loading) {
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
+                } else {
+                    button.disabled = false;
+                    button.innerHTML = button.id === 'loginBtn' ?
+                        '<i class="fas fa-sign-in-alt"></i> Sign In' :
+                        '<i class="fas fa-user-plus"></i> Create Account';
+                }
             }
 
-            if (password.length < 6) {
-                showToast('Password must be at least 6 characters', 'warning');
-                return;
-            }
+            // Login
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var email = document.getElementById('loginEmail').value.trim();
+                var password = document.getElementById('loginPassword').value;
 
-            setLoading(registerBtn, true);
+                if (!email || !password) {
+                    showToast('Please fill in all fields', 'warning');
+                    return;
+                }
 
-            if (!supabaseClient) {
-                showToast('Supabase not configured. Check environment variables.', 'error');
-                setLoading(registerBtn, false);
-                return;
-            }
+                if (!supabaseClient) {
+                    showToast('⚠️ Supabase not configured. Please check environment variables.', 'error');
+                    return;
+                }
 
-            supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    data: {
-                        full_name: name,
-                        user_type: 'free'
+                setLoading(loginBtn, true);
+
+                supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                }).then(function(result) {
+                    if (result.error) throw result.error;
+                    showToast('Welcome back! Redirecting...', 'success');
+                    setTimeout(function() {
+                        window.location.href = 'academy.html';
+                    }, 1500);
+                }).catch(function(error) {
+                    showToast(error.message || 'Login failed', 'error');
+                    setLoading(loginBtn, false);
+                });
+            });
+
+            // Register
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = document.getElementById('registerName').value.trim();
+                var email = document.getElementById('registerEmail').value.trim();
+                var password = document.getElementById('registerPassword').value;
+
+                if (!name || !email || !password) {
+                    showToast('Please fill in all fields', 'warning');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showToast('Password must be at least 6 characters', 'warning');
+                    return;
+                }
+
+                if (!supabaseClient) {
+                    showToast('⚠️ Supabase not configured. Please check environment variables.', 'error');
+                    return;
+                }
+
+                setLoading(registerBtn, true);
+
+                supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: name,
+                            user_type: 'free'
+                        }
                     }
-                }
-            }).then(function(result) {
-                if (result.error) throw result.error;
-                showToast('Account created! Please check your email to verify.', 'success');
-                setTimeout(function() {
-                    window.location.href = 'academy.html';
-                }, 2000);
-            }).catch(function(error) {
-                showToast(error.message || 'Registration failed', 'error');
-                setLoading(registerBtn, false);
+                }).then(function(result) {
+                    if (result.error) throw result.error;
+                    showToast('Account created! Please check your email to verify.', 'success');
+                    setTimeout(function() {
+                        window.location.href = 'academy.html';
+                    }, 2000);
+                }).catch(function(error) {
+                    showToast(error.message || 'Registration failed', 'error');
+                    setLoading(registerBtn, false);
+                });
             });
-        });
 
-        function handleGoogleAuth() {
-            if (!supabaseClient) {
-                showToast('Supabase not configured. Check environment variables.', 'error');
-                return;
+            // Google Auth
+            function handleGoogleAuth() {
+                if (!supabaseClient) {
+                    showToast('⚠️ Supabase not configured. Please check environment variables.', 'error');
+                    return;
+                }
+                supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + '/academy.html'
+                    }
+                }).catch(function(error) {
+                    showToast(error.message || 'Google authentication failed.', 'error');
+                });
             }
-            supabaseClient.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin + '/academy.html'
-                }
-            }).catch(function(error) {
-                showToast(error.message || 'Google authentication failed.', 'error');
-            });
-        }
 
-        document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleAuth);
-        document.getElementById('googleRegisterBtn').addEventListener('click', handleGoogleAuth);
+            document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleAuth);
+            document.getElementById('googleRegisterBtn').addEventListener('click', handleGoogleAuth);
 
-        function checkAuthStatus() {
-            if (!supabaseClient) return;
-            supabaseClient.auth.getSession().then(function(result) {
-                if (result.data.session) {
-                    window.location.href = 'academy.html';
-                }
-            }).catch(function(e) {
-                console.error('Auth check error:', e);
-            });
-        }
+            // Check auth status
+            function checkAuthStatus() {
+                if (!supabaseClient) return;
+                supabaseClient.auth.getSession().then(function(result) {
+                    if (result.data.session) {
+                        window.location.href = 'academy.html';
+                    }
+                }).catch(function(e) {
+                    console.error('Auth check error:', e);
+                });
+            }
 
-        checkAuthStatus();
+            checkAuthStatus();
+
+            // Expose for debugging
+            window.__authDebug = {
+                config: CONFIG,
+                supabase: supabaseClient,
+                showToast: showToast
+            };
+        })();
     </script>
 
 </body>
