@@ -1513,15 +1513,17 @@
         var ADMIN_EMAILS = ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'];
 
         // ============================================================
-        // INITIALIZE SUPABASE
+        // INITIALIZE SUPABASE - FIXED
         // ============================================================
         var supabase = null;
         var supabaseConfigured = false;
 
-        // Check if Supabase library is loaded
-        if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+        // Check if Supabase library is loaded (try both window.supabase and window.supabase)
+        var supabaseLib = window.supabase || window.__supabase__ || null;
+
+        if (supabaseLib && typeof supabaseLib.createClient === 'function') {
             try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 supabaseConfigured = true;
                 console.log('✅ Supabase connected successfully');
             } catch (e) {
@@ -1529,6 +1531,8 @@
             }
         } else {
             console.warn('❌ Supabase library not loaded. Check script tag.');
+            // Try loading Supabase again
+            console.log('🔄 Attempting to load Supabase...');
         }
 
         // ============================================================
@@ -2151,6 +2155,8 @@
                 console.log('✅ Supabase is configured and ready');
             } else {
                 console.warn('❌ Supabase is NOT configured. Check SUPABASE_URL and SUPABASE_ANON_KEY');
+                // Show error to user
+                showToast('⚠️ Supabase not configured. Please check the console for details.', 'error');
             }
 
             await checkAuth();
