@@ -7,273 +7,86 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --bg-primary: #0f0f1a;
-            --bg-secondary: #1a1a2e;
-            --bg-card: #16162a;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border: rgba(255, 255, 255, 0.08);
-            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #ec4899;
+            --bg-primary: #0f0f1a; --bg-secondary: #1a1a2e; --bg-card: #16162a;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border: rgba(255,255,255,0.08); --shadow-glow: 0 0 40px rgba(99,102,241,0.3);
         }
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
         }
-        .auth-container {
-            width: 100%;
-            max-width: 440px;
-        }
+        .auth-container { width: 100%; max-width: 440px; }
         .auth-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 48px 40px;
-            box-shadow: var(--shadow-glow);
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+            padding: 48px 40px; box-shadow: var(--shadow-glow);
         }
-        .auth-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        .auth-logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .auth-logo img {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            border: 2px solid var(--primary);
-        }
+        .auth-header { text-align: center; margin-bottom: 32px; }
+        .auth-logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
+        .auth-logo img { width: 48px; height: 48px; border-radius: 12px; border: 2px solid var(--primary); }
         .auth-logo span {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .auth-header h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.75rem;
-            margin-bottom: 8px;
-        }
-        .auth-header p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
+        .auth-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; margin-bottom: 8px; }
+        .auth-header p { color: var(--text-secondary); font-size: 0.95rem; }
         .auth-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 4px;
+            display: flex; gap: 8px; margin-bottom: 32px; background: var(--bg-secondary);
+            border-radius: 12px; padding: 4px;
         }
         .auth-tab {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-secondary);
+            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.9rem;
+            border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
         }
-        .auth-tab.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        }
-        .auth-tab:hover:not(.active) {
-            color: var(--text-primary);
-        }
-
-        .auth-form {
-            display: none;
-        }
-        .auth-form.active {
-            display: block;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
+        .auth-tab.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+        .auth-tab:hover:not(.active) { color: var(--text-primary); }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary); }
         .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
+            width: 100%; padding: 12px 16px; background: var(--bg-secondary); border: 2px solid var(--border);
+            border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;
             transition: all 0.3s ease;
         }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-        }
-        .form-control::placeholder {
-            color: var(--text-muted);
-        }
-
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+        .form-control::placeholder { color: var(--text-muted); }
         .btn-primary {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; border: none; border-radius: 12px; font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-        }
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-google {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            width: 100%; padding: 12px; background: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif;
+            font-weight: 500; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .btn-google:hover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin: 24px 0;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 24px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        .auth-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10001;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .btn-google:hover { border-color: var(--primary); background: rgba(99,102,241,0.1); }
+        .divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; color: var(--text-muted); font-size: 0.85rem; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .auth-footer { text-align: center; margin-top: 24px; color: var(--text-secondary); font-size: 0.9rem; }
+        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .auth-footer a:hover { text-decoration: underline; }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; }
         .toast {
-            padding: 14px 20px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transform: translateX(120%);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 320px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            padding: 14px 20px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.9rem;
+            transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+            max-width: 320px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        .toast-success {
-            background: rgba(16, 185, 129, 0.95);
-        }
-        .toast-error {
-            background: rgba(239, 68, 68, 0.95);
-        }
-        .toast-warning {
-            background: rgba(245, 158, 11, 0.95);
-        }
-        .toast-info {
-            background: rgba(99, 102, 241, 0.95);
-        }
-
-        @media (max-width: 480px) {
-            .auth-card {
-                padding: 32px 24px;
-            }
-        }
+        .toast.show { transform: translateX(0); opacity: 1; }
+        .toast-success { background: rgba(16,185,129,0.95); }
+        .toast-error { background: rgba(239,68,68,0.95); }
+        .toast-warning { background: rgba(245,158,11,0.95); }
+        .toast-info { background: rgba(99,102,241,0.95); }
+        @media (max-width: 480px) { .auth-card { padding: 32px 24px; } }
     </style>
 </head>
 <body>
@@ -296,7 +109,6 @@
                 <button class="auth-tab" data-tab="register">Sign Up</button>
             </div>
 
-            <!-- Login Form -->
             <form class="auth-form active" id="loginForm">
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
@@ -309,19 +121,15 @@
                 <button type="submit" class="btn-primary" id="loginBtn">
                     <i class="fas fa-sign-in-alt"></i> Sign In
                 </button>
-
                 <div class="divider">or continue with</div>
-
                 <button type="button" class="btn-google" id="googleLoginBtn">
                     <i class="fab fa-google"></i> Google Sign In
                 </button>
-
                 <div class="auth-footer">
                     Don't have an account? <a id="switchToRegister">Sign Up</a>
                 </div>
             </form>
 
-            <!-- Register Form -->
             <form class="auth-form" id="registerForm">
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
@@ -338,13 +146,10 @@
                 <button type="submit" class="btn-primary" id="registerBtn">
                     <i class="fas fa-user-plus"></i> Create Account
                 </button>
-
                 <div class="divider">or continue with</div>
-
                 <button type="button" class="btn-google" id="googleRegisterBtn">
                     <i class="fab fa-google"></i> Google Sign Up
                 </button>
-
                 <div class="auth-footer">
                     Already have an account? <a id="switchToLogin">Sign In</a>
                 </div>
@@ -352,251 +157,159 @@
         </div>
     </div>
 
-    <!-- Config: Reads Vercel/Vite env vars with your values as fallback -->
-    <script type="module">
-        const env = import.meta.env || {};
-        window.AUREX_CONFIG = {
-            supabase: {
-                url: env.VITE_SUPABASE_URL || 'https://brmoagghggdeumkfijmm.supabase.co',
-                anonKey: env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
-            },
-            app: {
-                name: env.VITE_APP_NAME || 'Aurex Designs',
-                url: env.VITE_APP_URL || 'https://aurex-design.vercel.app',
-                storageBucket: env.VITE_STORAGE_BUCKET || 'aurex-assets'
-            },
-            premium: {
-                price: env.VITE_PREMIUM_PRICE || '13500',
-                duration: env.VITE_PREMIUM_DURATION || '6',
-                discount: env.VITE_PREMIUM_DISCOUNT || '45'
-            },
-            adminEmails: (env.VITE_ADMIN_EMAILS || 'supremealpha04@gmail.com,aurexdesigns5@gmail.com').split(',')
-        };
-        console.log('✅ AUREX_CONFIG loaded from env');
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        (function() {
-            var CONFIG = window.AUREX_CONFIG || {};
+    (function() {
+        var CONFIG = {
+            supabase: {
+                url: 'https://brmoagghggdeumkfijmm.supabase.co',
+                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
+            },
+            app: {
+                name: 'Aurex Designs',
+                url: 'https://aurex-design.vercel.app',
+                storageBucket: 'aurex-assets'
+            },
+            premium: { price: '13500', duration: '6', discount: '45' },
+            adminEmails: ['supremealpha04@gmail.com','aurexdesigns5@gmail.com']
+        };
 
-            console.log('🔍 Auth page loaded. Config:', {
-                supabaseUrl: CONFIG.supabase ? (CONFIG.supabase.url ? '✅ Set' : '❌ Missing') : '❌ Config missing',
-                supabaseKey: CONFIG.supabase ? (CONFIG.supabase.anonKey ? '✅ Set' : '❌ Missing') : '❌ Config missing'
-            });
+        console.log('Auth page loaded. Config:', {
+            supabaseUrl: CONFIG.supabase.url ? 'Set' : 'Missing',
+            supabaseKey: CONFIG.supabase.anonKey ? 'Set' : 'Missing'
+        });
 
-            var supabaseClient = null;
+        var supabaseClient = null;
+        try {
+            var { createClient } = window.supabase;
+            supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+            console.log('Supabase connected');
+        } catch (e) {
+            console.error('Supabase error:', e.message);
+        }
 
-            try {
-                if (CONFIG.supabase && CONFIG.supabase.url && CONFIG.supabase.anonKey) {
-                    var { createClient } = window.supabase;
-                    supabaseClient = createClient(
-                        CONFIG.supabase.url,
-                        CONFIG.supabase.anonKey
-                    );
-                    console.log('✅ Supabase connected');
-                } else {
-                    console.warn('⚠️ Supabase config missing. Check Vercel environment variables.');
-                    setTimeout(function() {
-                        showToast('⚠️ Supabase not configured. Please check Vercel environment variables.', 'error');
-                    }, 500);
-                }
-            } catch (e) {
-                console.warn('❌ Supabase error:', e.message);
-                setTimeout(function() {
-                    showToast('❌ Error connecting to Supabase: ' + e.message, 'error');
-                }, 500);
+        var loginForm = document.getElementById('loginForm');
+        var registerForm = document.getElementById('registerForm');
+        var loginBtn = document.getElementById('loginBtn');
+        var registerBtn = document.getElementById('registerBtn');
+        var toastContainer = document.getElementById('toastContainer');
+
+        function showToast(message, type) {
+            type = type || 'success';
+            var icons = {
+                success: '<i class="fas fa-check-circle"></i>',
+                error: '<i class="fas fa-times-circle"></i>',
+                warning: '<i class="fas fa-exclamation-triangle"></i>',
+                info: '<i class="fas fa-info-circle"></i>'
+            };
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            toast.innerHTML = (icons[type] || icons.success) + ' ' + message;
+            toastContainer.appendChild(toast);
+            requestAnimationFrame(function() { toast.classList.add('show'); });
+            setTimeout(function() {
+                toast.classList.remove('show');
+                setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+            }, 4000);
+        }
+
+        if (!supabaseClient) {
+            showToast('Supabase failed to initialize. Check console.', 'error');
+        }
+
+        var tabs = document.querySelectorAll('.auth-tab');
+        var forms = document.querySelectorAll('.auth-form');
+        function switchTab(target) {
+            tabs.forEach(function(t) { t.classList.toggle('active', t.dataset.tab === target); });
+            forms.forEach(function(f) { f.classList.toggle('active', f.id === target + 'Form'); });
+        }
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function() { switchTab(tab.dataset.tab); });
+        });
+        document.getElementById('switchToRegister').addEventListener('click', function(e) {
+            e.preventDefault(); switchTab('register');
+        });
+        document.getElementById('switchToLogin').addEventListener('click', function(e) {
+            e.preventDefault(); switchTab('login');
+        });
+
+        function setLoading(button, loading) {
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
+            } else {
+                button.disabled = false;
+                button.innerHTML = button.id === 'loginBtn' ?
+                    '<i class="fas fa-sign-in-alt"></i> Sign In' :
+                    '<i class="fas fa-user-plus"></i> Create Account';
             }
+        }
 
-            // DOM Elements
-            var loginForm = document.getElementById('loginForm');
-            var registerForm = document.getElementById('registerForm');
-            var loginBtn = document.getElementById('loginBtn');
-            var registerBtn = document.getElementById('registerBtn');
-            var toastContainer = document.getElementById('toastContainer');
-
-            function showToast(message, type) {
-                type = type || 'success';
-                var icons = {
-                    success: '<i class="fas fa-check-circle"></i>',
-                    error: '<i class="fas fa-times-circle"></i>',
-                    warning: '<i class="fas fa-exclamation-triangle"></i>',
-                    info: '<i class="fas fa-info-circle"></i>'
-                };
-                var toast = document.createElement('div');
-                toast.className = 'toast toast-' + type;
-                toast.innerHTML = (icons[type] || icons.success) + ' ' + message;
-                toastContainer.appendChild(toast);
-                requestAnimationFrame(function() {
-                    toast.classList.add('show');
-                });
-                setTimeout(function() {
-                    toast.classList.remove('show');
-                    setTimeout(function() {
-                        if (toast.parentNode) toast.parentNode.removeChild(toast);
-                    }, 400);
-                }, 4000);
-            }
-
-            // Tabs
-            var tabs = document.querySelectorAll('.auth-tab');
-            var forms = document.querySelectorAll('.auth-form');
-
-            function switchTab(target) {
-                tabs.forEach(function(t) {
-                    t.classList.toggle('active', t.dataset.tab === target);
-                });
-                forms.forEach(function(f) {
-                    f.classList.toggle('active', f.id === target + 'Form');
-                });
-            }
-
-            tabs.forEach(function(tab) {
-                tab.addEventListener('click', function() {
-                    switchTab(tab.dataset.tab);
-                });
-            });
-
-            document.getElementById('switchToRegister').addEventListener('click', function(e) {
-                e.preventDefault();
-                switchTab('register');
-            });
-
-            document.getElementById('switchToLogin').addEventListener('click', function(e) {
-                e.preventDefault();
-                switchTab('login');
-            });
-
-            function setLoading(button, loading) {
-                if (loading) {
-                    button.disabled = true;
-                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
-                } else {
-                    button.disabled = false;
-                    button.innerHTML = button.id === 'loginBtn' ?
-                        '<i class="fas fa-sign-in-alt"></i> Sign In' :
-                        '<i class="fas fa-user-plus"></i> Create Account';
-                }
-            }
-
-            // Login
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var email = document.getElementById('loginEmail').value.trim();
-                var password = document.getElementById('loginPassword').value;
-
-                if (!email || !password) {
-                    showToast('Please fill in all fields', 'warning');
-                    return;
-                }
-
-                if (!supabaseClient) {
-                    showToast('⚠️ Supabase not configured. Please check environment variables.', 'error');
-                    return;
-                }
-
-                setLoading(loginBtn, true);
-
-                supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                }).then(function(result) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var email = document.getElementById('loginEmail').value.trim();
+            var password = document.getElementById('loginPassword').value;
+            if (!email || !password) { showToast('Please fill in all fields', 'warning'); return; }
+            if (!supabaseClient) { showToast('Supabase not available', 'error'); return; }
+            setLoading(loginBtn, true);
+            supabaseClient.auth.signInWithPassword({ email: email, password: password })
+                .then(function(result) {
                     if (result.error) throw result.error;
                     showToast('Welcome back! Redirecting...', 'success');
-                    setTimeout(function() {
-                        window.location.href = 'academy.html';
-                    }, 1500);
-                }).catch(function(error) {
+                    setTimeout(function() { window.location.href = 'academy.html'; }, 1500);
+                })
+                .catch(function(error) {
                     showToast(error.message || 'Login failed', 'error');
                     setLoading(loginBtn, false);
                 });
-            });
+        });
 
-            // Register
-            registerForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var name = document.getElementById('registerName').value.trim();
-                var email = document.getElementById('registerEmail').value.trim();
-                var password = document.getElementById('registerPassword').value;
-
-                if (!name || !email || !password) {
-                    showToast('Please fill in all fields', 'warning');
-                    return;
-                }
-
-                if (password.length < 6) {
-                    showToast('Password must be at least 6 characters', 'warning');
-                    return;
-                }
-
-                if (!supabaseClient) {
-                    showToast('⚠️ Supabase not configured. Please check environment variables.', 'error');
-                    return;
-                }
-
-                setLoading(registerBtn, true);
-
-                supabaseClient.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: name,
-                            user_type: 'free'
-                        }
-                    }
-                }).then(function(result) {
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var name = document.getElementById('registerName').value.trim();
+            var email = document.getElementById('registerEmail').value.trim();
+            var password = document.getElementById('registerPassword').value;
+            if (!name || !email || !password) { showToast('Please fill in all fields', 'warning'); return; }
+            if (password.length < 6) { showToast('Password must be at least 6 characters', 'warning'); return; }
+            if (!supabaseClient) { showToast('Supabase not available', 'error'); return; }
+            setLoading(registerBtn, true);
+            supabaseClient.auth.signUp({
+                email: email, password: password,
+                options: { data: { full_name: name, user_type: 'free' } }
+            })
+                .then(function(result) {
                     if (result.error) throw result.error;
-                    showToast('Account created! Please check your email to verify.', 'success');
-                    setTimeout(function() {
-                        window.location.href = 'academy.html';
-                    }, 2000);
-                }).catch(function(error) {
+                    showToast('Account created! Check your email to verify.', 'success');
+                    setTimeout(function() { window.location.href = 'academy.html'; }, 2000);
+                })
+                .catch(function(error) {
                     showToast(error.message || 'Registration failed', 'error');
                     setLoading(registerBtn, false);
                 });
+        });
+
+        function handleGoogleAuth() {
+            if (!supabaseClient) { showToast('Supabase not available', 'error'); return; }
+            supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: CONFIG.app.url + '/academy.html' }
+            }).catch(function(error) {
+                showToast(error.message || 'Google authentication failed.', 'error');
             });
+        }
+        document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleAuth);
+        document.getElementById('googleRegisterBtn').addEventListener('click', handleGoogleAuth);
 
-            // Google Auth
-            function handleGoogleAuth() {
-                if (!supabaseClient) {
-                    showToast('⚠️ Supabase not configured. Please check environment variables.', 'error');
-                    return;
+        if (supabaseClient) {
+            supabaseClient.auth.getSession().then(function(result) {
+                if (result.data && result.data.session) {
+                    window.location.href = 'academy.html';
                 }
-                supabaseClient.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: (CONFIG.app?.url || window.location.origin) + '/academy.html'
-                    }
-                }).catch(function(error) {
-                    showToast(error.message || 'Google authentication failed.', 'error');
-                });
-            }
+            }).catch(function(e) { console.error('Auth check error:', e); });
+        }
 
-            document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleAuth);
-            document.getElementById('googleRegisterBtn').addEventListener('click', handleGoogleAuth);
-
-            // Check auth status
-            function checkAuthStatus() {
-                if (!supabaseClient) return;
-                supabaseClient.auth.getSession().then(function(result) {
-                    if (result.data.session) {
-                        window.location.href = 'academy.html';
-                    }
-                }).catch(function(e) {
-                    console.error('Auth check error:', e);
-                });
-            }
-
-            checkAuthStatus();
-
-            // Expose for debugging
-            window.__authDebug = {
-                config: CONFIG,
-                supabase: supabaseClient,
-                showToast: showToast
-            };
-        })();
+        window.__authDebug = { config: CONFIG, supabase: supabaseClient, showToast: showToast };
+    })();
     </script>
 
 </body>
