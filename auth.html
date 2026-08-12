@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,12 +9,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         :root {
-            --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #ec4899;
-            --bg-primary: #0f0f1a; --bg-secondary: #1a1a2e; --bg-card: #16162a;
-            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
-            --border: rgba(255,255,255,0.08); --shadow-glow: 0 0 40px rgba(99,102,241,0.3);
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16162a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -25,53 +37,242 @@
             justify-content: center;
             padding: 20px;
         }
-        .auth-container { width: 100%; max-width: 440px; }
-        .auth-card {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
-            padding: 48px 40px; box-shadow: var(--shadow-glow);
+        .auth-container {
+            width: 100%;
+            max-width: 440px;
         }
-        .auth-header { text-align: center; margin-bottom: 32px; }
-        .auth-logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
-        .auth-logo img { width: 48px; height: 48px; border-radius: 12px; border: 2px solid var(--primary); }
-        .auth-logo span { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .auth-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; margin-bottom: 8px; }
-        .auth-header p { color: var(--text-secondary); font-size: 0.95rem; }
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: var(--shadow-glow);
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .auth-logo img {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            border: 2px solid var(--primary);
+        }
+        .auth-logo span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .auth-header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+        }
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
 
-        .auth-tabs { display: flex; gap: 8px; margin-bottom: 32px; background: var(--bg-secondary); border-radius: 12px; padding: 4px; }
-        .auth-tab { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-secondary); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.9rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
-        .auth-tab.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
-        .auth-tab:hover:not(.active) { color: var(--text-primary); }
+        .auth-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 4px;
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .auth-tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        .auth-tab:hover:not(.active) {
+            color: var(--text-primary);
+        }
 
-        .auth-form { display: none; }
-        .auth-form.active { display: block; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary); }
-        .form-control { width: 100%; padding: 12px 16px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: all 0.3s ease; }
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
-        .form-control::placeholder { color: var(--text-muted); }
+        .auth-form {
+            display: none;
+        }
+        .auth-form.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
 
-        .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: 12px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.4); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-        .btn-google { width: 100%; padding: 12px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-google:hover { border-color: var(--primary); background: rgba(99,102,241,0.1); }
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-google:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
 
-        .divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; color: var(--text-muted); font-size: 0.85rem; }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
 
-        .auth-footer { text-align: center; margin-top: 24px; color: var(--text-secondary); font-size: 0.9rem; }
-        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer; }
-        .auth-footer a:hover { text-decoration: underline; }
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
 
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 14px 20px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.9rem; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); max-width: 320px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-        .toast.show { transform: translateX(0); opacity: 1; }
-        .toast-success { background: rgba(16,185,129,0.95); }
-        .toast-error { background: rgba(239,68,68,0.95); }
-        .toast-warning { background: rgba(245,158,11,0.95); }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 320px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .toast-success {
+            background: rgba(16, 185, 129, 0.95);
+        }
+        .toast-error {
+            background: rgba(239, 68, 68, 0.95);
+        }
+        .toast-warning {
+            background: rgba(245, 158, 11, 0.95);
+        }
 
-        @media (max-width: 480px) { .auth-card { padding: 32px 24px; } }
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 32px 24px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -94,6 +295,7 @@
                 <button class="auth-tab" data-tab="register">Sign Up</button>
             </div>
 
+            <!-- Login Form -->
             <form class="auth-form active" id="loginForm">
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
@@ -103,12 +305,22 @@
                     <label class="form-label">Password</label>
                     <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+
                 <div class="divider">or continue with</div>
-                <button type="button" class="btn-google" id="googleLoginBtn"><i class="fab fa-google"></i> Google Sign In</button>
-                <div class="auth-footer">Don't have an account? <a id="switchToRegister">Sign Up</a></div>
+
+                <button type="button" class="btn-google" id="googleLoginBtn">
+                    <i class="fab fa-google"></i> Google Sign In
+                </button>
+
+                <div class="auth-footer">
+                    Don't have an account? <a id="switchToRegister">Sign Up</a>
+                </div>
             </form>
 
+            <!-- Register Form -->
             <form class="auth-form" id="registerForm">
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
@@ -122,10 +334,19 @@
                     <label class="form-label">Password</label>
                     <input type="password" class="form-control" id="registerPassword" placeholder="Min 6 characters" required minlength="6">
                 </div>
-                <button type="submit" class="btn-primary" id="registerBtn"><i class="fas fa-user-plus"></i> Create Account</button>
+                <button type="submit" class="btn-primary" id="registerBtn">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+
                 <div class="divider">or continue with</div>
-                <button type="button" class="btn-google" id="googleRegisterBtn"><i class="fab fa-google"></i> Google Sign Up</button>
-                <div class="auth-footer">Already have an account? <a id="switchToLogin">Sign In</a></div>
+
+                <button type="button" class="btn-google" id="googleRegisterBtn">
+                    <i class="fab fa-google"></i> Google Sign Up
+                </button>
+
+                <div class="auth-footer">
+                    Already have an account? <a id="switchToLogin">Sign In</a>
+                </div>
             </form>
         </div>
     </div>
@@ -133,9 +354,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         var CONFIG = window.AUREX_CONFIG || {};
-        
+
         var supabaseClient = null;
-        
+
         try {
             if (CONFIG.supabase && CONFIG.supabase.url && CONFIG.supabase.anonKey) {
                 var { createClient } = window.supabase;
@@ -143,8 +364,13 @@
                     CONFIG.supabase.url,
                     CONFIG.supabase.anonKey
                 );
+                console.log('Supabase connected');
+            } else {
+                console.warn('Supabase config missing');
             }
-        } catch (e) { console.warn('Supabase error:', e.message); }
+        } catch (e) {
+            console.warn('Supabase error:', e.message);
+        }
 
         var loginForm = document.getElementById('loginForm');
         var registerForm = document.getElementById('registerForm');
@@ -154,29 +380,54 @@
 
         function showToast(message, type) {
             type = type || 'success';
-            var icons = { success: '<i class="fas fa-check-circle"></i>', error: '<i class="fas fa-times-circle"></i>', warning: '<i class="fas fa-exclamation-triangle"></i>', info: '<i class="fas fa-info-circle"></i>' };
+            var icons = {
+                success: '<i class="fas fa-check-circle"></i>',
+                error: '<i class="fas fa-times-circle"></i>',
+                warning: '<i class="fas fa-exclamation-triangle"></i>',
+                info: '<i class="fas fa-info-circle"></i>'
+            };
             var toast = document.createElement('div');
             toast.className = 'toast toast-' + type;
             toast.innerHTML = (icons[type] || icons.success) + ' ' + message;
             toastContainer.appendChild(toast);
-            requestAnimationFrame(function() { toast.classList.add('show'); });
+            requestAnimationFrame(function() {
+                toast.classList.add('show');
+            });
             setTimeout(function() {
                 toast.classList.remove('show');
-                setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+                setTimeout(function() {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 400);
             }, 3000);
         }
 
         var tabs = document.querySelectorAll('.auth-tab');
         var forms = document.querySelectorAll('.auth-form');
+
         function switchTab(target) {
-            tabs.forEach(function(t) { t.classList.toggle('active', t.dataset.tab === target); });
-            forms.forEach(function(f) { f.classList.toggle('active', f.id === target + 'Form'); });
+            tabs.forEach(function(t) {
+                t.classList.toggle('active', t.dataset.tab === target);
+            });
+            forms.forEach(function(f) {
+                f.classList.toggle('active', f.id === target + 'Form');
+            });
         }
+
         tabs.forEach(function(tab) {
-            tab.addEventListener('click', function() { switchTab(tab.dataset.tab); });
+            tab.addEventListener('click', function() {
+                switchTab(tab.dataset.tab);
+            });
         });
-        document.getElementById('switchToRegister').addEventListener('click', function(e) { e.preventDefault(); switchTab('register'); });
-        document.getElementById('switchToLogin').addEventListener('click', function(e) { e.preventDefault(); switchTab('login'); });
+
+        document.getElementById('switchToRegister').addEventListener('click', function(e) {
+            e.preventDefault();
+            switchTab('register');
+        });
+
+        document.getElementById('switchToLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            switchTab('login');
+        });
 
         function setLoading(button, loading) {
             if (loading) {
@@ -184,7 +435,9 @@
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
             } else {
                 button.disabled = false;
-                button.innerHTML = button.id === 'loginBtn' ? '<i class="fas fa-sign-in-alt"></i> Sign In' : '<i class="fas fa-user-plus"></i> Create Account';
+                button.innerHTML = button.id === 'loginBtn' ?
+                    '<i class="fas fa-sign-in-alt"></i> Sign In' :
+                    '<i class="fas fa-user-plus"></i> Create Account';
             }
         }
 
@@ -192,25 +445,33 @@
             e.preventDefault();
             var email = document.getElementById('loginEmail').value.trim();
             var password = document.getElementById('loginPassword').value;
-            if (!email || !password) { showToast('Please fill in all fields', 'warning'); return; }
+
+            if (!email || !password) {
+                showToast('Please fill in all fields', 'warning');
+                return;
+            }
+
             setLoading(loginBtn, true);
-            
+
             if (!supabaseClient) {
                 showToast('Supabase not configured. Check environment variables.', 'error');
                 setLoading(loginBtn, false);
                 return;
             }
-            
-            supabaseClient.auth.signInWithPassword({ email: email, password: password })
-                .then(function(result) {
-                    if (result.error) throw result.error;
-                    showToast('Welcome back! Redirecting...', 'success');
-                    setTimeout(function() { window.location.href = 'academy.html'; }, 1500);
-                })
-                .catch(function(error) {
-                    showToast(error.message || 'Login failed', 'error');
-                    setLoading(loginBtn, false);
-                });
+
+            supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            }).then(function(result) {
+                if (result.error) throw result.error;
+                showToast('Welcome back! Redirecting...', 'success');
+                setTimeout(function() {
+                    window.location.href = 'academy.html';
+                }, 1500);
+            }).catch(function(error) {
+                showToast(error.message || 'Login failed', 'error');
+                setLoading(loginBtn, false);
+            });
         });
 
         registerForm.addEventListener('submit', function(e) {
@@ -218,27 +479,41 @@
             var name = document.getElementById('registerName').value.trim();
             var email = document.getElementById('registerEmail').value.trim();
             var password = document.getElementById('registerPassword').value;
-            if (!name || !email || !password) { showToast('Please fill in all fields', 'warning'); return; }
-            if (password.length < 6) { showToast('Password must be at least 6 characters', 'warning'); return; }
+
+            if (!name || !email || !password) {
+                showToast('Please fill in all fields', 'warning');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters', 'warning');
+                return;
+            }
+
             setLoading(registerBtn, true);
-            
+
             if (!supabaseClient) {
                 showToast('Supabase not configured. Check environment variables.', 'error');
                 setLoading(registerBtn, false);
                 return;
             }
-            
+
             supabaseClient.auth.signUp({
                 email: email,
                 password: password,
-                options: { data: { full_name: name, user_type: 'free' } }
-            })
-            .then(function(result) {
+                options: {
+                    data: {
+                        full_name: name,
+                        user_type: 'free'
+                    }
+                }
+            }).then(function(result) {
                 if (result.error) throw result.error;
                 showToast('Account created! Please check your email to verify.', 'success');
-                setTimeout(function() { window.location.href = 'academy.html'; }, 2000);
-            })
-            .catch(function(error) {
+                setTimeout(function() {
+                    window.location.href = 'academy.html';
+                }, 2000);
+            }).catch(function(error) {
                 showToast(error.message || 'Registration failed', 'error');
                 setLoading(registerBtn, false);
             });
@@ -251,23 +526,30 @@
             }
             supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: window.location.origin + '/academy.html' }
+                options: {
+                    redirectTo: window.location.origin + '/academy.html'
+                }
             }).catch(function(error) {
                 showToast(error.message || 'Google authentication failed.', 'error');
             });
         }
+
         document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleAuth);
         document.getElementById('googleRegisterBtn').addEventListener('click', handleGoogleAuth);
 
         function checkAuthStatus() {
             if (!supabaseClient) return;
-            supabaseClient.auth.getSession()
-                .then(function(result) {
-                    if (result.data.session) window.location.href = 'academy.html';
-                })
-                .catch(function(e) { console.error('Auth check error:', e); });
+            supabaseClient.auth.getSession().then(function(result) {
+                if (result.data.session) {
+                    window.location.href = 'academy.html';
+                }
+            }).catch(function(e) {
+                console.error('Auth check error:', e);
+            });
         }
+
         checkAuthStatus();
     </script>
+
 </body>
 </html>
