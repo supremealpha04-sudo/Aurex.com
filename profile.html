@@ -1501,38 +1501,48 @@
 
     <script>
         // ============================================================
-        // PROFILE APP - Auto detects active signed-in user
+        // PROFILE APP - CORRECTED SUPABASE URL
         // ============================================================
 
         // ============================================================
-        // SUPABASE CONFIG - HARDCODED
+        // SUPABASE CONFIG - FIXED URL
         // ============================================================
         var SUPABASE_URL = 'https://brmoagghggdeumkfijmm.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM';
         var STORAGE_BUCKET = 'aurex-assets';
         var ADMIN_EMAILS = ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'];
 
+        console.log('🔑 Supabase URL:', SUPABASE_URL);
+        console.log('🔑 Supabase Key:', SUPABASE_ANON_KEY.substring(0, 20) + '...');
+
         // ============================================================
-        // INITIALIZE SUPABASE - FIXED
+        // INITIALIZE SUPABASE
         // ============================================================
         var supabase = null;
         var supabaseConfigured = false;
 
-        // Check if Supabase library is loaded (try both window.supabase and window.supabase)
-        var supabaseLib = window.supabase || window.__supabase__ || null;
-
-        if (supabaseLib && typeof supabaseLib.createClient === 'function') {
+        // Check if Supabase library is loaded
+        if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
             try {
-                supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 supabaseConfigured = true;
-                console.log('✅ Supabase connected successfully');
+                console.log('✅ Supabase connected successfully to:', SUPABASE_URL);
             } catch (e) {
-                console.warn('❌ Supabase initialization error:', e.message);
+                console.error('❌ Supabase initialization error:', e.message);
             }
         } else {
-            console.warn('❌ Supabase library not loaded. Check script tag.');
-            // Try loading Supabase again
-            console.log('🔄 Attempting to load Supabase...');
+            console.error('❌ Supabase library not loaded. Check script tag.');
+            // Try alternative loading
+            try {
+                // @ts-ignore
+                if (typeof supabaseJs !== 'undefined') {
+                    supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    supabaseConfigured = true;
+                    console.log('✅ Supabase connected via fallback');
+                }
+            } catch (e2) {
+                console.error('❌ Fallback also failed:', e2.message);
+            }
         }
 
         // ============================================================
@@ -1610,7 +1620,7 @@
         // ============================================================
         async function checkAuth() {
             if (!supabaseConfigured) {
-                showToast('⚠️ Supabase not configured. Check your Supabase URL and Key.', 'error');
+                showToast('⚠️ Supabase not configured. Please check your URL and Key.', 'error');
                 showNoUserState();
                 return;
             }
@@ -2150,13 +2160,14 @@
         async function init() {
             autoDetectDevice();
 
-            // Log Supabase status
+            console.log('🚀 Initializing Profile App...');
+            console.log('🔑 Supabase configured:', supabaseConfigured);
+
             if (supabaseConfigured) {
                 console.log('✅ Supabase is configured and ready');
             } else {
-                console.warn('❌ Supabase is NOT configured. Check SUPABASE_URL and SUPABASE_ANON_KEY');
-                // Show error to user
-                showToast('⚠️ Supabase not configured. Please check the console for details.', 'error');
+                console.warn('❌ Supabase is NOT configured.');
+                showToast('⚠️ Supabase not configured. Please check your URL and Key.', 'error');
             }
 
             await checkAuth();
