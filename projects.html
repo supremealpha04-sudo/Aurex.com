@@ -12,6 +12,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        /* ============================================
+           COMPLETE PROJECTS STYLES
+           ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -378,6 +381,46 @@
         .sidebar-overlay.active {
             opacity: 1;
             pointer-events: auto;
+        }
+        .upgrade-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.08));
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            border-radius: 16px;
+            padding: 18px;
+            margin-top: auto;
+            text-align: center;
+            transition: opacity 0.25s;
+        }
+        .upgrade-card h4 {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .upgrade-card p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .upgrade-btn {
+            background: var(--gradient-purple);
+            border: none;
+            color: white;
+            padding: 9px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .upgrade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+        }
+        .upgrade-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* ===== MAIN ===== */
@@ -1509,7 +1552,6 @@
             }
         }
 
-        /* ===== ANIMATIONS ===== */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -1564,10 +1606,10 @@
                     <a href="profile.html" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
                 </div>
             </nav>
-            <div class="upgrade-card" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(59,130,246,0.08));border:1px solid rgba(124,58,237,0.15);border-radius:16px;padding:18px;margin-top:auto;text-align:center;transition:opacity 0.25s;">
-                <h4 style="font-size:13px;margin-bottom:6px;">Upgrade to Pro</h4>
-                <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Unlock all courses, certifications and premium features.</p>
-                <button class="upgrade-btn" onclick="showToast('Pro upgrade coming soon!', 'success')" style="background:var(--gradient-purple);border:none;color:white;padding:9px 20px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;width:100%;transition:all 0.2s;">Upgrade Now</button>
+            <div class="upgrade-card">
+                <h4>Upgrade to Pro</h4>
+                <p>Unlock all courses, certifications and premium features.</p>
+                <button class="upgrade-btn" onclick="window.location.href='profile.html'">Upgrade Now</button>
             </div>
         </aside>
 
@@ -1588,7 +1630,7 @@
                             <div class="status" id="userStatus">Free</div>
                         </div>
                     </div>
-                    <button class="btn-primary" id="authBtn" onclick="openAuthModal()">
+                    <button class="btn-primary" id="authBtn" onclick="window.location.href='auth.html'">
                         <i class="fas fa-sign-in-alt"></i> Sign In
                     </button>
                 </div>
@@ -1601,7 +1643,7 @@
                     <p>Browse creative projects from the community. Premium users can create and share their own projects.</p>
                 </div>
                 <div class="right">
-                    <button class="btn-secondary" onclick="filterProjects('all')"><i class="fas fa-sync"></i> Refresh</button>
+                    <button class="btn-secondary" onclick="loadProjects()"><i class="fas fa-sync"></i> Refresh</button>
                     <button class="btn-primary" id="createProjectBtn" onclick="openCreateModal()">
                         <i class="fas fa-plus"></i> New Project
                     </button>
@@ -1717,48 +1759,6 @@
         </div>
     </div>
 
-    <!-- AUTH MODAL -->
-    <div class="modal-overlay" id="authModal">
-        <div class="modal" style="width:420px;">
-            <button class="close-btn" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
-            <h2 id="authTitle">Welcome Back</h2>
-            <p id="authSubtitle">Sign in to continue</p>
-            <form id="authForm" onsubmit="handleAuthSubmit(event)">
-                <div class="form-group" id="nameGroup" style="display:none;">
-                    <label>Full Name</label>
-                    <input type="text" id="authName" placeholder="Enter your name">
-                </div>
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="authEmail" placeholder="you@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="authPassword" placeholder="********" required minlength="6">
-                </div>
-                <div class="error-msg" id="authError"></div>
-                <button type="submit" class="btn-primary" id="authSubmitBtn">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
-                </button>
-            </form>
-            <div style="display:flex; align-items:center; gap:12px; margin:16px 0; color:var(--text-muted); font-size:11px;">
-                <div style="flex:1; height:1px; background:var(--border-color);"></div>
-                or continue with
-                <div style="flex:1; height:1px; background:var(--border-color);"></div>
-            </div>
-            <button class="social-btn" onclick="socialAuth('google')">
-                <i class="fab fa-google"></i> Google
-            </button>
-            <button class="social-btn" onclick="socialAuth('github')">
-                <i class="fab fa-github"></i> GitHub
-            </button>
-            <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text-secondary);">
-                <span id="switchText">Don't have an account?</span>
-                <a onclick="toggleAuthMode()" id="switchLink" style="color:var(--accent-violet); cursor:pointer; font-weight:600;">Sign Up</a>
-            </div>
-        </div>
-    </div>
-
     <!-- TOAST -->
     <div class="toast" id="toast">
         <i class="fas fa-check-circle"></i>
@@ -1767,12 +1767,14 @@
 
     <script>
         // ============================================================
-        // PROJECTS APP - Uses config.js for all settings
+        // PROJECTS APP - Full Working Version
         // ============================================================
-        
+
         var CONFIG = window.AUREX_CONFIG || {};
-        
-        // Initialize Supabase from config
+
+        // ============================================================
+        // SUPABASE INIT
+        // ============================================================
         var supabase = null;
         var supabaseConfigured = false;
         var ADMIN_EMAILS = CONFIG.adminEmails || [];
@@ -1784,12 +1786,12 @@
                     CONFIG.supabase.anonKey
                 );
                 supabaseConfigured = true;
-                console.log('Supabase connected successfully!');
+                console.log('✅ Supabase connected');
             } else {
-                console.warn('Supabase config missing. Check environment variables.');
+                console.warn('⚠️ Supabase config missing');
             }
         } catch (e) {
-            console.warn('Supabase connection error:', e.message);
+            console.warn('❌ Supabase error:', e.message);
         }
 
         // ============================================================
@@ -1849,12 +1851,6 @@
         // ============================================================
         // STORAGE HELPERS
         // ============================================================
-        function getStorageUrl(path) {
-            if (!supabaseConfigured || !path) return path;
-            var { data } = supabase.storage.from(CONFIG.storageBucket || 'aurex-assets').getPublicUrl(path);
-            return data.publicUrl;
-        }
-
         async function uploadFile(file, path) {
             if (!supabaseConfigured) {
                 return new Promise(function(resolve) {
@@ -1891,106 +1887,65 @@
         // ============================================================
         // AUTH
         // ============================================================
-        function openAuthModal() {
-            document.getElementById('authModal').classList.add('active');
-            document.getElementById('authError').textContent = '';
-        }
-
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.remove('active');
-        }
-
-        function toggleAuthMode() {
-            isSignUp = !isSignUp;
-            document.getElementById('authTitle').textContent = isSignUp ? 'Create Account' : 'Welcome Back';
-            document.getElementById('authSubtitle').textContent = isSignUp ? 'Start your creative journey' :
-                'Sign in to continue';
-            document.getElementById('nameGroup').style.display = isSignUp ? 'block' : 'none';
-            document.getElementById('authSubmitBtn').innerHTML = isSignUp ? '<i class="fas fa-user-plus"></i> Sign Up' :
-                '<i class="fas fa-sign-in-alt"></i> Sign In';
-            document.getElementById('switchText').textContent = isSignUp ? 'Already have an account?' :
-                "Don't have an account?";
-            document.getElementById('switchLink').textContent = isSignUp ? 'Sign In' : 'Sign Up';
-            document.getElementById('authError').textContent = '';
-        }
-
-        async function handleAuthSubmit(e) {
-            e.preventDefault();
-            var email = document.getElementById('authEmail').value;
-            var password = document.getElementById('authPassword').value;
-            var name = document.getElementById('authName').value;
-            var errorEl = document.getElementById('authError');
-
+        async function checkAuth() {
             if (!supabaseConfigured) {
-                showToast(isSignUp ? 'Account created! (Offline mode)' : 'Signed in! (Offline mode)', 'success');
-                closeAuthModal();
-                updateUIForUser({ email: email, user_metadata: { full_name: name || email.split('@')[0] } });
+                var demoUser = {
+                    id: 'demo-user',
+                    email: 'demo@example.com',
+                    user_metadata: { full_name: 'Demo User', is_premium: true }
+                };
+                updateUIForUser(demoUser);
                 return;
             }
 
-            try {
-                if (isSignUp) {
-                    var { data, error } = await supabase.auth.signUp({
-                        email: email,
-                        password: password,
-                        options: { data: { full_name: name, is_premium: false } }
-                    });
-                    if (error) throw error;
-                    showToast('Account created! Check your email.', 'success');
-                    closeAuthModal();
-                    updateUIForUser(data.user);
-                } else {
-                    var { data, error } = await supabase.auth.signInWithPassword({ email: email, password: password });
-                    if (error) throw error;
-                    showToast('Signed in successfully!', 'success');
-                    closeAuthModal();
-                    updateUIForUser(data.user);
+            var { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                try {
+                    var { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
+                    if (profile) {
+                        user.user_metadata = { ...user.user_metadata, ...profile };
+                        isPremium = profile.is_premium || false;
+                    }
+                } catch (e) {
+                    isPremium = user.user_metadata?.is_premium || false;
                 }
-            } catch (err) {
-                errorEl.textContent = err.message;
+                updateUIForUser(user);
             }
+
+            supabase.auth.onAuthStateChange(function(event, session) {
+                if (event === 'SIGNED_IN' && session?.user) {
+                    updateUIForUser(session.user);
+                    loadProjects();
+                }
+                if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    isPremium = false;
+                    document.getElementById('authBtn').style.display = 'flex';
+                    document.getElementById('userProfile').style.display = 'none';
+                    document.getElementById('createProjectBtn').disabled = true;
+                    document.getElementById('createProjectBtn').textContent = 'Premium Only';
+                    loadProjects();
+                }
+            });
         }
 
-        async function socialAuth(provider) {
-            if (!supabaseConfigured) {
-                showToast(provider + ' auth (Offline mode)', 'success');
-                closeAuthModal();
-                updateUIForUser({ email: 'user@example.com', user_metadata: { full_name: 'User' } });
-                return;
-            }
-            var { error } = await supabase.auth.signInWithOAuth({ provider: provider });
-            if (error) showToast(error.message, 'error');
-        }
-
-        async function updateUIForUser(user) {
+        function updateUIForUser(user) {
             currentUser = user;
             document.getElementById('authBtn').style.display = 'none';
             document.getElementById('userProfile').style.display = 'flex';
+
             var name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
             document.getElementById('userName').textContent = name;
             document.getElementById('userProfileImg').src =
                 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=7c3aed&color=fff&size=100';
 
-            // Check premium status
-            if (supabaseConfigured) {
-                try {
-                    var { data: profile } = await supabase.from('users').select('is_premium').eq('id', user.id).single();
-                    isPremium = profile?.is_premium || false;
-                } catch (e) {
-                    isPremium = user?.user_metadata?.is_premium || false;
-                }
-            } else {
-                isPremium = user?.user_metadata?.is_premium || false;
-            }
-
-            var statusEl = document.getElementById('userStatus');
             if (isPremium) {
-                statusEl.textContent = 'Premium';
-                statusEl.className = 'status premium';
-                statusEl.innerHTML = 'Premium <i class="fas fa-crown" style="font-size:8px;"></i>';
+                document.getElementById('userStatus').textContent = 'Premium';
+                document.getElementById('userStatus').className = 'status premium';
+                document.getElementById('userStatus').innerHTML = 'Premium <i class="fas fa-crown" style="font-size:8px;"></i>';
             } else {
-                statusEl.textContent = 'Free';
-                statusEl.className = 'status';
+                document.getElementById('userStatus').textContent = 'Free';
+                document.getElementById('userStatus').className = 'status';
             }
 
             // Update create button
@@ -2004,31 +1959,10 @@
                 createBtn.title = 'Only premium users can create projects';
             }
 
-            loadProjects();
-        }
-
-        async function checkAuth() {
-            if (!supabaseConfigured) {
-                updateUIForUser({
-                    id: 'demo-user',
-                    email: 'demo@example.com',
-                    user_metadata: { full_name: 'Demo User', is_premium: true }
-                });
-                return;
+            // Check if admin
+            if (ADMIN_EMAILS.includes(user?.email)) {
+                document.getElementById('adminBadge').style.display = 'flex';
             }
-            var { data: { user } } = await supabase.auth.getUser();
-            if (user) updateUIForUser(user);
-            supabase.auth.onAuthStateChange(function(event, session) {
-                if (event === 'SIGNED_IN' && session?.user) updateUIForUser(session.user);
-                if (event === 'SIGNED_OUT') {
-                    currentUser = null;
-                    isPremium = false;
-                    document.getElementById('authBtn').style.display = 'flex';
-                    document.getElementById('userProfile').style.display = 'none';
-                    document.getElementById('createProjectBtn').disabled = true;
-                    document.getElementById('createProjectBtn').textContent = 'Premium Only';
-                }
-            });
         }
 
         // ============================================================
@@ -2054,8 +1988,9 @@
         // PROJECTS CRUD
         // ============================================================
         async function loadProjects() {
+            var grid = document.getElementById('projectsGrid');
+
             if (!supabaseConfigured) {
-                showToast('Supabase not configured. Using demo data.', 'warning');
                 allProjects = [{
                     id: 'demo-1',
                     title: 'Brand Identity Redesign',
@@ -2064,13 +1999,26 @@
                     category: 'branding',
                     progress: 65,
                     created_at: new Date().toISOString(),
-                    user_id: 'demo-user',
                     author_name: 'Demo User',
                     author_avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=7c3aed&color=fff&size=100',
                     tags: ['branding', 'logo', 'guidelines'],
                     image: 'https://images.unsplash.com/photo-1634942537034-2531766767d1?w=600&h=400&fit=crop',
                     likes: 12,
                     comments_count: 4,
+                    liked_by: []
+                }, {
+                    id: 'demo-2',
+                    title: 'EcoPack Sustainable Packaging',
+                    description: 'Eco-friendly packaging design for a sustainable cosmetics brand.',
+                    status: 'completed',
+                    category: 'packaging',
+                    created_at: new Date().toISOString(),
+                    author_name: 'Eco Designer',
+                    author_avatar: 'https://ui-avatars.com/api/?name=Eco+Designer&background=22c55e&color=fff&size=100',
+                    tags: ['packaging', 'sustainable', 'eco'],
+                    image: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&h=400&fit=crop',
+                    likes: 8,
+                    comments_count: 2,
                     liked_by: []
                 }];
                 renderProjects(allProjects);
@@ -2119,7 +2067,14 @@
 
         function renderProjects(projects) {
             var grid = document.getElementById('projectsGrid');
-            if (!projects || projects.length === 0) {
+
+            // Apply filter
+            var filtered = projects;
+            if (currentFilter !== 'all') {
+                filtered = projects.filter(function(p) { return p.status === currentFilter; });
+            }
+
+            if (!filtered || filtered.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-folder-open"></i>
@@ -2131,7 +2086,7 @@
                 return;
             }
 
-            grid.innerHTML = projects.map(function(p) {
+            grid.innerHTML = filtered.map(function(p) {
                 var tagsHTML = (p.tags || []).slice(0, 3).map(function(t) {
                     return '<span class="tag">' + t + '</span>';
                 }).join('');
@@ -2183,12 +2138,7 @@
             document.querySelectorAll('.tab-btn').forEach(function(btn) {
                 btn.classList.toggle('active', btn.dataset.tab === filter);
             });
-
-            var filtered = allProjects;
-            if (filter !== 'all') {
-                filtered = allProjects.filter(function(p) { return p.status === filter; });
-            }
-            renderProjects(filtered);
+            renderProjects(allProjects);
         }
 
         // ============================================================
@@ -2250,7 +2200,7 @@
         async function toggleLike(id) {
             if (!currentUser) {
                 showToast('Please sign in to like projects', 'error');
-                openAuthModal();
+                window.location.href = 'auth.html';
                 return;
             }
 
@@ -2342,7 +2292,7 @@
         async function submitComment() {
             if (!currentUser) {
                 showToast('Please sign in to comment', 'error');
-                openAuthModal();
+                window.location.href = 'auth.html';
                 return;
             }
 
@@ -2453,7 +2403,7 @@
         function openCreateModal() {
             if (!currentUser) {
                 showToast('Please sign in first', 'error');
-                openAuthModal();
+                window.location.href = 'auth.html';
                 return;
             }
 
@@ -2524,7 +2474,7 @@
             if (!supabaseConfigured) {
                 newProject.id = 'p' + Date.now();
                 allProjects.unshift(newProject);
-                showToast('Project created! (Offline mode)', 'success');
+                showToast('Project created! (Demo)', 'success');
                 closeCreateModal();
                 filterProjects(currentFilter);
                 document.getElementById('createForm').reset();
@@ -2583,7 +2533,6 @@
         // ============================================================
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closeAuthModal();
                 closeProjectModal();
                 closeCreateModal();
                 if (mobileSidebarOpen) {
@@ -2627,7 +2576,6 @@
             autoDetectDevice();
             await checkAuth();
             await loadProjects();
-
             filterProjects('all');
 
             setTimeout(function() {
@@ -2636,11 +2584,6 @@
         }
 
         // Expose functions to global
-        window.openAuthModal = openAuthModal;
-        window.closeAuthModal = closeAuthModal;
-        window.toggleAuthMode = toggleAuthMode;
-        window.handleAuthSubmit = handleAuthSubmit;
-        window.socialAuth = socialAuth;
         window.showToast = showToast;
         window.filterProjects = filterProjects;
         window.openProjectModal = openProjectModal;
@@ -2653,8 +2596,13 @@
         window.deleteComment = deleteComment;
         window.shareProject = shareProject;
         window.handleImageUpload = handleImageUpload;
+        window.loadProjects = loadProjects;
 
-        init();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 </html>
