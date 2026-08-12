@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auth | Aurex Designs</title>
-    <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -353,10 +352,32 @@
         </div>
     </div>
 
+    <!-- Config: Reads Vercel/Vite env vars with your values as fallback -->
+    <script type="module">
+        const env = import.meta.env || {};
+        window.AUREX_CONFIG = {
+            supabase: {
+                url: env.VITE_SUPABASE_URL || 'https://brmoagghggdeumkfijmm.supabase.co',
+                anonKey: env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
+            },
+            app: {
+                name: env.VITE_APP_NAME || 'Aurex Designs',
+                url: env.VITE_APP_URL || 'https://aurex-design.vercel.app',
+                storageBucket: env.VITE_STORAGE_BUCKET || 'aurex-assets'
+            },
+            premium: {
+                price: env.VITE_PREMIUM_PRICE || '13500',
+                duration: env.VITE_PREMIUM_DURATION || '6',
+                discount: env.VITE_PREMIUM_DISCOUNT || '45'
+            },
+            adminEmails: (env.VITE_ADMIN_EMAILS || 'supremealpha04@gmail.com,aurexdesigns5@gmail.com').split(',')
+        };
+        console.log('✅ AUREX_CONFIG loaded from env');
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         (function() {
-            // Wait for config to load
             var CONFIG = window.AUREX_CONFIG || {};
 
             console.log('🔍 Auth page loaded. Config:', {
@@ -376,7 +397,6 @@
                     console.log('✅ Supabase connected');
                 } else {
                     console.warn('⚠️ Supabase config missing. Check Vercel environment variables.');
-                    // Show a more helpful error
                     setTimeout(function() {
                         showToast('⚠️ Supabase not configured. Please check Vercel environment variables.', 'error');
                     }, 500);
@@ -546,7 +566,7 @@
                 supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: window.location.origin + '/academy.html'
+                        redirectTo: (CONFIG.app?.url || window.location.origin) + '/academy.html'
                     }
                 }).catch(function(error) {
                     showToast(error.message || 'Google authentication failed.', 'error');
