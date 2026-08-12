@@ -1546,26 +1546,25 @@
     <script>
         // ============================================================
         // PROFILE APP - Complete Working Version (No Demo Data)
+        // Supabase keys directly in code
         // ============================================================
 
-        var CONFIG = window.AUREX_CONFIG || {};
+        // ============================================================
+        // SUPABASE CONFIG - DIRECTLY IN CODE
+        // ============================================================
+        var SUPABASE_URL = 'https://brmoagghggdeumkfijmm.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM';
+        var STORAGE_BUCKET = 'aurex-assets';
+        var ADMIN_EMAILS = ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'];
 
-        // Initialize Supabase from config
+        // Initialize Supabase
         var supabase = null;
         var supabaseConfigured = false;
-        var ADMIN_EMAILS = CONFIG.adminEmails || [];
 
         try {
-            if (CONFIG.supabase && CONFIG.supabase.url && CONFIG.supabase.anonKey) {
-                supabase = window.supabase.createClient(
-                    CONFIG.supabase.url,
-                    CONFIG.supabase.anonKey
-                );
-                supabaseConfigured = true;
-                console.log('✅ Supabase connected');
-            } else {
-                console.warn('⚠️ Supabase config missing. Check environment variables.');
-            }
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseConfigured = true;
+            console.log('✅ Supabase connected');
         } catch (e) {
             console.warn('❌ Supabase error:', e.message);
         }
@@ -1621,18 +1620,17 @@
             }
 
             try {
-                var bucket = CONFIG.storageBucket || 'aurex-assets';
                 var fileExt = file.name.split('.').pop();
                 var fileName = 'avatars/' + userId + '/profile.' + fileExt;
 
                 var { error } = await supabase.storage
-                    .from(bucket)
+                    .from(STORAGE_BUCKET)
                     .upload(fileName, file, { upsert: true });
 
                 if (error) throw error;
 
                 var { data: urlData } = supabase.storage
-                    .from(bucket)
+                    .from(STORAGE_BUCKET)
                     .getPublicUrl(fileName);
 
                 return { publicUrl: urlData.publicUrl, error: null };
@@ -1673,7 +1671,7 @@
             var errorEl = document.getElementById('authError');
 
             if (!supabaseConfigured) {
-                showToast('Supabase not configured. Check environment variables.', 'error');
+                showToast('Supabase not configured.', 'error');
                 return;
             }
 
@@ -1702,7 +1700,7 @@
 
         async function socialAuth(provider) {
             if (!supabaseConfigured) {
-                showToast('Supabase not configured. Check environment variables.', 'error');
+                showToast('Supabase not configured.', 'error');
                 return;
             }
             var { error } = await supabase.auth.signInWithOAuth({ provider: provider });
@@ -1770,7 +1768,7 @@
             if (!supabaseConfigured) {
                 document.getElementById('authBtn').style.display = 'flex';
                 document.getElementById('userProfile').style.display = 'none';
-                showToast('⚠️ Supabase not configured. Check environment variables.', 'error');
+                showToast('⚠️ Supabase not configured.', 'error');
                 return;
             }
 
@@ -1861,7 +1859,7 @@
             }
 
             if (!supabaseConfigured) {
-                showToast('Supabase not configured. Check environment variables.', 'error');
+                showToast('Supabase not configured.', 'error');
                 return;
             }
 
@@ -1916,7 +1914,7 @@
             }
 
             if (!supabaseConfigured) {
-                showToast('Supabase not configured. Check environment variables.', 'error');
+                showToast('Supabase not configured.', 'error');
                 return;
             }
 
@@ -2000,7 +1998,7 @@
             }
 
             if (!supabaseConfigured) {
-                showToast('Supabase not configured. Check environment variables.', 'error');
+                showToast('Supabase not configured.', 'error');
                 return;
             }
 
@@ -2054,7 +2052,7 @@
             if (!currentUser) return;
 
             if (!supabaseConfigured) {
-                showToast('⚠️ Supabase not configured. Please check environment variables.', 'error');
+                showToast('⚠️ Supabase not configured.', 'error');
                 return;
             }
 
