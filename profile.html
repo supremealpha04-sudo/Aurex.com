@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#070714">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Aurex Academy - Profile</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js">
+    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js">
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -1513,37 +1514,61 @@
         var ADMIN_EMAILS = ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'];
 
         console.log('🔑 Supabase URL:', SUPABASE_URL);
-        console.log('🔑 Supabase Key:', SUPABASE_ANON_KEY.substring(0, 20) + '...');
+        console.log('🔑 Supabase Key:', SUPABASE_ANON_KEY.substring(0, 30) + '...');
 
         // ============================================================
-        // INITIALIZE SUPABASE
+        // INITIALIZE SUPABASE - USING WINDOW LOAD EVENT
         // ============================================================
         var supabase = null;
         var supabaseConfigured = false;
 
-        // Check if Supabase library is loaded
-        if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+        // Function to initialize Supabase
+        function initSupabase() {
             try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                supabaseConfigured = true;
-                console.log('✅ Supabase connected successfully to:', SUPABASE_URL);
-            } catch (e) {
-                console.error('❌ Supabase initialization error:', e.message);
-            }
-        } else {
-            console.error('❌ Supabase library not loaded. Check script tag.');
-            // Try alternative loading
-            try {
-                // @ts-ignore
-                if (typeof supabaseJs !== 'undefined') {
+                // Check if Supabase library is loaded
+                if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    supabaseConfigured = true;
+                    console.log('✅ Supabase connected successfully to:', SUPABASE_URL);
+                    return true;
+                } else if (typeof supabaseJs !== 'undefined' && supabaseJs.createClient) {
                     supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                     supabaseConfigured = true;
-                    console.log('✅ Supabase connected via fallback');
+                    console.log('✅ Supabase connected via supabaseJs global');
+                    return true;
+                } else {
+                    console.warn('❌ Supabase library not loaded. Retrying...');
+                    return false;
                 }
-            } catch (e2) {
-                console.error('❌ Fallback also failed:', e2.message);
+            } catch (e) {
+                console.error('❌ Supabase initialization error:', e.message);
+                return false;
             }
         }
+
+        // Try to initialize immediately
+        var initialized = initSupabase();
+
+        // If not initialized, try again after a short delay
+        if (!initialized) {
+            console.log('⏳ Waiting for Supabase library to load...');
+            setTimeout(function() {
+                initSupabase();
+                if (supabaseConfigured) {
+                    checkAuth();
+                }
+            }, 1000);
+        }
+
+        // Also try on window load
+        window.addEventListener('load', function() {
+            if (!supabaseConfigured) {
+                initSupabase();
+                if (supabaseConfigured) {
+                    checkAuth();
+                }
+            }
+        });
 
         // ============================================================
         // STATE
@@ -2161,16 +2186,34 @@
             autoDetectDevice();
 
             console.log('🚀 Initializing Profile App...');
-            console.log('🔑 Supabase configured:', supabaseConfigured);
 
+            // If Supabase was already initialized, check auth
             if (supabaseConfigured) {
                 console.log('✅ Supabase is configured and ready');
+                await checkAuth();
             } else {
-                console.warn('❌ Supabase is NOT configured.');
-                showToast('⚠️ Supabase not configured. Please check your URL and Key.', 'error');
+                console.warn('⚠️ Supabase not configured yet. Waiting...');
+                // Show a message to the user
+                document.getElementById('profileHeader').innerHTML = `
+                    <div style="text-align:center;padding:40px 20px;width:100%;">
+                        <i class="fas fa-spinner fa-spin" style="font-size:48px;color:var(--accent-purple);margin-bottom:16px;display:block;"></i>
+                        <h2 style="font-size:18px;margin-bottom:8px;">Connecting to Supabase...</h2>
+                        <p style="font-size:13px;color:var(--text-secondary);">Please wait while we connect to the server.</p>
+                    </div>
+                `;
+                // Try again in 2 seconds
+                setTimeout(function() {
+                    if (!supabaseConfigured) {
+                        initSupabase();
+                        if (supabaseConfigured) {
+                            checkAuth();
+                        } else {
+                            showNoUserState();
+                            showToast('⚠️ Could not connect to Supabase. Please check your internet connection.', 'error');
+                        }
+                    }
+                }, 2000);
             }
-
-            await checkAuth();
 
             setTimeout(function() {
                 document.getElementById('loadingScreen').classList.add('hidden');
