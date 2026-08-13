@@ -1095,6 +1095,103 @@
             cursor: not-allowed;
         }
 
+        /* ===== CLASSES SECTION ===== */
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin: 0 24px 32px;
+        }
+        .class-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .class-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(124, 58, 237, 0.15);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-glow);
+        }
+        .class-card .class-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .class-card .class-course {
+            font-size: 12px;
+            color: var(--accent-violet);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .class-card .class-meta {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .class-card .class-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .class-card .class-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .class-card .class-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .class-card .class-links a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            background: rgba(6, 182, 212, 0.08);
+            border-radius: 8px;
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            transition: all 0.2s;
+        }
+        .class-card .class-links a:hover {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+        .class-card .class-join-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--gradient-purple);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+        }
+        .class-card .class-join-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+        }
+        .class-card .class-join-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         /* ===== TOAST ===== */
         .toast {
             position: fixed;
@@ -1292,6 +1389,11 @@
                 margin: 0 16px 24px;
                 gap: 12px;
             }
+            .classes-grid {
+                grid-template-columns: 1fr;
+                margin: 0 16px 24px;
+                gap: 12px;
+            }
             .stats-row {
                 grid-template-columns: 1fr;
                 margin: 0 16px 24px;
@@ -1476,6 +1578,15 @@
             <div class="courses-grid animate-in" style="animation-delay:0.25s;" id="coursesGrid">
                 <!-- Will be populated by JavaScript -->
             </div>
+
+            <!-- ===== CLASSES ===== -->
+            <div class="section-header animate-in" style="animation-delay:0.3s;" id="classesSection">
+                <h2><i class="fas fa-calendar-alt" style="color:var(--accent-cyan);margin-right:8px;"></i>Upcoming Classes</h2>
+                <a class="view-all" onclick="loadClasses()">View All <i class="fas fa-chevron-right"></i></a>
+            </div>
+            <div class="classes-grid animate-in" style="animation-delay:0.35s;" id="classesGrid">
+                <!-- Will be populated by JavaScript -->
+            </div>
         </main>
     </div>
 
@@ -1495,12 +1606,12 @@
 
     <script>
         // ============================================================
-        // ACADEMY APP - Using same pattern as auth.html
+        // ACADEMY APP - With Enrollment + Classes
         // ============================================================
 
         (function() {
             // ============================================================
-            // SUPABASE CONFIG - Same as auth.html
+            // SUPABASE CONFIG
             // ============================================================
             var CONFIG = {
                 supabase: {
@@ -1522,7 +1633,7 @@
             });
 
             // ============================================================
-            // INITIALIZE SUPABASE - Same as auth.html
+            // INITIALIZE SUPABASE
             // ============================================================
             var supabaseClient = null;
             var supabaseConfigured = false;
@@ -1545,6 +1656,7 @@
             var allCourses = [];
             var allCategories = [];
             var allEnrollments = [];
+            var allClasses = [];
             var mobileSidebarOpen = false;
 
             // ============================================================
@@ -1565,12 +1677,23 @@
                 return '₦' + amount.toLocaleString();
             }
 
+            function formatDate(d) {
+                if (!d) return '—';
+                var dt = new Date(d);
+                return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            function formatTime(d) {
+                if (!d) return '—';
+                var dt = new Date(d);
+                return dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            }
+
             // ============================================================
             // AUTH
             // ============================================================
             async function checkAuth() {
                 if (!supabaseConfigured) {
-                    // Demo mode
                     var demoUser = {
                         id: 'demo-user',
                         email: 'demo@example.com',
@@ -1598,6 +1721,7 @@
                     if (event === 'SIGNED_IN' && session?.user) {
                         updateUIForUser(session.user);
                         loadCourses();
+                        loadClasses();
                     }
                     if (event === 'SIGNED_OUT') {
                         currentUser = null;
@@ -1605,6 +1729,7 @@
                         document.getElementById('authBtn').style.display = 'flex';
                         document.getElementById('userProfile').style.display = 'none';
                         loadCourses();
+                        loadClasses();
                     }
                 });
             }
@@ -1632,7 +1757,6 @@
                     document.getElementById('upgradeBtn').textContent = 'Upgrade Now';
                 }
 
-                // Check if admin
                 if (CONFIG.adminEmails.includes(user?.email)) {
                     document.getElementById('adminBadge').style.display = 'flex';
                 }
@@ -1896,35 +2020,55 @@
             }
 
             // ============================================================
-            // ENROLLMENT
+            // ENROLLMENT - What happens when user enrolls
             // ============================================================
             async function enrollCourse(courseId) {
+                // Step 1: Check if user is signed in
                 if (!currentUser) {
-                    showToast('Please sign in first', 'error');
+                    showToast('Please sign in first to enroll', 'error');
                     window.location.href = 'auth.html';
                     return;
                 }
 
                 var course = allCourses.find(function(c) { return c.id === courseId; });
-                if (!course) return;
-
-                // Check if already enrolled
-                if (allEnrollments.some(function(e) { return e.course_id === courseId; })) {
-                    showToast('You are already enrolled in this course', 'info');
+                if (!course) {
+                    showToast('Course not found', 'error');
                     return;
                 }
 
-                // Check if premium required
+                // Step 2: Check if already enrolled
+                if (allEnrollments.some(function(e) { return e.course_id === courseId; })) {
+                    showToast('You are already enrolled in this course 🎓', 'info');
+                    return;
+                }
+
+                // Step 3: Check if premium required
                 if (!course.is_free && !isPremium) {
                     showToast('This course requires a premium subscription', 'error');
                     window.location.href = 'profile.html';
                     return;
                 }
 
+                // Step 4: Show loading state
+                var btn = event?.target;
+                var originalText = btn ? btn.textContent : 'Enrolling...';
+                if (btn) {
+                    btn.textContent = '⏳ Enrolling...';
+                    btn.disabled = true;
+                }
+
+                // Step 5: Insert enrollment record into Supabase
                 if (!supabaseConfigured) {
-                    showToast('Enrolled in ' + course.title + ' (Demo)', 'success');
-                    allEnrollments.push({ course_id: courseId, progress: 0 });
-                    renderCourses(allCourses);
+                    // Demo mode
+                    setTimeout(function() {
+                        showToast('🎉 Enrolled in ' + course.title + '! (Demo)', 'success');
+                        allEnrollments.push({ course_id: courseId, progress: 0 });
+                        renderCourses(allCourses);
+                        if (btn) {
+                            btn.textContent = '✅ Continue Learning';
+                            btn.disabled = false;
+                        }
+                    }, 1000);
                     return;
                 }
 
@@ -1939,14 +2083,19 @@
 
                     if (error) throw error;
 
-                    showToast('🎉 Enrolled in ' + course.title + '!', 'success');
+                    // Step 6: Show success and update UI
+                    showToast('🎉 Successfully enrolled in ' + course.title + '!', 'success');
                     allEnrollments.push({ course_id: courseId, progress: 0 });
 
-                    // Refresh courses display
+                    // Update the button text
                     renderCourses(allCourses);
 
                 } catch (e) {
                     showToast('Error enrolling: ' + e.message, 'error');
+                    if (btn) {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }
                 }
             }
 
@@ -1959,7 +2108,128 @@
                     window.location.href = 'auth.html';
                     return;
                 }
-                showToast('Added to favorites ❤️', 'success');
+                showToast('❤️ Added to favorites!', 'success');
+            }
+
+            // ============================================================
+            // LOAD CLASSES
+            // ============================================================
+            var DEMO_CLASSES = [{
+                id: 'cl1',
+                course: 'UX Design Fundamentals',
+                title: 'Class 1: Introduction to UX',
+                description: 'Live session covering UX fundamentals, user research, and design thinking principles.',
+                date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                duration: 2,
+                whatsapp: 'https://chat.whatsapp.com/example1',
+                telegram: 'https://t.me/example1'
+            }, {
+                id: 'cl2',
+                course: 'Branding Identity Mastery',
+                title: 'Class 1: Brand Strategy 101',
+                description: 'Learn the foundations of brand strategy, positioning, and creating a brand blueprint.',
+                date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+                duration: 2.5,
+                whatsapp: 'https://chat.whatsapp.com/example2',
+                telegram: 'https://t.me/example2'
+            }, {
+                id: 'cl3',
+                course: 'Web Design Pro',
+                title: 'Class 1: Figma Fundamentals',
+                description: 'Master Figma for web design - from wireframing to high-fidelity prototypes.',
+                date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+                duration: 3,
+                whatsapp: 'https://chat.whatsapp.com/example3',
+                telegram: 'https://t.me/example3'
+            }];
+
+            async function loadClasses() {
+                var grid = document.getElementById('classesGrid');
+
+                if (!supabaseConfigured) {
+                    renderClasses(DEMO_CLASSES);
+                    return;
+                }
+
+                try {
+                    var { data, error } = await supabaseClient
+                        .from('classes')
+                        .select('*')
+                        .eq('is_active', true)
+                        .order('date', { ascending: true });
+
+                    if (!error && data && data.length > 0) {
+                        renderClasses(data);
+                    } else {
+                        renderClasses(DEMO_CLASSES);
+                    }
+                } catch (e) {
+                    renderClasses(DEMO_CLASSES);
+                }
+            }
+
+            function renderClasses(classes) {
+                var grid = document.getElementById('classesGrid');
+                if (!classes || classes.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><h3>No classes scheduled</h3><p>Check back soon for upcoming classes!</p></div>';
+                    return;
+                }
+
+                grid.innerHTML = classes.map(function(c) {
+                    var isEnrolled = c.course_id ? allEnrollments.some(function(e) { return e.course_id === c.course_id; }) : true;
+                    var canJoin = currentUser && isEnrolled;
+
+                    return '<div class="class-card">' +
+                        '<div class="class-title">' + c.title + '</div>' +
+                        '<div class="class-course"><i class="fas fa-graduation-cap"></i> ' + c.course + '</div>' +
+                        '<div class="class-meta">' +
+                        '<span><i class="fas fa-calendar"></i> ' + formatDate(c.date) + '</span>' +
+                        '<span><i class="fas fa-clock"></i> ' + formatTime(c.date) + '</span>' +
+                        '<span><i class="fas fa-hourglass-half"></i> ' + c.duration + 'h</span>' +
+                        '</div>' +
+                        '<div class="class-desc">' + (c.description || '') + '</div>' +
+                        '<div class="class-links">' +
+                        (c.whatsapp ? '<a href="' + c.whatsapp + '" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Group</a>' : '') +
+                        (c.telegram ? '<a href="' + c.telegram + '" target="_blank"><i class="fab fa-telegram"></i> Telegram Group</a>' : '') +
+                        '</div>' +
+                        '<button class="class-join-btn" onclick="joinClass(\'' + c.id + '\')" ' + (!canJoin ? 'disabled' : '') + '>' +
+                        (!currentUser ? 'Sign in to Join' : !isEnrolled ? 'Enroll to Join' : 'Join Class') +
+                        '</button>' +
+                        '</div>';
+                }).join('');
+            }
+
+            // ============================================================
+            // JOIN CLASS
+            // ============================================================
+            function joinClass(classId) {
+                if (!currentUser) {
+                    showToast('Please sign in first', 'error');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                var cls = allClasses.find(function(c) { return c.id === classId; });
+                if (!cls) {
+                    showToast('Class not found', 'error');
+                    return;
+                }
+
+                // Check if enrolled in the course
+                var isEnrolled = cls.course_id ? allEnrollments.some(function(e) { return e.course_id === cls.course_id; }) : true;
+                if (!isEnrolled) {
+                    showToast('Please enroll in the course first', 'error');
+                    return;
+                }
+
+                // Open the class link (WhatsApp or Telegram)
+                var link = cls.whatsapp || cls.telegram;
+                if (link) {
+                    window.open(link, '_blank');
+                    showToast('Joining class...', 'success');
+                } else {
+                    showToast('No group link available for this class', 'warning');
+                }
             }
 
             // ============================================================
@@ -2084,6 +2354,7 @@
                 await loadStats();
                 await loadCategories();
                 await loadCourses();
+                await loadClasses();
                 await loadHeroAvatars();
 
                 // Hide loading screen
@@ -2095,7 +2366,9 @@
             // Expose globally
             window.loadCourses = loadCourses;
             window.loadCategories = loadCategories;
+            window.loadClasses = loadClasses;
             window.enrollCourse = enrollCourse;
+            window.joinClass = joinClass;
             window.toggleFavorite = toggleFavorite;
             window.filterByCategory = filterByCategory;
             window.showToast = showToast;
