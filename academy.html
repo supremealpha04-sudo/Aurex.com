@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* ============================================
-           COMPLETE ACADEMY STYLES
+           ENHANCED ACADEMY STYLES
            ============================================ */
         * {
             margin: 0;
@@ -582,6 +582,28 @@
             background: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.12);
         }
+        /* Admin Button */
+        .admin-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .admin-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-1px);
+        }
         @media (max-width: 600px) {
             .top-bar {
                 margin: 6px 10px 14px;
@@ -606,6 +628,10 @@
                 width: 32px;
                 height: 32px;
                 border-radius: 8px;
+            }
+            .admin-btn {
+                padding: 6px 12px;
+                font-size: 10px;
             }
         }
 
@@ -1094,6 +1120,20 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+        .course-card .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-primary);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .course-card .progress-bar .fill {
+            height: 100%;
+            background: var(--gradient-purple);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
 
         /* ===== CLASSES SECTION ===== */
         .classes-grid {
@@ -1190,6 +1230,14 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+        .class-card .class-join-btn.joined {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        .class-card .class-join-btn.joined:hover {
+            background: rgba(34, 197, 94, 0.2);
         }
 
         /* ===== TOAST ===== */
@@ -1497,6 +1545,10 @@
                             <div class="status" id="userStatus">Free</div>
                         </div>
                     </div>
+                    <!-- Admin Button - Only visible to admin users -->
+                    <a href="admin.html" class="admin-btn" id="adminBtn" style="display:none;">
+                        <i class="fas fa-shield-alt"></i> Admin Panel
+                    </a>
                     <button class="btn-primary" id="authBtn" onclick="window.location.href='auth.html'">
                         <i class="fas fa-sign-in-alt"></i> Sign In
                     </button>
@@ -1514,6 +1566,9 @@
                             Start Learning <i class="fas fa-arrow-right"></i>
                         </button>
                         <button class="btn-secondary" onclick="loadCourses()">Browse Courses</button>
+                        <button class="btn-secondary" onclick="document.getElementById('classesSection').scrollIntoView({behavior:'smooth'})">
+                            <i class="fas fa-calendar-alt"></i> Classes
+                        </button>
                     </div>
                     <div class="hero-students">
                         <div class="avatar-group" id="heroAvatars"></div>
@@ -1606,7 +1661,7 @@
 
     <script>
         // ============================================================
-        // ACADEMY APP - With Enrollment + Classes
+        // ACADEMY APP - Enhanced with Admin Visibility
         // ============================================================
 
         (function() {
@@ -1627,10 +1682,7 @@
                 adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
             };
 
-            console.log('Academy page loaded. Config:', {
-                supabaseUrl: CONFIG.supabase.url ? 'Set' : 'Missing',
-                supabaseKey: CONFIG.supabase.anonKey ? 'Set' : 'Missing'
-            });
+            console.log('✅ Academy page loaded');
 
             // ============================================================
             // INITIALIZE SUPABASE
@@ -1642,7 +1694,7 @@
                 var { createClient } = window.supabase;
                 supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
                 supabaseConfigured = true;
-                console.log('✅ Supabase connected successfully');
+                console.log('✅ Supabase connected');
             } catch (e) {
                 console.error('❌ Supabase error:', e.message);
                 supabaseConfigured = false;
@@ -1653,6 +1705,7 @@
             // ============================================================
             var currentUser = null;
             var isPremium = false;
+            var isAdmin = false;
             var allCourses = [];
             var allCategories = [];
             var allEnrollments = [];
@@ -1689,6 +1742,19 @@
                 return dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
             }
 
+            function getTimeRemaining(dateStr) {
+                var now = new Date();
+                var target = new Date(dateStr);
+                var diff = target - now;
+                if (diff < 0) return 'Started';
+                var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                if (days > 0) return days + 'd';
+                var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                if (hours > 0) return hours + 'h';
+                var mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                return mins + 'm';
+            }
+
             // ============================================================
             // AUTH
             // ============================================================
@@ -1710,15 +1776,18 @@
                         if (profile) {
                             user.user_metadata = { ...user.user_metadata, ...profile };
                             isPremium = profile.is_premium || false;
+                            isAdmin = CONFIG.adminEmails.includes(user.email) || profile.role === 'admin';
                         }
                     } catch (e) {
                         isPremium = user.user_metadata?.is_premium || false;
+                        isAdmin = CONFIG.adminEmails.includes(user.email);
                     }
                     updateUIForUser(user);
                 }
 
                 supabaseClient.auth.onAuthStateChange(function(event, session) {
                     if (event === 'SIGNED_IN' && session?.user) {
+                        isAdmin = CONFIG.adminEmails.includes(session.user.email);
                         updateUIForUser(session.user);
                         loadCourses();
                         loadClasses();
@@ -1726,7 +1795,9 @@
                     if (event === 'SIGNED_OUT') {
                         currentUser = null;
                         isPremium = false;
+                        isAdmin = false;
                         document.getElementById('authBtn').style.display = 'flex';
+                        document.getElementById('adminBtn').style.display = 'none';
                         document.getElementById('userProfile').style.display = 'none';
                         loadCourses();
                         loadClasses();
@@ -1744,6 +1815,7 @@
                 document.getElementById('userProfileImg').src =
                     'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=7c3aed&color=fff&size=100';
 
+                // Update premium status
                 if (isPremium || user?.user_metadata?.is_premium) {
                     document.getElementById('userStatus').textContent = 'Premium';
                     document.getElementById('userStatus').className = 'status premium';
@@ -1757,8 +1829,12 @@
                     document.getElementById('upgradeBtn').textContent = 'Upgrade Now';
                 }
 
-                if (CONFIG.adminEmails.includes(user?.email)) {
+                // Show admin button if admin
+                if (isAdmin || CONFIG.adminEmails.includes(user?.email)) {
+                    document.getElementById('adminBtn').style.display = 'inline-flex';
                     document.getElementById('adminBadge').style.display = 'flex';
+                } else {
+                    document.getElementById('adminBtn').style.display = 'none';
                 }
             }
 
@@ -1970,7 +2046,10 @@
                 }
 
                 grid.innerHTML = courses.map(function(c) {
-                    var isEnrolled = allEnrollments.some(function(e) { return e.course_id === c.id; });
+                    var enrollment = allEnrollments.find(function(e) { return e.course_id === c.id; });
+                    var isEnrolled = !!enrollment;
+                    var progress = enrollment ? enrollment.progress || 0 : 0;
+
                     var priceDisplay = c.is_free ?
                         '<span style="color:var(--accent-green);">Free</span>' :
                         (isPremium ? '<span style="color:var(--accent-cyan);">' + formatCurrency(c.price * 0.55) + '</span>' :
@@ -1986,6 +2065,10 @@
 
                     var enrollText = isEnrolled ? 'Continue Learning' : (c.is_free ? 'Start Free' : (isPremium ?
                         'Enroll Now' : 'Premium Only'));
+
+                    var progressBar = isEnrolled ?
+                        '<div class="progress-bar"><div class="fill" style="width:' + progress + '%;"></div></div>' :
+                        '';
 
                     return '<div class="course-card">' +
                         '<div class="course-image">' +
@@ -2010,6 +2093,7 @@
                         '</span><span class="count">(' + (c.review_count || 0) + ')</span></div>' +
                         '<div class="duration"><i class="far fa-clock"></i> ' + (c.duration || '0h') + '</div>' +
                         '</div>' +
+                        progressBar +
                         '<button class="enroll-btn" onclick="enrollCourse(\'' + c.id + '\')" ' + (!currentUser ?
                             'disabled' : '') + '>' +
                         (isEnrolled ? '✅ ' : '') + enrollText +
@@ -2062,7 +2146,8 @@
                     // Demo mode
                     setTimeout(function() {
                         showToast('🎉 Enrolled in ' + course.title + '! (Demo)', 'success');
-                        allEnrollments.push({ course_id: courseId, progress: 0 });
+                        allEnrollments.push({ course_id: courseId, progress: 0, status: 'active' });
+                        loadUserEnrollments();
                         renderCourses(allCourses);
                         if (btn) {
                             btn.textContent = '✅ Continue Learning';
@@ -2085,9 +2170,7 @@
 
                     // Step 6: Show success and update UI
                     showToast('🎉 Successfully enrolled in ' + course.title + '!', 'success');
-                    allEnrollments.push({ course_id: courseId, progress: 0 });
-
-                    // Update the button text
+                    await loadUserEnrollments();
                     renderCourses(allCourses);
 
                 } catch (e) {
@@ -2117,6 +2200,7 @@
             var DEMO_CLASSES = [{
                 id: 'cl1',
                 course: 'UX Design Fundamentals',
+                course_id: 1,
                 title: 'Class 1: Introduction to UX',
                 description: 'Live session covering UX fundamentals, user research, and design thinking principles.',
                 date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
@@ -2126,6 +2210,7 @@
             }, {
                 id: 'cl2',
                 course: 'Branding Identity Mastery',
+                course_id: 2,
                 title: 'Class 1: Brand Strategy 101',
                 description: 'Learn the foundations of brand strategy, positioning, and creating a brand blueprint.',
                 date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
@@ -2135,6 +2220,7 @@
             }, {
                 id: 'cl3',
                 course: 'Web Design Pro',
+                course_id: 3,
                 title: 'Class 1: Figma Fundamentals',
                 description: 'Master Figma for web design - from wireframing to high-fidelity prototypes.',
                 date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
@@ -2178,22 +2264,29 @@
                 grid.innerHTML = classes.map(function(c) {
                     var isEnrolled = c.course_id ? allEnrollments.some(function(e) { return e.course_id === c.course_id; }) : true;
                     var canJoin = currentUser && isEnrolled;
+                    var timeRemaining = getTimeRemaining(c.date);
+                    var isSoon = timeRemaining !== 'Started' && parseInt(timeRemaining) < 3;
 
                     return '<div class="class-card">' +
-                        '<div class="class-title">' + c.title + '</div>' +
+                        '<div class="class-title">' + c.title +
+                        (isSoon ? ' <span style="font-size:9px;color:var(--accent-orange);font-weight:600;">🔴 Soon</span>' : '') +
+                        '</div>' +
                         '<div class="class-course"><i class="fas fa-graduation-cap"></i> ' + c.course + '</div>' +
                         '<div class="class-meta">' +
                         '<span><i class="fas fa-calendar"></i> ' + formatDate(c.date) + '</span>' +
                         '<span><i class="fas fa-clock"></i> ' + formatTime(c.date) + '</span>' +
                         '<span><i class="fas fa-hourglass-half"></i> ' + c.duration + 'h</span>' +
+                        (timeRemaining !== 'Started' ? '<span style="color:var(--accent-cyan);font-weight:600;">⏱️ ' + timeRemaining + ' left</span>' : '') +
                         '</div>' +
                         '<div class="class-desc">' + (c.description || '') + '</div>' +
                         '<div class="class-links">' +
                         (c.whatsapp ? '<a href="' + c.whatsapp + '" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Group</a>' : '') +
                         (c.telegram ? '<a href="' + c.telegram + '" target="_blank"><i class="fab fa-telegram"></i> Telegram Group</a>' : '') +
                         '</div>' +
-                        '<button class="class-join-btn" onclick="joinClass(\'' + c.id + '\')" ' + (!canJoin ? 'disabled' : '') + '>' +
-                        (!currentUser ? 'Sign in to Join' : !isEnrolled ? 'Enroll to Join' : 'Join Class') +
+                        '<button class="class-join-btn ' + (canJoin ? '' : '') + '" onclick="joinClass(\'' + c.id + '\')" ' + (!canJoin ? 'disabled' : '') + '>' +
+                        (!currentUser ? '🔒 Sign in to Join' :
+                            !isEnrolled ? '📚 Enroll to Join' :
+                            '🚀 Join Class') +
                         '</button>' +
                         '</div>';
                 }).join('');
@@ -2339,14 +2432,6 @@
                 autoDetectDevice();
 
                 console.log('🚀 Initializing Academy App...');
-                console.log('🔑 Supabase configured:', supabaseConfigured);
-
-                if (supabaseConfigured) {
-                    console.log('✅ Supabase is configured and ready');
-                } else {
-                    console.warn('❌ Supabase is NOT configured.');
-                    showToast('⚠️ Supabase not configured. Please check your URL and Key.', 'error');
-                }
 
                 // Load data
                 await checkAuth();
