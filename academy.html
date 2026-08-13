@@ -6,9 +6,8 @@
     <meta name="theme-color" content="#070714">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Aurex Academy - Learn Creative Skills</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
-    <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -779,16 +778,9 @@
             animation-delay: 2.1s;
         }
         @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            33% {
-                transform: translateY(-12px) rotate(2deg);
-            }
-            66% {
-                transform: translateY(-6px) rotate(-1deg);
-            }
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-12px) rotate(2deg); }
+            66% { transform: translateY(-6px) rotate(-1deg); }
         }
 
         /* ===== STATS ROW ===== */
@@ -1168,9 +1160,7 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
         .loading-overlay p {
             margin-top: 14px;
@@ -1254,14 +1244,8 @@
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(24px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .animate-in {
             animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -1511,597 +1495,619 @@
 
     <script>
         // ============================================================
-        // ACADEMY APP - Full Working Version
+        // ACADEMY APP - Using same pattern as auth.html
         // ============================================================
 
-        var CONFIG = window.AUREX_CONFIG || {};
+        (function() {
+            // ============================================================
+            // SUPABASE CONFIG - Same as auth.html
+            // ============================================================
+            var CONFIG = {
+                supabase: {
+                    url: 'https://brmoagghggdeumkfijmm.supabase.co',
+                    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
+                },
+                app: {
+                    name: 'Aurex Designs',
+                    url: 'https://aurex-design.vercel.app',
+                    storageBucket: 'aurex-assets'
+                },
+                premium: { price: '13500', duration: '6', discount: '45' },
+                adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
+            };
 
-        // ============================================================
-        // SUPABASE INIT
-        // ============================================================
-        var supabase = null;
-        var supabaseConfigured = false;
-        var ADMIN_EMAILS = CONFIG.adminEmails || [];
+            console.log('Academy page loaded. Config:', {
+                supabaseUrl: CONFIG.supabase.url ? 'Set' : 'Missing',
+                supabaseKey: CONFIG.supabase.anonKey ? 'Set' : 'Missing'
+            });
 
-        try {
-            if (CONFIG.supabase && CONFIG.supabase.url && CONFIG.supabase.anonKey) {
-                supabase = window.supabase.createClient(
-                    CONFIG.supabase.url,
-                    CONFIG.supabase.anonKey
-                );
+            // ============================================================
+            // INITIALIZE SUPABASE - Same as auth.html
+            // ============================================================
+            var supabaseClient = null;
+            var supabaseConfigured = false;
+
+            try {
+                var { createClient } = window.supabase;
+                supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
                 supabaseConfigured = true;
-                console.log('✅ Supabase connected');
-            } else {
-                console.warn('⚠️ Supabase config missing');
-            }
-        } catch (e) {
-            console.warn('❌ Supabase error:', e.message);
-        }
-
-        // ============================================================
-        // STATE
-        // ============================================================
-        var currentUser = null;
-        var isPremium = false;
-        var allCourses = [];
-        var allCategories = [];
-        var allEnrollments = [];
-        var allStats = {
-            courses: 0,
-            students: 0,
-            certificates: 0,
-            hours: 0
-        };
-        var mobileSidebarOpen = false;
-
-        // ============================================================
-        // HELPERS
-        // ============================================================
-        function showToast(msg, type) {
-            type = type || 'success';
-            var t = document.getElementById('toast');
-            if (!t) return;
-            t.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i> ' + msg;
-            t.className = 'toast ' + type + ' show';
-            clearTimeout(t._hide);
-            t._hide = setTimeout(function() { t.classList.remove('show'); }, 3500);
-        }
-
-        function formatCurrency(amount) {
-            if (!amount) return 'Free';
-            return '₦' + amount.toLocaleString();
-        }
-
-        // ============================================================
-        // AUTH
-        // ============================================================
-        async function checkAuth() {
-            if (!supabaseConfigured) {
-                // Demo mode
-                var demoUser = {
-                    id: 'demo-user',
-                    email: 'demo@example.com',
-                    user_metadata: { full_name: 'Demo User', is_premium: true }
-                };
-                updateUIForUser(demoUser);
-                return;
+                console.log('✅ Supabase connected successfully');
+            } catch (e) {
+                console.error('❌ Supabase error:', e.message);
+                supabaseConfigured = false;
             }
 
-            var { data: { user } } = await supabase.auth.getUser();
-            if (user) {
+            // ============================================================
+            // STATE
+            // ============================================================
+            var currentUser = null;
+            var isPremium = false;
+            var allCourses = [];
+            var allCategories = [];
+            var allEnrollments = [];
+            var mobileSidebarOpen = false;
+
+            // ============================================================
+            // HELPERS
+            // ============================================================
+            function showToast(msg, type) {
+                type = type || 'success';
+                var t = document.getElementById('toast');
+                if (!t) return;
+                t.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i> ' + msg;
+                t.className = 'toast ' + type + ' show';
+                clearTimeout(t._hide);
+                t._hide = setTimeout(function() { t.classList.remove('show'); }, 3500);
+            }
+
+            function formatCurrency(amount) {
+                if (!amount) return 'Free';
+                return '₦' + amount.toLocaleString();
+            }
+
+            // ============================================================
+            // AUTH
+            // ============================================================
+            async function checkAuth() {
+                if (!supabaseConfigured) {
+                    // Demo mode
+                    var demoUser = {
+                        id: 'demo-user',
+                        email: 'demo@example.com',
+                        user_metadata: { full_name: 'Demo User', is_premium: true }
+                    };
+                    updateUIForUser(demoUser);
+                    return;
+                }
+
+                var { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    try {
+                        var { data: profile } = await supabaseClient.from('users').select('*').eq('id', user.id).single();
+                        if (profile) {
+                            user.user_metadata = { ...user.user_metadata, ...profile };
+                            isPremium = profile.is_premium || false;
+                        }
+                    } catch (e) {
+                        isPremium = user.user_metadata?.is_premium || false;
+                    }
+                    updateUIForUser(user);
+                }
+
+                supabaseClient.auth.onAuthStateChange(function(event, session) {
+                    if (event === 'SIGNED_IN' && session?.user) {
+                        updateUIForUser(session.user);
+                        loadCourses();
+                    }
+                    if (event === 'SIGNED_OUT') {
+                        currentUser = null;
+                        isPremium = false;
+                        document.getElementById('authBtn').style.display = 'flex';
+                        document.getElementById('userProfile').style.display = 'none';
+                        loadCourses();
+                    }
+                });
+            }
+
+            function updateUIForUser(user) {
+                currentUser = user;
+                document.getElementById('authBtn').style.display = 'none';
+                document.getElementById('userProfile').style.display = 'flex';
+
+                var name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+                document.getElementById('userName').textContent = name;
+                document.getElementById('userProfileImg').src =
+                    'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=7c3aed&color=fff&size=100';
+
+                if (isPremium || user?.user_metadata?.is_premium) {
+                    document.getElementById('userStatus').textContent = 'Premium';
+                    document.getElementById('userStatus').className = 'status premium';
+                    document.getElementById('userStatus').innerHTML = 'Premium <i class="fas fa-crown" style="font-size:8px;"></i>';
+                    document.getElementById('upgradeBtn').disabled = true;
+                    document.getElementById('upgradeBtn').textContent = '✓ Premium Active';
+                } else {
+                    document.getElementById('userStatus').textContent = 'Free';
+                    document.getElementById('userStatus').className = 'status';
+                    document.getElementById('upgradeBtn').disabled = false;
+                    document.getElementById('upgradeBtn').textContent = 'Upgrade Now';
+                }
+
+                // Check if admin
+                if (CONFIG.adminEmails.includes(user?.email)) {
+                    document.getElementById('adminBadge').style.display = 'flex';
+                }
+            }
+
+            // ============================================================
+            // LOAD STATS
+            // ============================================================
+            async function loadStats() {
+                if (!supabaseConfigured) {
+                    document.getElementById('statCourses').textContent = '24';
+                    document.getElementById('statStudents').textContent = '1,284';
+                    document.getElementById('statCerts').textContent = '342';
+                    document.getElementById('statHours').textContent = '156';
+                    return;
+                }
+
                 try {
-                    var { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
-                    if (profile) {
-                        user.user_metadata = { ...user.user_metadata, ...profile };
-                        isPremium = profile.is_premium || false;
+                    var [coursesCount, usersCount, certsCount, hoursData] = await Promise.all([
+                        supabaseClient.from('courses').select('*', { count: 'exact', head: true }),
+                        supabaseClient.from('users').select('*', { count: 'exact', head: true }),
+                        supabaseClient.from('user_certificates').select('*', { count: 'exact', head: true }),
+                        supabaseClient.from('courses').select('duration_hours')
+                    ]);
+
+                    document.getElementById('statCourses').textContent = coursesCount.count || 0;
+                    document.getElementById('statStudents').textContent = (usersCount.count || 0).toLocaleString();
+                    document.getElementById('statCerts').textContent = (certsCount.count || 0).toLocaleString();
+
+                    var totalHours = 0;
+                    if (hoursData.data) {
+                        hoursData.data.forEach(function(c) {
+                            totalHours += c.duration_hours || 0;
+                        });
+                    }
+                    document.getElementById('statHours').textContent = totalHours || 0;
+
+                } catch (e) {
+                    console.error('Stats error:', e);
+                }
+            }
+
+            // ============================================================
+            // LOAD CATEGORIES
+            // ============================================================
+            var DEMO_CATEGORIES = [
+                { name: 'UI/UX', icon: 'fa-pencil-ruler', color: '#7c3aed' },
+                { name: 'Branding', icon: 'fa-tag', color: '#ec4899' },
+                { name: 'Web Design', icon: 'fa-globe', color: '#3b82f6' },
+                { name: 'Motion', icon: 'fa-film', color: '#06b6d4' },
+                { name: '3D Design', icon: 'fa-cube', color: '#f59e0b' },
+                { name: 'Graphic Design', icon: 'fa-paint-brush', color: '#22c55e' },
+                { name: 'AI Design', icon: 'fa-brain', color: '#a855f7' },
+                { name: 'Typography', icon: 'fa-font', color: '#ec4899' }
+            ];
+
+            async function loadCategories() {
+                var grid = document.getElementById('categoriesGrid');
+
+                if (!supabaseConfigured) {
+                    renderCategories(DEMO_CATEGORIES);
+                    return;
+                }
+
+                try {
+                    var { data, error } = await supabaseClient.from('categories').select('*').order('display_order', { ascending: true });
+                    if (!error && data && data.length > 0) {
+                        renderCategories(data);
+                    } else {
+                        renderCategories(DEMO_CATEGORIES);
                     }
                 } catch (e) {
-                    isPremium = user.user_metadata?.is_premium || false;
-                }
-                updateUIForUser(user);
-            }
-
-            supabase.auth.onAuthStateChange(function(event, session) {
-                if (event === 'SIGNED_IN' && session?.user) {
-                    updateUIForUser(session.user);
-                    loadCourses();
-                }
-                if (event === 'SIGNED_OUT') {
-                    currentUser = null;
-                    isPremium = false;
-                    document.getElementById('authBtn').style.display = 'flex';
-                    document.getElementById('userProfile').style.display = 'none';
-                    loadCourses();
-                }
-            });
-        }
-
-        function updateUIForUser(user) {
-            currentUser = user;
-            document.getElementById('authBtn').style.display = 'none';
-            document.getElementById('userProfile').style.display = 'flex';
-
-            var name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
-            document.getElementById('userName').textContent = name;
-            document.getElementById('userProfileImg').src =
-                'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=7c3aed&color=fff&size=100';
-
-            if (isPremium || user?.user_metadata?.is_premium) {
-                document.getElementById('userStatus').textContent = 'Premium';
-                document.getElementById('userStatus').className = 'status premium';
-                document.getElementById('userStatus').innerHTML = 'Premium <i class="fas fa-crown" style="font-size:8px;"></i>';
-                document.getElementById('upgradeBtn').disabled = true;
-                document.getElementById('upgradeBtn').textContent = '✓ Premium Active';
-            } else {
-                document.getElementById('userStatus').textContent = 'Free';
-                document.getElementById('userStatus').className = 'status';
-                document.getElementById('upgradeBtn').disabled = false;
-                document.getElementById('upgradeBtn').textContent = 'Upgrade Now';
-            }
-
-            // Check if admin
-            if (ADMIN_EMAILS.includes(user?.email)) {
-                document.getElementById('adminBadge').style.display = 'flex';
-            }
-        }
-
-        // ============================================================
-        // LOAD STATS
-        // ============================================================
-        async function loadStats() {
-            if (!supabaseConfigured) {
-                document.getElementById('statCourses').textContent = '24';
-                document.getElementById('statStudents').textContent = '1,284';
-                document.getElementById('statCerts').textContent = '342';
-                document.getElementById('statHours').textContent = '156';
-                return;
-            }
-
-            try {
-                var [coursesCount, usersCount, certsCount, hoursData] = await Promise.all([
-                    supabase.from('courses').select('*', { count: 'exact', head: true }),
-                    supabase.from('users').select('*', { count: 'exact', head: true }),
-                    supabase.from('user_certificates').select('*', { count: 'exact', head: true }),
-                    supabase.from('courses').select('duration_hours')
-                ]);
-
-                document.getElementById('statCourses').textContent = coursesCount.count || 0;
-                document.getElementById('statStudents').textContent = (usersCount.count || 0).toLocaleString();
-                document.getElementById('statCerts').textContent = (certsCount.count || 0).toLocaleString();
-
-                var totalHours = 0;
-                if (hoursData.data) {
-                    hoursData.data.forEach(function(c) {
-                        totalHours += c.duration_hours || 0;
-                    });
-                }
-                document.getElementById('statHours').textContent = totalHours || 0;
-
-            } catch (e) {
-                console.error('Stats error:', e);
-            }
-        }
-
-        // ============================================================
-        // LOAD CATEGORIES
-        // ============================================================
-        var DEMO_CATEGORIES = [
-            { name: 'UI/UX', icon: 'fa-pencil-ruler', color: '#7c3aed' },
-            { name: 'Branding', icon: 'fa-tag', color: '#ec4899' },
-            { name: 'Web Design', icon: 'fa-globe', color: '#3b82f6' },
-            { name: 'Motion', icon: 'fa-film', color: '#06b6d4' },
-            { name: '3D Design', icon: 'fa-cube', color: '#f59e0b' },
-            { name: 'Graphic Design', icon: 'fa-paint-brush', color: '#22c55e' },
-            { name: 'AI Design', icon: 'fa-brain', color: '#a855f7' },
-            { name: 'Typography', icon: 'fa-font', color: '#ec4899' }
-        ];
-
-        async function loadCategories() {
-            var grid = document.getElementById('categoriesGrid');
-
-            if (!supabaseConfigured) {
-                renderCategories(DEMO_CATEGORIES);
-                return;
-            }
-
-            try {
-                var { data, error } = await supabase.from('categories').select('*').order('display_order', { ascending: true });
-                if (!error && data && data.length > 0) {
-                    renderCategories(data);
-                } else {
                     renderCategories(DEMO_CATEGORIES);
                 }
-            } catch (e) {
-                renderCategories(DEMO_CATEGORIES);
-            }
-        }
-
-        function renderCategories(categories) {
-            var grid = document.getElementById('categoriesGrid');
-            if (!categories || categories.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><h3>No categories</h3></div>';
-                return;
             }
 
-            grid.innerHTML = categories.slice(0, 8).map(function(cat) {
-                var color = cat.color || '#7c3aed';
-                return '<div class="category-card" onclick="filterByCategory(\'' + (cat.name || cat.slug || '') + '\')">' +
-                    '<div class="cat-icon" style="background: ' + color + '15; color: ' + color + ';">' +
-                    '<i class="fas ' + (cat.icon || 'fa-circle') + '"></i>' +
-                    '</div>' +
-                    '<div class="cat-name">' + (cat.name || 'Category') + '</div>' +
-                    '</div>';
-            }).join('');
-        }
-
-        function filterByCategory(category) {
-            showToast('Showing: ' + category, 'info');
-            var filtered = allCourses.filter(function(c) {
-                return c.category === category || c.category === category.toLowerCase();
-            });
-            if (filtered.length === 0) {
-                showToast('No courses found in this category', 'warning');
-                loadCourses();
-            } else {
-                renderCourses(filtered);
-            }
-        }
-
-        // ============================================================
-        // LOAD COURSES
-        // ============================================================
-        var DEMO_COURSES = [{
-            id: 1,
-            title: 'UX Design Fundamentals',
-            description: 'Learn the core principles of user experience design',
-            category: 'UI/UX',
-            price: 25000,
-            is_free: false,
-            instructor: 'Sarah Johnson',
-            rating: 4.8,
-            review_count: 156,
-            duration: '8h',
-            badge: 'bestseller',
-            image: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop'
-        }, {
-            id: 2,
-            title: 'Branding Identity Mastery',
-            description: 'Build powerful brand identities from scratch',
-            category: 'Branding',
-            price: 30000,
-            is_free: false,
-            instructor: 'Michael Chen',
-            rating: 4.9,
-            review_count: 89,
-            duration: '12h',
-            badge: 'popular',
-            image: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&h=250&fit=crop'
-        }, {
-            id: 3,
-            title: 'Web Design Pro',
-            description: 'Master modern web design with Figma and Framer',
-            category: 'Web Design',
-            price: 0,
-            is_free: true,
-            instructor: 'Emily Rodriguez',
-            rating: 4.7,
-            review_count: 234,
-            duration: '6h',
-            badge: 'free',
-            image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&h=250&fit=crop'
-        }, {
-            id: 4,
-            title: 'Motion Graphics Pro',
-            description: 'Create stunning motion graphics with After Effects',
-            category: 'Motion',
-            price: 35000,
-            is_free: false,
-            instructor: 'David Kim',
-            rating: 4.6,
-            review_count: 78,
-            duration: '15h',
-            badge: 'trending',
-            image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop'
-        }, {
-            id: 5,
-            title: '3D Design with Blender',
-            description: 'Learn 3D modeling and animation from zero to hero',
-            category: '3D Design',
-            price: 40000,
-            is_free: false,
-            instructor: 'Alex Turner',
-            rating: 4.5,
-            review_count: 45,
-            duration: '20h',
-            badge: 'new',
-            image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=250&fit=crop'
-        }];
-
-        async function loadCourses() {
-            var grid = document.getElementById('coursesGrid');
-
-            if (!supabaseConfigured) {
-                allCourses = DEMO_COURSES;
-                renderCourses(allCourses);
-                return;
-            }
-
-            try {
-                var { data, error } = await supabase
-                    .from('courses')
-                    .select('*')
-                    .eq('is_active', true)
-                    .order('created_at', { ascending: false });
-
-                if (!error && data && data.length > 0) {
-                    allCourses = data;
-                } else {
-                    allCourses = DEMO_COURSES;
+            function renderCategories(categories) {
+                var grid = document.getElementById('categoriesGrid');
+                if (!categories || categories.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><h3>No categories</h3></div>';
+                    return;
                 }
-                renderCourses(allCourses);
-            } catch (e) {
-                allCourses = DEMO_COURSES;
-                renderCourses(allCourses);
-            }
-        }
 
-        function renderCourses(courses) {
-            var grid = document.getElementById('coursesGrid');
-            if (!courses || courses.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No courses available</h3><p>Check back soon for new courses!</p></div>';
-                return;
+                grid.innerHTML = categories.slice(0, 8).map(function(cat) {
+                    var color = cat.color || '#7c3aed';
+                    return '<div class="category-card" onclick="filterByCategory(\'' + (cat.name || cat.slug || '') + '\')">' +
+                        '<div class="cat-icon" style="background: ' + color + '15; color: ' + color + ';">' +
+                        '<i class="fas ' + (cat.icon || 'fa-circle') + '"></i>' +
+                        '</div>' +
+                        '<div class="cat-name">' + (cat.name || 'Category') + '</div>' +
+                        '</div>';
+                }).join('');
             }
 
-            grid.innerHTML = courses.map(function(c) {
-                var isEnrolled = allEnrollments.some(function(e) { return e.course_id === c.id; });
-                var priceDisplay = c.is_free ?
-                    '<span style="color:var(--accent-green);">Free</span>' :
-                    (isPremium ? '<span style="color:var(--accent-cyan);">' + formatCurrency(c.price * 0.55) + '</span>' :
-                        '<span>' + formatCurrency(c.price) + '</span>');
-
-                var originalPrice = (!c.is_free && isPremium) ?
-                    '<span class="original">' + formatCurrency(c.price) + '</span>' :
-                    '';
-
-                var discountBadge = (!c.is_free && isPremium) ?
-                    '<span class="discount">-45%</span>' :
-                    '';
-
-                var enrollText = isEnrolled ? 'Continue Learning' : (c.is_free ? 'Start Free' : (isPremium ?
-                    'Enroll Now' : 'Premium Only'));
-
-                return '<div class="course-card">' +
-                    '<div class="course-image">' +
-                    '<img src="' + (c.image || 'https://via.placeholder.com/400x250/1a1a3e/7c3aed?text=' + encodeURIComponent(c
-                        .title)) + '" alt="' + c.title + '" loading="lazy">' +
-                    (c.badge ? '<span class="course-badge badge-' + c.badge.toLowerCase() + '">' + c.badge + '</span>' :
-                        '') +
-                    '<div class="price-tag">' + originalPrice + ' ' + priceDisplay + ' ' + discountBadge + '</div>' +
-                    '<button class="heart-btn" onclick="event.stopPropagation(); toggleFavorite(\'' + c.id + '\')">' +
-                    '<i class="far fa-heart"></i>' +
-                    '</button>' +
-                    '</div>' +
-                    '<div class="course-body">' +
-                    '<div class="course-title">' + c.title + '</div>' +
-                    '<div class="course-instructor">' +
-                    '<img src="https://ui-avatars.com/api/?name=' + encodeURIComponent(c.instructor || 'Instructor') +
-                    '&background=7c3aed&color=fff&size=100" alt="' + (c.instructor || 'Instructor') + '">' +
-                    '<span>' + (c.instructor || 'Instructor') + '</span>' +
-                    '</div>' +
-                    '<div class="course-meta">' +
-                    '<div class="rating"><span class="stars"><i class="fas fa-star"></i> ' + (c.rating || '0.0') +
-                    '</span><span class="count">(' + (c.review_count || 0) + ')</span></div>' +
-                    '<div class="duration"><i class="far fa-clock"></i> ' + (c.duration || '0h') + '</div>' +
-                    '</div>' +
-                    '<button class="enroll-btn" onclick="enrollCourse(\'' + c.id + '\')" ' + (!currentUser ?
-                        'disabled' : '') + '>' +
-                    (isEnrolled ? '✅ ' : '') + enrollText +
-                    '</button>' +
-                    '</div>' +
-                    '</div>';
-            }).join('');
-        }
-
-        // ============================================================
-        // ENROLLMENT
-        // ============================================================
-        async function enrollCourse(courseId) {
-            if (!currentUser) {
-                showToast('Please sign in first', 'error');
-                window.location.href = 'auth.html';
-                return;
-            }
-
-            var course = allCourses.find(function(c) { return c.id === courseId; });
-            if (!course) return;
-
-            // Check if already enrolled
-            if (allEnrollments.some(function(e) { return e.course_id === courseId; })) {
-                showToast('You are already enrolled in this course', 'info');
-                return;
-            }
-
-            // Check if premium required
-            if (!course.is_free && !isPremium) {
-                showToast('This course requires a premium subscription', 'error');
-                window.location.href = 'profile.html';
-                return;
-            }
-
-            if (!supabaseConfigured) {
-                showToast('Enrolled in ' + course.title + ' (Demo)', 'success');
-                allEnrollments.push({ course_id: courseId, progress: 0 });
-                renderCourses(allCourses);
-                return;
-            }
-
-            try {
-                var { error } = await supabase.from('enrollments').insert({
-                    user_id: currentUser.id,
-                    course_id: courseId,
-                    progress: 0,
-                    status: 'active',
-                    started_at: new Date().toISOString()
+            function filterByCategory(category) {
+                showToast('Showing: ' + category, 'info');
+                var filtered = allCourses.filter(function(c) {
+                    return c.category === category || c.category === category.toLowerCase();
                 });
-
-                if (error) throw error;
-
-                showToast('🎉 Enrolled in ' + course.title + '!', 'success');
-                allEnrollments.push({ course_id: courseId, progress: 0 });
-
-                // Refresh courses display
-                renderCourses(allCourses);
-
-            } catch (e) {
-                showToast('Error enrolling: ' + e.message, 'error');
-            }
-        }
-
-        // ============================================================
-        // FAVORITES
-        // ============================================================
-        function toggleFavorite(courseId) {
-            if (!currentUser) {
-                showToast('Please sign in first', 'error');
-                window.location.href = 'auth.html';
-                return;
-            }
-            showToast('Added to favorites ❤️', 'success');
-        }
-
-        // ============================================================
-        // HERO AVATARS
-        // ============================================================
-        async function loadHeroAvatars() {
-            if (!supabaseConfigured) {
-                document.getElementById('heroStudentCount').textContent = '1,284+';
-                return;
+                if (filtered.length === 0) {
+                    showToast('No courses found in this category', 'warning');
+                    loadCourses();
+                } else {
+                    renderCourses(filtered);
+                }
             }
 
-            try {
-                var { data } = await supabase.from('users').select('avatar_url').limit(4);
-                var container = document.getElementById('heroAvatars');
-                if (data && data.length > 0) {
-                    container.innerHTML = data.map(function(p) {
-                        return '<img src="' + (p.avatar_url ||
-                            'https://ui-avatars.com/api/?name=Student&background=7c3aed&color=fff&size=100') +
-                            '" alt="">';
-                    }).join('');
+            // ============================================================
+            // LOAD COURSES
+            // ============================================================
+            var DEMO_COURSES = [{
+                id: 1,
+                title: 'UX Design Fundamentals',
+                description: 'Learn the core principles of user experience design',
+                category: 'UI/UX',
+                price: 25000,
+                is_free: false,
+                instructor: 'Sarah Johnson',
+                rating: 4.8,
+                review_count: 156,
+                duration: '8h',
+                badge: 'bestseller',
+                image: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop'
+            }, {
+                id: 2,
+                title: 'Branding Identity Mastery',
+                description: 'Build powerful brand identities from scratch',
+                category: 'Branding',
+                price: 30000,
+                is_free: false,
+                instructor: 'Michael Chen',
+                rating: 4.9,
+                review_count: 89,
+                duration: '12h',
+                badge: 'popular',
+                image: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&h=250&fit=crop'
+            }, {
+                id: 3,
+                title: 'Web Design Pro',
+                description: 'Master modern web design with Figma and Framer',
+                category: 'Web Design',
+                price: 0,
+                is_free: true,
+                instructor: 'Emily Rodriguez',
+                rating: 4.7,
+                review_count: 234,
+                duration: '6h',
+                badge: 'free',
+                image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&h=250&fit=crop'
+            }, {
+                id: 4,
+                title: 'Motion Graphics Pro',
+                description: 'Create stunning motion graphics with After Effects',
+                category: 'Motion',
+                price: 35000,
+                is_free: false,
+                instructor: 'David Kim',
+                rating: 4.6,
+                review_count: 78,
+                duration: '15h',
+                badge: 'trending',
+                image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop'
+            }, {
+                id: 5,
+                title: '3D Design with Blender',
+                description: 'Learn 3D modeling and animation from zero to hero',
+                category: '3D Design',
+                price: 40000,
+                is_free: false,
+                instructor: 'Alex Turner',
+                rating: 4.5,
+                review_count: 45,
+                duration: '20h',
+                badge: 'new',
+                image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=250&fit=crop'
+            }];
+
+            async function loadCourses() {
+                var grid = document.getElementById('coursesGrid');
+
+                if (!supabaseConfigured) {
+                    allCourses = DEMO_COURSES;
+                    renderCourses(allCourses);
+                    return;
                 }
 
-                var { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
-                document.getElementById('heroStudentCount').textContent = (count || 0).toLocaleString() + '+';
-            } catch (e) {
-                console.error('Hero avatars error:', e);
+                try {
+                    var { data, error } = await supabaseClient
+                        .from('courses')
+                        .select('*')
+                        .eq('is_active', true)
+                        .order('created_at', { ascending: false });
+
+                    if (!error && data && data.length > 0) {
+                        allCourses = data;
+                    } else {
+                        allCourses = DEMO_COURSES;
+                    }
+                    renderCourses(allCourses);
+                } catch (e) {
+                    allCourses = DEMO_COURSES;
+                    renderCourses(allCourses);
+                }
             }
-        }
 
-        // ============================================================
-        // LOAD USER ENROLLMENTS
-        // ============================================================
-        async function loadUserEnrollments() {
-            if (!currentUser || !supabaseConfigured) return;
+            function renderCourses(courses) {
+                var grid = document.getElementById('coursesGrid');
+                if (!courses || courses.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No courses available</h3><p>Check back soon for new courses!</p></div>';
+                    return;
+                }
 
-            try {
-                var { data } = await supabase.from('enrollments').select('*').eq('user_id', currentUser.id);
-                allEnrollments = data || [];
-            } catch (e) {
-                console.error('Load enrollments error:', e);
+                grid.innerHTML = courses.map(function(c) {
+                    var isEnrolled = allEnrollments.some(function(e) { return e.course_id === c.id; });
+                    var priceDisplay = c.is_free ?
+                        '<span style="color:var(--accent-green);">Free</span>' :
+                        (isPremium ? '<span style="color:var(--accent-cyan);">' + formatCurrency(c.price * 0.55) + '</span>' :
+                            '<span>' + formatCurrency(c.price) + '</span>');
+
+                    var originalPrice = (!c.is_free && isPremium) ?
+                        '<span class="original">' + formatCurrency(c.price) + '</span>' :
+                        '';
+
+                    var discountBadge = (!c.is_free && isPremium) ?
+                        '<span class="discount">-45%</span>' :
+                        '';
+
+                    var enrollText = isEnrolled ? 'Continue Learning' : (c.is_free ? 'Start Free' : (isPremium ?
+                        'Enroll Now' : 'Premium Only'));
+
+                    return '<div class="course-card">' +
+                        '<div class="course-image">' +
+                        '<img src="' + (c.image || 'https://via.placeholder.com/400x250/1a1a3e/7c3aed?text=' + encodeURIComponent(c
+                            .title)) + '" alt="' + c.title + '" loading="lazy">' +
+                        (c.badge ? '<span class="course-badge badge-' + c.badge.toLowerCase() + '">' + c.badge + '</span>' :
+                            '') +
+                        '<div class="price-tag">' + originalPrice + ' ' + priceDisplay + ' ' + discountBadge + '</div>' +
+                        '<button class="heart-btn" onclick="event.stopPropagation(); toggleFavorite(\'' + c.id + '\')">' +
+                        '<i class="far fa-heart"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '<div class="course-body">' +
+                        '<div class="course-title">' + c.title + '</div>' +
+                        '<div class="course-instructor">' +
+                        '<img src="https://ui-avatars.com/api/?name=' + encodeURIComponent(c.instructor || 'Instructor') +
+                        '&background=7c3aed&color=fff&size=100" alt="' + (c.instructor || 'Instructor') + '">' +
+                        '<span>' + (c.instructor || 'Instructor') + '</span>' +
+                        '</div>' +
+                        '<div class="course-meta">' +
+                        '<div class="rating"><span class="stars"><i class="fas fa-star"></i> ' + (c.rating || '0.0') +
+                        '</span><span class="count">(' + (c.review_count || 0) + ')</span></div>' +
+                        '<div class="duration"><i class="far fa-clock"></i> ' + (c.duration || '0h') + '</div>' +
+                        '</div>' +
+                        '<button class="enroll-btn" onclick="enrollCourse(\'' + c.id + '\')" ' + (!currentUser ?
+                            'disabled' : '') + '>' +
+                        (isEnrolled ? '✅ ' : '') + enrollText +
+                        '</button>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
             }
-        }
 
-        // ============================================================
-        // SIDEBAR / NAV
-        // ============================================================
-        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-            document.getElementById('mainContent').classList.toggle('sidebar-collapsed');
-        });
+            // ============================================================
+            // ENROLLMENT
+            // ============================================================
+            async function enrollCourse(courseId) {
+                if (!currentUser) {
+                    showToast('Please sign in first', 'error');
+                    window.location.href = 'auth.html';
+                    return;
+                }
 
-        var mmb = document.getElementById('mobileMenuBtn');
-        if (mmb) {
-            mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
-            mmb.addEventListener('click', function() {
-                document.getElementById('sidebar').classList.toggle('mobile-open');
-                document.getElementById('sidebarOverlay').classList.toggle('active');
+                var course = allCourses.find(function(c) { return c.id === courseId; });
+                if (!course) return;
+
+                // Check if already enrolled
+                if (allEnrollments.some(function(e) { return e.course_id === courseId; })) {
+                    showToast('You are already enrolled in this course', 'info');
+                    return;
+                }
+
+                // Check if premium required
+                if (!course.is_free && !isPremium) {
+                    showToast('This course requires a premium subscription', 'error');
+                    window.location.href = 'profile.html';
+                    return;
+                }
+
+                if (!supabaseConfigured) {
+                    showToast('Enrolled in ' + course.title + ' (Demo)', 'success');
+                    allEnrollments.push({ course_id: courseId, progress: 0 });
+                    renderCourses(allCourses);
+                    return;
+                }
+
+                try {
+                    var { error } = await supabaseClient.from('enrollments').insert({
+                        user_id: currentUser.id,
+                        course_id: courseId,
+                        progress: 0,
+                        status: 'active',
+                        started_at: new Date().toISOString()
+                    });
+
+                    if (error) throw error;
+
+                    showToast('🎉 Enrolled in ' + course.title + '!', 'success');
+                    allEnrollments.push({ course_id: courseId, progress: 0 });
+
+                    // Refresh courses display
+                    renderCourses(allCourses);
+
+                } catch (e) {
+                    showToast('Error enrolling: ' + e.message, 'error');
+                }
+            }
+
+            // ============================================================
+            // FAVORITES
+            // ============================================================
+            function toggleFavorite(courseId) {
+                if (!currentUser) {
+                    showToast('Please sign in first', 'error');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+                showToast('Added to favorites ❤️', 'success');
+            }
+
+            // ============================================================
+            // HERO AVATARS
+            // ============================================================
+            async function loadHeroAvatars() {
+                if (!supabaseConfigured) {
+                    document.getElementById('heroStudentCount').textContent = '1,284+';
+                    return;
+                }
+
+                try {
+                    var { data } = await supabaseClient.from('users').select('avatar_url').limit(4);
+                    var container = document.getElementById('heroAvatars');
+                    if (data && data.length > 0) {
+                        container.innerHTML = data.map(function(p) {
+                            return '<img src="' + (p.avatar_url ||
+                                'https://ui-avatars.com/api/?name=Student&background=7c3aed&color=fff&size=100') +
+                                '" alt="">';
+                        }).join('');
+                    }
+
+                    var { count } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+                    document.getElementById('heroStudentCount').textContent = (count || 0).toLocaleString() + '+';
+                } catch (e) {
+                    console.error('Hero avatars error:', e);
+                }
+            }
+
+            // ============================================================
+            // LOAD USER ENROLLMENTS
+            // ============================================================
+            async function loadUserEnrollments() {
+                if (!currentUser || !supabaseConfigured) return;
+
+                try {
+                    var { data } = await supabaseClient.from('enrollments').select('*').eq('user_id', currentUser.id);
+                    allEnrollments = data || [];
+                } catch (e) {
+                    console.error('Load enrollments error:', e);
+                }
+            }
+
+            // ============================================================
+            // SIDEBAR / NAV
+            // ============================================================
+            document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('collapsed');
+                document.getElementById('mainContent').classList.toggle('sidebar-collapsed');
             });
-        }
-        document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.remove('mobile-open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
-        });
 
-        // ============================================================
-        // SCROLL EFFECT
-        // ============================================================
-        window.addEventListener('scroll', function() {
-            var topBar = document.getElementById('topBar');
-            if (window.scrollY > 20) {
-                topBar.classList.add('scrolled');
-            } else {
-                topBar.classList.remove('scrolled');
+            var mmb = document.getElementById('mobileMenuBtn');
+            if (mmb) {
+                mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
+                mmb.addEventListener('click', function() {
+                    document.getElementById('sidebar').classList.toggle('mobile-open');
+                    document.getElementById('sidebarOverlay').classList.toggle('active');
+                });
             }
-        });
-
-        // ============================================================
-        // AUTO DETECT DEVICE
-        // ============================================================
-        function autoDetectDevice() {
-            var isMobile = window.innerWidth <= 900;
-            if (mmb) mmb.style.display = isMobile ? 'flex' : 'none';
-            if (!isMobile) {
+            document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
                 document.getElementById('sidebar').classList.remove('mobile-open');
                 document.getElementById('sidebarOverlay').classList.remove('active');
-            }
-        }
-        window.addEventListener('resize', autoDetectDevice);
+            });
 
-        // ============================================================
-        // KEYBOARD SHORTCUTS
-        // ============================================================
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (mobileSidebarOpen) {
+            // ============================================================
+            // SCROLL EFFECT
+            // ============================================================
+            window.addEventListener('scroll', function() {
+                var topBar = document.getElementById('topBar');
+                if (window.scrollY > 20) {
+                    topBar.classList.add('scrolled');
+                } else {
+                    topBar.classList.remove('scrolled');
+                }
+            });
+
+            // ============================================================
+            // AUTO DETECT DEVICE
+            // ============================================================
+            function autoDetectDevice() {
+                var isMobile = window.innerWidth <= 900;
+                if (mmb) mmb.style.display = isMobile ? 'flex' : 'none';
+                if (!isMobile) {
                     document.getElementById('sidebar').classList.remove('mobile-open');
                     document.getElementById('sidebarOverlay').classList.remove('active');
-                    mobileSidebarOpen = false;
                 }
             }
-        });
+            window.addEventListener('resize', autoDetectDevice);
 
-        // ============================================================
-        // INIT
-        // ============================================================
-        async function init() {
-            autoDetectDevice();
+            // ============================================================
+            // KEYBOARD SHORTCUTS
+            // ============================================================
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (mobileSidebarOpen) {
+                        document.getElementById('sidebar').classList.remove('mobile-open');
+                        document.getElementById('sidebarOverlay').classList.remove('active');
+                        mobileSidebarOpen = false;
+                    }
+                }
+            });
 
-            // Load data
-            await checkAuth();
-            await loadUserEnrollments();
-            await loadStats();
-            await loadCategories();
-            await loadCourses();
-            await loadHeroAvatars();
+            // ============================================================
+            // INIT
+            // ============================================================
+            async function init() {
+                autoDetectDevice();
 
-            // Hide loading screen
-            setTimeout(function() {
-                document.getElementById('loadingScreen').classList.add('hidden');
-            }, 600);
-        }
+                console.log('🚀 Initializing Academy App...');
+                console.log('🔑 Supabase configured:', supabaseConfigured);
 
-        // Expose globally
-        window.loadCourses = loadCourses;
-        window.loadCategories = loadCategories;
-        window.enrollCourse = enrollCourse;
-        window.toggleFavorite = toggleFavorite;
-        window.filterByCategory = filterByCategory;
-        window.showToast = showToast;
+                if (supabaseConfigured) {
+                    console.log('✅ Supabase is configured and ready');
+                } else {
+                    console.warn('❌ Supabase is NOT configured.');
+                    showToast('⚠️ Supabase not configured. Please check your URL and Key.', 'error');
+                }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
+                // Load data
+                await checkAuth();
+                await loadUserEnrollments();
+                await loadStats();
+                await loadCategories();
+                await loadCourses();
+                await loadHeroAvatars();
+
+                // Hide loading screen
+                setTimeout(function() {
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                }, 600);
+            }
+
+            // Expose globally
+            window.loadCourses = loadCourses;
+            window.loadCategories = loadCategories;
+            window.enrollCourse = enrollCourse;
+            window.toggleFavorite = toggleFavorite;
+            window.filterByCategory = filterByCategory;
+            window.showToast = showToast;
+
+            // Run init when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+        })();
     </script>
 
 </body>
