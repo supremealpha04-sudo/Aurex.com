@@ -1,12 +1,17 @@
 {
   "name": "Aurex Designs",
   "short_name": "Aurex",
+  "description": "Professional Graphic Design Studio - Design. Edit. Inspire.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f0f1a",
   "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
   "icons": [
-    { "src": "IMG-20260403-WA0021(1).jpg", "sizes": "192x192", "type": "image/jpeg" },
-    { "src": "IMG-20260403-WA0021(1).jpg", "sizes": "512x512", "type": "image/jpeg" }
-  ]
+    { "src": "IMG-20260403-WA0021(1).jpg", "sizes": "192x192", "type": "image/jpeg", "purpose": "any maskable" },
+    { "src": "IMG-20260403-WA0021(1).jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }
+  ],
+  "categories": ["design", "education", "business"],
+  "lang": "en"
 }
