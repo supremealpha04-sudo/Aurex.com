@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Aurex Designs">
     <link rel="manifest" href="manifest.json">
@@ -815,18 +816,18 @@
                     var category = project.category || 'Design';
                     var authorName = project.author_name || 'Aurex Team';
                     var authorAvatar = project.author_avatar || 'IMG-20260403-WA0021(1).jpg';
-                    html += '<div class="project-card">' +
-                        '<img src="' + imgUrl + '" alt="' + (project.title || 'Project') + '" class="project-image" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop'">' +
-                        '<div class="project-body">' +
-                            '<div class="project-category"><i class="fas fa-tag"></i> ' + category + '</div>' +
-                            '<h3 class="project-title">' + (project.title || 'Untitled Project') + '</h3>' +
-                            '<p class="project-desc">' + (project.description || 'A creative design project by Aurex Designs Studio.') + '</p>' +
-                            '<div class="project-meta">' +
-                                '<span class="project-author"><img src="' + authorAvatar + '" alt="' + authorName + '" onerror="this.src='IMG-20260403-WA0021(1).jpg'"> ' + authorName + '</span>' +
-                                '<span class="project-date"><i class="far fa-clock"></i> ' + dateStr + '</span>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>';
+                    html += `<div class="project-card">
+                        <img src="${imgUrl}" alt="${project.title || 'Project'}" class="project-image" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop'">
+                        <div class="project-body">
+                            <div class="project-category"><i class="fas fa-tag"></i> ${category}</div>
+                            <h3 class="project-title">${project.title || 'Untitled Project'}</h3>
+                            <p class="project-desc">${project.description || 'A creative design project by Aurex Designs Studio.'}</p>
+                            <div class="project-meta">
+                                <span class="project-author"><img src="${authorAvatar}" alt="${authorName}" onerror="this.src='IMG-20260403-WA0021(1).jpg'"> ${authorName}</span>
+                                <span class="project-date"><i class="far fa-clock"></i> ${dateStr}</span>
+                            </div>
+                        </div>
+                    </div>`;
                 });
                 grid.innerHTML = html;
                 // Animate in
@@ -891,19 +892,19 @@
                 courses.forEach(function(course) {
                     var imgUrl = course.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=340&fit=crop';
                     var priceText = course.is_free ? 'Free' : '₦' + (course.price || 0).toLocaleString();
-                    var badge = course.badge ? '<span class="course-badge">' + course.badge + '</span>' : '';
-                    html += '<div class="course-card">' +
-                        '<img src="' + imgUrl + '" alt="' + (course.title || 'Course') + '" class="course-image" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=340&fit=crop'">' +
-                        '<div class="course-body">' +
-                            badge +
-                            '<h3 class="course-title">' + (course.title || 'Untitled Course') + '</h3>' +
-                            '<p class="course-desc">' + (course.description || 'Learn professional design skills with this comprehensive course.') + '</p>' +
-                            '<div class="course-footer">' +
-                                '<span class="course-price">' + priceText + '</span>' +
-                                '<button class="course-btn" onclick="showToast('Enrollment coming soon!', 'info')">Enroll</button>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>';
+                    var badge = course.badge ? `<span class="course-badge">${course.badge}</span>` : '';
+                    html += `<div class="course-card">
+                        <img src="${imgUrl}" alt="${course.title || 'Course'}" class="course-image" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=340&fit=crop'">
+                        <div class="course-body">
+                            ${badge}
+                            <h3 class="course-title">${course.title || 'Untitled Course'}</h3>
+                            <p class="course-desc">${course.description || 'Learn professional design skills with this comprehensive course.'}</p>
+                            <div class="course-footer">
+                                <span class="course-price">${priceText}</span>
+                                <button class="course-btn" onclick="showToast('Enrollment coming soon!', 'info')">Enroll</button>
+                            </div>
+                        </div>
+                    </div>`;
                 });
                 grid.innerHTML = html;
                 if (typeof gsap !== 'undefined') {
@@ -1091,10 +1092,7 @@
                     var email = document.getElementById('contactEmail').value;
                     var type = document.getElementById('contactType').value;
                     var message = document.getElementById('contactMessage').value;
-                    var whatsappText = 'Hello! I am ' + encodeURIComponent(name) +
-                        '%0A%0AEmail: ' + encodeURIComponent(email) +
-                        '%0AService: ' + encodeURIComponent(type) +
-                        '%0A%0AMessage:%0A' + encodeURIComponent(message);
+                    var whatsappText = `Hello! I am ${encodeURIComponent(name)}%0A%0AEmail: ${encodeURIComponent(email)}%0AService: ${encodeURIComponent(type)}%0A%0AMessage:%0A${encodeURIComponent(message)}`;
                     window.open('https://wa.me/2349127161200?text=' + whatsappText, '_blank');
                     showToast('Opening WhatsApp...', 'success');
                     form.reset();
