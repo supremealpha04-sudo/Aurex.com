@@ -2,1987 +2,835 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | Aurex Designs</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#070714">
+    <title>Admin Dashboard | Aurex Designs</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* ============================================
-           COMPLETE ADMIN STYLES - Fully Working
-           ============================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         :root {
-            --bg-primary: #0a0a12;
-            --bg-secondary: #111125;
-            --bg-card: #18183a;
-            --bg-card-hover: #22224a;
-            --bg-elevated: #2a2a5a;
-            --accent: #7c3aed;
-            --accent-light: #a855f7;
-            --accent-blue: #3b82f6;
-            --accent-cyan: #06b6d4;
-            --accent-green: #22c55e;
-            --accent-orange: #f59e0b;
-            --accent-red: #ef4444;
-            --accent-pink: #ec4899;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border-color: rgba(148, 163, 184, 0.08);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --shadow-glow: 0 0 60px rgba(124, 58, 237, 0.15);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --sidebar-width: 260px;
+            --bg-primary:#070714; --bg-secondary:#0d0d1f; --bg-card:#13132a; --bg-card-hover:#1a1a3e;
+            --bg-elevated:#1c1c42; --accent-purple:#7c3aed; --accent-violet:#a855f7; --accent-blue:#3b82f6;
+            --accent-cyan:#06b6d4; --accent-pink:#ec4899; --accent-green:#22c55e; --accent-orange:#f59e0b;
+            --accent-red:#ef4444; --text-primary:#f8fafc; --text-secondary:#94a3b8; --text-muted:#64748b;
+            --border-color:rgba(148,163,184,0.08); --gradient-purple:linear-gradient(135deg,#7c3aed,#6366f1,#3b82f6);
+            --shadow-glow:0 0 60px rgba(124,58,237,0.12); --sidebar-width:260px; --sidebar-collapsed:72px;
+            --radius:16px; --radius-sm:12px; --transition:0.3s cubic-bezier(0.4,0,0.2,1);
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-        }
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(124, 58, 237, 0.3);
-            border-radius: 10px;
-        }
+        body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); min-height:100vh; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+        ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.25);border-radius:10px}
 
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border-color);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-        }
-        .sidebar-brand {
-            padding: 24px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .sidebar-brand .logo {
-            width: 40px;
-            height: 40px;
-            background: var(--accent);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 800;
-            color: white;
-        }
-        .sidebar-brand .brand-text {
-            font-size: 18px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent), var(--accent-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .sidebar-brand .brand-sub {
-            font-size: 10px;
-            color: var(--text-muted);
-            display: block;
-            -webkit-text-fill-color: var(--text-muted);
-        }
-        .sidebar-nav {
-            flex: 1;
-            padding: 16px 12px;
-            overflow-y: auto;
-        }
-        .sidebar-nav .nav-section-title {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            padding: 8px 12px;
-            font-weight: 600;
-        }
-        .sidebar-nav .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-        }
-        .sidebar-nav .nav-item:hover {
-            background: rgba(124, 58, 237, 0.08);
-            color: var(--text-primary);
-        }
-        .sidebar-nav .nav-item.active {
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(124, 58, 237, 0.05));
-            color: var(--accent-light);
-            border: 1px solid rgba(124, 58, 237, 0.15);
-        }
-        .sidebar-nav .nav-item i {
-            width: 20px;
-            text-align: center;
-        }
-        .sidebar-nav .nav-item .badge {
-            margin-left: auto;
-            background: var(--accent-red);
-            color: white;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-weight: 700;
-        }
-        .sidebar-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border-color);
-        }
-        .sidebar-footer .user-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--bg-card);
-            border-radius: var(--radius-sm);
-        }
-        .sidebar-footer .user-card img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .sidebar-footer .user-card .user-info {
-            flex: 1;
-        }
-        .sidebar-footer .user-card .user-name {
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .sidebar-footer .user-card .user-role {
-            font-size: 10px;
-            color: var(--accent-light);
-        }
-        .sidebar-footer .logout-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: rgba(239, 68, 68, 0.1);
-            border: none;
-            color: var(--accent-red);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .sidebar-footer .logout-btn:hover {
-            background: var(--accent-red);
-            color: white;
-        }
-        .mobile-menu-btn {
-            display: none;
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            .mobile-menu-btn {
-                display: flex !important;
-            }
-        }
+        .loading-overlay{position:fixed;inset:0;background:var(--bg-primary);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s}
+        .loading-overlay.hidden{opacity:0;pointer-events:none}
+        .spinner{width:44px;height:44px;border:3px solid rgba(124,58,237,0.15);border-top-color:var(--accent-purple);border-radius:50%;animation:spin .8s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-overlay p{margin-top:16px;color:var(--text-muted);font-size:13px;font-weight:500}
 
-        /* ===== MAIN ===== */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-        }
-        @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-            }
-        }
-        .top-bar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 16px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            backdrop-filter: blur(20px);
-        }
-        .top-bar .page-title {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff, var(--accent-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .top-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        .icon-btn:hover {
-            background: var(--bg-card-hover);
-            color: var(--text-primary);
-        }
-        .content-area {
-            padding: 24px 32px 100px;
-        }
+        .sidebar{position:fixed;left:0;top:0;width:var(--sidebar-width);height:100vh;height:100dvh;background:var(--bg-secondary);border-right:1px solid var(--border-color);z-index:1000;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(0.4,0,0.2,1),width .35s cubic-bezier(0.4,0,0.2,1);overflow:hidden}
+        .sidebar-brand{padding:20px 16px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-color)}
+        .sidebar-brand .logo{width:40px;height:40px;background:var(--gradient-purple);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;box-shadow:0 4px 20px rgba(124,58,237,0.3)}
+        .sidebar-brand .brand-text{font-size:18px;font-weight:700;background:var(--gradient-purple);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .sidebar-brand .brand-sub{font-size:10px;color:var(--text-muted);display:block;-webkit-text-fill-color:var(--text-muted);letter-spacing:1.5px}
+        .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;overflow-x:hidden}
+        .nav-section-title{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:12px 12px 6px;font-weight:700}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--text-secondary);cursor:pointer;transition:var(--transition);text-decoration:none;font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left;position:relative;margin-bottom:2px;white-space:nowrap}
+        .nav-item:hover{background:rgba(124,58,237,0.08);color:var(--text-primary)}
+        .nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,0.15) 0%,rgba(124,58,237,0.05) 100%);color:var(--accent-violet)}
+        .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--gradient-purple);border-radius:0 3px 3px 0}
+        .nav-item i{width:20px;text-align:center;font-size:15px}
+        .nav-item .badge{margin-left:auto;background:var(--accent-red);color:white;font-size:9px;padding:2px 8px;border-radius:20px;font-weight:700;min-width:18px;text-align:center}
+        .sidebar-footer{padding:14px 12px;border-top:1px solid var(--border-color)}
+        .user-card{display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-card);border-radius:var(--radius-sm);border:1px solid var(--border-color)}
+        .user-card img{width:34px;height:34px;border-radius:10px;object-fit:cover}
+        .user-card .user-info{flex:1;min-width:0}
+        .user-card .user-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .user-card .user-role{font-size:10px;color:var(--accent-violet);font-weight:500}
+        .logout-btn{width:30px;height:30px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.15);color:var(--accent-red);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;font-size:11px}
+        .logout-btn:hover{background:var(--accent-red);color:white}
+        .sidebar-toggle{position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:20px;height:20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:5px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:8px;transition:all .2s;z-index:10}
+        .sidebar-toggle:hover{background:var(--accent-purple);color:white;border-color:var(--accent-purple)}
+        @media(max-width:900px){.sidebar{transform:translateX(-100%);width:var(--sidebar-width)!important;box-shadow:10px 0 40px rgba(0,0,0,0.5)}.sidebar.mobile-open{transform:translateX(0)}.sidebar-toggle{display:none}}
+        .sidebar.collapsed{width:var(--sidebar-collapsed)}
+        .sidebar.collapsed .brand-text,.sidebar.collapsed .brand-sub,.sidebar.collapsed .nav-item span,.sidebar.collapsed .nav-item .badge,.sidebar.collapsed .user-info{opacity:0;pointer-events:none;width:0;overflow:hidden}
+        .sidebar.collapsed .sidebar-brand{justify-content:center;padding:20px 0 16px}
+        .sidebar.collapsed .nav-item{justify-content:center;padding:12px}
+        .sidebar.collapsed .nav-item i{width:auto;font-size:17px}
+        .sidebar.collapsed .user-card{justify-content:center;padding:10px 0}
+        .sidebar.collapsed .logout-btn{display:none}
+        @media(max-width:900px){.sidebar.collapsed{width:var(--sidebar-width)!important}.sidebar.collapsed .brand-text,.sidebar.collapsed .brand-sub,.sidebar.collapsed .nav-item span,.sidebar.collapsed .nav-item .badge,.sidebar.collapsed .user-info{opacity:1!important;pointer-events:auto!important;width:auto!important}.sidebar.collapsed .sidebar-brand{justify-content:flex-start;padding:20px 16px 16px}.sidebar.collapsed .nav-item{justify-content:flex-start;padding:9px 12px}.sidebar.collapsed .nav-item i{width:20px;font-size:15px}.sidebar.collapsed .user-card{justify-content:flex-start;padding:10px}.sidebar.collapsed .logout-btn{display:flex}}
 
-        /* ===== STATS ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 20px 24px;
-            transition: var(--transition);
-        }
-        .stat-card:hover {
-            border-color: rgba(124, 58, 237, 0.2);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow);
-        }
-        .stat-card .stat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-        .stat-card .stat-icon.purple {
-            background: rgba(124, 58, 237, 0.12);
-            color: var(--accent-light);
-        }
-        .stat-card .stat-icon.blue {
-            background: rgba(59, 130, 246, 0.12);
-            color: var(--accent-blue);
-        }
-        .stat-card .stat-icon.green {
-            background: rgba(34, 197, 94, 0.12);
-            color: var(--accent-green);
-        }
-        .stat-card .stat-icon.orange {
-            background: rgba(245, 158, 11, 0.12);
-            color: var(--accent-orange);
-        }
-        .stat-card .stat-icon.pink {
-            background: rgba(236, 72, 153, 0.12);
-            color: var(--accent-pink);
-        }
-        .stat-card .stat-icon.cyan {
-            background: rgba(6, 182, 212, 0.12);
-            color: var(--accent-cyan);
-        }
-        .stat-card .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-        .stat-card .stat-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        .stat-card .stat-change {
-            font-size: 11px;
-            font-weight: 600;
-            margin-top: 4px;
-        }
-        .stat-card .stat-change.up {
-            color: var(--accent-green);
-        }
-        .stat-card .stat-change.down {
-            color: var(--accent-red);
-        }
+        .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:900;opacity:0;pointer-events:none;transition:opacity .3s}
+        .sidebar-overlay.active{opacity:1;pointer-events:auto}
 
-        /* ===== CARDS ===== */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 20px;
-            transition: var(--transition);
-        }
-        .card:hover {
-            border-color: rgba(124, 58, 237, 0.1);
-        }
-        .card .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .card .card-header h3 {
-            font-size: 16px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .card .card-header .actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .main-content{margin-left:var(--sidebar-width);min-height:100vh;transition:margin-left .35s cubic-bezier(0.4,0,0.2,1);overflow-x:hidden}
+        .main-content.sidebar-collapsed{margin-left:var(--sidebar-collapsed)}
+        @media(max-width:900px){.main-content{margin-left:0!important}}
 
-        /* ===== BUTTONS ===== */
-        .btn {
-            padding: 8px 18px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent), #6366f1);
-            color: white;
-        }
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
-        }
-        .btn-secondary {
-            background: var(--bg-elevated);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-        }
-        .btn-secondary:hover {
-            background: var(--bg-card-hover);
-            color: var(--text-primary);
-        }
-        .btn-success {
-            background: rgba(34, 197, 94, 0.12);
-            color: var(--accent-green);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }
-        .btn-success:hover {
-            background: var(--accent-green);
-            color: white;
-        }
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.12);
-            color: var(--accent-red);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-        .btn-danger:hover {
-            background: var(--accent-red);
-            color: white;
-        }
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 11px;
-        }
+        .top-bar{position:sticky;top:8px;z-index:100;display:flex;align-items:center;justify-content:space-between;margin:8px 16px 24px;padding:10px 16px;background:rgba(13,13,31,0.85);backdrop-filter:blur(20px) saturate(1.5);border:1px solid var(--border-color);border-radius:var(--radius-sm);box-shadow:0 8px 32px rgba(0,0,0,0.3);flex-wrap:wrap;gap:10px}
+        .top-bar .page-title{font-size:18px;font-weight:700;background:linear-gradient(135deg,#fff 0%,#c4b5fd 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .icon-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border-color);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;font-size:13px}
+        .icon-btn:hover{background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.2);color:var(--text-primary)}
+        .icon-btn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--accent-red);border-radius:50%;border:2px solid var(--bg-secondary)}
+        .mobile-menu-btn{display:none!important}
+        @media(max-width:900px){.mobile-menu-btn{display:flex!important}}
+        @media(max-width:600px){.top-bar{margin:6px 10px 16px;padding:8px 12px;border-radius:12px}.top-bar .page-title{font-size:15px}}
 
-        /* ===== TABLE ===== */
-        .table-wrapper {
-            overflow-x: auto;
-        }
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .data-table th {
-            text-align: left;
-            padding: 12px 16px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
-            font-weight: 600;
-        }
-        .data-table td {
-            padding: 12px 16px;
-            font-size: 13px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-        .data-table tr:hover td {
-            background: rgba(124, 58, 237, 0.03);
-        }
+        .content-area{padding:0 24px 40px}
+        @media(max-width:768px){.content-area{padding:0 16px 80px}}
 
-        /* ===== BADGES ===== */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .badge-success {
-            background: rgba(34, 197, 94, 0.12);
-            color: var(--accent-green);
-        }
-        .badge-warning {
-            background: rgba(245, 158, 11, 0.12);
-            color: var(--accent-orange);
-        }
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.12);
-            color: var(--accent-red);
-        }
-        .badge-info {
-            background: rgba(59, 130, 246, 0.12);
-            color: var(--accent-blue);
-        }
-        .badge-premium {
-            background: rgba(124, 58, 237, 0.12);
-            color: var(--accent-light);
-        }
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+        .stat-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px;transition:var(--transition);position:relative;overflow:hidden}
+        .stat-card:hover{border-color:rgba(124,58,237,0.15);transform:translateY(-2px);box-shadow:var(--shadow-glow)}
+        .stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle,rgba(124,58,237,0.08) 0%,transparent 70%);border-radius:50%;transform:translate(30%,-30%)}
+        .stat-card .stat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+        .stat-card .stat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px}
+        .stat-card .stat-icon.purple{background:rgba(124,58,237,0.12);color:var(--accent-violet)}
+        .stat-card .stat-icon.blue{background:rgba(59,130,246,0.12);color:var(--accent-blue)}
+        .stat-card .stat-icon.green{background:rgba(34,197,94,0.12);color:var(--accent-green)}
+        .stat-card .stat-icon.orange{background:rgba(245,158,11,0.12);color:var(--accent-orange)}
+        .stat-card .stat-icon.pink{background:rgba(236,72,153,0.12);color:var(--accent-pink)}
+        .stat-card .stat-icon.cyan{background:rgba(6,182,212,0.12);color:var(--accent-cyan)}
+        .stat-card .stat-icon.red{background:rgba(239,68,68,0.12);color:var(--accent-red)}
+        .stat-card .stat-value{font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+        .stat-card .stat-label{font-size:12px;color:var(--text-muted);font-weight:500}
+        .stat-card .stat-change{font-size:11px;font-weight:600;margin-top:8px;display:flex;align-items:center;gap:4px}
+        .stat-card .stat-change.up{color:var(--accent-green)}
+        .stat-card .stat-change.down{color:var(--accent-red)}
 
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-        .status-pill.active {
-            background: rgba(34, 197, 94, 0.12);
-            color: var(--accent-green);
-        }
-        .status-pill.pending {
-            background: rgba(245, 158, 11, 0.12);
-            color: var(--accent-orange);
-        }
-        .status-pill.inactive {
-            background: rgba(100, 116, 139, 0.12);
-            color: var(--text-muted);
-        }
-        .status-pill.completed {
-            background: rgba(34, 197, 94, 0.12);
-            color: var(--accent-green);
-        }
-        .status-pill.in-progress {
-            background: rgba(59, 130, 246, 0.12);
-            color: var(--accent-blue);
-        }
+        .card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:24px;margin-bottom:20px;transition:var(--transition)}
+        .card:hover{border-color:rgba(124,58,237,0.1)}
+        .card .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+        .card .card-header h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+        .card .card-header h3 i{font-size:14px}
+        .card .card-actions{display:flex;gap:8px;flex-wrap:wrap}
 
-        /* ===== MODAL ===== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(12px);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        .modal {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            max-width: 540px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 32px;
-            animation: modalIn 0.3s ease;
-        }
-        @keyframes modalIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-        .modal .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .modal .modal-header h2 {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .modal .modal-header .close-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .modal .modal-header .close-btn:hover {
-            background: var(--accent-red);
-            color: white;
-            border-color: var(--accent-red);
-        }
-        .modal .form-group {
-            margin-bottom: 16px;
-        }
-        .modal .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-        .modal .form-group input,
-        .modal .form-group select,
-        .modal .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            color: var(--text-primary);
-            font-size: 13px;
-            outline: none;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-        .modal .form-group input:focus,
-        .modal .form-group select:focus,
-        .modal .form-group textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
-        }
-        .modal .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .modal .btn {
-            width: 100%;
-            justify-content: center;
-        }
+        .btn{padding:8px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);border:none;font-family:inherit;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+        .btn-primary{background:var(--gradient-purple);color:white}
+        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(124,58,237,0.3)}
+        .btn-secondary{background:rgba(255,255,255,0.04);color:var(--text-secondary);border:1px solid var(--border-color)}
+        .btn-secondary:hover{background:rgba(255,255,255,0.08);color:var(--text-primary);border-color:rgba(255,255,255,0.12)}
+        .btn-success{background:rgba(34,197,94,0.12);color:var(--accent-green);border:1px solid rgba(34,197,94,0.2)}
+        .btn-success:hover{background:var(--accent-green);color:white}
+        .btn-danger{background:rgba(239,68,68,0.12);color:var(--accent-red);border:1px solid rgba(239,68,68,0.2)}
+        .btn-danger:hover{background:var(--accent-red);color:white}
+        .btn-info{background:rgba(6,182,212,0.12);color:var(--accent-cyan);border:1px solid rgba(6,182,212,0.2)}
+        .btn-info:hover{background:var(--accent-cyan);color:white}
+        .btn-sm{padding:6px 12px;font-size:11px;border-radius:8px}
+        .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
 
-        /* ===== TOAST ===== */
-        .toast-container {
-            position: fixed;
-            top: 80px;
-            right: 24px;
-            z-index: 3000;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .toast {
-            padding: 14px 20px;
-            border-radius: var(--radius-sm);
-            color: white;
-            font-size: 13px;
-            font-weight: 500;
-            transform: translateX(120%);
-            opacity: 0;
-            transition: all 0.4s ease;
-            max-width: 340px;
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: var(--shadow);
-        }
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        .toast-success {
-            background: rgba(34, 197, 94, 0.95);
-        }
-        .toast-error {
-            background: rgba(239, 68, 68, 0.95);
-        }
-        .toast-warning {
-            background: rgba(245, 158, 11, 0.95);
-        }
-        .toast-info {
-            background: rgba(124, 58, 237, 0.95);
-        }
+        .table-wrapper{overflow-x:auto;border-radius:12px;border:1px solid var(--border-color)}
+        .data-table{width:100%;border-collapse:collapse;font-size:13px}
+        .data-table th{text-align:left;padding:12px 16px;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);border-bottom:1px solid var(--border-color);font-weight:700;background:var(--bg-secondary);white-space:nowrap}
+        .data-table td{padding:12px 16px;border-bottom:1px solid var(--border-color);color:var(--text-secondary);vertical-align:middle}
+        .data-table tr:last-child td{border-bottom:none}
+        .data-table tr:hover td{background:rgba(124,58,237,0.03)}
+        .data-table .cell-user{display:flex;align-items:center;gap:10px}
+        .data-table .cell-user img{width:32px;height:32px;border-radius:10px;object-fit:cover;background:var(--bg-secondary)}
+        .data-table .cell-user .cell-info{line-height:1.3}
+        .data-table .cell-user .cell-info .name{font-weight:600;color:var(--text-primary);font-size:12px}
+        .data-table .cell-user .cell-info .meta{font-size:11px;color:var(--text-muted)}
 
-        /* ===== LOADING ===== */
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: var(--bg-primary);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s;
-        }
-        .loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(124, 58, 237, 0.15);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        .loading-overlay p {
-            margin-top: 12px;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
+        .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:capitalize}
+        .badge-success{background:rgba(34,197,94,0.12);color:var(--accent-green);border:1px solid rgba(34,197,94,0.15)}
+        .badge-warning{background:rgba(245,158,11,0.12);color:var(--accent-orange);border:1px solid rgba(245,158,11,0.15)}
+        .badge-danger{background:rgba(239,68,68,0.12);color:var(--accent-red);border:1px solid rgba(239,68,68,0.15)}
+        .badge-info{background:rgba(59,130,246,0.12);color:var(--accent-blue);border:1px solid rgba(59,130,246,0.15)}
+        .badge-purple{background:rgba(124,58,237,0.12);color:var(--accent-violet);border:1px solid rgba(124,58,237,0.15)}
+        .badge-muted{background:rgba(100,116,139,0.12);color:var(--text-muted);border:1px solid rgba(100,116,139,0.15)}
 
-        .search-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 8px 12px;
-            margin-bottom: 16px;
-        }
-        .search-bar i {
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-        .search-bar input {
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: 12px;
-            outline: none;
-            flex: 1;
-            font-family: inherit;
-        }
-        .search-bar input::placeholder {
-            color: var(--text-muted);
-        }
+        .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+        .search-bar{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:8px 12px;flex:1;min-width:200px;max-width:320px}
+        .search-bar i{color:var(--text-muted);font-size:12px}
+        .search-bar input{background:transparent;border:none;color:var(--text-primary);font-size:12px;outline:none;width:100%;font-family:inherit}
+        .search-bar input::placeholder{color:var(--text-muted)}
+        .filter-select{padding:8px 12px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;color:var(--text-primary);font-size:12px;outline:none;font-family:inherit;cursor:pointer}
+        .filter-select:focus{border-color:var(--accent-purple)}
+        @media(max-width:600px){.toolbar{flex-direction:column;align-items:stretch}.search-bar{max-width:100%}}
 
-        .filter-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .filter-bar select {
-            padding: 6px 12px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 11px;
-            outline: none;
-            font-family: inherit;
-        }
+        .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-bottom:24px}
+        .chart-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px}
+        .chart-card h4{font-size:13px;font-weight:700;margin-bottom:16px;color:var(--text-secondary);display:flex;align-items:center;gap:8px}
+        .chart-card h4 i{color:var(--accent-violet);font-size:14px}
+        .chart-container{position:relative;height:220px}
+        @media(max-width:600px){.chart-grid{grid-template-columns:1fr}.chart-container{height:180px}}
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        .empty-state i {
-            font-size: 48px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-            opacity: 0.3;
-        }
-        .empty-state h3 {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-        .empty-state p {
-            color: var(--text-muted);
-            font-size: 13px;
-        }
+        .tabs{display:flex;gap:4px;padding:4px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;margin-bottom:20px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+        .tab{padding:7px 16px;border-radius:8px;border:none;background:transparent;color:var(--text-secondary);font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:inherit;white-space:nowrap}
+        .tab:hover{color:var(--text-primary)}
+        .tab.active{background:var(--gradient-purple);color:white;box-shadow:0 4px 15px rgba(124,58,237,0.3)}
 
-        @media (max-width: 768px) {
-            .content-area {
-                padding: 16px;
-            }
-            .top-bar {
-                padding: 12px 16px;
-            }
-            .top-bar .page-title {
-                font-size: 16px;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .modal .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(16px);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px 16px;overflow-y:auto}
+        .modal-overlay.active{display:flex}
+        .modal{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius);width:560px;max-width:100%;max-height:90vh;overflow-y:auto;padding:28px;position:relative;animation:modalIn .3s cubic-bezier(0.4,0,0.2,1);box-shadow:0 40px 80px rgba(0,0,0,0.5)}
+        @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        .modal .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+        .modal .modal-header h2{font-size:18px;font-weight:700}
+        .modal .modal-header .close-btn{width:32px;height:32px;border-radius:10px;border:1px solid var(--border-color);background:transparent;color:var(--text-muted);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;font-size:12px}
+        .modal .modal-header .close-btn:hover{background:var(--accent-red);color:white;border-color:var(--accent-red)}
+        .modal .form-group{margin-bottom:16px}
+        .modal .form-group label{display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+        .modal .form-group input,.modal .form-group select,.modal .form-group textarea{width:100%;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;color:var(--text-primary);font-size:13px;outline:none;transition:var(--transition);font-family:inherit;-webkit-appearance:none;appearance:none}
+        .modal .form-group input:focus,.modal .form-group select:focus,.modal .form-group textarea:focus{border-color:var(--accent-purple);box-shadow:0 0 0 3px rgba(124,58,237,0.08)}
+        .modal .form-group textarea{resize:vertical;min-height:80px}
+        .modal .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .modal .btn{width:100%;justify-content:center;margin-top:4px}
+        @media(max-width:600px){.modal{padding:20px 16px;border-radius:16px}.modal .form-row{grid-template-columns:1fr}}
+
+        .toast-container{position:fixed;top:80px;right:20px;z-index:3000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+        .toast{padding:12px 18px;border-radius:12px;color:white;font-size:13px;font-weight:500;transform:translateX(120%);opacity:0;transition:all .4s cubic-bezier(0.4,0,0.2,1);max-width:340px;backdrop-filter:blur(10px);display:flex;align-items:center;gap:10px;box-shadow:0 20px 50px rgba(0,0,0,0.3);pointer-events:auto;border:1px solid rgba(255,255,255,0.05)}
+        .toast.show{transform:translateX(0);opacity:1}
+        .toast-success{background:rgba(34,197,94,0.95)}
+        .toast-error{background:rgba(239,68,68,0.95)}
+        .toast-warning{background:rgba(245,158,11,0.95)}
+        .toast-info{background:rgba(124,58,237,0.95)}
+
+        .empty-state{text-align:center;padding:60px 20px}
+        .empty-state i{font-size:48px;color:var(--text-muted);margin-bottom:16px;opacity:0.3}
+        .empty-state h3{font-size:16px;font-weight:700;margin-bottom:8px}
+        .empty-state p{color:var(--text-muted);font-size:13px}
+
+        .animate-in{animation:fadeInUp .6s cubic-bezier(0.4,0,0.2,1) forwards;opacity:0}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+        .section{display:none}
+        .section.active{display:block}
+
+        .quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+        .quick-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:16px;text-align:center;cursor:pointer;transition:var(--transition);text-decoration:none;color:inherit}
+        .quick-card:hover{background:var(--bg-card-hover);border-color:rgba(124,58,237,0.2);transform:translateY(-2px)}
+        .quick-card i{font-size:20px;margin-bottom:8px;display:block}
+        .quick-card.purple i{color:var(--accent-violet)}
+        .quick-card.blue i{color:var(--accent-blue)}
+        .quick-card.green i{color:var(--accent-green)}
+        .quick-card.orange i{color:var(--accent-orange)}
+        .quick-card.pink i{color:var(--accent-pink)}
+        .quick-card.cyan i{color:var(--accent-cyan)}
+        .quick-card span{font-size:11px;font-weight:600;color:var(--text-secondary)}
+
+        @media(max-width:768px){.stats-grid{grid-template-columns:1fr 1fr}.chart-grid{grid-template-columns:1fr}.content-area{padding:0 12px 80px}}
+        @media(max-width:480px){.stats-grid{grid-template-columns:1fr}.quick-grid{grid-template-columns:repeat(2,1fr)}}
     </style>
+<base target="_blank">
 </head>
 <body>
-
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <p>Loading Admin Panel...</p>
-    </div>
-
+    <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><p>Loading Admin Dashboard...</p></div>
     <div class="toast-container" id="toastContainer"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="logo">A</div>
-            <div>
-                <div class="brand-text">Aurex</div>
-                <span class="brand-sub">ADMIN PANEL</span>
-            </div>
+            <div><div class="brand-text">Aurex</div><span class="brand-sub">ADMIN PANEL</span></div>
+            <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar"><i class="fas fa-chevron-left"></i></button>
         </div>
         <nav class="sidebar-nav">
             <div class="nav-section-title">Overview</div>
-            <button class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
-                <i class="fas fa-chart-line"></i> Dashboard
-            </button>
+            <button class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i><span>Dashboard</span></button>
             <div class="nav-section-title">Management</div>
-            <button class="nav-item" data-section="users" onclick="showSection('users')">
-                <i class="fas fa-users"></i> Users <span class="badge" id="userBadge">0</span>
-            </button>
-            <button class="nav-item" data-section="projects" onclick="showSection('projects')">
-                <i class="fas fa-folder-open"></i> Projects
-            </button>
-            <button class="nav-item" data-section="courses" onclick="showSection('courses')">
-                <i class="fas fa-graduation-cap"></i> Courses
-            </button>
-            <button class="nav-item" data-section="premium" onclick="showSection('premium')">
-                <i class="fas fa-crown"></i> Premium <span class="badge" id="premiumBadge">0</span>
-            </button>
-            <button class="nav-item" data-section="payments" onclick="showSection('payments')">
-                <i class="fas fa-credit-card"></i> Payments
-            </button>
+            <button class="nav-item" data-section="users" onclick="showSection('users')"><i class="fas fa-users"></i><span>Users</span><span class="badge" id="badgeUsers">0</span></button>
+            <button class="nav-item" data-section="courses" onclick="showSection('courses')"><i class="fas fa-graduation-cap"></i><span>Courses</span><span class="badge" id="badgeCourses">0</span></button>
+            <button class="nav-item" data-section="classes" onclick="showSection('classes')"><i class="fas fa-calendar-alt"></i><span>Classes</span></button>
+            <button class="nav-item" data-section="projects" onclick="showSection('projects')"><i class="fas fa-folder-open"></i><span>Projects</span></button>
+            <button class="nav-item" data-section="tools" onclick="showSection('tools')"><i class="fas fa-tools"></i><span>Tools</span></button>
+            <button class="nav-item" data-section="resources" onclick="showSection('resources')"><i class="fas fa-download"></i><span>Resources</span></button>
+            <button class="nav-item" data-section="premium" onclick="showSection('premium')"><i class="fas fa-crown"></i><span>Premium</span><span class="badge" id="badgePremium">0</span></button>
+            <button class="nav-item" data-section="payments" onclick="showSection('payments')"><i class="fas fa-credit-card"></i><span>Payments</span></button>
             <div class="nav-section-title">System</div>
-            <button class="nav-item" onclick="window.location.href='index.html'">
-                <i class="fas fa-arrow-left"></i> Back to Site
-            </button>
+            <button class="nav-item" data-section="settings" onclick="showSection('settings')"><i class="fas fa-cog"></i><span>Settings</span></button>
+            <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i><span>Back to Site</span></button>
         </nav>
         <div class="sidebar-footer">
             <div class="user-card">
-                <img id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff" alt="Admin">
-                <div class="user-info">
-                    <div class="user-name" id="adminName">Admin</div>
-                    <div class="user-role">Super Admin</div>
-                </div>
-                <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i></button>
+                <img id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff&size=100" alt="Admin">
+                <div class="user-info"><div class="user-name" id="adminName">Admin</div><div class="user-role">Super Admin</div></div>
+                <button class="logout-btn" onclick="handleLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </aside>
 
-    <!-- MAIN -->
-    <main class="main-content">
-        <header class="top-bar">
+    <main class="main-content" id="mainContent">
+        <header class="top-bar" id="topBar">
             <div style="display:flex;align-items:center;gap:12px;">
-                <button class="btn btn-secondary mobile-menu-btn" onclick="toggleMobileSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <button class="icon-btn mobile-menu-btn" onclick="toggleMobileSidebar()"><i class="fas fa-bars"></i></button>
                 <div class="page-title" id="pageTitle">Dashboard</div>
             </div>
             <div class="top-actions">
-                <button class="icon-btn" onclick="refreshData()" title="Refresh">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-                <button class="icon-btn" onclick="window.location.href='index.html'" title="View Site">
-                    <i class="fas fa-external-link-alt"></i>
-                </button>
+                <button class="icon-btn" onclick="refreshAll()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+                <button class="icon-btn" onclick="window.open('index.html','_blank')" title="View Site"><i class="fas fa-external-link-alt"></i></button>
             </div>
         </header>
 
         <div class="content-area">
             <!-- DASHBOARD -->
-            <div id="section-dashboard">
-                <div class="stats-grid" id="statsGrid"></div>
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-clock" style="color:var(--accent-cyan);"></i> Recent Activity</h3>
-                        <div class="actions">
-                            <button class="btn btn-sm btn-secondary" onclick="loadDashboard()">
-                                <i class="fas fa-sync-alt"></i> Refresh
-                            </button>
-                        </div>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Action</th>
-                                    <th>Time</th>
-                                </tr>
-                            </thead>
-                            <tbody id="activityBody"></tbody>
-                        </table>
-                    </div>
+            <div class="section active" id="section-dashboard">
+                <div class="stats-grid animate-in" id="dashStats"></div>
+                <div class="quick-grid animate-in" style="animation-delay:.05s">
+                    <div class="quick-card purple" onclick="showSection('users')"><i class="fas fa-user-plus"></i><span>Add User</span></div>
+                    <div class="quick-card blue" onclick="openModal('courseModal')"><i class="fas fa-plus-circle"></i><span>New Course</span></div>
+                    <div class="quick-card green" onclick="openModal('classModal')"><i class="fas fa-calendar-plus"></i><span>New Class</span></div>
+                    <div class="quick-card orange" onclick="openModal('toolModal')"><i class="fas fa-wrench"></i><span>Add Tool</span></div>
+                    <div class="quick-card pink" onclick="openModal('resourceModal')"><i class="fas fa-file-upload"></i><span>Add Resource</span></div>
+                    <div class="quick-card cyan" onclick="showSection('premium')"><i class="fas fa-check-circle"></i><span>Approve Premium</span></div>
+                </div>
+                <div class="chart-grid animate-in" style="animation-delay:.1s">
+                    <div class="chart-card"><h4><i class="fas fa-chart-bar"></i> Revenue Overview</h4><div class="chart-container"><canvas id="revenueChart"></canvas></div></div>
+                    <div class="chart-card"><h4><i class="fas fa-chart-pie"></i> User Distribution</h4><div class="chart-container"><canvas id="userChart"></canvas></div></div>
+                </div>
+                <div class="card animate-in" style="animation-delay:.15s">
+                    <div class="card-header"><h3><i class="fas fa-clock" style="color:var(--accent-cyan)"></i> Recent Activity</h3><button class="btn btn-sm btn-secondary" onclick="loadActivity()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>User</th><th>Action</th><th>Entity</th><th>Time</th></tr></thead><tbody id="activityBody"></tbody></table></div>
                 </div>
             </div>
 
             <!-- USERS -->
-            <div id="section-users" style="display:none;">
+            <div class="section" id="section-users">
                 <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-users" style="color:var(--accent-blue);"></i> All Users</h3>
-                        <div class="actions">
-                            <button class="btn btn-sm btn-primary" onclick="openModal('userModal')">
-                                <i class="fas fa-plus"></i> Add User
-                            </button>
-                        </div>
+                    <div class="card-header"><h3><i class="fas fa-users" style="color:var(--accent-blue)"></i> All Users</h3><div class="card-actions"><button class="btn btn-sm btn-secondary" onclick="loadUsers()"><i class="fas fa-sync-alt"></i></button><button class="btn btn-sm btn-primary" onclick="openUserModal()"><i class="fas fa-plus"></i> Add User</button></div></div>
+                    <div class="toolbar">
+                        <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers()"></div>
+                        <select class="filter-select" id="userRoleFilter" onchange="filterUsers()"><option value="">All Roles</option><option value="student">Student</option><option value="instructor">Instructor</option><option value="admin">Admin</option></select>
+                        <select class="filter-select" id="userStatusFilter" onchange="filterUsers()"><option value="">All Status</option><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option></select>
+                        <select class="filter-select" id="userPremiumFilter" onchange="filterUsers()"><option value="">All</option><option value="true">Premium</option><option value="false">Free</option></select>
                     </div>
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers()">
-                    </div>
-                    <div class="filter-bar">
-                        <select id="userRoleFilter" onchange="filterUsers()">
-                            <option value="">All Roles</option>
-                            <option value="student">Student</option>
-                            <option value="instructor">Instructor</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                        <select id="userStatusFilter" onchange="filterUsers()">
-                            <option value="">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="pending">Pending</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                        <select id="userPremiumFilter" onchange="filterUsers()">
-                            <option value="">All Users</option>
-                            <option value="true">Premium</option>
-                            <option value="false">Free</option>
-                        </select>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Status</th>
-                                    <th>Premium</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="usersBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PROJECTS -->
-            <div id="section-projects" style="display:none;">
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-folder-open" style="color:var(--accent-orange);"></i> Projects</h3>
-                        <div class="actions">
-                            <button class="btn btn-sm btn-primary" onclick="openModal('projectModal')">
-                                <i class="fas fa-plus"></i> Add Project
-                            </button>
-                        </div>
-                    </div>
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="projectSearch" placeholder="Search projects..." oninput="filterProjects()">
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Category</th>
-                                    <th>Likes</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="projectsBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Premium</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
                 </div>
             </div>
 
             <!-- COURSES -->
-            <div id="section-courses" style="display:none;">
+            <div class="section" id="section-courses">
                 <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-graduation-cap" style="color:var(--accent-violet);"></i> Courses</h3>
-                        <div class="actions">
-                            <button class="btn btn-sm btn-primary" onclick="openModal('courseModal')">
-                                <i class="fas fa-plus"></i> Add Course
-                            </button>
-                        </div>
-                    </div>
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="courseSearch" placeholder="Search courses..." oninput="filterCourses()">
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Instructor</th>
-                                    <th>Category</th>
-                                    <th>Price</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="coursesBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="card-header"><h3><i class="fas fa-graduation-cap" style="color:var(--accent-violet)"></i> Courses</h3><div class="card-actions"><button class="btn btn-sm btn-secondary" onclick="loadCourses()"><i class="fas fa-sync-alt"></i></button><button class="btn btn-sm btn-primary" onclick="openModal('courseModal')"><i class="fas fa-plus"></i> Add Course</button></div></div>
+                    <div class="toolbar"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="courseSearch" placeholder="Search courses..." oninput="filterCourses()"></div></div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>Title</th><th>Instructor</th><th>Category</th><th>Price</th><th>Enrolled</th><th>Status</th><th>Actions</th></tr></thead><tbody id="coursesBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- CLASSES -->
+            <div class="section" id="section-classes">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-calendar-alt" style="color:var(--accent-cyan)"></i> Classes</h3><div class="card-actions"><button class="btn btn-sm btn-secondary" onclick="loadClasses()"><i class="fas fa-sync-alt"></i></button><button class="btn btn-sm btn-primary" onclick="openModal('classModal')"><i class="fas fa-plus"></i> Add Class</button></div></div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>Title</th><th>Course</th><th>Date</th><th>Type</th><th>Capacity</th><th>Actions</th></tr></thead><tbody id="classesBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- PROJECTS -->
+            <div class="section" id="section-projects">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-folder-open" style="color:var(--accent-orange)"></i> Projects</h3><div class="card-actions"><button class="btn btn-sm btn-secondary" onclick="loadProjects()"><i class="fas fa-sync-alt"></i></button></div></div>
+                    <div class="toolbar"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="projectSearch" placeholder="Search projects..." oninput="filterProjects()"></div></div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Likes</th><th>Status</th><th>Actions</th></tr></thead><tbody id="projectsBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- TOOLS -->
+            <div class="section" id="section-tools">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-tools" style="color:var(--accent-green)"></i> Tools</h3><div class="card-actions"><button class="btn btn-sm btn-secondary" onclick="loadTools()"><i class="fas fa-sync-alt"></i></button><button class="btn btn-sm btn-primary" onclick="openModal('toolModal')"><i class="fas fa-plus"></i> Add Tool</button></div></div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Link</th><th>Actions</th></tr></thead><tbody id="toolsBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- RESOURCES -->
+            <div class="section" id="section-resources">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-download" style="color:var(--accent-pink)"></i> Resources</h3><div class="card-actions"><button class="btn btn-sm btn-secondary" onclick="loadResources()"><i class="fas fa-sync-alt"></i></button><button class="btn btn-sm btn-primary" onclick="openModal('resourceModal')"><i class="fas fa-plus"></i> Add Resource</button></div></div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>Title</th><th>Type</th><th>Downloads</th><th>Price</th><th>Actions</th></tr></thead><tbody id="resourcesBody"></tbody></table></div>
                 </div>
             </div>
 
             <!-- PREMIUM -->
-            <div id="section-premium" style="display:none;">
+            <div class="section" id="section-premium">
                 <div class="stats-grid" id="premiumStats"></div>
                 <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-crown" style="color:var(--accent-orange);"></i> Premium Users</h3>
-                        <div class="actions">
-                            <button class="btn btn-sm btn-secondary" onclick="loadPremium()">
-                                <i class="fas fa-sync-alt"></i> Refresh
-                            </button>
-                        </div>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Email</th>
-                                    <th>Started</th>
-                                    <th>Expires</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="premiumBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="card-header"><h3><i class="fas fa-crown" style="color:var(--accent-orange)"></i> Premium Users</h3><div class="card-actions"><button class="btn btn-sm btn-secondary" onclick="loadPremium()"><i class="fas fa-sync-alt"></i></button></div></div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>User</th><th>Email</th><th>Started</th><th>Expires</th><th>Actions</th></tr></thead><tbody id="premiumBody"></tbody></table></div>
                 </div>
                 <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-clock" style="color:var(--accent-orange);"></i> Pending Requests</h3>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Email</th>
-                                    <th>Amount</th>
-                                    <th>Requested</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pendingBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="card-header"><h3><i class="fas fa-clock" style="color:var(--accent-orange)"></i> Pending Requests</h3></div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>User</th><th>Email</th><th>Amount</th><th>Requested</th><th>Actions</th></tr></thead><tbody id="pendingBody"></tbody></table></div>
                 </div>
             </div>
 
             <!-- PAYMENTS -->
-            <div id="section-payments" style="display:none;">
+            <div class="section" id="section-payments">
                 <div class="stats-grid" id="paymentStats"></div>
                 <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-credit-card" style="color:var(--accent-green);"></i> All Payments</h3>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Amount</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody id="paymentsBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="card-header"><h3><i class="fas fa-credit-card" style="color:var(--accent-green)"></i> All Payments</h3><div class="card-actions"><button class="btn btn-sm btn-secondary" onclick="loadPayments()"><i class="fas fa-sync-alt"></i></button></div></div>
+                    <div class="table-wrapper"><table class="data-table"><thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Item</th><th>Status</th><th>Date</th></tr></thead><tbody id="paymentsBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div class="section" id="section-settings">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-cog" style="color:var(--accent-violet)"></i> Site Settings</h3><button class="btn btn-sm btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Save Changes</button></div>
+                    <div id="settingsBody"></div>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- MODALS -->
+    <div class="modal-overlay" id="userModal"><div class="modal"><div class="modal-header"><h2 id="userModalTitle">Add User</h2><button class="close-btn" onclick="closeModal('userModal')"><i class="fas fa-times"></i></button></div><input type="hidden" id="editUserId">
+        <div class="form-group"><label>Full Name</label><input type="text" id="userName" placeholder="John Doe"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="userEmail" placeholder="john@example.com"></div>
+        <div class="form-row"><div class="form-group"><label>Role</label><select id="userRole"><option value="student">Student</option><option value="instructor">Instructor</option><option value="admin">Admin</option></select></div><div class="form-group"><label>Status</label><select id="userStatus"><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option></select></div></div>
+        <div class="form-group" id="passwordGroup"><label>Password</label><input type="password" id="userPassword" placeholder="Min 6 characters"></div>
+        <button class="btn btn-primary" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
+    </div></div>
 
-    <!-- User Modal -->
-    <div class="modal-overlay" id="userModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 id="userModalTitle">Add User</h2>
-                <button class="close-btn" onclick="closeModal('userModal')"><i class="fas fa-times"></i></button>
-            </div>
-            <input type="hidden" id="editUserId">
-            <div class="form-group"><label>Full Name</label><input type="text" id="userName" placeholder="John Doe"></div>
-            <div class="form-group"><label>Email</label><input type="email" id="userEmail" placeholder="john@example.com">
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Role</label><select id="userRole"><option value="student">Student</option><option value="instructor">Instructor</option><option value="admin">Admin</option></select></div>
-                <div class="form-group"><label>Status</label><select id="userStatus"><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option></select></div>
-            </div>
-            <div class="form-group" id="passwordGroup"><label>Password</label><input type="password" id="userPassword" placeholder="••••••••"></div>
-            <button class="btn btn-primary" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
-        </div>
-    </div>
+    <div class="modal-overlay" id="courseModal"><div class="modal"><div class="modal-header"><h2 id="courseModalTitle">Add Course</h2><button class="close-btn" onclick="closeModal('courseModal')"><i class="fas fa-times"></i></button></div><input type="hidden" id="editCourseId">
+        <div class="form-group"><label>Title</label><input type="text" id="courseTitle" placeholder="Course name"></div>
+        <div class="form-group"><label>Description</label><textarea id="courseDesc" rows="2" placeholder="Brief description..."></textarea></div>
+        <div class="form-row"><div class="form-group"><label>Instructor</label><input type="text" id="courseInstructor" placeholder="Instructor name"></div><div class="form-group"><label>Category</label><select id="courseCategory"><option value="ui-ux">UI/UX Design</option><option value="branding">Branding</option><option value="web-design">Web Design</option><option value="motion-graphics">Motion Graphics</option><option value="3d-design">3D Design</option><option value="graphic-design">Graphic Design</option><option value="ai-design">AI Design</option><option value="typography">Typography</option><option value="packaging">Packaging</option><option value="illustration">Illustration</option></select></div></div>
+        <div class="form-row"><div class="form-group"><label>Price (NGN)</label><input type="number" id="coursePrice" value="0" placeholder="0 = Free"></div><div class="form-group"><label>Duration (hours)</label><input type="number" id="courseDuration" value="10"></div></div>
+        <div class="form-row"><div class="form-group"><label>Badge</label><select id="courseBadge"><option value="">None</option><option value="bestseller">Bestseller</option><option value="popular">Popular</option><option value="trending">Trending</option><option value="new">New</option><option value="free">Free</option></select></div><div class="form-group"><label>Featured</label><select id="courseFeatured"><option value="false">No</option><option value="true">Yes</option></select></div></div>
+        <button class="btn btn-primary" onclick="saveCourse()"><i class="fas fa-save"></i> Save Course</button>
+    </div></div>
 
-    <!-- Project Modal -->
-    <div class="modal-overlay" id="projectModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Add Project</h2>
-                <button class="close-btn" onclick="closeModal('projectModal')"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="form-group"><label>Title</label><input type="text" id="projectTitle" placeholder="Project name"></div>
-            <div class="form-group"><label>Description</label><textarea id="projectDesc" rows="2" placeholder="Description..."></textarea></div>
-            <div class="form-row">
-                <div class="form-group"><label>Category</label><select id="projectCategory"><option value="ui-ux">UI/UX</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion</option><option value="3d">3D</option></select></div>
-                <div class="form-group"><label>Status</label><select id="projectStatus"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select></div>
-            </div>
-            <button class="btn btn-primary" onclick="saveProject()"><i class="fas fa-save"></i> Save Project</button>
-        </div>
-    </div>
+    <div class="modal-overlay" id="classModal"><div class="modal"><div class="modal-header"><h2>Add Class</h2><button class="close-btn" onclick="closeModal('classModal')"><i class="fas fa-times"></i></button></div>
+        <div class="form-group"><label>Title</label><input type="text" id="classTitle" placeholder="Class title"></div>
+        <div class="form-group"><label>Course</label><input type="text" id="classCourse" placeholder="Associated course"></div>
+        <div class="form-row"><div class="form-group"><label>Date & Time</label><input type="datetime-local" id="classDate"></div><div class="form-group"><label>Duration (hours)</label><input type="number" id="classDuration" value="2"></div></div>
+        <div class="form-row"><div class="form-group"><label>Class Type</label><select id="classType"><option value="free">Free</option><option value="premium">Premium</option><option value="paid">Paid</option></select></div><div class="form-group"><label>Capacity</label><input type="number" id="classCapacity" value="50"></div></div>
+        <div class="form-group"><label>WhatsApp Group Link</label><input type="url" id="classWhatsapp" placeholder="https://chat.whatsapp.com/..."></div>
+        <div class="form-group"><label>Telegram Group Link</label><input type="url" id="classTelegram" placeholder="https://t.me/..."></div>
+        <div class="form-group"><label>Zoom Link</label><input type="url" id="classZoom" placeholder="https://zoom.us/..."></div>
+        <button class="btn btn-primary" onclick="saveClass()"><i class="fas fa-save"></i> Save Class</button>
+    </div></div>
 
-    <!-- Course Modal -->
-    <div class="modal-overlay" id="courseModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Add Course</h2>
-                <button class="close-btn" onclick="closeModal('courseModal')"><i class="fas fa-times"></i></button>
-            </div>
-            <input type="hidden" id="editCourseId">
-            <div class="form-group"><label>Title</label><input type="text" id="courseTitle" placeholder="Course name"></div>
-            <div class="form-group"><label>Instructor</label><input type="text" id="courseInstructor" placeholder="Instructor name"></div>
-            <div class="form-row">
-                <div class="form-group"><label>Category</label><select id="courseCategory"><option value="ui-ux">UI/UX</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion</option></select></div>
-                <div class="form-group"><label>Price (₦)</label><input type="number" id="coursePrice" value="0" placeholder="0 for free"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Duration (hours)</label><input type="number" id="courseDuration" value="10"></div>
-                <div class="form-group"><label>Badge</label><select id="courseBadge"><option value="">None</option><option value="bestseller">Bestseller</option><option value="popular">Popular</option><option value="trending">Trending</option><option value="new">New</option></select></div>
-            </div>
-            <div class="form-group"><label>Image URL</label><input type="text" id="courseImage" placeholder="https://example.com/image.jpg"></div>
-            <button class="btn btn-primary" onclick="saveCourse()"><i class="fas fa-save"></i> Save Course</button>
-        </div>
-    </div>
+    <div class="modal-overlay" id="toolModal"><div class="modal"><div class="modal-header"><h2>Add Tool</h2><button class="close-btn" onclick="closeModal('toolModal')"><i class="fas fa-times"></i></button></div>
+        <div class="form-group"><label>Name</label><input type="text" id="toolName" placeholder="Tool name"></div>
+        <div class="form-group"><label>Description</label><textarea id="toolDesc" rows="2" placeholder="What does this tool do?"></textarea></div>
+        <div class="form-row"><div class="form-group"><label>Category</label><select id="toolCategory"><option value="design">Design</option><option value="development">Development</option><option value="ai">AI</option><option value="productivity">Productivity</option><option value="general">General</option></select></div><div class="form-group"><label>Price (NGN)</label><input type="number" id="toolPrice" value="0" placeholder="0 = Free"></div></div>
+        <div class="form-group"><label>Link / Download URL</label><input type="url" id="toolLink" placeholder="https://..."></div>
+        <button class="btn btn-primary" onclick="saveTool()"><i class="fas fa-save"></i> Save Tool</button>
+    </div></div>
+
+    <div class="modal-overlay" id="resourceModal"><div class="modal"><div class="modal-header"><h2>Add Resource</h2><button class="close-btn" onclick="closeModal('resourceModal')"><i class="fas fa-times"></i></button></div>
+        <div class="form-group"><label>Title</label><input type="text" id="resTitle" placeholder="Resource name"></div>
+        <div class="form-group"><label>Description</label><textarea id="resDesc" rows="2" placeholder="What is included?"></textarea></div>
+        <div class="form-row"><div class="form-group"><label>Type</label><select id="resType"><option value="free">Free</option><option value="premium">Premium</option><option value="paid">Paid</option></select></div><div class="form-group"><label>Price (NGN)</label><input type="number" id="resPrice" value="0" placeholder="0 = Free"></div></div>
+        <div class="form-group"><label>File URL</label><input type="url" id="resUrl" placeholder="https://..."></div>
+        <button class="btn btn-primary" onclick="saveResource()"><i class="fas fa-save"></i> Save Resource</button>
+    </div></div>
 
     <script>
-        // ============================================================
-        // COMPLETE ADMIN APP - Fully Working
-        // ============================================================
-
-        // ============================================================
-        // CONFIG
-        // ============================================================
+    (function(){
         var CONFIG = {
             supabase: {
                 url: 'https://brmoagghggdeumkfijmm.supabase.co',
                 anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
             },
-            adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
+            adminEmails: ['supremealpha04@gmail.com','aurexdesigns5@gmail.com']
         };
 
-        var supabase = null;
-        var supabaseConfigured = false;
-        var ADMIN_EMAILS = CONFIG.adminEmails || [];
+        var supabase = null, supabaseConfigured = false;
+        try { supabase = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey); supabaseConfigured = true; } catch(e){ console.warn('Supabase init error:', e.message); }
 
-        try {
-            supabase = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
-            supabaseConfigured = true;
-            console.log('✅ Supabase connected');
-        } catch (e) {
-            console.warn('❌ Supabase error:', e.message);
-        }
+        var currentUser = null, allUsers = [], allCourses = [], allClasses = [], allProjects = [], allTools = [], allResources = [], allPayments = [], allPremium = [], allPending = [], allSettings = [], allActivity = [];
+        var revenueChartInst = null, userChartInst = null;
 
-        // ============================================================
-        // STATE
-        // ============================================================
-        var allUsers = [];
-        var allProjects = [];
-        var allCourses = [];
-        var allCategories = [];
-        var allClasses = [];
-        var allPayments = [];
-        var allPremiumUsers = [];
-        var allPendingRequests = [];
-        var currentUser = null;
-
-        // ============================================================
-        // HELPERS
-        // ============================================================
-        function showToast(msg, type) {
+        function $(id){ return document.getElementById(id); }
+        function showToast(msg, type){
             type = type || 'success';
-            var container = document.getElementById('toastContainer');
+            var container = $('toastContainer');
             var toast = document.createElement('div');
             toast.className = 'toast toast-' + type;
-            toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') +
-                '"></i> ' + msg;
+            toast.innerHTML = '<i class="fas ' + (type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':type==='warning'?'fa-exclamation-triangle':'fa-info-circle') + '"></i> ' + msg;
             container.appendChild(toast);
-            requestAnimationFrame(function() { toast.classList.add('show'); });
-            setTimeout(function() {
-                toast.classList.remove('show');
-                setTimeout(function() { toast.remove(); }, 400);
-            }, 3000);
+            requestAnimationFrame(function(){ toast.classList.add('show'); });
+            setTimeout(function(){ toast.classList.remove('show'); setTimeout(function(){ toast.remove(); }, 400); }, 3000);
         }
+        function formatDate(d){ if(!d) return '—'; return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+        function formatCurrency(a){ if(!a) return '₦0'; return '₦' + parseInt(a).toLocaleString(); }
+        function formatTimeAgo(d){ if(!d) return '—'; var diff=Math.floor((new Date()-new Date(d))/1000); if(diff<60) return 'just now'; if(diff<3600) return Math.floor(diff/60)+'m ago'; if(diff<86400) return Math.floor(diff/3600)+'h ago'; return Math.floor(diff/86400)+'d ago'; }
+        function openModal(id){ $(id).classList.add('active'); document.body.style.overflow='hidden'; }
+        function closeModal(id){ $(id).classList.remove('active'); document.body.style.overflow=''; }
+        function getBadgeClass(role){ return role==='admin'?'badge-danger':role==='instructor'?'badge-info':'badge-success'; }
+        function getStatusClass(s){ return s==='active'||s==='completed'?'badge-success':s==='pending'?'badge-warning':s==='in-progress'?'badge-info':'badge-muted'; }
 
-        function formatDate(date) {
-            if (!date) return '—';
-            return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-
-        function formatDateTime(date) {
-            if (!date) return '—';
-            return new Date(date).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit',
-                    minute: '2-digit' });
-        }
-
-        function formatCurrency(amount) {
-            if (!amount) return '₦0';
-            return '₦' + parseInt(amount).toLocaleString();
-        }
-
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // ============================================================
-        // AUTH
-        // ============================================================
-        function checkAuth() {
-            if (!supabaseConfigured) {
-                showToast('⚠️ Supabase not configured.', 'error');
-                return false;
-            }
-
-            supabase.auth.getSession().then(function(result) {
-                if (!result.data.session) {
-                    window.location.href = 'auth.html';
-                    return;
-                }
-                var userEmail = result.data.session.user.email;
-                if (!ADMIN_EMAILS.includes(userEmail)) {
-                    showToast('❌ Access denied. Admin only.', 'error');
-                    setTimeout(function() { window.location.href = 'index.html'; }, 1500);
-                    return;
-                }
-                currentUser = result.data.session.user;
-                document.getElementById('adminName').textContent = userEmail.split('@')[0];
-                document.getElementById('adminAvatar').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(
-                    userEmail.split('@')[0]) + '&background=7c3aed&color=fff';
-            }).catch(function() {
-                window.location.href = 'auth.html';
-            });
+        async function checkAuth(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return false; }
+            var { data:{session} } = await supabase.auth.getSession();
+            if(!session){ window.location.href='auth.html'; return false; }
+            var email = session.user.email;
+            if(!CONFIG.adminEmails.includes(email)){ showToast('Access denied. Admin only.','error'); setTimeout(function(){ window.location.href='index.html'; }, 1500); return false; }
+            currentUser = session.user;
+            $('adminName').textContent = email.split('@')[0];
+            $('adminAvatar').src = 'https://ui-avatars.com/api/?name='+encodeURIComponent(email.split('@')[0])+'&background=7c3aed&color=fff&size=100';
             return true;
         }
+        function handleLogout(){ if(supabaseConfigured) supabase.auth.signOut(); showToast('Logged out','success'); setTimeout(function(){ window.location.href='index.html'; }, 800); }
 
-        function handleLogout() {
-            if (supabaseConfigured) supabase.auth.signOut();
-            showToast('Logged out', 'success');
-            setTimeout(function() { window.location.href = 'index.html'; }, 800);
+        function toggleMobileSidebar(){ $('sidebar').classList.toggle('mobile-open'); $('sidebarOverlay').classList.toggle('active'); }
+        function showSection(section){
+            document.querySelectorAll('.section').forEach(function(el){ el.classList.remove('active'); });
+            var sec = $('section-'+section); if(sec) sec.classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.remove('active'); });
+            var nav = document.querySelector('.nav-item[data-section="'+section+'"]'); if(nav) nav.classList.add('active');
+            var titles = {dashboard:'Dashboard',users:'Users',courses:'Courses',classes:'Classes',projects:'Projects',tools:'Tools',resources:'Resources',premium:'Premium Management',payments:'Payments',settings:'Settings'};
+            $('pageTitle').textContent = titles[section] || section;
+            $('sidebar').classList.remove('mobile-open'); $('sidebarOverlay').classList.remove('active');
+            if(section==='dashboard') loadDashboard();
+            if(section==='users') loadUsers();
+            if(section==='courses') loadCourses();
+            if(section==='classes') loadClasses();
+            if(section==='projects') loadProjects();
+            if(section==='tools') loadTools();
+            if(section==='resources') loadResources();
+            if(section==='premium') loadPremium();
+            if(section==='payments') loadPayments();
+            if(section==='settings') loadSettings();
         }
+        function refreshAll(){ var active = document.querySelector('.nav-item.active'); var section = active ? active.dataset.section : 'dashboard'; showSection(section); showToast('Data refreshed','success'); }
 
-        // ============================================================
-        // NAVIGATION
-        // ============================================================
-        function toggleMobileSidebar() {
-            document.getElementById('sidebar').classList.toggle('mobile-open');
-        }
-
-        function showSection(section) {
-            document.querySelectorAll('[id^="section-"]').forEach(function(el) {
-                el.style.display = 'none';
-            });
-            document.getElementById('section-' + section).style.display = 'block';
-
-            document.querySelectorAll('.nav-item').forEach(function(el) {
-                el.classList.remove('active');
-            });
-            var navItem = document.querySelector('.nav-item[data-section="' + section + '"]');
-            if (navItem) navItem.classList.add('active');
-
-            var titles = {
-                dashboard: 'Dashboard',
-                users: 'Users',
-                projects: 'Projects',
-                courses: 'Courses',
-                premium: 'Premium',
-                payments: 'Payments'
-            };
-            document.getElementById('pageTitle').textContent = titles[section] || section;
-
-            document.getElementById('sidebar').classList.remove('mobile-open');
-
-            if (section === 'dashboard') loadDashboard();
-            if (section === 'users') loadUsers();
-            if (section === 'projects') loadProjects();
-            if (section === 'courses') loadCourses();
-            if (section === 'premium') loadPremium();
-            if (section === 'payments') loadPayments();
-        }
-
-        function refreshData() {
-            var active = document.querySelector('.nav-item.active');
-            var section = active ? active.dataset.section : 'dashboard';
-            if (section === 'dashboard') loadDashboard();
-            if (section === 'users') loadUsers();
-            if (section === 'projects') loadProjects();
-            if (section === 'courses') loadCourses();
-            if (section === 'premium') loadPremium();
-            if (section === 'payments') loadPayments();
-            showToast('Data refreshed', 'success');
-        }
-
-        // ============================================================
-        // DASHBOARD
-        // ============================================================
-        async function loadDashboard() {
-            if (!supabaseConfigured) {
-                showToast('⚠️ Supabase not configured', 'error');
-                return;
-            }
-
-            try {
-                var [users, projects, courses, payments] = await Promise.all([
+        async function loadDashboard(){
+            if(!supabaseConfigured) return;
+            try{
+                var [users, courses, projects, payments, classes, tools, resources, premium] = await Promise.all([
                     supabase.from('users').select('*'),
-                    supabase.from('projects').select('*'),
                     supabase.from('courses').select('*'),
-                    supabase.from('payments').select('*')
+                    supabase.from('projects').select('*'),
+                    supabase.from('payments').select('*'),
+                    supabase.from('classes').select('*'),
+                    supabase.from('tools').select('*'),
+                    supabase.from('resources').select('*'),
+                    supabase.from('users').select('*').eq('is_premium', true)
                 ]);
+                allUsers = users.data || []; allCourses = courses.data || []; allProjects = projects.data || [];
+                allPayments = payments.data || []; allClasses = classes.data || []; allTools = tools.data || [];
+                allResources = resources.data || []; allPremium = premium.data || [];
 
-                allUsers = users.data || [];
-                allProjects = projects.data || [];
-                allCourses = courses.data || [];
-                allPayments = payments.data || [];
+                var totalRevenue = allPayments.reduce(function(s,p){ return s + (p.amount||0); }, 0);
+                var pendingPayments = allPayments.filter(function(p){ return p.status==='pending'; }).length;
+                var freeCourses = allCourses.filter(function(c){ return c.is_free; }).length;
 
-                var premiumCount = allUsers.filter(function(u) { return u.is_premium; }).length;
-                var totalRevenue = allPayments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
+                $('dashStats').innerHTML = `
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon purple"><i class="fas fa-users"></i></div></div><div class="stat-value">${allUsers.length}</div><div class="stat-label">Total Users</div><div class="stat-change up"><i class="fas fa-arrow-up"></i> ${allPremium.length} premium</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon blue"><i class="fas fa-graduation-cap"></i></div></div><div class="stat-value">${allCourses.length}</div><div class="stat-label">Courses</div><div class="stat-change up"><i class="fas fa-arrow-up"></i> ${freeCourses} free</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon green"><i class="fas fa-folder-open"></i></div></div><div class="stat-value">${allProjects.length}</div><div class="stat-label">Projects</div><div class="stat-change up"><i class="fas fa-arrow-up"></i> Active</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon orange"><i class="fas fa-crown"></i></div></div><div class="stat-value">${allPremium.length}</div><div class="stat-label">Premium Users</div><div class="stat-change up"><i class="fas fa-arrow-up"></i> ${allUsers.length ? Math.round((allPremium.length/allUsers.length)*100) : 0}%</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon pink"><i class="fas fa-credit-card"></i></div></div><div class="stat-value">${formatCurrency(totalRevenue)}</div><div class="stat-label">Total Revenue</div><div class="stat-change ${pendingPayments>0?'up':'down'}"><i class="fas fa-${pendingPayments>0?'clock':'check'}"></i> ${pendingPayments} pending</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon cyan"><i class="fas fa-calendar-alt"></i></div></div><div class="stat-value">${allClasses.length}</div><div class="stat-label">Classes</div><div class="stat-change up"><i class="fas fa-arrow-up"></i> Scheduled</div></div>`;
 
-                document.getElementById('statsGrid').innerHTML = `
-                        <div class="stat-card">
-                            <div class="stat-icon purple"><i class="fas fa-users"></i></div>
-                            <div class="stat-value">${allUsers.length}</div>
-                            <div class="stat-label">Total Users</div>
-                            <div class="stat-change up">↑ Active</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon orange"><i class="fas fa-crown"></i></div>
-                            <div class="stat-value">${premiumCount}</div>
-                            <div class="stat-label">Premium Users</div>
-                            <div class="stat-change up">↑ ${premiumCount > 0 ? Math.round((premiumCount/allUsers.length)*100) : 0}%</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon green"><i class="fas fa-folder-open"></i></div>
-                            <div class="stat-value">${allProjects.length}</div>
-                            <div class="stat-label">Total Projects</div>
-                            <div class="stat-change up">↑ Active</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon blue"><i class="fas fa-graduation-cap"></i></div>
-                            <div class="stat-value">${allCourses.length}</div>
-                            <div class="stat-label">Total Courses</div>
-                            <div class="stat-change up">↑ Active</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon pink"><i class="fas fa-credit-card"></i></div>
-                            <div class="stat-value">${formatCurrency(totalRevenue)}</div>
-                            <div class="stat-label">Total Revenue</div>
-                            <div class="stat-change up">↑ ${allPayments.length} payments</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon cyan"><i class="fas fa-clock"></i></div>
-                            <div class="stat-value">${allPayments.filter(function(p){return p.status === 'pending';}).length}</div>
-                            <div class="stat-label">Pending Payments</div>
-                            <div class="stat-change ${allPayments.filter(function(p){return p.status === 'pending';}).length > 0 ? 'up' : 'down'}">
-                                ${allPayments.filter(function(p){return p.status === 'pending';}).length > 0 ? '⚠️ Action needed' : '✅ All clear'}
-                            </div>
-                        </div>
-                    `;
+                $('badgeUsers').textContent = allUsers.length;
+                $('badgeCourses').textContent = allCourses.length;
+                $('badgePremium').textContent = allPremium.length;
 
-                document.getElementById('userBadge').textContent = allUsers.length;
-                document.getElementById('premiumBadge').textContent = premiumCount;
+                renderCharts(totalRevenue);
+                loadActivity();
+            }catch(e){ console.error('Dashboard error:', e); showToast('Error loading dashboard','error'); }
+        }
 
-                var activity = allUsers.slice(0, 5).map(function(u) {
-                    return '<tr><td>' + (u.full_name || 'User') + '</td><td>Signed up</td><td>' + formatDate(u
-                        .created_at) + '</td></tr>';
+        function renderCharts(totalRevenue){
+            var ctx1 = $('revenueChart'); if(!ctx1) return;
+            if(revenueChartInst) revenueChartInst.destroy();
+            var monthly = [0,0,0,0,0,0,0];
+            allPayments.forEach(function(p){ var d=new Date(p.created_at); var idx=6-(new Date().getMonth()-d.getMonth()); if(idx>=0&&idx<7) monthly[idx]+=(p.amount||0); });
+            revenueChartInst = new Chart(ctx1, { type:'bar', data:{ labels:['Jan','Feb','Mar','Apr','May','Jun','Jul'].slice(-7), datasets:[{ label:'Revenue (NGN)', data:monthly, backgroundColor:'rgba(124,58,237,0.7)', borderColor:'rgba(124,58,237,1)', borderWidth:1, borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{ grid:{color:'rgba(148,163,184,0.05)'}, ticks:{color:'var(--text-muted)'} }, x:{ grid:{display:false}, ticks:{color:'var(--text-muted)'} } } } });
+
+            var ctx2 = $('userChart'); if(!ctx2) return;
+            if(userChartInst) userChartInst.destroy();
+            var students = allUsers.filter(function(u){ return u.role==='student'; }).length;
+            var instructors = allUsers.filter(function(u){ return u.role==='instructor'; }).length;
+            var admins = allUsers.filter(function(u){ return u.role==='admin'; }).length;
+            userChartInst = new Chart(ctx2, { type:'doughnut', data:{ labels:['Students','Instructors','Admins'], datasets:[{ data:[students,instructors,admins], backgroundColor:['rgba(124,58,237,0.8)','rgba(59,130,246,0.8)','rgba(239,68,68,0.8)'], borderColor:'var(--bg-card)', borderWidth:3 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ color:'var(--text-secondary)', font:{size:11}, boxWidth:12 } } }, cutout:'65%' } });
+        }
+
+        async function loadActivity(){
+            if(!supabaseConfigured) return;
+            try{
+                var { data } = await supabase.from('activity_log').select('*, users(full_name, avatar_url)').order('created_at',{ascending:false}).limit(20);
+                allActivity = data || [];
+                var tbody = $('activityBody');
+                if(!allActivity.length){ tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)">No recent activity</td></tr>'; return; }
+                tbody.innerHTML = allActivity.map(function(a){
+                    var name = a.users ? (a.users.full_name || 'User') : 'User';
+                    var avatar = a.users ? (a.users.avatar_url || 'https://ui-avatars.com/api/?name='+encodeURIComponent(name)+'&background=7c3aed&color=fff&size=100') : 'https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=100';
+                    var actionColors = {user:'var(--accent-blue)',project:'var(--accent-orange)',course:'var(--accent-violet)',class:'var(--accent-cyan)',payment:'var(--accent-green)',comment:'var(--accent-pink)',enrollment:'var(--accent-purple)'};
+                    var color = actionColors[a.entity_type] || 'var(--text-muted)';
+                    return '<tr><td><div class="cell-user"><img src="'+avatar+'" alt=""><div class="cell-info"><div class="name">'+name+'</div></div></div></td><td style="color:'+color+'">'+a.action+'</td><td>'+(a.entity_type||'—')+'</td><td>'+formatTimeAgo(a.created_at)+'</td></tr>';
                 }).join('');
-
-                document.getElementById('activityBody').innerHTML = activity ||
-                    '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:20px;">No activity</td></tr>';
-
-            } catch (e) {
-                console.error('Dashboard error:', e);
-                showToast('Error loading dashboard', 'error');
-            }
+            }catch(e){ console.error('Activity error:', e); }
         }
 
-        // ============================================================
-        // USERS CRUD
-        // ============================================================
-        async function loadUsers() {
-            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
-
-            try {
-                var { data } = await supabase.from('users').select('*').order('created_at', { ascending: false });
-                allUsers = data || [];
-                renderUsers(allUsers);
-            } catch (e) {
-                showToast('Error loading users', 'error');
-            }
+        async function loadUsers(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return; }
+            try{ var { data } = await supabase.from('users').select('*').order('created_at',{ascending:false}); allUsers = data || []; renderUsers(allUsers); }catch(e){ showToast('Error loading users','error'); }
         }
-
-        function renderUsers(users) {
-            var tbody = document.getElementById('usersBody');
-            if (!users || users.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No users found</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = users.map(function(u) {
-                var roleBadge = u.role === 'admin' ? 'badge-danger' : u.role === 'instructor' ? 'badge-info' :
-                    'badge-success';
-                var statusBadge = u.status === 'active' ? 'status-pill active' : u.status === 'pending' ?
-                    'status-pill pending' : 'status-pill inactive';
-                var premiumBadge = u.is_premium ?
-                    '<span class="badge badge-premium"><i class="fas fa-crown"></i> Premium</span>' :
-                    '<span class="badge badge-warning">Free</span>';
-
-                return '<tr>' +
-                    '<td><strong style="color:var(--text-primary);">' + (u.full_name || 'Unknown') + '</strong></td>' +
-                    '<td>' + (u.email || '') + '</td>' +
-                    '<td><span class="badge ' + roleBadge + '">' + (u.role || 'student') + '</span></td>' +
-                    '<td><span class="' + statusBadge + '">' + (u.status || 'active') + '</span></td>' +
-                    '<td>' + premiumBadge + '</td>' +
-                    '<td>' +
-                    '<button class="btn btn-sm btn-secondary" onclick="togglePremium(\'' + u.id + '\')" title="Toggle Premium"><i class="fas fa-crown"></i></button> ' +
-                    '<button class="btn btn-sm btn-danger" onclick="deleteUser(\'' + u.id + '\')" title="Delete"><i class="fas fa-trash"></i></button>' +
-                    '</td>' +
-                    '</tr>';
+        function renderUsers(users){
+            var tbody = $('usersBody');
+            if(!users || !users.length){ tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">No users found</td></tr>'; return; }
+            tbody.innerHTML = users.map(function(u){
+                var avatar = u.avatar_url || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.full_name||'User')+'&background=7c3aed&color=fff&size=100';
+                var premiumBadge = u.is_premium ? '<span class="badge badge-purple"><i class="fas fa-crown"></i> Premium</span>' : '<span class="badge badge-muted">Free</span>';
+                return '<tr><td><div class="cell-user"><img src="'+avatar+'" alt=""><div class="cell-info"><div class="name">'+(u.full_name||'Unknown')+'</div></div></div></td><td>'+(u.email||'')+'</td><td><span class="badge '+getBadgeClass(u.role)+'">'+(u.role||'student')+'</span></td><td><span class="badge '+getStatusClass(u.status)+'">'+(u.status||'active')+'</span></td><td>'+premiumBadge+'</td><td>'+formatDate(u.created_at)+'</td><td><button class="btn btn-sm btn-secondary" onclick="openUserModal(' + JSON.stringify(u.id).replace(/"/g,'&quot;') + ')" title="Edit"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-success" onclick="togglePremium(' + JSON.stringify(u.id).replace(/"/g,'&quot;') + ')" title="Toggle Premium"><i class="fas fa-crown"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteUser(' + JSON.stringify(u.id).replace(/"/g,'&quot;') + ')" title="Delete"><i class="fas fa-trash"></i></button></td></tr>';
             }).join('');
         }
-
-        function filterUsers() {
-            var query = document.getElementById('userSearch').value.toLowerCase();
-            var role = document.getElementById('userRoleFilter').value;
-            var status = document.getElementById('userStatusFilter').value;
-            var premium = document.getElementById('userPremiumFilter').value;
-
-            var filtered = allUsers.filter(function(u) {
-                var matchName = (u.full_name || '').toLowerCase().includes(query);
-                var matchEmail = (u.email || '').toLowerCase().includes(query);
-                var matchRole = !role || u.role === role;
-                var matchStatus = !status || u.status === status;
-                var matchPremium = premium === '' || String(u.is_premium) === premium;
-                return (matchName || matchEmail) && matchRole && matchStatus && matchPremium;
+        function filterUsers(){
+            var q = $('userSearch').value.toLowerCase();
+            var role = $('userRoleFilter').value, status = $('userStatusFilter').value, prem = $('userPremiumFilter').value;
+            var filtered = allUsers.filter(function(u){
+                var match = (u.full_name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+                return match && (!role || u.role===role) && (!status || u.status===status) && (prem==='' || String(u.is_premium)===prem);
             });
-
             renderUsers(filtered);
         }
-
-        async function saveUser() {
-            var id = document.getElementById('editUserId').value;
-            var name = document.getElementById('userName').value.trim();
-            var email = document.getElementById('userEmail').value.trim();
-            var role = document.getElementById('userRole').value;
-            var status = document.getElementById('userStatus').value;
-
-            if (!name || !email) {
-                showToast('Please fill in all fields', 'error');
-                return;
-            }
-
-            var payload = {
-                full_name: name,
-                email: email,
-                role: role,
-                status: status,
-                updated_at: new Date().toISOString()
-            };
-
-            if (id) {
-                var { error } = await supabase.from('users').update(payload).eq('id', id);
-                if (error) { showToast('Error updating user', 'error'); return; }
-                showToast('User updated', 'success');
+        function openUserModal(id){
+            $('userModalTitle').textContent = id ? 'Edit User' : 'Add User';
+            $('editUserId').value = id || '';
+            $('passwordGroup').style.display = id ? 'none' : 'block';
+            if(id){
+                var u = allUsers.find(function(x){ return x.id===id; });
+                if(u){ $('userName').value = u.full_name || ''; $('userEmail').value = u.email || ''; $('userRole').value = u.role || 'student'; $('userStatus').value = u.status || 'active'; }
+            } else { $('userName').value=''; $('userEmail').value=''; $('userPassword').value=''; $('userRole').value='student'; $('userStatus').value='active'; }
+            openModal('userModal');
+        }
+        async function saveUser(){
+            var id = $('editUserId').value;
+            var name = $('userName').value.trim(), email = $('userEmail').value.trim(), role = $('userRole').value, status = $('userStatus').value;
+            if(!name || !email){ showToast('Please fill in all fields','error'); return; }
+            var payload = { full_name:name, email:email, role:role, status:status, updated_at:new Date().toISOString() };
+            if(id){
+                var { error } = await supabase.from('users').update(payload).eq('id',id);
+                if(error){ showToast('Error updating user: '+error.message,'error'); return; }
+                showToast('User updated','success');
             } else {
-                var password = document.getElementById('userPassword').value;
-                if (!password) { showToast('Please enter a password', 'error'); return; }
-                payload.password = password;
-                payload.is_premium = false;
-                payload.created_at = new Date().toISOString();
+                var pw = $('userPassword').value; if(!pw || pw.length<6){ showToast('Password must be at least 6 characters','error'); return; }
+                payload.password = pw; payload.is_premium = false; payload.created_at = new Date().toISOString();
                 var { error } = await supabase.from('users').insert(payload);
-                if (error) { showToast('Error creating user', 'error'); return; }
-                showToast('User created', 'success');
+                if(error){ showToast('Error creating user: '+error.message,'error'); return; }
+                showToast('User created','success');
             }
-
-            closeModal('userModal');
-            resetUserForm();
-            loadUsers();
-            loadDashboard();
+            closeModal('userModal'); loadUsers(); loadDashboard();
         }
-
-        function resetUserForm() {
-            document.getElementById('editUserId').value = '';
-            document.getElementById('userName').value = '';
-            document.getElementById('userEmail').value = '';
-            document.getElementById('userPassword').value = '';
-            document.getElementById('userModalTitle').textContent = 'Add User';
-            document.getElementById('passwordGroup').style.display = 'block';
+        async function togglePremium(id){
+            var u = allUsers.find(function(x){ return x.id===id; }); if(!u) return;
+            var newStatus = !u.is_premium;
+            var payload = { is_premium:newStatus, updated_at:new Date().toISOString() };
+            if(newStatus){ payload.premium_start = new Date().toISOString(); payload.premium_end = new Date(Date.now()+180*24*60*60*1000).toISOString(); }
+            else { payload.premium_start = null; payload.premium_end = null; }
+            var { error } = await supabase.from('users').update(payload).eq('id',id);
+            if(error){ showToast('Error toggling premium','error'); return; }
+            showToast((u.full_name||'User')+' is now '+(newStatus?'Premium':'Free'),'success');
+            loadUsers(); loadDashboard(); if($('section-premium').classList.contains('active')) loadPremium();
         }
+        async function deleteUser(id){ if(!confirm('Delete this user permanently?')) return; var { error } = await supabase.from('users').delete().eq('id',id); if(error){ showToast('Error deleting user','error'); return; } showToast('User deleted','success'); loadUsers(); loadDashboard(); }
 
-        async function togglePremium(id) {
-            var user = allUsers.find(function(u) { return u.id === id; });
-            if (!user) return;
-
-            var newStatus = !user.is_premium;
-            var { error } = await supabase.from('users').update({
-                is_premium: newStatus,
-                premium_start: newStatus ? new Date().toISOString() : null,
-                premium_end: newStatus ? new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString() : null
-            }).eq('id', id);
-
-            if (error) { showToast('Error updating premium', 'error'); return; }
-            showToast(user.full_name + ' is now ' + (newStatus ? 'Premium' : 'Free'), 'success');
-            loadUsers();
-            loadDashboard();
-            loadPremium();
+        async function loadCourses(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return; }
+            try{ var { data } = await supabase.from('courses').select('*').order('created_at',{ascending:false}); allCourses = data || []; renderCourses(allCourses); }catch(e){ showToast('Error loading courses','error'); }
         }
-
-        async function deleteUser(id) {
-            if (!confirm('Delete this user?')) return;
-            var { error } = await supabase.from('users').delete().eq('id', id);
-            if (error) { showToast('Error deleting user', 'error'); return; }
-            showToast('User deleted', 'success');
-            loadUsers();
-            loadDashboard();
-            loadPremium();
-        }
-
-        // ============================================================
-        // PROJECTS CRUD
-        // ============================================================
-        async function loadProjects() {
-            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
-
-            try {
-                var { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
-                allProjects = data || [];
-                renderProjects(allProjects);
-            } catch (e) {
-                showToast('Error loading projects', 'error');
-            }
-        }
-
-        function renderProjects(projects) {
-            var tbody = document.getElementById('projectsBody');
-            if (!projects || projects.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No projects found</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = projects.map(function(p) {
-                var statusBadge = p.status === 'completed' ? 'status-pill completed' : p.status === 'in-progress' ?
-                    'status-pill in-progress' : 'status-pill pending';
-                return '<tr>' +
-                    '<td><strong style="color:var(--text-primary);">' + (p.title || 'Untitled') + '</strong></td>' +
-                    '<td><span class="badge badge-info">' + (p.category || 'General') + '</span></td>' +
-                    '<td>❤️ ' + (p.likes || 0) + '</td>' +
-                    '<td><span class="' + statusBadge + '">' + (p.status || 'pending') + '</span></td>' +
-                    '<td>' +
-                    '<button class="btn btn-sm btn-danger" onclick="deleteProject(\'' + p.id + '\')"><i class="fas fa-trash"></i></button>' +
-                    '</td>' +
-                    '</tr>';
+        function renderCourses(courses){
+            var tbody = $('coursesBody');
+            if(!courses || !courses.length){ tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">No courses found</td></tr>'; return; }
+            tbody.innerHTML = courses.map(function(c){
+                return '<tr><td><strong style="color:var(--text-primary)">'+(c.title||'Untitled')+'</strong></td><td>'+(c.instructor||'—')+'</td><td><span class="badge badge-info">'+(c.category||'General')+'</span></td><td>'+(c.is_free?'Free':formatCurrency(c.price))+'</td><td>'+(c.enrollment_count||0)+'</td><td><span class="badge '+(c.is_active?'badge-success':'badge-muted')+'">'+(c.is_active?'Active':'Inactive')+'</span></td><td><button class="btn btn-sm btn-secondary" onclick="openCourseModal(' + JSON.stringify(c.id).replace(/"/g,'&quot;') + ')" title="Edit"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteCourse(' + JSON.stringify(c.id).replace(/"/g,'&quot;') + ')" title="Delete"><i class="fas fa-trash"></i></button></td></tr>';
             }).join('');
         }
-
-        function filterProjects() {
-            var query = document.getElementById('projectSearch').value.toLowerCase();
-            var filtered = allProjects.filter(function(p) {
-                return (p.title || '').toLowerCase().includes(query);
-            });
-            renderProjects(filtered);
-        }
-
-        async function saveProject() {
-            var title = document.getElementById('projectTitle').value.trim();
-            var desc = document.getElementById('projectDesc').value.trim();
-            var category = document.getElementById('projectCategory').value;
-            var status = document.getElementById('projectStatus').value;
-
-            if (!title) { showToast('Please enter a title', 'error'); return; }
-
-            var { error } = await supabase.from('projects').insert({
-                title: title,
-                description: desc,
-                category: category,
-                status: status,
-                likes: 0,
-                comments_count: 0,
-                author_name: 'Admin',
-                is_active: true,
-                created_at: new Date().toISOString()
-            });
-
-            if (error) { showToast('Error creating project', 'error'); return; }
-            showToast('Project created', 'success');
-            closeModal('projectModal');
-            loadProjects();
-            loadDashboard();
-        }
-
-        async function deleteProject(id) {
-            if (!confirm('Delete this project?')) return;
-            var { error } = await supabase.from('projects').delete().eq('id', id);
-            if (error) { showToast('Error deleting project', 'error'); return; }
-            showToast('Project deleted', 'success');
-            loadProjects();
-            loadDashboard();
-        }
-
-        // ============================================================
-        // COURSES CRUD
-        // ============================================================
-        async function loadCourses() {
-            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
-
-            try {
-                var { data } = await supabase.from('courses').select('*').order('created_at', { ascending: false });
-                allCourses = data || [];
-                renderCourses(allCourses);
-            } catch (e) {
-                showToast('Error loading courses', 'error');
-            }
-        }
-
-        function renderCourses(courses) {
-            var tbody = document.getElementById('coursesBody');
-            if (!courses || courses.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No courses found</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = courses.map(function(c) {
-                return '<tr>' +
-                    '<td><strong style="color:var(--text-primary);">' + (c.title || 'Untitled') + '</strong></td>' +
-                    '<td>' + (c.instructor || 'Unknown') + '</td>' +
-                    '<td><span class="badge badge-info">' + (c.category || 'General') + '</span></td>' +
-                    '<td>' + (c.is_free ? 'Free' : formatCurrency(c.price)) + '</td>' +
-                    '<td>' +
-                    '<button class="btn btn-sm btn-secondary" onclick="editCourse(\'' + c.id + '\')"><i class="fas fa-edit"></i></button> ' +
-                    '<button class="btn btn-sm btn-danger" onclick="deleteCourse(\'' + c.id + '\')"><i class="fas fa-trash"></i></button>' +
-                    '</td>' +
-                    '</tr>';
-            }).join('');
-        }
-
-        function filterCourses() {
-            var query = document.getElementById('courseSearch').value.toLowerCase();
-            var filtered = allCourses.filter(function(c) {
-                return (c.title || '').toLowerCase().includes(query) ||
-                    (c.instructor || '').toLowerCase().includes(query);
-            });
-            renderCourses(filtered);
-        }
-
-        function editCourse(id) {
-            var course = allCourses.find(function(c) { return c.id === id; });
-            if (!course) return;
-
-            document.getElementById('editCourseId').value = id;
-            document.getElementById('courseTitle').value = course.title || '';
-            document.getElementById('courseInstructor').value = course.instructor || '';
-            document.getElementById('courseCategory').value = course.category || 'ui-ux';
-            document.getElementById('coursePrice').value = course.price || 0;
-            document.getElementById('courseDuration').value = course.duration_hours || 10;
-            document.getElementById('courseBadge').value = course.badge || '';
-            document.getElementById('courseImage').value = course.image || '';
-
+        function filterCourses(){ var q = $('courseSearch').value.toLowerCase(); var filtered = allCourses.filter(function(c){ return (c.title||'').toLowerCase().includes(q) || (c.instructor||'').toLowerCase().includes(q); }); renderCourses(filtered); }
+        function openCourseModal(id){
+            $('courseModalTitle').textContent = id ? 'Edit Course' : 'Add Course';
+            $('editCourseId').value = id || '';
+            if(id){ var c = allCourses.find(function(x){ return x.id===id; }); if(c){ $('courseTitle').value=c.title||''; $('courseDesc').value=c.description||''; $('courseInstructor').value=c.instructor||''; $('courseCategory').value=c.category||'ui-ux'; $('coursePrice').value=c.price||0; $('courseDuration').value=c.duration_hours||10; $('courseBadge').value=c.badge||''; $('courseFeatured').value=String(c.is_featured||false); }}
+            else { $('courseTitle').value=''; $('courseDesc').value=''; $('courseInstructor').value=''; $('courseCategory').value='ui-ux'; $('coursePrice').value=0; $('courseDuration').value=10; $('courseBadge').value=''; $('courseFeatured').value='false'; }
             openModal('courseModal');
-            document.querySelector('#courseModal h2').textContent = 'Edit Course';
         }
-
-        async function saveCourse() {
-            var id = document.getElementById('editCourseId').value;
-            var title = document.getElementById('courseTitle').value.trim();
-            var instructor = document.getElementById('courseInstructor').value.trim();
-            var category = document.getElementById('courseCategory').value;
-            var price = parseInt(document.getElementById('coursePrice').value) || 0;
-            var duration = parseInt(document.getElementById('courseDuration').value) || 10;
-            var badge = document.getElementById('courseBadge').value;
-            var image = document.getElementById('courseImage').value.trim();
-
-            if (!title) { showToast('Please enter a title', 'error'); return; }
-
-            var payload = {
-                title: title,
-                instructor: instructor || 'Admin',
-                category: category,
-                price: price,
-                is_free: price === 0,
-                duration_hours: duration,
-                badge: badge || '',
-                image: image || '',
-                updated_at: new Date().toISOString()
-            };
-
-            if (id) {
-                var { error } = await supabase.from('courses').update(payload).eq('id', id);
-                if (error) { showToast('Error updating course', 'error'); return; }
-                showToast('Course updated', 'success');
-            } else {
-                payload.is_active = true;
-                payload.created_at = new Date().toISOString();
-                var { error } = await supabase.from('courses').insert(payload);
-                if (error) { showToast('Error creating course', 'error'); return; }
-                showToast('Course created', 'success');
-            }
-
-            closeModal('courseModal');
-            document.getElementById('editCourseId').value = '';
-            document.querySelector('#courseModal h2').textContent = 'Add Course';
-            loadCourses();
-            loadDashboard();
+        async function saveCourse(){
+            var id = $('editCourseId').value;
+            var title = $('courseTitle').value.trim(), desc = $('courseDesc').value.trim(), instructor = $('courseInstructor').value.trim();
+            var category = $('courseCategory').value, price = parseInt($('coursePrice').value)||0, duration = parseInt($('courseDuration').value)||0;
+            var badge = $('courseBadge').value, featured = $('courseFeatured').value === 'true';
+            if(!title){ showToast('Please enter a course title','error'); return; }
+            var payload = { title:title, description:desc, instructor:instructor, category:category, price:price, is_free:price===0, duration_hours:duration, badge:badge||null, is_featured:featured, updated_at:new Date().toISOString() };
+            if(id){ var { error } = await supabase.from('courses').update(payload).eq('id',id); if(error){ showToast('Error updating course','error'); return; } showToast('Course updated','success'); }
+            else { payload.is_active = true; payload.enrollment_count = 0; payload.created_at = new Date().toISOString(); var { error } = await supabase.from('courses').insert(payload); if(error){ showToast('Error creating course','error'); return; } showToast('Course created','success'); }
+            closeModal('courseModal'); loadCourses(); loadDashboard();
         }
+        async function deleteCourse(id){ if(!confirm('Delete this course?')) return; var { error } = await supabase.from('courses').delete().eq('id',id); if(error){ showToast('Error deleting course','error'); return; } showToast('Course deleted','success'); loadCourses(); loadDashboard(); }
 
-        async function deleteCourse(id) {
-            if (!confirm('Delete this course?')) return;
-            var { error } = await supabase.from('courses').delete().eq('id', id);
-            if (error) { showToast('Error deleting course', 'error'); return; }
-            showToast('Course deleted', 'success');
-            loadCourses();
-            loadDashboard();
+        async function loadClasses(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return; }
+            try{ var { data } = await supabase.from('classes').select('*').order('date',{ascending:true}); allClasses = data || []; renderClasses(allClasses); }catch(e){ showToast('Error loading classes','error'); }
         }
+        function renderClasses(classes){
+            var tbody = $('classesBody');
+            if(!classes || !classes.length){ tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">No classes found</td></tr>'; return; }
+            tbody.innerHTML = classes.map(function(c){
+                var typeBadge = c.class_type==='premium'?'badge-purple':c.class_type==='paid'?'badge-warning':'badge-success';
+                return '<tr><td><strong style="color:var(--text-primary)">'+(c.title||'Untitled')+'</strong></td><td>'+(c.course||'—')+'</td><td>'+formatDate(c.date)+' '+new Date(c.date).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})+'</td><td><span class="badge '+typeBadge+'">'+(c.class_type||'free')+'</span></td><td>'+(c.capacity||50)+'</td><td><button class="btn btn-sm btn-danger" onclick="deleteClass(' + JSON.stringify(c.id).replace(/"/g,'&quot;') + ')"><i class="fas fa-trash"></i></button></td></tr>';
+            }).join('');
+        }
+        async function saveClass(){
+            var title = $('classTitle').value.trim(), course = $('classCourse').value.trim(), date = $('classDate').value;
+            var duration = parseInt($('classDuration').value)||2, type = $('classType').value, capacity = parseInt($('classCapacity').value)||50;
+            var whatsapp = $('classWhatsapp').value.trim(), telegram = $('classTelegram').value.trim(), zoom = $('classZoom').value.trim();
+            if(!title || !date){ showToast('Please fill in title and date','error'); return; }
+            var payload = { title:title, course:course, date:date, duration:duration, duration_minutes:duration*60, class_type:type, capacity:capacity, whatsapp:whatsapp||null, telegram:telegram||null, zoom_link:zoom||null, is_active:true, created_at:new Date().toISOString() };
+            var { error } = await supabase.from('classes').insert(payload);
+            if(error){ showToast('Error creating class: '+error.message,'error'); return; }
+            showToast('Class created','success'); closeModal('classModal'); loadClasses(); loadDashboard();
+        }
+        async function deleteClass(id){ if(!confirm('Delete this class?')) return; var { error } = await supabase.from('classes').delete().eq('id',id); if(error){ showToast('Error deleting class','error'); return; } showToast('Class deleted','success'); loadClasses(); loadDashboard(); }
 
-        // ============================================================
-        // PREMIUM MANAGEMENT
-        // ============================================================
-        async function loadPremium() {
-            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+        async function loadProjects(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return; }
+            try{ var { data } = await supabase.from('projects').select('*').order('created_at',{ascending:false}); allProjects = data || []; renderProjects(allProjects); }catch(e){ showToast('Error loading projects','error'); }
+        }
+        function renderProjects(projects){
+            var tbody = $('projectsBody');
+            if(!projects || !projects.length){ tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">No projects found</td></tr>'; return; }
+            tbody.innerHTML = projects.map(function(p){
+                return '<tr><td><strong style="color:var(--text-primary)">'+(p.title||'Untitled')+'</strong></td><td>'+(p.author_name||'Anonymous')+'</td><td><span class="badge badge-info">'+(p.category||'General')+'</span></td><td>❤️ '+(p.likes||0)+'</td><td><span class="badge '+getStatusClass(p.status)+'">'+(p.status||'pending')+'</span></td><td><button class="btn btn-sm btn-danger" onclick="deleteProject(' + JSON.stringify(p.id).replace(/"/g,'&quot;') + ')"><i class="fas fa-trash"></i></button></td></tr>';
+            }).join('');
+        }
+        function filterProjects(){ var q = $('projectSearch').value.toLowerCase(); var filtered = allProjects.filter(function(p){ return (p.title||'').toLowerCase().includes(q); }); renderProjects(filtered); }
+        async function deleteProject(id){ if(!confirm('Delete this project?')) return; var { error } = await supabase.from('projects').delete().eq('id',id); if(error){ showToast('Error deleting project','error'); return; } showToast('Project deleted','success'); loadProjects(); loadDashboard(); }
 
-            try {
-                var [premiumUsers, pendingRequests] = await Promise.all([
-                    supabase.from('users').select('*').eq('is_premium', true).order('premium_start', { ascending: false }),
-                    supabase.from('premium_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false })
+        async function loadTools(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return; }
+            try{ var { data } = await supabase.from('tools').select('*').order('created_at',{ascending:false}); allTools = data || []; renderTools(allTools); }catch(e){ showToast('Error loading tools','error'); }
+        }
+        function renderTools(tools){
+            var tbody = $('toolsBody');
+            if(!tools || !tools.length){ tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">No tools found</td></tr>'; return; }
+            tbody.innerHTML = tools.map(function(t){
+                return '<tr><td><strong style="color:var(--text-primary)">'+(t.name||'Untitled')+'</strong></td><td><span class="badge badge-info">'+(t.category||'general')+'</span></td><td>'+(t.is_free?'Free':formatCurrency(t.price))+'</td><td>'+(t.link?'<a href="'+t.link+'" target="_blank" style="color:var(--accent-cyan);font-size:12px">Open <i class="fas fa-external-link-alt" style="font-size:9px"></i></a>':'—')+'</td><td><button class="btn btn-sm btn-danger" onclick="deleteTool(' + JSON.stringify(t.id).replace(/"/g,'&quot;') + ')"><i class="fas fa-trash"></i></button></td></tr>';
+            }).join('');
+        }
+        async function saveTool(){
+            var name = $('toolName').value.trim(), desc = $('toolDesc').value.trim(), category = $('toolCategory').value;
+            var price = parseInt($('toolPrice').value)||0, link = $('toolLink').value.trim();
+            if(!name){ showToast('Please enter a tool name','error'); return; }
+            var payload = { name:name, description:desc, category:category, price:price, is_free:price===0, link:link||null, is_active:true, created_at:new Date().toISOString() };
+            var { error } = await supabase.from('tools').insert(payload);
+            if(error){ showToast('Error creating tool: '+error.message,'error'); return; }
+            showToast('Tool created','success'); closeModal('toolModal'); loadTools(); loadDashboard();
+        }
+        async function deleteTool(id){ if(!confirm('Delete this tool?')) return; var { error } = await supabase.from('tools').delete().eq('id',id); if(error){ showToast('Error deleting tool','error'); return; } showToast('Tool deleted','success'); loadTools(); loadDashboard(); }
+
+        async function loadResources(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return; }
+            try{ var { data } = await supabase.from('resources').select('*').order('created_at',{ascending:false}); allResources = data || []; renderResources(allResources); }catch(e){ showToast('Error loading resources','error'); }
+        }
+        function renderResources(resources){
+            var tbody = $('resourcesBody');
+            if(!resources || !resources.length){ tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">No resources found</td></tr>'; return; }
+            tbody.innerHTML = resources.map(function(r){
+                var typeBadge = r.resource_type==='premium'?'badge-purple':r.resource_type==='paid'?'badge-warning':'badge-success';
+                return '<tr><td><strong style="color:var(--text-primary)">'+(r.title||'Untitled')+'</strong></td><td><span class="badge '+typeBadge+'">'+(r.resource_type||'free')+'</span></td><td>'+(r.download_count||0)+'</td><td>'+(r.price?formatCurrency(r.price):'Free')+'</td><td><button class="btn btn-sm btn-danger" onclick="deleteResource(' + JSON.stringify(r.id).replace(/"/g,'&quot;') + ')"><i class="fas fa-trash"></i></button></td></tr>';
+            }).join('');
+        }
+        async function saveResource(){
+            var title = $('resTitle').value.trim(), desc = $('resDesc').value.trim(), type = $('resType').value;
+            var price = parseInt($('resPrice').value)||0, url = $('resUrl').value.trim();
+            if(!title){ showToast('Please enter a resource title','error'); return; }
+            var payload = { title:title, description:desc, resource_type:type, price:price, file_url:url||null, is_active:true, created_at:new Date().toISOString() };
+            var { error } = await supabase.from('resources').insert(payload);
+            if(error){ showToast('Error creating resource: '+error.message,'error'); return; }
+            showToast('Resource created','success'); closeModal('resourceModal'); loadResources(); loadDashboard();
+        }
+        async function deleteResource(id){ if(!confirm('Delete this resource?')) return; var { error } = await supabase.from('resources').delete().eq('id',id); if(error){ showToast('Error deleting resource','error'); return; } showToast('Resource deleted','success'); loadResources(); loadDashboard(); }
+
+        async function loadPremium(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return; }
+            try{
+                var [premiumUsers, pendingReqs] = await Promise.all([
+                    supabase.from('users').select('*').eq('is_premium',true).order('premium_start',{ascending:false}),
+                    supabase.from('premium_requests').select('*').eq('status','pending').order('created_at',{ascending:false})
                 ]);
-
-                allPremiumUsers = premiumUsers.data || [];
-                allPendingRequests = pendingRequests.data || [];
-
-                document.getElementById('premiumStats').innerHTML = `
-                        <div class="stat-card">
-                            <div class="stat-icon orange"><i class="fas fa-crown"></i></div>
-                            <div class="stat-value">${allPremiumUsers.length}</div>
-                            <div class="stat-label">Active Premium Users</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon purple"><i class="fas fa-users"></i></div>
-                            <div class="stat-value">${allUsers.filter(function(u){return u.is_premium;}).length}</div>
-                            <div class="stat-label">Total Premium</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon blue"><i class="fas fa-clock"></i></div>
-                            <div class="stat-value">${allPendingRequests.length}</div>
-                            <div class="stat-label">Pending Requests</div>
-                        </div>
-                    `;
-
-                renderPremium(allPremiumUsers);
-                renderPending(allPendingRequests);
-
-            } catch (e) {
-                showToast('Error loading premium', 'error');
-            }
+                allPremium = premiumUsers.data || []; allPending = pendingReqs.data || [];
+                $('premiumStats').innerHTML = `
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon orange"><i class="fas fa-crown"></i></div></div><div class="stat-value">${allPremium.length}</div><div class="stat-label">Active Premium</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon purple"><i class="fas fa-users"></i></div></div><div class="stat-value">${allUsers.filter(function(u){return u.is_premium;}).length}</div><div class="stat-label">Total Premium</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon blue"><i class="fas fa-clock"></i></div></div><div class="stat-value">${allPending.length}</div><div class="stat-label">Pending Requests</div></div>`;
+                var ptbody = $('premiumBody');
+                if(!allPremium.length){ ptbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">No premium users</td></tr>'; }
+                else { ptbody.innerHTML = allPremium.map(function(u){ return '<tr><td><strong style="color:var(--text-primary)">'+(u.full_name||'Unknown')+'</strong></td><td>'+(u.email||'')+'</td><td>'+formatDate(u.premium_start)+'</td><td>'+formatDate(u.premium_end)+'</td><td><button class="btn btn-sm btn-danger" onclick="togglePremium(' + JSON.stringify(u.id).replace(/"/g,'&quot;') + ')"><i class="fas fa-crown"></i> Revoke</button></td></tr>'; }).join(''); }
+                var pntbody = $('pendingBody');
+                if(!allPending.length){ pntbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">No pending requests</td></tr>'; }
+                else { pntbody.innerHTML = allPending.map(function(r){ return '<tr><td><strong style="color:var(--text-primary)">'+(r.user_name||'Unknown')+'</strong></td><td>'+(r.user_email||'')+'</td><td>'+formatCurrency(r.amount||13500)+'</td><td>'+formatDate(r.created_at)+'</td><td><button class="btn btn-sm btn-success" onclick="confirmPremium(' + JSON.stringify(r.id).replace(/"/g,'&quot;') + ', ' + JSON.stringify('confirm').replace(/"/g,'&quot;') + ')"><i class="fas fa-check"></i></button> <button class="btn btn-sm btn-danger" onclick="confirmPremium(' + JSON.stringify(r.id).replace(/"/g,'&quot;') + ', ' + JSON.stringify('reject').replace(/"/g,'&quot;') + ')"><i class="fas fa-times"></i></button></td></tr>'; }).join(''); }
+            }catch(e){ showToast('Error loading premium data','error'); }
         }
-
-        function renderPremium(users) {
-            var tbody = document.getElementById('premiumBody');
-            if (!users || users.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No premium users</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = users.map(function(u) {
-                return '<tr>' +
-                    '<td><strong style="color:var(--text-primary);">' + (u.full_name || 'Unknown') + '</strong></td>' +
-                    '<td>' + (u.email || '') + '</td>' +
-                    '<td>' + formatDate(u.premium_start) + '</td>' +
-                    '<td>' + formatDate(u.premium_end) + '</td>' +
-                    '<td><button class="btn btn-sm btn-danger" onclick="togglePremium(\'' + u.id + '\')"><i class="fas fa-crown"></i> Revoke</button></td>' +
-                    '</tr>';
-            }).join('');
-        }
-
-        function renderPending(requests) {
-            var tbody = document.getElementById('pendingBody');
-            if (!requests || requests.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No pending requests</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = requests.map(function(r) {
-                return '<tr>' +
-                    '<td><strong style="color:var(--text-primary);">' + (r.user_name || 'Unknown') + '</strong></td>' +
-                    '<td>' + (r.user_email || '') + '</td>' +
-                    '<td>' + formatCurrency(r.amount || 13500) + '</td>' +
-                    '<td>' + formatDate(r.created_at) + '</td>' +
-                    '<td>' +
-                    '<button class="btn btn-sm btn-success" onclick="confirmPremium(\'' + r.id + '\', \'confirm\')"><i class="fas fa-check"></i></button> ' +
-                    '<button class="btn btn-sm btn-danger" onclick="confirmPremium(\'' + r.id + '\', \'reject\')"><i class="fas fa-times"></i></button>' +
-                    '</td>' +
-                    '</tr>';
-            }).join('');
-        }
-
-        async function confirmPremium(requestId, action) {
-            var request = allPendingRequests.find(function(r) { return r.id === requestId; });
-            if (!request) return;
-
-            if (action === 'confirm') {
-                var { error: userError } = await supabase.from('users').update({
-                    is_premium: true,
-                    premium_start: new Date().toISOString(),
-                    premium_end: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
-                    payment_status: 'confirmed'
-                }).eq('id', request.user_id);
-
-                if (userError) { showToast('Error updating user', 'error'); return; }
-
-                await supabase.from('premium_requests').update({
-                    status: 'confirmed',
-                    confirmed_by: currentUser?.id,
-                    confirmed_at: new Date().toISOString()
-                }).eq('id', requestId);
-
-                await supabase.from('payments').insert({
-                    user_id: request.user_id,
-                    user_email: request.user_email,
-                    amount: request.amount || 13500,
-                    payment_type: 'premium',
-                    item: 'Premium Subscription',
-                    status: 'completed',
-                    created_at: new Date().toISOString()
-                });
-
-                showToast('Premium confirmed for ' + (request.user_name || 'user'), 'success');
-                loadPremium();
-                loadUsers();
-                loadDashboard();
-
+        async function confirmPremium(reqId, action){
+            var req = allPending.find(function(r){ return r.id===reqId; }); if(!req) return;
+            if(action==='confirm'){
+                var { error:userErr } = await supabase.from('users').update({ is_premium:true, premium_start:new Date().toISOString(), premium_end:new Date(Date.now()+180*24*60*60*1000).toISOString(), payment_status:'confirmed' }).eq('id',req.user_id);
+                if(userErr){ showToast('Error confirming premium','error'); return; }
+                await supabase.from('premium_requests').update({ status:'confirmed', confirmed_by:currentUser?.id, confirmed_at:new Date().toISOString() }).eq('id',reqId);
+                await supabase.from('payments').insert({ user_id:req.user_id, user_email:req.user_email, amount:req.amount||13500, payment_type:'premium', item:'Premium Subscription', status:'completed', created_at:new Date().toISOString() });
+                showToast('Premium confirmed for '+(req.user_name||'user'),'success');
             } else {
-                await supabase.from('premium_requests').update({
-                    status: 'rejected',
-                    confirmed_by: currentUser?.id,
-                    confirmed_at: new Date().toISOString()
-                }).eq('id', requestId);
-
-                showToast('Premium request rejected', 'warning');
-                loadPremium();
+                await supabase.from('premium_requests').update({ status:'rejected', confirmed_by:currentUser?.id, confirmed_at:new Date().toISOString() }).eq('id',reqId);
+                showToast('Premium request rejected','warning');
             }
+            loadPremium(); loadDashboard(); loadPayments();
         }
 
-        // ============================================================
-        // PAYMENTS
-        // ============================================================
-        async function loadPayments() {
-            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
-
-            try {
-                var { data } = await supabase.from('payments').select('*').order('created_at', { ascending: false });
-                allPayments = data || [];
-
-                var totalRevenue = allPayments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
-                var completed = allPayments.filter(function(p) { return p.status === 'completed'; });
-                var pending = allPayments.filter(function(p) { return p.status === 'pending'; });
-
-                document.getElementById('paymentStats').innerHTML = `
-                        <div class="stat-card">
-                            <div class="stat-icon green"><i class="fas fa-money-bill-wave"></i></div>
-                            <div class="stat-value">${formatCurrency(totalRevenue)}</div>
-                            <div class="stat-label">Total Revenue</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon blue"><i class="fas fa-check-circle"></i></div>
-                            <div class="stat-value">${completed.length}</div>
-                            <div class="stat-label">Completed</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
-                            <div class="stat-value">${pending.length}</div>
-                            <div class="stat-label">Pending</div>
-                        </div>
-                    `;
-
-                renderPayments(allPayments);
-            } catch (e) {
-                showToast('Error loading payments', 'error');
-            }
+        async function loadPayments(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return; }
+            try{ var { data } = await supabase.from('payments').select('*').order('created_at',{ascending:false}); allPayments = data || [];
+                var totalRev = allPayments.reduce(function(s,p){ return s+(p.amount||0); },0);
+                var completed = allPayments.filter(function(p){ return p.status==='completed'; }).length;
+                var pending = allPayments.filter(function(p){ return p.status==='pending'; }).length;
+                $('paymentStats').innerHTML = `
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon green"><i class="fas fa-money-bill-wave"></i></div></div><div class="stat-value">${formatCurrency(totalRev)}</div><div class="stat-label">Total Revenue</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon blue"><i class="fas fa-check-circle"></i></div></div><div class="stat-value">${completed}</div><div class="stat-label">Completed</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon orange"><i class="fas fa-clock"></i></div></div><div class="stat-value">${pending}</div><div class="stat-label">Pending</div></div>`;
+                var tbody = $('paymentsBody');
+                if(!allPayments.length){ tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">No payments found</td></tr>'; return; }
+                var typeMap = {premium:'<span class="badge badge-purple"><i class="fas fa-crown"></i> Premium</span>',course:'<span class="badge badge-info"><i class="fas fa-graduation-cap"></i> Course</span>',tool:'<span class="badge badge-warning"><i class="fas fa-tools"></i> Tool</span>',resource:'<span class="badge badge-pink"><i class="fas fa-download"></i> Resource</span>'};
+                tbody.innerHTML = allPayments.map(function(p){ return '<tr><td>'+(p.user_email||'Unknown')+'</td><td><strong style="color:var(--accent-green)">'+formatCurrency(p.amount)+'</strong></td><td>'+(typeMap[p.payment_type]||p.payment_type||'—')+'</td><td>'+(p.item||'—')+'</td><td><span class="badge '+getStatusClass(p.status)+'">'+(p.status||'pending')+'</span></td><td>'+formatDate(p.created_at)+'</td></tr>'; }).join('');
+            }catch(e){ showToast('Error loading payments','error'); }
         }
 
-        function renderPayments(payments) {
-            var tbody = document.getElementById('paymentsBody');
-            if (!payments || payments.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No payments found</td></tr>';
-                return;
-            }
-
-            var typeMap = {
-                'premium': '<span class="badge badge-premium"><i class="fas fa-crown"></i> Premium</span>',
-                'course': '<span class="badge badge-info"><i class="fas fa-graduation-cap"></i> Course</span>',
-                'tool': '<span class="badge badge-warning"><i class="fas fa-tools"></i> Tool</span>'
-            };
-
-            tbody.innerHTML = payments.map(function(p) {
-                var statusBadge = p.status === 'completed' ? 'status-pill completed' : p.status === 'pending' ?
-                    'status-pill pending' : 'status-pill inactive';
-                return '<tr>' +
-                    '<td>' + (p.user_email || 'Unknown') + '</td>' +
-                    '<td><strong style="color:var(--accent-green);">' + formatCurrency(p.amount) + '</strong></td>' +
-                    '<td>' + (typeMap[p.payment_type] || p.payment_type || '—') + '</td>' +
-                    '<td><span class="' + statusBadge + '">' + (p.status || 'pending') + '</span></td>' +
-                    '<td>' + formatDate(p.created_at) + '</td>' +
-                    '</tr>';
-            }).join('');
+        async function loadSettings(){
+            if(!supabaseConfigured){ showToast('Supabase not configured','error'); return; }
+            try{ var { data } = await supabase.from('site_settings').select('*').order('key',{ascending:true}); allSettings = data || [];
+                var container = $('settingsBody');
+                if(!allSettings.length){ container.innerHTML = '<div class="empty-state"><i class="fas fa-cog"></i><h3>No settings found</h3></div>'; return; }
+                container.innerHTML = '<div class="form-row">' + allSettings.map(function(s){
+                    var inputType = s.type==='boolean' ? 'select' : s.type==='number' ? 'number' : 'text';
+                    var inputHtml = s.type==='boolean' ? '<select id="setting-'+s.id+'"><option value="true" '+(s.value==='true'?'selected':'')+'>True</option><option value="false" '+(s.value==='false'?'selected':'')+'>False</option></select>' : '<input type="'+inputType+'" id="setting-'+s.id+'" value="'+(s.value||'')+'">';
+                    return '<div class="form-group"><label>'+s.key+' <span style="color:var(--text-muted);font-weight:400">('+s.type+')</span></label><p style="font-size:11px;color:var(--text-muted);margin-bottom:6px">'+s.description+'</p>'+inputHtml+'</div>';
+                }).join('') + '</div>';
+            }catch(e){ showToast('Error loading settings','error'); }
+        }
+        async function saveSettings(){
+            if(!allSettings.length) return;
+            var updates = allSettings.map(function(s){ return { id:s.id, value:$('setting-'+s.id).value, updated_at:new Date().toISOString() }; });
+            var { error } = await supabase.from('site_settings').upsert(updates);
+            if(error){ showToast('Error saving settings','error'); return; }
+            showToast('Settings saved','success'); loadSettings();
         }
 
-        // ============================================================
-        // KEYBOARD SHORTCUTS
-        // ============================================================
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.active').forEach(function(el) {
-                    el.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
+        $('sidebarToggle')?.addEventListener('click', function(){
+            $('sidebar').classList.toggle('collapsed'); $('mainContent').classList.toggle('sidebar-collapsed');
+            setTimeout(function(){ if(revenueChartInst) revenueChartInst.resize(); if(userChartInst) userChartInst.resize(); }, 350);
         });
+        $('sidebarOverlay')?.addEventListener('click', function(){ $('sidebar').classList.remove('mobile-open'); $('sidebarOverlay').classList.remove('active'); });
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ document.querySelectorAll('.modal-overlay.active').forEach(function(el){ el.classList.remove('active'); document.body.style.overflow=''; }); } });
 
-        // ============================================================
-        // INIT
-        // ============================================================
-        function init() {
-            checkAuth();
-            loadDashboard();
-            loadUsers();
-            loadProjects();
-            loadCourses();
-            loadPremium();
-            loadPayments();
-
-            setTimeout(function() {
-                document.getElementById('loadingOverlay').classList.add('hidden');
-            }, 800);
+        async function init(){
+            var authed = await checkAuth(); if(!authed) return;
+            loadDashboard(); loadUsers(); loadCourses(); loadClasses(); loadProjects(); loadTools(); loadResources(); loadPremium(); loadPayments(); loadSettings();
+            setTimeout(function(){ $('loadingOverlay').classList.add('hidden'); }, 600);
         }
+        if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-        // Expose globally
-        window.showSection = showSection;
-        window.openModal = openModal;
-        window.closeModal = closeModal;
-        window.saveUser = saveUser;
-        window.togglePremium = togglePremium;
-        window.deleteUser = deleteUser;
-        window.saveProject = saveProject;
-        window.deleteProject = deleteProject;
-        window.saveCourse = saveCourse;
-        window.deleteCourse = deleteCourse;
-        window.editCourse = editCourse;
-        window.confirmPremium = confirmPremium;
-        window.loadPremium = loadPremium;
-        window.toggleMobileSidebar = toggleMobileSidebar;
-        window.handleLogout = handleLogout;
-        window.refreshData = refreshData;
-        window.showToast = showToast;
-        window.filterUsers = filterUsers;
-        window.filterProjects = filterProjects;
-        window.filterCourses = filterCourses;
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
+        window.showSection = showSection; window.openModal = openModal; window.closeModal = closeModal; window.openUserModal = openUserModal; window.openCourseModal = openCourseModal;
+        window.saveUser = saveUser; window.togglePremium = togglePremium; window.deleteUser = deleteUser;
+        window.saveCourse = saveCourse; window.deleteCourse = deleteCourse; window.saveClass = saveClass; window.deleteClass = deleteClass;
+        window.saveTool = saveTool; window.deleteTool = deleteTool; window.saveResource = saveResource; window.deleteResource = deleteResource;
+        window.confirmPremium = confirmPremium; window.saveSettings = saveSettings; window.refreshAll = refreshAll;
+        window.toggleMobileSidebar = toggleMobileSidebar; window.handleLogout = handleLogout;
+        window.filterUsers = filterUsers; window.filterCourses = filterCourses; window.filterProjects = filterProjects;
+    })();
     </script>
-
 </body>
 </html>
