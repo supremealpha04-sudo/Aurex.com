@@ -163,9 +163,8 @@ async function syncMessages() {
     try {
         const db = await openDB();
         const messages = await db.getAll('messages');
-        
+
         for (const message of messages) {
-            // Try to send each queued message
             try {
                 const response = await fetch('/api/messages', {
                     method: 'POST',
