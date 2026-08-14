@@ -384,8 +384,8 @@
                 </a>
                 <div class="nav-links">
                     <a href="#home" class="nav-link active"><i class="fas fa-home" style="font-size:0.8rem;"></i> Home</a>
-                    <a href="#academy" class="nav-link"><i class="fas fa-graduation-cap" style="font-size:0.8rem;"></i> Academy</a>
-                    <a href="#projects" class="nav-link"><i class="fas fa-briefcase" style="font-size:0.8rem;"></i> Projects</a>
+                    <a href="academy.html" class="nav-link"><i class="fas fa-graduation-cap" style="font-size:0.8rem;"></i> Academy</a>
+                    <a href="projects.html" class="nav-link"><i class="fas fa-briefcase" style="font-size:0.8rem;"></i> Projects</a>
                     <a href="#about" class="nav-link"><i class="fas fa-user" style="font-size:0.8rem;"></i> About</a>
                     <a href="#services" class="nav-link"><i class="fas fa-cogs" style="font-size:0.8rem;"></i> Services</a>
                     <a href="#contact" class="nav-link"><i class="fas fa-envelope" style="font-size:0.8rem;"></i> Contact</a>
@@ -472,7 +472,7 @@
                 </div>
                 <div class="ceo-card">
                     <div class="ceo-image-wrapper">
-                        <img src="IMG-20260403-WA0021(1).jpg" alt="Mustapha Oniyangi - CEO of Aurex Designs" class="ceo-image">
+                        <img src="ceo.jpg" alt="Mustapha Oniyangi - CEO of Aurex Designs" class="ceo-image">
                         <div class="ceo-image-badge"><i class="fas fa-crown"></i> Founder & CEO</div>
                     </div>
                     <div class="ceo-content">
@@ -687,7 +687,7 @@
                     <i class="fas fa-copyright" style="margin-right:4px;"></i> <span id="currentYear">2026</span> Aurex Designs Studio. All rights reserved.<br>
                     Crafted with <i class="fas fa-heart" style="color:var(--error);"></i> by
                     <a href="https://supreme-amerweb.vercel.app" target="_blank" rel="noopener" class="footer-credit-logo">
-                        <img src="IMG-20260403-WA0021(1).jpg" alt="SupremeAmer" class="credit-logo-img">
+                        <img src="Amer.jpg" alt="SupremeAmer" class="credit-logo-img">
                         SupremeAmer
                     </a>
                 </p>
@@ -695,18 +695,17 @@
         </div>
     </footer>
 
-    <!-- Bottom Navigation Bar - 3 Buttons Only -->
     <nav class="bottom-nav" id="bottomNav">
         <div class="bottom-nav-inner">
             <a href="#home" class="bottom-nav-btn active" id="bottomNavHome">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
-            <a href="#academy" class="bottom-nav-btn" id="bottomNavAcademy">
+            <a href="academy.html" class="bottom-nav-btn" id="bottomNavAcademy">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Academy</span>
             </a>
-            <a href="#projects" class="bottom-nav-btn" id="bottomNavProjects">
+            <a href="projects.html" class="bottom-nav-btn" id="bottomNavProjects">
                 <i class="fas fa-briefcase"></i>
                 <span>Projects</span>
             </a>
@@ -721,10 +720,6 @@
     <script>
     (function() {
         'use strict';
-
-        // ============================================
-        // CONFIGURATION
-        // ============================================
         const CONFIG = {
             supabase: {
                 url: 'https://brmoagghggdeumkfijmm.supabase.co',
@@ -733,10 +728,7 @@
             adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
         };
 
-        // ============================================
-        // SUPABASE INITIALIZATION
-        // ============================================
-        let supabase = null;
+       let supabase = null;
         try {
             supabase = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
             console.log('Supabase initialized');
@@ -744,10 +736,7 @@
             console.error('Supabase init failed:', e);
         }
 
-        // ============================================
-        // TOAST NOTIFICATIONS
-        // ============================================
-        function showToast(message, type) {
+      function showToast(message, type) {
             type = type || 'success';
             var container = document.getElementById('toastContainer');
             if (!container) return;
@@ -769,10 +758,7 @@
             }, 3000);
         }
 
-        // ============================================
-        // PROJECTS MODULE - Dynamic from Supabase
-        // ============================================
-        var ProjectsModule = {
+           var ProjectsModule = {
             init: function() {
                 this.loadProjects();
                 this.setupRealtime();
@@ -850,10 +836,7 @@
             }
         };
 
-        // ============================================
-        // ACADEMY MODULE - Dynamic Courses from Supabase
-        // ============================================
-        var AcademyModule = {
+       var AcademyModule = {
             init: function() {
                 this.loadCourses();
             },
@@ -915,10 +898,7 @@
             }
         };
 
-        // ============================================
-        // THEME MODULE
-        // ============================================
-        var ThemeModule = {
+         var ThemeModule = {
             init: function() {
                 var toggle = document.getElementById('themeToggle');
                 var icon = document.getElementById('themeIcon');
@@ -938,10 +918,7 @@
             }
         };
 
-        // ============================================
-        // NAVIGATION MODULE
-        // ============================================
-        var NavModule = {
+var NavModule = {
             init: function() {
                 var header = document.getElementById('header');
                 var menuToggle = document.getElementById('menuToggle');
@@ -1003,10 +980,7 @@
             }
         };
 
-        // ============================================
-        // BOTTOM NAVIGATION MODULE - 3 Items
-        // ============================================
-        var BottomNavModule = {
+     var BottomNavModule = {
             init: function() {
                 var sections = ['home', 'academy', 'projects', 'about', 'services', 'skills', 'contact'];
                 window.addEventListener('scroll', function() {
@@ -1031,9 +1005,7 @@
             }
         };
 
-        // ============================================
-        // LOADING MODULE
-        // ============================================
+
         var LoadingModule = {
             init: function() {
                 var self = this;
@@ -1079,9 +1051,6 @@
             }
         };
 
-        // ============================================
-        // CONTACT FORM MODULE
-        // ============================================
         var ContactModule = {
             init: function() {
                 var form = document.getElementById('contactForm');
@@ -1100,9 +1069,6 @@
             }
         };
 
-        // ============================================
-        // GSAP ANIMATIONS
-        // ============================================
         var GsapModule = {
             init: function() {
                 if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
@@ -1117,10 +1083,7 @@
             }
         };
 
-        // ============================================
-        // PWA / INSTALL MODULE
-        // ============================================
-        var InstallModule = {
+         var InstallModule = {
             deferredPrompt: null,
             init: function() {
                 var self = this;
