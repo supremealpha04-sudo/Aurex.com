@@ -1499,7 +1499,6 @@
         <i class="fas fa-check-circle"></i>
         <span id="toastMsg">Success!</span>
     </div>
-
 <script>
 (function() {
     var CONFIG = {
@@ -1514,6 +1513,7 @@
     var supabaseConfigured = false;
     var currentUser = null;
     var isPremium = false;
+    var userProfile = null;
     var allEnrollments = [];
     var allCertificates = [];
     var allAchievements = [];
@@ -1523,9 +1523,9 @@
         var { createClient } = window.supabase;
         supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
         supabaseConfigured = true;
-        console.log('✅ Supabase connected');
+        console.log('Supabase connected');
     } catch (e) {
-        console.error('❌ Supabase error:', e);
+        console.error('Supabase error:', e);
         supabaseConfigured = false;
     }
 
@@ -1557,20 +1557,17 @@
 
     async function checkAuth() {
         if (!supabaseConfigured) {
-            showToast('⚠️ Supabase not configured.', 'error');
+            showToast('Supabase not configured.', 'error');
             return;
         }
 
         try {
             var { data: { user }, error } = await supabaseClient.auth.getUser();
-
             if (error || !user) {
-                console.log('No user found');
                 showNoUserState();
                 return;
             }
 
-            console.log('✅ User found:', user.email);
             currentUser = user;
             
             var { data: profile } = await supabaseClient
@@ -1580,12 +1577,11 @@
                 .single();
 
             if (profile) {
-                console.log('✅ Profile loaded');
+                userProfile = profile;
                 isPremium = profile.is_premium || false;
                 updateUI(profile);
                 await loadUserData();
             } else {
-                console.log('⚠️ No profile found');
                 updateUI(user);
             }
 
@@ -1623,6 +1619,11 @@
         document.getElementById('profileAvatar').src = avatar;
         document.getElementById('userProfileImg').src = avatar.replace('size=200', 'size=100');
 
+        if (userProfile) {
+            document.getElementById('editBio').value = userProfile.bio || '';
+            document.getElementById('editPhone').value = userProfile.phone || '';
+        }
+
         var badgeRow = document.getElementById('badgeRow');
         var badges = '';
         if (isPremium) {
@@ -1648,19 +1649,13 @@
     }
 
     async function loadUserData() {
-        if (!currentUser) {
-            console.log('No current user');
-            return;
-        }
-
+        if (!currentUser) return;
         if (!supabaseConfigured) {
             showToast('Supabase not configured.', 'error');
             return;
         }
 
         try {
-            console.log('Loading user data for:', currentUser.id);
-
             var { data: profile } = await supabaseClient
                 .from('users')
                 .select('*')
@@ -1697,20 +1692,12 @@
 
             if (enrollError) {
                 console.error('Enrollments error:', enrollError);
-                var { data: altEnrollments, error: altError } = await supabaseClient
+                var { data: altEnrollments } = await supabaseClient
                     .from('enrollments')
                     .select('*')
                     .eq('user_id', currentUser.id);
-                
-                if (altError) {
-                    console.error('Alternative query failed:', altError);
-                    allEnrollments = [];
-                } else {
-                    console.log('Alternative query succeeded:', altEnrollments?.length || 0);
-                    allEnrollments = altEnrollments || [];
-                }
+                allEnrollments = altEnrollments || [];
             } else {
-                console.log('Enrollments loaded:', enrollments?.length || 0);
                 allEnrollments = enrollments || [];
             }
 
@@ -1725,7 +1712,6 @@
                     )
                 `)
                 .eq('user_id', currentUser.id);
-
             allCertificates = certificates || [];
 
             var { data: achievements } = await supabaseClient
@@ -1741,7 +1727,6 @@
                 `)
                 .eq('user_id', currentUser.id)
                 .eq('is_complete', true);
-
             allAchievements = achievements || [];
 
             var totalCourses = allEnrollments.length || 0;
@@ -1783,10 +1768,7 @@
 
     function renderEnrollments(enrollments) {
         var container = document.getElementById('enrollmentsList');
-        if (!container) {
-            console.error('enrollmentsList element not found');
-            return;
-        }
+        if (!container) return;
 
         if (!enrollments || enrollments.length === 0) {
             container.innerHTML =
@@ -2099,7 +2081,8 @@
             currentUser.user_metadata.is_premium = true;
             showToast('Premium activated successfully! 🎉', 'success');
             closePremiumModal();
-            await updateUI(currentUser);
+            await loadUserData();
+            updateUI(currentUser);
         } catch (e) {
             console.error('Premium upgrade error:', e);
             showToast('Error upgrading: ' + e.message, 'error');
@@ -2180,7 +2163,7 @@
 
     async function init() {
         autoDetectDevice();
-        console.log('🚀 Initializing Profile App...');
+        console.log('Initializing Profile App...');
         await checkAuth();
         setTimeout(function() {
             document.getElementById('loadingScreen').classList.add('hidden');
