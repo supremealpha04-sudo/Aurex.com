@@ -603,928 +603,1004 @@
 
     <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg">Success!</span></div>
 
-    <script>
-    (function() {
-        const CONFIG = {
-            supabase: {
-                url: 'https://brmoagghggdeumkfijmm.supabase.co',
-                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
-            },
-            adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
-        };
+<script>
+(function() {
+    const CONFIG = {
+        supabase: {
+            url: 'https://brmoagghggdeumkfijmm.supabase.co',
+            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
+        },
+        adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'],
+        storageBucket: 'aurex-assets'
+    };
 
-        let supabase = null;
-        let currentUser = null;
-        let isAdmin = false;
-        let dataCache = {};
-        let userChart = null;
-        let enrollmentChart = null;
+    let supabase = null;
+    let currentUser = null;
+    let isAdmin = false;
+    let dataCache = {};
+    let userChart = null;
+    let enrollmentChart = null;
 
-        function showToast(msg, type='success') {
-            const t = document.getElementById('toast');
-            t.innerHTML = '<i class="fas ' + (type==='success'?'fa-check-circle':'fa-exclamation-circle') + '"></i> <span>' + msg + '</span>';
-            t.className = 'toast ' + type + ' show';
-            clearTimeout(t._hide);
-            t._hide = setTimeout(() => t.classList.remove('show'), 3500);
+    function showToast(msg, type) {
+        type = type || 'success';
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i> <span>' + msg + '</span>';
+        t.className = 'toast ' + type + ' show';
+        clearTimeout(t._hide);
+        t._hide = setTimeout(function() { t.classList.remove('show'); }, 3500);
+    }
+
+    function formatDate(d) {
+        if (!d) return '—';
+        return new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
+    }
+
+    function formatCurrency(n) {
+        return '\u20A6' + (n||0).toLocaleString();
+    }
+
+    window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
+    window.openModal = function(id) { document.getElementById(id).classList.add('active'); };
+
+    window.showSection = function(name) {
+        document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+        document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+        document.getElementById('section-' + name).classList.add('active');
+        document.querySelector('.nav-item[data-section="' + name + '"]').classList.add('active');
+        const titles = {overview:'Admin Overview', users:'Manage Users', courses:'Manage Courses', classes:'Manage Classes', enrollments:'Manage Enrollments', projects:'Manage Projects', tools:'Manage Tools', resources:'Manage Resources', payments:'Payments', premium_requests:'Premium Requests', settings:'Site Settings', activity:'Activity Log'};
+        document.getElementById('pageTitle').textContent = titles[name] || 'Admin';
+    };
+
+    async function uploadFile(file, folder) {
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = folder + '/' + Date.now() + '-' + Math.random().toString(36).substring(7) + '.' + fileExt;
+            const { error: uploadError } = await supabase.storage
+                .from(CONFIG.storageBucket)
+                .upload(fileName, file);
+            if (uploadError) throw uploadError;
+            const { data: urlData } = supabase.storage
+                .from(CONFIG.storageBucket)
+                .getPublicUrl(fileName);
+            return urlData.publicUrl;
+        } catch (e) {
+            console.error('Upload error:', e);
+            showToast('Upload failed: ' + e.message, 'error');
+            return null;
+        }
+    }
+
+    async function init() {
+        try {
+            supabase = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+        } catch(e) {
+            showToast('Supabase connection failed', 'error');
+            document.getElementById('loadingScreen').classList.add('hidden');
+            return;
         }
 
-        function formatDate(d) {
-            if (!d) return '—';
-            return new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { window.location.href = 'auth.html'; return; }
+
+        currentUser = user;
+        document.getElementById('userName').textContent = user.email?.split('@')[0] || 'Admin';
+        document.getElementById('userProfileImg').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.email||'Admin') + '&background=7c3aed&color=fff&size=100';
+
+        const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
+        isAdmin = profile?.role === 'admin' || CONFIG.adminEmails.includes(user.email);
+
+        if (!isAdmin) {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('accessDenied').classList.add('active');
+            return;
         }
 
-        function formatCurrency(n) {
-            return '\u20A6' + (n||0).toLocaleString();
-        }
+        document.getElementById('adminApp').style.display = 'flex';
+        await refreshAll();
+        setTimeout(function() { document.getElementById('loadingScreen').classList.add('hidden'); }, 400);
+    }
 
-        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
-        window.openModal = function(id) { document.getElementById(id).classList.add('active'); };
+    window.refreshAll = async function() {
+        await Promise.all([
+            loadStats(), loadUsers(), loadCourses(), loadClasses(), loadEnrollments(),
+            loadProjects(), loadTools(), loadResources(), loadPayments(),
+            loadPremiumRequests(), loadSettings(), loadActivity()
+        ]);
+        await loadCourseOptions();
+        updateCharts();
+        updatePendingCount();
+    };
 
-        window.showSection = function(name) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('section-' + name).classList.add('active');
-            document.querySelector('.nav-item[data-section="' + name + '"]').classList.add('active');
-            const titles = {overview:'Admin Overview', users:'Manage Users', courses:'Manage Courses', classes:'Manage Classes', enrollments:'Manage Enrollments', projects:'Manage Projects', tools:'Manage Tools', resources:'Manage Resources', payments:'Payments', premium_requests:'Premium Requests', settings:'Site Settings', activity:'Activity Log'};
-            document.getElementById('pageTitle').textContent = titles[name] || 'Admin';
-        };
+    window.logout = async function() {
+        await supabase.auth.signOut();
+        window.location.href = 'index.html';
+    };
 
-        async function init() {
-            try {
-                supabase = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
-            } catch(e) {
-                showToast('Supabase connection failed', 'error');
-                document.getElementById('loadingScreen').classList.add('hidden');
-                return;
-            }
+    function updatePendingCount() {
+        const pending = (dataCache.premiumRequests || []).filter(function(r) { return r.status === 'pending'; }).length || 0;
+        document.getElementById('pendingCount').textContent = pending + ' pending';
+    }
 
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) { window.location.href = 'auth.html'; return; }
+    async function loadCourseOptions() {
+        const { data } = await supabase.from('courses').select('id, title').eq('is_active', true);
+        const select = document.getElementById('classCourseId');
+        if (!select) return;
+        select.innerHTML = '<option value="">Select a course...</option>' +
+            (data||[]).map(function(c) { return '<option value="' + c.id + '">' + c.title + '</option>'; }).join('');
+    }
 
-            currentUser = user;
-            document.getElementById('userName').textContent = user.email?.split('@')[0] || 'Admin';
-            document.getElementById('userProfileImg').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.email||'Admin') + '&background=7c3aed&color=fff&size=100';
-
-            const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
-            isAdmin = profile?.role === 'admin' || CONFIG.adminEmails.includes(user.email);
-
-            if (!isAdmin) {
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('accessDenied').classList.add('active');
-                return;
-            }
-
-            document.getElementById('adminApp').style.display = 'flex';
-            await refreshAll();
-            setTimeout(() => document.getElementById('loadingScreen').classList.add('hidden'), 400);
-        }
-
-        window.refreshAll = async function() {
-            await Promise.all([
-                loadStats(), loadUsers(), loadCourses(), loadClasses(), loadEnrollments(),
-                loadProjects(), loadTools(), loadResources(), loadPayments(), 
-                loadPremiumRequests(), loadSettings(), loadActivity()
+    async function loadStats() {
+        try {
+            const [{count:users}, {count:premium}, {count:courses}, {count:projects}, {count:tools}, {count:pending}, {count:classes}, {count:enrollments}] = await Promise.all([
+                supabase.from('users').select('*', {count:'exact', head:true}),
+                supabase.from('users').select('*', {count:'exact', head:true}).eq('is_premium', true),
+                supabase.from('courses').select('*', {count:'exact', head:true}),
+                supabase.from('projects').select('*', {count:'exact', head:true}),
+                supabase.from('tools').select('*', {count:'exact', head:true}),
+                supabase.from('premium_requests').select('*', {count:'exact', head:true}).eq('status', 'pending'),
+                supabase.from('classes').select('*', {count:'exact', head:true}).gte('date', new Date().toISOString()),
+                supabase.from('enrollments').select('*', {count:'exact', head:true})
             ]);
-            await loadCourseOptions();
-            updateCharts();
-            updatePendingCount();
-        };
+            document.getElementById('statTotalUsers').textContent = users || 0;
+            document.getElementById('statPremiumUsers').textContent = premium || 0;
+            document.getElementById('statTotalCourses').textContent = courses || 0;
+            document.getElementById('statTotalProjects').textContent = projects || 0;
+            document.getElementById('statTotalTools').textContent = tools || 0;
+            document.getElementById('statPendingRequests').textContent = pending || 0;
+            document.getElementById('statUpcomingClasses').textContent = classes || 0;
+            document.getElementById('statTotalEnrollments').textContent = enrollments || 0;
 
-        window.logout = async function() {
-            await supabase.auth.signOut();
-            window.location.href = 'index.html';
-        };
+            const { data: payments } = await supabase.from('payments').select('amount').eq('status', 'completed');
+            const revenue = (payments || []).reduce(function(a,b) { return a + (b.amount||0); }, 0);
+            document.getElementById('statRevenue').textContent = formatCurrency(revenue);
+        } catch(e) { console.error('Stats error', e); }
+    }
 
-        function updatePendingCount() {
-            const pending = dataCache.premiumRequests?.filter(r => r.status === 'pending').length || 0;
-            document.getElementById('pendingCount').textContent = pending + ' pending';
+    async function loadUsers() {
+        const { data } = await supabase.from('users').select('*').order('created_at', {ascending:false});
+        dataCache.users = data || [];
+        renderUsers(dataCache.users);
+    }
+
+    function renderUsers(users) {
+        const tbody = document.getElementById('usersTable');
+        if (!users || users.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-users"></i><p>No users found</p></td></tr>'; return; }
+        tbody.innerHTML = users.map(function(u) {
+            const roleBadge = u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : (u.role === 'instructor' ? '<span class="badge badge-premium">Instructor</span>' : '<span class="badge badge-free">Student</span>');
+            const statusBadge = u.status === 'active' ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">' + u.status + '</span>';
+            const premiumBadge = u.is_premium ? '<span class="badge badge-premium" style="margin-left:4px;"><i class="fas fa-crown"></i></span>' : '';
+            const enrolled = u.enrollment_count || 0;
+            return '<tr><td><div class="cell-title">' + (u.full_name || 'Unknown') + ' ' + premiumBadge + '</div></td><td>' + u.email + '</td><td>' + roleBadge + '</td><td>' + statusBadge + '</td><td>' + enrolled + '</td><td class="cell-meta">' + formatDate(u.created_at) + '</td><td><div class="table-actions"><button onclick="editUser(\'' + u.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteUser(\'' + u.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
+
+    window.filterUsers = function(q) {
+        const term = q.toLowerCase();
+        renderUsers(dataCache.users.filter(function(u) { return (u.full_name||'').toLowerCase().includes(term) || (u.email||'').toLowerCase().includes(term); }));
+    };
+
+    window.editUser = function(id) {
+        const u = dataCache.users.find(function(x) { return x.id === id; });
+        if (!u) return;
+        document.getElementById('editUserId').value = u.id;
+        document.getElementById('editUserName').value = u.full_name || '';
+        document.getElementById('editUserEmail').value = u.email || '';
+        document.getElementById('editUserRole').value = u.role || 'student';
+        document.getElementById('editUserStatus').value = u.status || 'active';
+        document.getElementById('editUserPremium').checked = u.is_premium || false;
+        document.getElementById('editUserInstructor').checked = u.user_type === 'instructor';
+        openModal('userModal');
+    };
+
+    window.handleUserSubmit = async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('editUserId').value;
+        const updates = {
+            full_name: document.getElementById('editUserName').value,
+            role: document.getElementById('editUserRole').value,
+            status: document.getElementById('editUserStatus').value,
+            is_premium: document.getElementById('editUserPremium').checked,
+            user_type: document.getElementById('editUserInstructor').checked ? 'instructor' : 'student'
+        };
+        const { error } = await supabase.from('users').update(updates).eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('User updated'); closeModal('userModal'); await loadUsers(); await loadStats();
+    };
+
+    window.deleteUser = async function(id) {
+        if (!confirm('Delete this user?')) return;
+        const { error } = await supabase.from('users').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('User deleted'); await loadUsers(); await loadStats();
+    };
+
+    async function loadCourses() {
+        const { data } = await supabase.from('courses').select('*').order('created_at', {ascending:false});
+        dataCache.courses = data || [];
+        renderCourses(dataCache.courses);
+    }
+
+    function renderCourses(courses) {
+        const tbody = document.getElementById('coursesTable');
+        if (!courses || courses.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-graduation-cap"></i><p>No courses found</p></td></tr>'; return; }
+        tbody.innerHTML = courses.map(function(c) {
+            const price = c.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(c.price);
+            const status = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
+            return '<tr><td><div class="cell-title">' + c.title + '</div><div class="cell-meta">' + (c.instructor || '') + '</div></td><td>' + (c.category || '') + '</td><td>' + price + '</td><td>' + status + '</td><td>' + (c.enrollment_count || 0) + '</td><td><div class="table-actions"><button onclick="editCourse(\'' + c.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteCourse(\'' + c.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
+
+    window.filterCourses = function(q) {
+        const term = q.toLowerCase();
+        renderCourses(dataCache.courses.filter(function(c) { return (c.title||'').toLowerCase().includes(term) || (c.category||'').toLowerCase().includes(term); }));
+    };
+
+    window.openCourseModal = function() {
+        document.getElementById('courseModalTitle').textContent = 'Add Course';
+        document.getElementById('courseForm').reset();
+        document.getElementById('courseId').value = '';
+        document.getElementById('courseImagePreview').src = '';
+        document.getElementById('courseImagePreview').style.display = 'none';
+        document.getElementById('courseError').textContent = '';
+        openModal('courseModal');
+    };
+
+    window.editCourse = function(id) {
+        const c = dataCache.courses.find(function(x) { return x.id === id; });
+        if (!c) return;
+        document.getElementById('courseModalTitle').textContent = 'Edit Course';
+        document.getElementById('courseId').value = c.id;
+        document.getElementById('courseTitle').value = c.title || '';
+        document.getElementById('courseDesc').value = c.description || '';
+        document.getElementById('courseCategory').value = c.category || '';
+        document.getElementById('coursePrice').value = c.price || 0;
+        document.getElementById('courseInstructor').value = c.instructor || '';
+        document.getElementById('courseDuration').value = c.duration || '';
+        document.getElementById('courseBadge').value = c.badge || '';
+        document.getElementById('courseIsFree').checked = c.is_free || false;
+        document.getElementById('courseIsActive').checked = c.is_active !== false;
+        document.getElementById('courseIsFeatured').checked = c.is_featured || false;
+        if (c.image) {
+            document.getElementById('courseImagePreview').src = c.image;
+            document.getElementById('courseImagePreview').style.display = 'block';
+        } else {
+            document.getElementById('courseImagePreview').style.display = 'none';
+        }
+        document.getElementById('courseError').textContent = '';
+        openModal('courseModal');
+    };
+
+    window.handleCourseSubmit = async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('courseId').value;
+        const imageFile = document.getElementById('courseImageFile').files[0];
+        let imageUrl = document.getElementById('courseImageUrl').value || '';
+
+        if (imageFile) {
+            const uploaded = await uploadFile(imageFile, 'courses');
+            if (uploaded) imageUrl = uploaded;
         }
 
-        async function loadCourseOptions() {
-            const { data } = await supabase.from('courses').select('id, title').eq('is_active', true);
-            const select = document.getElementById('classCourseId');
-            if (!select) return;
-            select.innerHTML = '<option value="">Select a course...</option>' + 
-                (data||[]).map(c => '<option value="' + c.id + '">' + c.title + '</option>').join('');
+        const payload = {
+            title: document.getElementById('courseTitle').value,
+            description: document.getElementById('courseDesc').value,
+            category: document.getElementById('courseCategory').value,
+            price: parseInt(document.getElementById('coursePrice').value) || 0,
+            instructor: document.getElementById('courseInstructor').value,
+            duration: document.getElementById('courseDuration').value,
+            image: imageUrl,
+            badge: document.getElementById('courseBadge').value || null,
+            is_free: document.getElementById('courseIsFree').checked,
+            is_active: document.getElementById('courseIsActive').checked,
+            is_featured: document.getElementById('courseIsFeatured').checked
+        };
+        let error;
+        if (id) {
+            const res = await supabase.from('courses').update(payload).eq('id', id);
+            error = res.error;
+        } else {
+            const res = await supabase.from('courses').insert([payload]);
+            error = res.error;
         }
+        if (error) { document.getElementById('courseError').textContent = error.message; return; }
+        showToast(id ? 'Course updated' : 'Course created'); closeModal('courseModal');
+        await loadCourses(); await loadStats(); await loadCourseOptions();
+        await logActivity(id ? 'updated' : 'created', 'course', payload.title);
+    };
 
-        // Stats
-        async function loadStats() {
-            try {
-                const [{count:users}, {count:premium}, {count:courses}, {count:projects}, {count:tools}, {count:pending}, {count:classes}, {count:enrollments}] = await Promise.all([
-                    supabase.from('users').select('*', {count:'exact', head:true}),
-                    supabase.from('users').select('*', {count:'exact', head:true}).eq('is_premium', true),
-                    supabase.from('courses').select('*', {count:'exact', head:true}),
-                    supabase.from('projects').select('*', {count:'exact', head:true}),
-                    supabase.from('tools').select('*', {count:'exact', head:true}),
-                    supabase.from('premium_requests').select('*', {count:'exact', head:true}).eq('status', 'pending'),
-                    supabase.from('classes').select('*', {count:'exact', head:true}).gte('date', new Date().toISOString()),
-                    supabase.from('enrollments').select('*', {count:'exact', head:true})
-                ]);
-                document.getElementById('statTotalUsers').textContent = users || 0;
-                document.getElementById('statPremiumUsers').textContent = premium || 0;
-                document.getElementById('statTotalCourses').textContent = courses || 0;
-                document.getElementById('statTotalProjects').textContent = projects || 0;
-                document.getElementById('statTotalTools').textContent = tools || 0;
-                document.getElementById('statPendingRequests').textContent = pending || 0;
-                document.getElementById('statUpcomingClasses').textContent = classes || 0;
-                document.getElementById('statTotalEnrollments').textContent = enrollments || 0;
+    window.deleteCourse = async function(id) {
+        if (!confirm('Delete this course?')) return;
+        const { error } = await supabase.from('courses').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Course deleted'); await loadCourses(); await loadStats(); await loadCourseOptions();
+    };
 
-                const { data: payments } = await supabase.from('payments').select('amount').eq('status', 'completed');
-                const revenue = (payments || []).reduce((a,b) => a + (b.amount||0), 0);
-                document.getElementById('statRevenue').textContent = formatCurrency(revenue);
-            } catch(e) { console.error('Stats error', e); }
+    async function loadClasses() {
+        const { data } = await supabase.from('classes').select('*').order('date', {ascending:true});
+        dataCache.classes = data || [];
+        renderClasses(dataCache.classes);
+    }
+
+    function renderClasses(classes) {
+        const tbody = document.getElementById('classesTable');
+        if (!classes || classes.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-calendar-alt"></i><p>No classes found</p></td></tr>'; return; }
+        tbody.innerHTML = classes.map(function(c) {
+            const typeBadge = c.class_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : (c.class_type === 'paid' ? '<span class="badge badge-admin">Paid</span>' : '<span class="badge badge-free">Free</span>');
+            const status = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
+            const requiresEnroll = c.requires_enrollment !== false ? '🔒 Enrolled only' : '🌐 Everyone';
+            return '<tr><td><div class="cell-title">' + c.title + '</div><div class="cell-meta">' + requiresEnroll + '</div></td><td>' + (c.course || c.course_id || '—') + '</td><td class="cell-meta">' + formatDate(c.date) + '</td><td>' + typeBadge + '</td><td>' + status + '</td><td><div class="table-actions"><button onclick="editClass(\'' + c.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteClass(\'' + c.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
+
+    window.openClassModal = function() {
+        document.getElementById('classModalTitle').textContent = 'Add Class';
+        document.getElementById('classForm').reset();
+        document.getElementById('classId').value = '';
+        document.getElementById('classError').textContent = '';
+        openModal('classModal');
+    };
+
+    window.editClass = function(id) {
+        const c = dataCache.classes.find(function(x) { return x.id === id; });
+        if (!c) return;
+        document.getElementById('classModalTitle').textContent = 'Edit Class';
+        document.getElementById('classId').value = c.id;
+        document.getElementById('classTitle').value = c.title || '';
+        document.getElementById('classCourseId').value = c.course_id || '';
+        document.getElementById('classDate').value = c.date ? new Date(c.date).toISOString().slice(0,16) : '';
+        document.getElementById('classDuration').value = c.duration || 2;
+        document.getElementById('classType').value = c.class_type || 'live';
+        document.getElementById('classRequiresEnrollment').value = c.requires_enrollment !== false ? 'true' : 'false';
+        document.getElementById('classDesc').value = c.description || '';
+        document.getElementById('classWhatsapp').value = c.whatsapp || '';
+        document.getElementById('classTelegram').value = c.telegram || '';
+        document.getElementById('classZoom').value = c.meeting_link || c.zoom_link || '';
+        document.getElementById('classRecording').value = c.recording_url || '';
+        document.getElementById('classIsActive').checked = c.is_active !== false;
+        document.getElementById('classIsRecorded').checked = c.is_recorded || false;
+        document.getElementById('classError').textContent = '';
+        openModal('classModal');
+    };
+
+    window.handleClassSubmit = async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('classId').value;
+        const courseId = document.getElementById('classCourseId').value;
+        const courseTitle = dataCache.courses?.find(function(c) { return c.id === courseId; })?.title || '';
+        const payload = {
+            title: document.getElementById('classTitle').value,
+            course_id: courseId,
+            course: courseTitle,
+            date: document.getElementById('classDate').value ? new Date(document.getElementById('classDate').value).toISOString() : null,
+            duration: parseInt(document.getElementById('classDuration').value) || 2,
+            class_type: document.getElementById('classType').value,
+            requires_enrollment: document.getElementById('classRequiresEnrollment').value === 'true',
+            description: document.getElementById('classDesc').value,
+            whatsapp: document.getElementById('classWhatsapp').value,
+            telegram: document.getElementById('classTelegram').value,
+            meeting_link: document.getElementById('classZoom').value,
+            zoom_link: document.getElementById('classZoom').value,
+            recording_url: document.getElementById('classRecording').value,
+            is_active: document.getElementById('classIsActive').checked,
+            is_recorded: document.getElementById('classIsRecorded').checked
+        };
+        let error;
+        if (id) {
+            const res = await supabase.from('classes').update(payload).eq('id', id);
+            error = res.error;
+        } else {
+            const res = await supabase.from('classes').insert([payload]);
+            error = res.error;
         }
+        if (error) { document.getElementById('classError').textContent = error.message; return; }
+        showToast(id ? 'Class updated' : 'Class created'); closeModal('classModal');
+        await loadClasses(); await loadStats();
+        await logActivity(id ? 'updated' : 'created', 'class', payload.title);
+    };
 
-        // Users
-        async function loadUsers() {
-            const { data } = await supabase.from('users').select('*').order('created_at', {ascending:false});
-            dataCache.users = data || [];
-            renderUsers(dataCache.users);
-        }
+    window.deleteClass = async function(id) {
+        if (!confirm('Delete this class?')) return;
+        const { error } = await supabase.from('classes').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Class deleted'); await loadClasses(); await loadStats();
+    };
 
-        function renderUsers(users) {
-            const tbody = document.getElementById('usersTable');
-            if (!users?.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-users"></i><p>No users found</p></td></tr>'; return; }
-            tbody.innerHTML = users.map(u => {
-                const roleBadge = u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : (u.role === 'instructor' ? '<span class="badge badge-premium">Instructor</span>' : '<span class="badge badge-free">Student</span>');
-                const statusBadge = u.status === 'active' ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">' + u.status + '</span>';
-                const premiumBadge = u.is_premium ? '<span class="badge badge-premium" style="margin-left:4px;"><i class="fas fa-crown"></i></span>' : '';
-                const enrolled = u.enrollment_count || 0;
-                return `<tr><td><div class="cell-title">${u.full_name || 'Unknown'} ${premiumBadge}</div></td><td>${u.email}</td><td>${roleBadge}</td><td>${statusBadge}</td><td>${enrolled}</td><td class="cell-meta">${formatDate(u.created_at)}</td><td><div class="table-actions"><button onclick="editUser('${u.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteUser('${u.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
-        }
+    async function loadEnrollments() {
+        const { data } = await supabase
+            .from('enrollments')
+            .select(`
+                *,
+                users:user_id (id, full_name, email),
+                courses:course_id (id, title)
+            `)
+            .order('enrolled_at', {ascending:false});
+        dataCache.enrollments = data || [];
+        renderEnrollments(dataCache.enrollments);
+    }
 
-        window.filterUsers = function(q) {
-            const term = q.toLowerCase();
-            renderUsers(dataCache.users.filter(u => (u.full_name||'').toLowerCase().includes(term) || (u.email||'').toLowerCase().includes(term)));
-        };
+    function renderEnrollments(enrollments) {
+        const tbody = document.getElementById('enrollmentsTable');
+        if (!enrollments || enrollments.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-book-open"></i><p>No enrollments found</p></td></tr>'; return; }
+        tbody.innerHTML = enrollments.map(function(e) {
+            const user = e.users || {};
+            const course = e.courses || {};
+            const statusBadge = e.status === 'active' ? '<span class="badge badge-active">Active</span>' :
+                (e.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' :
+                '<span class="badge badge-inactive">' + e.status + '</span>');
+            const progress = e.progress || 0;
+            return '<tr><td><div class="cell-title">' + (user.full_name || 'Unknown') + '</div><div class="cell-meta">' + (user.email || '') + '</div></td><td>' + (course.title || e.course_id || 'Unknown') + '</td><td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:4px;background:var(--bg-primary);border-radius:2px;overflow:hidden;"><div style="height:100%;width:' + progress + '%;background:var(--gradient-purple);border-radius:2px;"></div></div><span style="font-size:11px;font-weight:600;">' + progress + '%</span></div></td><td>' + statusBadge + '</td><td class="cell-meta">' + formatDate(e.enrolled_at || e.created_at) + '</td><td><div class="table-actions"><button class="delete" onclick="deleteEnrollment(\'' + e.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
 
-        window.editUser = function(id) {
-            const u = dataCache.users.find(x => x.id === id);
-            if (!u) return;
-            document.getElementById('editUserId').value = u.id;
-            document.getElementById('editUserName').value = u.full_name || '';
-            document.getElementById('editUserEmail').value = u.email || '';
-            document.getElementById('editUserRole').value = u.role || 'student';
-            document.getElementById('editUserStatus').value = u.status || 'active';
-            document.getElementById('editUserPremium').checked = u.is_premium || false;
-            document.getElementById('editUserInstructor').checked = u.user_type === 'instructor';
-            openModal('userModal');
-        };
-
-        window.handleUserSubmit = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('editUserId').value;
-            const updates = {
-                full_name: document.getElementById('editUserName').value,
-                role: document.getElementById('editUserRole').value,
-                status: document.getElementById('editUserStatus').value,
-                is_premium: document.getElementById('editUserPremium').checked,
-                user_type: document.getElementById('editUserInstructor').checked ? 'instructor' : 'student'
-            };
-            const { error } = await supabase.from('users').update(updates).eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('User updated'); closeModal('userModal'); await loadUsers(); await loadStats();
-        };
-
-        window.deleteUser = async function(id) {
-            if (!confirm('Delete this user?')) return;
-            const { error } = await supabase.from('users').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('User deleted'); await loadUsers(); await loadStats();
-        };
-
-        // Courses
-        async function loadCourses() {
-            const { data } = await supabase.from('courses').select('*').order('created_at', {ascending:false});
-            dataCache.courses = data || [];
-            renderCourses(dataCache.courses);
-        }
-
-        function renderCourses(courses) {
-            const tbody = document.getElementById('coursesTable');
-            if (!courses?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-graduation-cap"></i><p>No courses found</p></td></tr>'; return; }
-            tbody.innerHTML = courses.map(c => {
-                const price = c.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(c.price);
-                const status = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
-                return `<tr><td><div class="cell-title">${c.title}</div><div class="cell-meta">${c.instructor || ''}</div></td><td>${c.category || ''}</td><td>${price}</td><td>${status}</td><td>${c.enrollment_count || 0}</td><td><div class="table-actions"><button onclick="editCourse('${c.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteCourse('${c.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
-        }
-
-        window.filterCourses = function(q) {
-            const term = q.toLowerCase();
-            renderCourses(dataCache.courses.filter(c => (c.title||'').toLowerCase().includes(term) || (c.category||'').toLowerCase().includes(term)));
-        };
-
-        window.openCourseModal = function() {
-            document.getElementById('courseModalTitle').textContent = 'Add Course';
-            document.getElementById('courseForm').reset();
-            document.getElementById('courseId').value = '';
-            document.getElementById('courseError').textContent = '';
-            openModal('courseModal');
-        };
-
-        window.editCourse = function(id) {
-            const c = dataCache.courses.find(x => x.id === id);
-            if (!c) return;
-            document.getElementById('courseModalTitle').textContent = 'Edit Course';
-            document.getElementById('courseId').value = c.id;
-            document.getElementById('courseTitle').value = c.title || '';
-            document.getElementById('courseDesc').value = c.description || '';
-            document.getElementById('courseCategory').value = c.category || '';
-            document.getElementById('coursePrice').value = c.price || 0;
-            document.getElementById('courseInstructor').value = c.instructor || '';
-            document.getElementById('courseDuration').value = c.duration || '';
-            document.getElementById('courseImage').value = c.image || '';
-            document.getElementById('courseBadge').value = c.badge || '';
-            document.getElementById('courseIsFree').checked = c.is_free || false;
-            document.getElementById('courseIsActive').checked = c.is_active !== false;
-            document.getElementById('courseIsFeatured').checked = c.is_featured || false;
-            document.getElementById('courseError').textContent = '';
-            openModal('courseModal');
-        };
-
-        window.handleCourseSubmit = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('courseId').value;
-            const payload = {
-                title: document.getElementById('courseTitle').value,
-                description: document.getElementById('courseDesc').value,
-                category: document.getElementById('courseCategory').value,
-                price: parseInt(document.getElementById('coursePrice').value) || 0,
-                instructor: document.getElementById('courseInstructor').value,
-                duration: document.getElementById('courseDuration').value,
-                image: document.getElementById('courseImage').value,
-                badge: document.getElementById('courseBadge').value || null,
-                is_free: document.getElementById('courseIsFree').checked,
-                is_active: document.getElementById('courseIsActive').checked,
-                is_featured: document.getElementById('courseIsFeatured').checked
-            };
-            let error;
-            if (id) {
-                const res = await supabase.from('courses').update(payload).eq('id', id);
-                error = res.error;
-            } else {
-                const res = await supabase.from('courses').insert([payload]);
-                error = res.error;
-            }
-            if (error) { document.getElementById('courseError').textContent = error.message; return; }
-            showToast(id ? 'Course updated' : 'Course created'); closeModal('courseModal'); 
-            await loadCourses(); await loadStats(); await loadCourseOptions();
-            await logActivity(id ? 'updated' : 'created', 'course', payload.title);
-        };
-
-        window.deleteCourse = async function(id) {
-            if (!confirm('Delete this course?')) return;
-            const { error } = await supabase.from('courses').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Course deleted'); await loadCourses(); await loadStats(); await loadCourseOptions();
-        };
-
-        // Classes
-        async function loadClasses() {
-            const { data } = await supabase.from('classes').select('*').order('date', {ascending:true});
-            dataCache.classes = data || [];
-            renderClasses(dataCache.classes);
-        }
-
-        function renderClasses(classes) {
-            const tbody = document.getElementById('classesTable');
-            if (!classes?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-calendar-alt"></i><p>No classes found</p></td></tr>'; return; }
-            tbody.innerHTML = classes.map(c => {
-                const typeBadge = c.class_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : (c.class_type === 'paid' ? '<span class="badge badge-admin">Paid</span>' : '<span class="badge badge-free">Free</span>');
-                const status = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
-                const requiresEnroll = c.requires_enrollment !== false ? '🔒 Enrolled only' : '🌐 Everyone';
-                return `<tr><td><div class="cell-title">${c.title}</div><div class="cell-meta">${requiresEnroll}</div></td><td>${c.course || c.course_id || '—'}</td><td class="cell-meta">${formatDate(c.date)}</td><td>${typeBadge}</td><td>${status}</td><td><div class="table-actions"><button onclick="editClass('${c.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteClass('${c.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
-        }
-
-        window.openClassModal = function() {
-            document.getElementById('classModalTitle').textContent = 'Add Class';
-            document.getElementById('classForm').reset();
-            document.getElementById('classId').value = '';
-            document.getElementById('classError').textContent = '';
-            openModal('classModal');
-        };
-
-        window.editClass = function(id) {
-            const c = dataCache.classes.find(x => x.id === id);
-            if (!c) return;
-            document.getElementById('classModalTitle').textContent = 'Edit Class';
-            document.getElementById('classId').value = c.id;
-            document.getElementById('classTitle').value = c.title || '';
-            document.getElementById('classCourseId').value = c.course_id || '';
-            document.getElementById('classDate').value = c.date ? new Date(c.date).toISOString().slice(0,16) : '';
-            document.getElementById('classDuration').value = c.duration || 2;
-            document.getElementById('classType').value = c.class_type || 'live';
-            document.getElementById('classRequiresEnrollment').value = c.requires_enrollment !== false ? 'true' : 'false';
-            document.getElementById('classDesc').value = c.description || '';
-            document.getElementById('classWhatsapp').value = c.whatsapp || '';
-            document.getElementById('classTelegram').value = c.telegram || '';
-            document.getElementById('classZoom').value = c.meeting_link || c.zoom_link || '';
-            document.getElementById('classRecording').value = c.recording_url || '';
-            document.getElementById('classIsActive').checked = c.is_active !== false;
-            document.getElementById('classIsRecorded').checked = c.is_recorded || false;
-            document.getElementById('classError').textContent = '';
-            openModal('classModal');
-        };
-
-        window.handleClassSubmit = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('classId').value;
-            const courseId = document.getElementById('classCourseId').value;
-            const payload = {
-                title: document.getElementById('classTitle').value,
-                course_id: courseId,
-                course: dataCache.courses?.find(c => c.id === courseId)?.title || '',
-                date: document.getElementById('classDate').value ? new Date(document.getElementById('classDate').value).toISOString() : null,
-                duration: parseInt(document.getElementById('classDuration').value) || 2,
-                class_type: document.getElementById('classType').value,
-                requires_enrollment: document.getElementById('classRequiresEnrollment').value === 'true',
-                description: document.getElementById('classDesc').value,
-                whatsapp: document.getElementById('classWhatsapp').value,
-                telegram: document.getElementById('classTelegram').value,
-                meeting_link: document.getElementById('classZoom').value,
-                zoom_link: document.getElementById('classZoom').value,
-                recording_url: document.getElementById('classRecording').value,
-                is_active: document.getElementById('classIsActive').checked,
-                is_recorded: document.getElementById('classIsRecorded').checked
-            };
-            let error;
-            if (id) {
-                const res = await supabase.from('classes').update(payload).eq('id', id);
-                error = res.error;
-            } else {
-                const res = await supabase.from('classes').insert([payload]);
-                error = res.error;
-            }
-            if (error) { document.getElementById('classError').textContent = error.message; return; }
-            showToast(id ? 'Class updated' : 'Class created'); closeModal('classModal'); 
-            await loadClasses(); await loadStats();
-            await logActivity(id ? 'updated' : 'created', 'class', payload.title);
-        };
-
-        window.deleteClass = async function(id) {
-            if (!confirm('Delete this class?')) return;
-            const { error } = await supabase.from('classes').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Class deleted'); await loadClasses(); await loadStats();
-        };
-
-        // Enrollments
-        async function loadEnrollments() {
-            const { data } = await supabase
-                .from('enrollments')
-                .select(`
-                    *,
-                    users:user_id (id, full_name, email),
-                    courses:course_id (id, title)
-                `)
-                .order('enrolled_at', {ascending:false});
-            dataCache.enrollments = data || [];
-            renderEnrollments(dataCache.enrollments);
-        }
-
-        function renderEnrollments(enrollments) {
-            const tbody = document.getElementById('enrollmentsTable');
-            if (!enrollments?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-book-open"></i><p>No enrollments found</p></td></tr>'; return; }
-            tbody.innerHTML = enrollments.map(e => {
-                const user = e.users || {};
-                const course = e.courses || {};
-                const statusBadge = e.status === 'active' ? '<span class="badge badge-active">Active</span>' : 
-                    (e.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : 
-                    '<span class="badge badge-inactive">' + e.status + '</span>');
-                const progress = e.progress || 0;
-                return `<tr><td><div class="cell-title">${user.full_name || 'Unknown'}</div><div class="cell-meta">${user.email || ''}</div></td><td>${course.title || e.course_id || 'Unknown'}</td><td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:4px;background:var(--bg-primary);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${progress}%;background:var(--gradient-purple);border-radius:2px;"></div></div><span style="font-size:11px;font-weight:600;">${progress}%</span></div></td><td>${statusBadge}</td><td class="cell-meta">${formatDate(e.enrolled_at || e.created_at)}</td><td><div class="table-actions"><button class="delete" onclick="deleteEnrollment('${e.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
-        }
-
-        window.filterEnrollments = function(q) {
-            const term = q.toLowerCase();
-            renderEnrollments(dataCache.enrollments.filter(e => 
-                (e.users?.full_name||'').toLowerCase().includes(term) || 
+    window.filterEnrollments = function(q) {
+        const term = q.toLowerCase();
+        renderEnrollments(dataCache.enrollments.filter(function(e) {
+            return (e.users?.full_name||'').toLowerCase().includes(term) ||
                 (e.users?.email||'').toLowerCase().includes(term) ||
-                (e.courses?.title||'').toLowerCase().includes(term)
-            ));
-        };
+                (e.courses?.title||'').toLowerCase().includes(term);
+        }));
+    };
 
-        window.deleteEnrollment = async function(id) {
-            if (!confirm('Delete this enrollment?')) return;
-            const { error } = await supabase.from('enrollments').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Enrollment deleted'); await loadEnrollments(); await loadStats();
-        };
+    window.deleteEnrollment = async function(id) {
+        if (!confirm('Delete this enrollment?')) return;
+        const { error } = await supabase.from('enrollments').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Enrollment deleted'); await loadEnrollments(); await loadStats();
+    };
 
-        // Projects
-        async function loadProjects() {
-            const { data } = await supabase.from('projects').select('*').order('created_at', {ascending:false});
-            dataCache.projects = data || [];
-            renderProjects(dataCache.projects);
+    async function loadProjects() {
+        const { data } = await supabase.from('projects').select('*').order('created_at', {ascending:false});
+        dataCache.projects = data || [];
+        renderProjects(dataCache.projects);
+    }
+
+    function renderProjects(projects) {
+        const tbody = document.getElementById('projectsTable');
+        if (!projects || projects.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-folder"></i><p>No projects found</p></td></tr>'; return; }
+        tbody.innerHTML = projects.map(function(p) {
+            const statusBadge = p.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' :
+                (p.status === 'in-progress' ? '<span class="badge badge-premium">In Progress</span>' :
+                '<span class="badge badge-pending">Pending</span>');
+            const featured = p.is_featured ? '<span class="badge badge-premium" style="margin-left:4px;"><i class="fas fa-star"></i></span>' : '';
+            return '<tr><td><div class="cell-title">' + p.title + ' ' + featured + '</div></td><td>' + (p.author_name || 'Unknown') + '</td><td>' + statusBadge + '</td><td>' + (p.likes || 0) + '</td><td class="cell-meta">' + formatDate(p.created_at) + '</td><td><div class="table-actions"><button onclick="editProject(\'' + p.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button onclick="toggleProjectFeature(\'' + p.id + '\', ' + (!p.is_featured) + ')" title="Toggle Feature"><i class="fas ' + (p.is_featured ? 'fa-star' : 'far fa-star') + '"></i></button><button class="delete" onclick="deleteProject(\'' + p.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
+
+    window.filterProjects = function(q) {
+        const term = q.toLowerCase();
+        renderProjects(dataCache.projects.filter(function(p) { return (p.title||'').toLowerCase().includes(term) || (p.author_name||'').toLowerCase().includes(term); }));
+    };
+
+    window.openProjectModal = function() {
+        document.getElementById('projectModalTitle').textContent = 'Add Project';
+        document.getElementById('projectForm').reset();
+        document.getElementById('projectId').value = '';
+        document.getElementById('projectImagePreview').src = '';
+        document.getElementById('projectImagePreview').style.display = 'none';
+        document.getElementById('projectError').textContent = '';
+        openModal('projectModal');
+    };
+
+    window.editProject = function(id) {
+        const p = dataCache.projects.find(function(x) { return x.id === id; });
+        if (!p) return;
+        document.getElementById('projectModalTitle').textContent = 'Edit Project';
+        document.getElementById('projectId').value = p.id;
+        document.getElementById('projectTitle').value = p.title || '';
+        document.getElementById('projectDesc').value = p.description || '';
+        document.getElementById('projectAuthor').value = p.author_name || '';
+        document.getElementById('projectAuthorEmail').value = p.author_email || '';
+        document.getElementById('projectCategory').value = p.category || 'design';
+        document.getElementById('projectStatus').value = p.status || 'pending';
+        document.getElementById('projectDemoLink').value = p.demo_link || '';
+        document.getElementById('projectIsFeatured').checked = p.is_featured || false;
+        document.getElementById('projectIsActive').checked = p.is_active !== false;
+        if (p.image) {
+            document.getElementById('projectImagePreview').src = p.image;
+            document.getElementById('projectImagePreview').style.display = 'block';
+        } else {
+            document.getElementById('projectImagePreview').style.display = 'none';
+        }
+        document.getElementById('projectError').textContent = '';
+        openModal('projectModal');
+    };
+
+    window.handleProjectSubmit = async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('projectId').value;
+        const imageFile = document.getElementById('projectImageFile').files[0];
+        let imageUrl = document.getElementById('projectImageUrl').value || '';
+
+        if (imageFile) {
+            const uploaded = await uploadFile(imageFile, 'projects');
+            if (uploaded) imageUrl = uploaded;
         }
 
-        function renderProjects(projects) {
-            const tbody = document.getElementById('projectsTable');
-            if (!projects?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-folder"></i><p>No projects found</p></td></tr>'; return; }
-            tbody.innerHTML = projects.map(p => {
-                const statusBadge = p.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : 
-                    (p.status === 'in-progress' ? '<span class="badge badge-premium">In Progress</span>' : 
-                    '<span class="badge badge-pending">Pending</span>');
-                const featured = p.is_featured ? '<span class="badge badge-premium" style="margin-left:4px;"><i class="fas fa-star"></i></span>' : '';
-                return `<tr><td><div class="cell-title">${p.title} ${featured}</div></td><td>${p.author_name || 'Unknown'}</td><td>${statusBadge}</td><td>${p.likes || 0}</td><td class="cell-meta">${formatDate(p.created_at)}</td><td><div class="table-actions"><button onclick="editProject('${p.id}')" title="Edit"><i class="fas fa-edit"></i></button><button onclick="toggleProjectFeature('${p.id}', ${!p.is_featured})" title="Toggle Feature"><i class="fas ${p.is_featured ? 'fa-star' : 'far fa-star'}"></i></button><button class="delete" onclick="deleteProject('${p.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
+        const payload = {
+            title: document.getElementById('projectTitle').value,
+            description: document.getElementById('projectDesc').value,
+            author_name: document.getElementById('projectAuthor').value,
+            author_email: document.getElementById('projectAuthorEmail').value,
+            category: document.getElementById('projectCategory').value,
+            status: document.getElementById('projectStatus').value,
+            image: imageUrl,
+            demo_link: document.getElementById('projectDemoLink').value,
+            is_featured: document.getElementById('projectIsFeatured').checked,
+            is_active: document.getElementById('projectIsActive').checked
+        };
+        let error;
+        if (id) {
+            const res = await supabase.from('projects').update(payload).eq('id', id);
+            error = res.error;
+        } else {
+            const res = await supabase.from('projects').insert([payload]);
+            error = res.error;
+        }
+        if (error) { document.getElementById('projectError').textContent = error.message; return; }
+        showToast(id ? 'Project updated' : 'Project created'); closeModal('projectModal');
+        await loadProjects(); await loadStats();
+        await logActivity(id ? 'updated' : 'created', 'project', payload.title);
+    };
+
+    window.toggleProjectFeature = async function(id, featured) {
+        const { error } = await supabase.from('projects').update({is_featured: featured}).eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast(featured ? 'Project featured' : 'Project unfeatured'); await loadProjects();
+    };
+
+    window.deleteProject = async function(id) {
+        if (!confirm('Delete this project?')) return;
+        const { error } = await supabase.from('projects').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Project deleted'); await loadProjects(); await loadStats();
+    };
+
+    async function loadTools() {
+        const { data } = await supabase.from('tools').select('*').order('created_at', {ascending:false});
+        dataCache.tools = data || [];
+        renderTools(dataCache.tools);
+    }
+
+    function renderTools(tools) {
+        const tbody = document.getElementById('toolsTable');
+        if (!tools || tools.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-wrench"></i><p>No tools found</p></td></tr>'; return; }
+        tbody.innerHTML = tools.map(function(t) {
+            const status = t.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
+            const price = t.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(t.price);
+            return '<tr><td><div class="cell-title">' + t.name + '</div></td><td>' + (t.category || '') + '</td><td>' + price + '</td><td>' + status + '</td><td><div class="table-actions"><button onclick="editTool(\'' + t.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteTool(\'' + t.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
+
+    window.openToolModal = function() {
+        document.getElementById('toolModalTitle').textContent = 'Add Tool';
+        document.getElementById('toolForm').reset();
+        document.getElementById('toolId').value = '';
+        document.getElementById('toolImagePreview').src = '';
+        document.getElementById('toolImagePreview').style.display = 'none';
+        document.getElementById('toolError').textContent = '';
+        openModal('toolModal');
+    };
+
+    window.editTool = function(id) {
+        const t = dataCache.tools.find(function(x) { return x.id === id; });
+        if (!t) return;
+        document.getElementById('toolModalTitle').textContent = 'Edit Tool';
+        document.getElementById('toolId').value = t.id;
+        document.getElementById('toolName').value = t.name || '';
+        document.getElementById('toolDesc').value = t.description || '';
+        document.getElementById('toolCategory').value = t.category || 'design';
+        document.getElementById('toolPrice').value = t.price || 0;
+        document.getElementById('toolLink').value = t.link || '';
+        document.getElementById('toolIsFree').checked = t.is_free !== false;
+        document.getElementById('toolIsActive').checked = t.is_active !== false;
+        if (t.image) {
+            document.getElementById('toolImagePreview').src = t.image;
+            document.getElementById('toolImagePreview').style.display = 'block';
+        } else {
+            document.getElementById('toolImagePreview').style.display = 'none';
+        }
+        document.getElementById('toolError').textContent = '';
+        openModal('toolModal');
+    };
+
+    window.handleToolSubmit = async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('toolId').value;
+        const imageFile = document.getElementById('toolImageFile').files[0];
+        let imageUrl = document.getElementById('toolImageUrl').value || '';
+
+        if (imageFile) {
+            const uploaded = await uploadFile(imageFile, 'tools');
+            if (uploaded) imageUrl = uploaded;
         }
 
-        window.filterProjects = function(q) {
-            const term = q.toLowerCase();
-            renderProjects(dataCache.projects.filter(p => (p.title||'').toLowerCase().includes(term) || (p.author_name||'').toLowerCase().includes(term)));
+        const payload = {
+            name: document.getElementById('toolName').value,
+            description: document.getElementById('toolDesc').value,
+            category: document.getElementById('toolCategory').value,
+            price: parseInt(document.getElementById('toolPrice').value) || 0,
+            link: document.getElementById('toolLink').value,
+            image: imageUrl,
+            is_free: document.getElementById('toolIsFree').checked,
+            is_active: document.getElementById('toolIsActive').checked
         };
+        let error;
+        if (id) {
+            const res = await supabase.from('tools').update(payload).eq('id', id);
+            error = res.error;
+        } else {
+            const res = await supabase.from('tools').insert([payload]);
+            error = res.error;
+        }
+        if (error) { document.getElementById('toolError').textContent = error.message; return; }
+        showToast(id ? 'Tool updated' : 'Tool created'); closeModal('toolModal'); await loadTools(); await loadStats();
+    };
 
-        window.openProjectModal = function() {
-            document.getElementById('projectModalTitle').textContent = 'Add Project';
-            document.getElementById('projectForm').reset();
-            document.getElementById('projectId').value = '';
-            document.getElementById('projectError').textContent = '';
-            openModal('projectModal');
-        };
+    window.deleteTool = async function(id) {
+        if (!confirm('Delete this tool?')) return;
+        const { error } = await supabase.from('tools').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Tool deleted'); await loadTools(); await loadStats();
+    };
 
-        window.editProject = function(id) {
-            const p = dataCache.projects.find(x => x.id === id);
-            if (!p) return;
-            document.getElementById('projectModalTitle').textContent = 'Edit Project';
-            document.getElementById('projectId').value = p.id;
-            document.getElementById('projectTitle').value = p.title || '';
-            document.getElementById('projectDesc').value = p.description || '';
-            document.getElementById('projectAuthor').value = p.author_name || '';
-            document.getElementById('projectAuthorEmail').value = p.author_email || '';
-            document.getElementById('projectCategory').value = p.category || 'design';
-            document.getElementById('projectStatus').value = p.status || 'pending';
-            document.getElementById('projectImage').value = p.image || '';
-            document.getElementById('projectDemoLink').value = p.demo_link || '';
-            document.getElementById('projectIsFeatured').checked = p.is_featured || false;
-            document.getElementById('projectIsActive').checked = p.is_active !== false;
-            document.getElementById('projectError').textContent = '';
-            openModal('projectModal');
-        };
+    async function loadResources() {
+        const { data } = await supabase.from('resources').select('*').order('created_at', {ascending:false});
+        dataCache.resources = data || [];
+        renderResources(dataCache.resources);
+    }
 
-        window.handleProjectSubmit = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('projectId').value;
-            const payload = {
-                title: document.getElementById('projectTitle').value,
-                description: document.getElementById('projectDesc').value,
-                author_name: document.getElementById('projectAuthor').value,
-                author_email: document.getElementById('projectAuthorEmail').value,
-                category: document.getElementById('projectCategory').value,
-                status: document.getElementById('projectStatus').value,
-                image: document.getElementById('projectImage').value,
-                demo_link: document.getElementById('projectDemoLink').value,
-                is_featured: document.getElementById('projectIsFeatured').checked,
-                is_active: document.getElementById('projectIsActive').checked
-            };
-            let error;
-            if (id) {
-                const res = await supabase.from('projects').update(payload).eq('id', id);
-                error = res.error;
-            } else {
-                const res = await supabase.from('projects').insert([payload]);
-                error = res.error;
-            }
-            if (error) { document.getElementById('projectError').textContent = error.message; return; }
-            showToast(id ? 'Project updated' : 'Project created'); closeModal('projectModal'); 
-            await loadProjects(); await loadStats();
-            await logActivity(id ? 'updated' : 'created', 'project', payload.title);
-        };
+    function renderResources(resources) {
+        const tbody = document.getElementById('resourcesTable');
+        if (!resources || resources.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-file-alt"></i><p>No resources found</p></td></tr>'; return; }
+        tbody.innerHTML = resources.map(function(r) {
+            const typeBadge = r.resource_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : (r.resource_type === 'paid' ? '<span class="badge badge-admin">Paid</span>' : '<span class="badge badge-free">Free</span>');
+            const status = r.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
+            return '<tr><td><div class="cell-title">' + r.title + '</div></td><td>' + typeBadge + '</td><td>' + (r.price ? formatCurrency(r.price) : 'Free') + '</td><td>' + (r.download_count || 0) + '</td><td>' + status + '</td><td><div class="table-actions"><button onclick="editResource(\'' + r.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteResource(\'' + r.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
 
-        window.toggleProjectFeature = async function(id, featured) {
-            const { error } = await supabase.from('projects').update({is_featured: featured}).eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast(featured ? 'Project featured' : 'Project unfeatured'); await loadProjects();
-        };
+    window.openResourceModal = function() {
+        document.getElementById('resourceModalTitle').textContent = 'Add Resource';
+        document.getElementById('resourceForm').reset();
+        document.getElementById('resourceId').value = '';
+        document.getElementById('resourceError').textContent = '';
+        openModal('resourceModal');
+    };
 
-        window.deleteProject = async function(id) {
-            if (!confirm('Delete this project?')) return;
-            const { error } = await supabase.from('projects').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Project deleted'); await loadProjects(); await loadStats();
-        };
+    window.editResource = function(id) {
+        const r = dataCache.resources.find(function(x) { return x.id === id; });
+        if (!r) return;
+        document.getElementById('resourceModalTitle').textContent = 'Edit Resource';
+        document.getElementById('resourceId').value = r.id;
+        document.getElementById('resourceTitle').value = r.title || '';
+        document.getElementById('resourceDesc').value = r.description || '';
+        document.getElementById('resourceType').value = r.resource_type || 'free';
+        document.getElementById('resourcePrice').value = r.price || 0;
+        document.getElementById('resourceFileUrl').value = r.file_url || '';
+        document.getElementById('resourceIsActive').checked = r.is_active !== false;
+        document.getElementById('resourceError').textContent = '';
+        openModal('resourceModal');
+    };
 
-        // Tools
-        async function loadTools() {
-            const { data } = await supabase.from('tools').select('*').order('created_at', {ascending:false});
-            dataCache.tools = data || [];
-            renderTools(dataCache.tools);
+    window.handleResourceSubmit = async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('resourceId').value;
+        const fileInput = document.getElementById('resourceFile');
+        let fileUrl = document.getElementById('resourceFileUrl').value || '';
+
+        if (fileInput && fileInput.files[0]) {
+            const uploaded = await uploadFile(fileInput.files[0], 'resources');
+            if (uploaded) fileUrl = uploaded;
         }
 
-        function renderTools(tools) {
-            const tbody = document.getElementById('toolsTable');
-            if (!tools?.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-wrench"></i><p>No tools found</p></td></tr>'; return; }
-            tbody.innerHTML = tools.map(t => {
-                const status = t.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
-                const price = t.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(t.price);
-                return `<tr><td><div class="cell-title">${t.name}</div></td><td>${t.category || ''}</td><td>${price}</td><td>${status}</td><td><div class="table-actions"><button onclick="editTool('${t.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteTool('${t.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
+        const payload = {
+            title: document.getElementById('resourceTitle').value,
+            description: document.getElementById('resourceDesc').value,
+            resource_type: document.getElementById('resourceType').value,
+            price: parseInt(document.getElementById('resourcePrice').value) || 0,
+            file_url: fileUrl,
+            is_active: document.getElementById('resourceIsActive').checked
+        };
+        let error;
+        if (id) {
+            const res = await supabase.from('resources').update(payload).eq('id', id);
+            error = res.error;
+        } else {
+            const res = await supabase.from('resources').insert([payload]);
+            error = res.error;
         }
+        if (error) { document.getElementById('resourceError').textContent = error.message; return; }
+        showToast(id ? 'Resource updated' : 'Resource created'); closeModal('resourceModal'); await loadResources(); await loadStats();
+    };
 
-        window.openToolModal = function() {
-            document.getElementById('toolModalTitle').textContent = 'Add Tool';
-            document.getElementById('toolForm').reset();
-            document.getElementById('toolId').value = '';
-            document.getElementById('toolError').textContent = '';
-            openModal('toolModal');
+    window.deleteResource = async function(id) {
+        if (!confirm('Delete this resource?')) return;
+        const { error } = await supabase.from('resources').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Resource deleted'); await loadResources(); await loadStats();
+    };
+
+    async function loadPayments() {
+        const { data } = await supabase.from('payments').select('*').order('created_at', {ascending:false});
+        dataCache.payments = data || [];
+        renderPayments(dataCache.payments);
+    }
+
+    function renderPayments(payments) {
+        const tbody = document.getElementById('paymentsTable');
+        if (!payments || payments.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-credit-card"></i><p>No payments found</p></td></tr>'; return; }
+        tbody.innerHTML = payments.map(function(p) {
+            const status = p.status === 'completed' ? '<span class="badge badge-active">Completed</span>' : (p.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + p.status + '</span>');
+            return '<tr><td>' + (p.user_email || 'Unknown') + '</td><td>' + formatCurrency(p.amount) + '</td><td>' + (p.payment_type || p.type || '') + '</td><td>' + status + '</td><td class="cell-meta">' + formatDate(p.created_at) + '</td><td><div class="table-actions">' + (p.status === 'pending' ? '<button class="success" onclick="confirmPayment(\'' + p.id + '\')" title="Confirm"><i class="fas fa-check"></i></button>' : '') + '<button class="delete" onclick="deletePayment(\'' + p.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
+
+    window.confirmPayment = async function(id) {
+        const { error } = await supabase.from('payments').update({status: 'completed', confirmed_by: currentUser.id, confirmed_at: new Date().toISOString()}).eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Payment confirmed'); await loadPayments(); await loadStats();
+        await logActivity('confirmed', 'payment', 'Payment confirmed');
+    };
+
+    window.deletePayment = async function(id) {
+        if (!confirm('Delete this payment record?')) return;
+        const { error } = await supabase.from('payments').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Payment deleted'); await loadPayments(); await loadStats();
+    };
+
+    async function loadPremiumRequests() {
+        const { data } = await supabase.from('premium_requests').select('*').order('created_at', {ascending:false});
+        dataCache.premiumRequests = data || [];
+        renderPremiumRequests(dataCache.premiumRequests);
+        updatePendingCount();
+    }
+
+    function renderPremiumRequests(requests) {
+        const tbody = document.getElementById('premiumRequestsTable');
+        if (!requests || requests.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-crown"></i><p>No premium requests found</p></td></tr>'; return; }
+        tbody.innerHTML = requests.map(function(r) {
+            const status = r.status === 'confirmed' ? '<span class="badge badge-active">Confirmed</span>' : (r.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">Rejected</span>');
+            return '<tr><td>' + (r.user_name || 'Unknown') + '</td><td>' + (r.user_email || '') + '</td><td>' + formatCurrency(r.amount || 13500) + '</td><td>' + status + '</td><td class="cell-meta">' + formatDate(r.created_at) + '</td><td><div class="table-actions">' + (r.status === 'pending' ? '<button class="success" onclick="approveRequest(\'' + r.id + '\', \'' + r.user_id + '\')" title="Approve"><i class="fas fa-check"></i></button><button class="delete" onclick="rejectRequest(\'' + r.id + '\')" title="Reject"><i class="fas fa-times"></i></button>' : '') + '<button class="delete" onclick="deleteRequest(\'' + r.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
+
+    window.approveRequest = async function(id, userId) {
+        const { error: reqErr } = await supabase.from('premium_requests').update({status: 'confirmed', confirmed_by: currentUser.id, confirmed_at: new Date().toISOString()}).eq('id', id);
+        if (reqErr) { showToast(reqErr.message, 'error'); return; }
+        const { error: userErr } = await supabase.from('users').update({
+            is_premium: true,
+            subscription_status: 'active',
+            premium_start: new Date().toISOString(),
+            premium_end: new Date(Date.now() + 180*24*60*60*1000).toISOString()
+        }).eq('id', userId);
+        if (userErr) { showToast(userErr.message, 'error'); return; }
+        await supabase.from('payments').insert({
+            user_id: userId,
+            user_email: (dataCache.users || []).find(function(u) { return u.id === userId; })?.email || '',
+            amount: 13500,
+            payment_type: 'premium',
+            item: 'Premium Subscription (6 months)',
+            status: 'completed',
+            confirmed_by: currentUser.id,
+            confirmed_at: new Date().toISOString(),
+            created_at: new Date().toISOString()
+        });
+        showToast('Premium request approved! 🎉');
+        await loadPremiumRequests(); await loadStats(); await loadUsers(); await loadPayments();
+        await logActivity('approved', 'premium_request', 'Approved premium for user');
+    };
+
+    window.rejectRequest = async function(id) {
+        const { error } = await supabase.from('premium_requests').update({status: 'rejected'}).eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Premium request rejected'); await loadPremiumRequests();
+    };
+
+    window.deleteRequest = async function(id) {
+        if (!confirm('Delete this request?')) return;
+        const { error } = await supabase.from('premium_requests').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Request deleted'); await loadPremiumRequests();
+    };
+
+    async function loadSettings() {
+        const { data } = await supabase.from('site_settings').select('*').order('key', {ascending:true});
+        dataCache.settings = data || [];
+        renderSettings(dataCache.settings);
+    }
+
+    function renderSettings(settings) {
+        const tbody = document.getElementById('settingsTable');
+        if (!settings || settings.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-cog"></i><p>No settings found</p></td></tr>'; return; }
+        tbody.innerHTML = settings.map(function(s) {
+            const pub = s.is_public ? '<span class="badge badge-active">Yes</span>' : '<span class="badge badge-inactive">No</span>';
+            return '<tr><td><div class="cell-title">' + s.key + '</div></td><td>' + s.value + '</td><td>' + s.type + '</td><td>' + pub + '</td><td class="cell-meta">' + (s.description || '') + '</td><td><div class="table-actions"><button onclick="editSetting(\'' + s.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteSetting(\'' + s.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
+
+    window.openSettingModal = function() {
+        document.getElementById('settingModalTitle').textContent = 'Add Setting';
+        document.getElementById('settingForm').reset();
+        document.getElementById('settingId').value = '';
+        document.getElementById('settingError').textContent = '';
+        openModal('settingModal');
+    };
+
+    window.editSetting = function(id) {
+        const s = dataCache.settings.find(function(x) { return x.id === id; });
+        if (!s) return;
+        document.getElementById('settingModalTitle').textContent = 'Edit Setting';
+        document.getElementById('settingId').value = s.id;
+        document.getElementById('settingKey').value = s.key || '';
+        document.getElementById('settingValue').value = s.value || '';
+        document.getElementById('settingType').value = s.type || 'text';
+        document.getElementById('settingIsPublic').checked = s.is_public || false;
+        document.getElementById('settingDescription').value = s.description || '';
+        document.getElementById('settingError').textContent = '';
+        openModal('settingModal');
+    };
+
+    window.handleSettingSubmit = async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('settingId').value;
+        const payload = {
+            key: document.getElementById('settingKey').value,
+            value: document.getElementById('settingValue').value,
+            type: document.getElementById('settingType').value,
+            is_public: document.getElementById('settingIsPublic').checked,
+            description: document.getElementById('settingDescription').value
         };
-
-        window.editTool = function(id) {
-            const t = dataCache.tools.find(x => x.id === id);
-            if (!t) return;
-            document.getElementById('toolModalTitle').textContent = 'Edit Tool';
-            document.getElementById('toolId').value = t.id;
-            document.getElementById('toolName').value = t.name || '';
-            document.getElementById('toolDesc').value = t.description || '';
-            document.getElementById('toolCategory').value = t.category || 'design';
-            document.getElementById('toolPrice').value = t.price || 0;
-            document.getElementById('toolLink').value = t.link || '';
-            document.getElementById('toolImage').value = t.image || '';
-            document.getElementById('toolIsFree').checked = t.is_free !== false;
-            document.getElementById('toolIsActive').checked = t.is_active !== false;
-            document.getElementById('toolError').textContent = '';
-            openModal('toolModal');
-        };
-
-        window.handleToolSubmit = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('toolId').value;
-            const payload = {
-                name: document.getElementById('toolName').value,
-                description: document.getElementById('toolDesc').value,
-                category: document.getElementById('toolCategory').value,
-                price: parseInt(document.getElementById('toolPrice').value) || 0,
-                link: document.getElementById('toolLink').value,
-                image: document.getElementById('toolImage').value,
-                is_free: document.getElementById('toolIsFree').checked,
-                is_active: document.getElementById('toolIsActive').checked
-            };
-            let error;
-            if (id) {
-                const res = await supabase.from('tools').update(payload).eq('id', id);
-                error = res.error;
-            } else {
-                const res = await supabase.from('tools').insert([payload]);
-                error = res.error;
-            }
-            if (error) { document.getElementById('toolError').textContent = error.message; return; }
-            showToast(id ? 'Tool updated' : 'Tool created'); closeModal('toolModal'); await loadTools(); await loadStats();
-        };
-
-        window.deleteTool = async function(id) {
-            if (!confirm('Delete this tool?')) return;
-            const { error } = await supabase.from('tools').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Tool deleted'); await loadTools(); await loadStats();
-        };
-
-        // Resources
-        async function loadResources() {
-            const { data } = await supabase.from('resources').select('*').order('created_at', {ascending:false});
-            dataCache.resources = data || [];
-            renderResources(dataCache.resources);
+        let error;
+        if (id) {
+            const res = await supabase.from('site_settings').update(payload).eq('id', id);
+            error = res.error;
+        } else {
+            const res = await supabase.from('site_settings').insert([payload]);
+            error = res.error;
         }
+        if (error) { document.getElementById('settingError').textContent = error.message; return; }
+        showToast(id ? 'Setting updated' : 'Setting created'); closeModal('settingModal'); await loadSettings();
+    };
 
-        function renderResources(resources) {
-            const tbody = document.getElementById('resourcesTable');
-            if (!resources?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-file-alt"></i><p>No resources found</p></td></tr>'; return; }
-            tbody.innerHTML = resources.map(r => {
-                const typeBadge = r.resource_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : (r.resource_type === 'paid' ? '<span class="badge badge-admin">Paid</span>' : '<span class="badge badge-free">Free</span>');
-                const status = r.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
-                return `<tr><td><div class="cell-title">${r.title}</div></td><td>${typeBadge}</td><td>${r.price ? formatCurrency(r.price) : 'Free'}</td><td>${r.download_count || 0}</td><td>${status}</td><td><div class="table-actions"><button onclick="editResource('${r.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteResource('${r.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
-        }
+    window.deleteSetting = async function(id) {
+        if (!confirm('Delete this setting?')) return;
+        const { error } = await supabase.from('site_settings').delete().eq('id', id);
+        if (error) { showToast(error.message, 'error'); return; }
+        showToast('Setting deleted'); await loadSettings();
+    };
 
-        window.openResourceModal = function() {
-            document.getElementById('resourceModalTitle').textContent = 'Add Resource';
-            document.getElementById('resourceForm').reset();
-            document.getElementById('resourceId').value = '';
-            document.getElementById('resourceError').textContent = '';
-            openModal('resourceModal');
-        };
+    async function loadActivity() {
+        const { data } = await supabase.from('activity_log').select('*').order('created_at', {ascending:false}).limit(50);
+        dataCache.activity = data || [];
+        renderActivity(dataCache.activity);
+        renderRecentActivity(dataCache.activity.slice(0, 5));
+    }
 
-        window.editResource = function(id) {
-            const r = dataCache.resources.find(x => x.id === id);
-            if (!r) return;
-            document.getElementById('resourceModalTitle').textContent = 'Edit Resource';
-            document.getElementById('resourceId').value = r.id;
-            document.getElementById('resourceTitle').value = r.title || '';
-            document.getElementById('resourceDesc').value = r.description || '';
-            document.getElementById('resourceType').value = r.resource_type || 'free';
-            document.getElementById('resourcePrice').value = r.price || 0;
-            document.getElementById('resourceFileUrl').value = r.file_url || '';
-            document.getElementById('resourceIsActive').checked = r.is_active !== false;
-            document.getElementById('resourceError').textContent = '';
-            openModal('resourceModal');
-        };
+    function renderActivity(activity) {
+        const tbody = document.getElementById('activityTable');
+        if (!activity || activity.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-history"></i><p>No activity found</p></td></tr>'; return; }
+        tbody.innerHTML = activity.map(function(a) {
+            return '<tr><td><div class="cell-title">' + a.action + '</div></td><td>' + (a.entity_type || '') + (a.entity_id ? ' (' + a.entity_id.slice(0,8) + '...)' : '') + '</td><td class="cell-meta">' + (a.details ? JSON.stringify(a.details).slice(0,60) : '') + '</td><td class="cell-meta">' + formatDate(a.created_at) + '</td></tr>';
+        }).join('');
+    }
 
-        window.handleResourceSubmit = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('resourceId').value;
-            const payload = {
-                title: document.getElementById('resourceTitle').value,
-                description: document.getElementById('resourceDesc').value,
-                resource_type: document.getElementById('resourceType').value,
-                price: parseInt(document.getElementById('resourcePrice').value) || 0,
-                file_url: document.getElementById('resourceFileUrl').value,
-                is_active: document.getElementById('resourceIsActive').checked
-            };
-            let error;
-            if (id) {
-                const res = await supabase.from('resources').update(payload).eq('id', id);
-                error = res.error;
-            } else {
-                const res = await supabase.from('resources').insert([payload]);
-                error = res.error;
-            }
-            if (error) { document.getElementById('resourceError').textContent = error.message; return; }
-            showToast(id ? 'Resource updated' : 'Resource created'); closeModal('resourceModal'); await loadResources(); await loadStats();
-        };
+    function renderRecentActivity(activity) {
+        const tbody = document.getElementById('recentActivityTable');
+        if (!activity || activity.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-history"></i><p>No recent activity</p></td></tr>'; return; }
+        tbody.innerHTML = activity.map(function(a) {
+            return '<tr><td><div class="cell-title">' + a.action + '</div></td><td>' + (a.entity_type || '') + '</td><td class="cell-meta">' + (a.user_id ? a.user_id.slice(0,8) + '...' : 'System') + '</td><td class="cell-meta">' + formatDate(a.created_at) + '</td></tr>';
+        }).join('');
+    }
 
-        window.deleteResource = async function(id) {
-            if (!confirm('Delete this resource?')) return;
-            const { error } = await supabase.from('resources').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Resource deleted'); await loadResources(); await loadStats();
-        };
-
-        // Payments
-        async function loadPayments() {
-            const { data } = await supabase.from('payments').select('*').order('created_at', {ascending:false});
-            dataCache.payments = data || [];
-            renderPayments(dataCache.payments);
-        }
-
-        function renderPayments(payments) {
-            const tbody = document.getElementById('paymentsTable');
-            if (!payments?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-credit-card"></i><p>No payments found</p></td></tr>'; return; }
-            tbody.innerHTML = payments.map(p => {
-                const status = p.status === 'completed' ? '<span class="badge badge-active">Completed</span>' : (p.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + p.status + '</span>');
-                return `<tr><td>${p.user_email || 'Unknown'}</td><td>${formatCurrency(p.amount)}</td><td>${p.payment_type || p.type || ''}</td><td>${status}</td><td class="cell-meta">${formatDate(p.created_at)}</td><td><div class="table-actions">${p.status === 'pending' ? `<button class="success" onclick="confirmPayment('${p.id}')" title="Confirm"><i class="fas fa-check"></i></button>` : ''}<button class="delete" onclick="deletePayment('${p.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
-        }
-
-        window.confirmPayment = async function(id) {
-            const { error } = await supabase.from('payments').update({status: 'completed', confirmed_by: currentUser.id, confirmed_at: new Date().toISOString()}).eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Payment confirmed'); await loadPayments(); await loadStats();
-            await logActivity('confirmed', 'payment', 'Payment confirmed');
-        };
-
-        window.deletePayment = async function(id) {
-            if (!confirm('Delete this payment record?')) return;
-            const { error } = await supabase.from('payments').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Payment deleted'); await loadPayments(); await loadStats();
-        };
-
-        // Premium Requests
-        async function loadPremiumRequests() {
-            const { data } = await supabase.from('premium_requests').select('*').order('created_at', {ascending:false});
-            dataCache.premiumRequests = data || [];
-            renderPremiumRequests(dataCache.premiumRequests);
-            updatePendingCount();
-        }
-
-        function renderPremiumRequests(requests) {
-            const tbody = document.getElementById('premiumRequestsTable');
-            if (!requests?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-crown"></i><p>No premium requests found</p></td></tr>'; return; }
-            tbody.innerHTML = requests.map(r => {
-                const status = r.status === 'confirmed' ? '<span class="badge badge-active">Confirmed</span>' : (r.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">Rejected</span>');
-                return `<tr><td>${r.user_name || 'Unknown'}</td><td>${r.user_email || ''}</td><td>${formatCurrency(r.amount || 13500)}</td><td>${status}</td><td class="cell-meta">${formatDate(r.created_at)}</td><td><div class="table-actions">${r.status === 'pending' ? `<button class="success" onclick="approveRequest('${r.id}', '${r.user_id}')" title="Approve"><i class="fas fa-check"></i></button><button class="delete" onclick="rejectRequest('${r.id}')" title="Reject"><i class="fas fa-times"></i></button>` : ''}<button class="delete" onclick="deleteRequest('${r.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
-        }
-
-        window.approveRequest = async function(id, userId) {
-            const { error: reqErr } = await supabase.from('premium_requests').update({status: 'confirmed', confirmed_by: currentUser.id, confirmed_at: new Date().toISOString()}).eq('id', id);
-            if (reqErr) { showToast(reqErr.message, 'error'); return; }
-            const { error: userErr } = await supabase.from('users').update({
-                is_premium: true, 
-                subscription_status: 'active', 
-                premium_start: new Date().toISOString(), 
-                premium_end: new Date(Date.now() + 180*24*60*60*1000).toISOString()
-            }).eq('id', userId);
-            if (userErr) { showToast(userErr.message, 'error'); return; }
-            // Record payment
-            await supabase.from('payments').insert({
-                user_id: userId,
-                user_email: dataCache.users?.find(u => u.id === userId)?.email || '',
-                amount: 13500,
-                payment_type: 'premium',
-                item: 'Premium Subscription (6 months)',
-                status: 'completed',
-                confirmed_by: currentUser.id,
-                confirmed_at: new Date().toISOString(),
+    async function logActivity(action, entityType, details) {
+        try {
+            await supabase.from('activity_log').insert({
+                action: action,
+                entity_type: entityType,
+                details: { message: details },
+                user_id: currentUser.id,
                 created_at: new Date().toISOString()
             });
-            showToast('Premium request approved! 🎉'); 
-            await loadPremiumRequests(); await loadStats(); await loadUsers(); await loadPayments();
-            await logActivity('approved', 'premium_request', 'Approved premium for user');
-        };
+        } catch(e) { console.error('Log error:', e); }
+    }
 
-        window.rejectRequest = async function(id) {
-            const { error } = await supabase.from('premium_requests').update({status: 'rejected'}).eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Premium request rejected'); await loadPremiumRequests();
-        };
-
-        window.deleteRequest = async function(id) {
-            if (!confirm('Delete this request?')) return;
-            const { error } = await supabase.from('premium_requests').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Request deleted'); await loadPremiumRequests();
-        };
-
-        // Settings
-        async function loadSettings() {
-            const { data } = await supabase.from('site_settings').select('*').order('key', {ascending:true});
-            dataCache.settings = data || [];
-            renderSettings(dataCache.settings);
-        }
-
-        function renderSettings(settings) {
-            const tbody = document.getElementById('settingsTable');
-            if (!settings?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-cog"></i><p>No settings found</p></td></tr>'; return; }
-            tbody.innerHTML = settings.map(s => {
-                const pub = s.is_public ? '<span class="badge badge-active">Yes</span>' : '<span class="badge badge-inactive">No</span>';
-                return `<tr><td><div class="cell-title">${s.key}</div></td><td>${s.value}</td><td>${s.type}</td><td>${pub}</td><td class="cell-meta">${s.description || ''}</td><td><div class="table-actions"><button onclick="editSetting('${s.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteSetting('${s.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
-            }).join('');
-        }
-
-        window.openSettingModal = function() {
-            document.getElementById('settingModalTitle').textContent = 'Add Setting';
-            document.getElementById('settingForm').reset();
-            document.getElementById('settingId').value = '';
-            document.getElementById('settingError').textContent = '';
-            openModal('settingModal');
-        };
-
-        window.editSetting = function(id) {
-            const s = dataCache.settings.find(x => x.id === id);
-            if (!s) return;
-            document.getElementById('settingModalTitle').textContent = 'Edit Setting';
-            document.getElementById('settingId').value = s.id;
-            document.getElementById('settingKey').value = s.key || '';
-            document.getElementById('settingValue').value = s.value || '';
-            document.getElementById('settingType').value = s.type || 'text';
-            document.getElementById('settingIsPublic').checked = s.is_public || false;
-            document.getElementById('settingDescription').value = s.description || '';
-            document.getElementById('settingError').textContent = '';
-            openModal('settingModal');
-        };
-
-        window.handleSettingSubmit = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('settingId').value;
-            const payload = {
-                key: document.getElementById('settingKey').value,
-                value: document.getElementById('settingValue').value,
-                type: document.getElementById('settingType').value,
-                is_public: document.getElementById('settingIsPublic').checked,
-                description: document.getElementById('settingDescription').value
-            };
-            let error;
-            if (id) {
-                const res = await supabase.from('site_settings').update(payload).eq('id', id);
-                error = res.error;
-            } else {
-                const res = await supabase.from('site_settings').insert([payload]);
-                error = res.error;
-            }
-            if (error) { document.getElementById('settingError').textContent = error.message; return; }
-            showToast(id ? 'Setting updated' : 'Setting created'); closeModal('settingModal'); await loadSettings();
-        };
-
-        window.deleteSetting = async function(id) {
-            if (!confirm('Delete this setting?')) return;
-            const { error } = await supabase.from('site_settings').delete().eq('id', id);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Setting deleted'); await loadSettings();
-        };
-
-        // Activity Log
-        async function loadActivity() {
-            const { data } = await supabase.from('activity_log').select('*').order('created_at', {ascending:false}).limit(50);
-            dataCache.activity = data || [];
-            renderActivity(dataCache.activity);
-            renderRecentActivity(dataCache.activity.slice(0, 5));
-        }
-
-        function renderActivity(activity) {
-            const tbody = document.getElementById('activityTable');
-            if (!activity?.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-history"></i><p>No activity found</p></td></tr>'; return; }
-            tbody.innerHTML = activity.map(a => `<tr><td><div class="cell-title">${a.action}</div></td><td>${a.entity_type || ''}${a.entity_id ? ' (' + a.entity_id.slice(0,8) + '...)' : ''}</td><td class="cell-meta">${a.details ? JSON.stringify(a.details).slice(0,60) : ''}</td><td class="cell-meta">${formatDate(a.created_at)}</td></tr>`).join('');
-        }
-
-        function renderRecentActivity(activity) {
-            const tbody = document.getElementById('recentActivityTable');
-            if (!activity?.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-history"></i><p>No recent activity</p></td></tr>'; return; }
-            tbody.innerHTML = activity.map(a => `<tr><td><div class="cell-title">${a.action}</div></td><td>${a.entity_type || ''}</td><td class="cell-meta">${a.user_id ? a.user_id.slice(0,8)+'...' : 'System'}</td><td class="cell-meta">${formatDate(a.created_at)}</td></tr>`).join('');
-        }
-
-        async function logActivity(action, entityType, details) {
-            try {
-                await supabase.from('activity_log').insert({
-                    action: action,
-                    entity_type: entityType,
-                    details: { message: details },
-                    user_id: currentUser.id,
-                    created_at: new Date().toISOString()
-                });
-            } catch(e) { console.error('Log error:', e); }
-        }
-
-        // Charts
-        function updateCharts() {
-            // User Growth Chart
-            const ctx1 = document.getElementById('userChart')?.getContext('2d');
-            if (ctx1) {
-                if (userChart) userChart.destroy();
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                const userCounts = months.map((_, i) => {
-                    const monthStart = new Date(2026, i, 1);
-                    const monthEnd = new Date(2026, i + 1, 1);
-                    return dataCache.users?.filter(u => {
-                        const d = new Date(u.created_at);
-                        return d >= monthStart && d < monthEnd;
-                    }).length || 0;
-                });
-                userChart = new Chart(ctx1, {
-                    type: 'line',
-                    data: {
-                        labels: months,
-                        datasets: [{
-                            label: 'New Users',
-                            data: userCounts,
-                            borderColor: '#7c3aed',
-                            backgroundColor: 'rgba(124,58,237,0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { labels: { color: '#94a3b8' } } },
-                        scales: {
-                            x: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b' } },
-                            y: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b' } }
-                        }
+    function updateCharts() {
+        const ctx1 = document.getElementById('userChart');
+        if (ctx1) {
+            if (userChart) userChart.destroy();
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const userCounts = months.map(function(_, i) {
+                const monthStart = new Date(2026, i, 1);
+                const monthEnd = new Date(2026, i + 1, 1);
+                return (dataCache.users || []).filter(function(u) {
+                    const d = new Date(u.created_at);
+                    return d >= monthStart && d < monthEnd;
+                }).length || 0;
+            });
+            userChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'New Users',
+                        data: userCounts,
+                        borderColor: '#7c3aed',
+                        backgroundColor: 'rgba(124,58,237,0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b' } },
+                        y: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b' } }
                     }
-                });
-            }
-
-            // Enrollment Stats Chart
-            const ctx2 = document.getElementById('enrollmentChart')?.getContext('2d');
-            if (ctx2) {
-                if (enrollmentChart) enrollmentChart.destroy();
-                const total = dataCache.enrollments?.length || 0;
-                const completed = dataCache.enrollments?.filter(e => e.progress === 100).length || 0;
-                const active = dataCache.enrollments?.filter(e => e.status === 'active' && e.progress < 100).length || 0;
-                enrollmentChart = new Chart(ctx2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Completed', 'Active', 'Inactive'],
-                        datasets: [{
-                            data: [completed, active, total - completed - active],
-                            backgroundColor: ['#22c55e', '#7c3aed', '#64748b']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
-                    }
-                });
-            }
-        }
-
-        // Sidebar
-        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-            const s = document.getElementById('sidebar'), mc = document.getElementById('mainContent');
-            s.classList.toggle('collapsed'); mc.classList.toggle('sidebar-collapsed');
-        });
-        const mmb = document.getElementById('mobileMenuBtn');
-        if (mmb) {
-            mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
-            mmb.addEventListener('click', function() {
-                const s = document.getElementById('sidebar'), o = document.getElementById('sidebarOverlay');
-                s.classList.toggle('mobile-open'); o.classList.toggle('active');
+                }
             });
         }
-        document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.remove('mobile-open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
+
+        const ctx2 = document.getElementById('enrollmentChart');
+        if (ctx2) {
+            if (enrollmentChart) enrollmentChart.destroy();
+            const total = (dataCache.enrollments || []).length || 0;
+            const completed = (dataCache.enrollments || []).filter(function(e) { return e.progress === 100; }).length || 0;
+            const active = (dataCache.enrollments || []).filter(function(e) { return e.status === 'active' && e.progress < 100; }).length || 0;
+            enrollmentChart = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Active', 'Inactive'],
+                    datasets: [{
+                        data: [completed, active, total - completed - active],
+                        backgroundColor: ['#22c55e', '#7c3aed', '#64748b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
+                }
+            });
+        }
+    }
+
+    document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+        const s = document.getElementById('sidebar');
+        const mc = document.getElementById('mainContent');
+        s.classList.toggle('collapsed');
+        mc.classList.toggle('sidebar-collapsed');
+    });
+
+    const mmb = document.getElementById('mobileMenuBtn');
+    if (mmb) {
+        mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
+        mmb.addEventListener('click', function() {
+            const s = document.getElementById('sidebar');
+            const o = document.getElementById('sidebarOverlay');
+            s.classList.toggle('mobile-open');
+            o.classList.toggle('active');
         });
-        window.addEventListener('resize', () => { if (mmb) mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; });
+    }
 
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); });
+    document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
+        document.getElementById('sidebar').classList.remove('mobile-open');
+        document.getElementById('sidebarOverlay').classList.remove('active');
+    });
 
-        window.addEventListener('DOMContentLoaded', init);
-    })();
-    </script>
+    window.addEventListener('resize', function() {
+        if (mmb) mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay').forEach(function(m) { m.classList.remove('active'); });
+        }
+    });
+
+    window.addEventListener('DOMContentLoaded', init);
+})();
+</script>
 </body>
 </html>
