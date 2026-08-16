@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#070714">
     <title>Aurex Admin - Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -92,8 +93,16 @@
         .stat-card .stat-icon.cyan { background:rgba(6,182,212,0.12); color:var(--accent-cyan); }
         .stat-card .stat-value { font-size:28px; font-weight:800; letter-spacing:-0.5px; margin-bottom:4px; }
         .stat-card .stat-label { font-size:12px; color:var(--text-muted); }
+        .stat-card .stat-change { font-size:11px; font-weight:600; }
+        .stat-card .stat-change.up { color:var(--accent-green); }
+        .stat-card .stat-change.down { color:var(--accent-red); }
         @media (max-width:1200px) { .stats-grid { grid-template-columns:repeat(2,1fr); } }
         @media (max-width:600px) { .stats-grid { grid-template-columns:1fr; margin:0 10px 16px; gap:10px; } }
+        .chart-grid { display:grid; grid-template-columns:2fr 1fr; gap:16px; margin:0 16px 24px; }
+        .chart-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding:20px; }
+        .chart-card h3 { font-size:14px; font-weight:600; margin-bottom:12px; }
+        .chart-card canvas { max-height:200px; max-width:100%; }
+        @media (max-width:900px) { .chart-grid { grid-template-columns:1fr; } }
         .section { display:none; margin:0 16px; animation:fadeInUp 0.4s ease; }
         .section.active { display:block; }
         .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
@@ -114,10 +123,12 @@
         .badge-active { background:rgba(34,197,94,0.1); color:var(--accent-green); border:1px solid rgba(34,197,94,0.15); }
         .badge-pending { background:rgba(245,158,11,0.1); color:var(--accent-orange); border:1px solid rgba(245,158,11,0.15); }
         .badge-inactive { background:rgba(100,116,139,0.1); color:var(--text-muted); border:1px solid var(--border-color); }
+        .badge-completed { background:rgba(34,197,94,0.1); color:var(--accent-green); border:1px solid rgba(34,197,94,0.15); }
         .table-actions { display:flex; gap:6px; }
         .table-actions button { width:28px; height:28px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid var(--border-color); color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all 0.2s; }
         .table-actions button:hover { background:rgba(124,58,237,0.1); color:var(--accent-violet); border-color:rgba(124,58,237,0.2); }
         .table-actions button.delete:hover { background:rgba(239,68,68,0.1); color:var(--accent-red); border-color:rgba(239,68,68,0.2); }
+        .table-actions button.success:hover { background:rgba(34,197,94,0.1); color:var(--accent-green); border-color:rgba(34,197,94,0.2); }
         @media (max-width:900px) { .data-table { display:block; overflow-x:auto; white-space:nowrap; } }
         .search-bar { display:flex; align-items:center; gap:10px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:6px 12px; flex:1; max-width:300px; }
         .search-bar input { background:transparent; border:none; color:var(--text-primary); font-size:12px; outline:none; width:100%; font-family:inherit; }
@@ -125,7 +136,7 @@
         .search-bar i { color:var(--text-muted); font-size:14px; }
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(12px); display:none; align-items:center; justify-content:center; z-index:1000; overflow-y:auto; padding:20px 16px; }
         .modal-overlay.active { display:flex; }
-        .modal { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:20px; padding:24px; width:520px; max-width:100%; position:relative; box-shadow:0 40px 80px rgba(0,0,0,0.5); max-height:90vh; overflow-y:auto; }
+        .modal { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:20px; padding:24px; width:560px; max-width:100%; position:relative; box-shadow:0 40px 80px rgba(0,0,0,0.5); max-height:90vh; overflow-y:auto; }
         .modal .close-btn { position:absolute; top:14px; right:14px; width:28px; height:28px; background:rgba(255,255,255,0.04); border:1px solid var(--border-color); border-radius:8px; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all 0.2s; }
         .modal .close-btn:hover { background:rgba(255,255,255,0.08); color:var(--text-primary); }
         .modal h2 { font-size:20px; font-weight:700; margin-bottom:4px; }
@@ -136,6 +147,7 @@
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--accent-purple); box-shadow:0 0 0 3px rgba(124,58,237,0.08); }
         .form-group textarea { resize:vertical; min-height:80px; }
         .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .form-group input[type="checkbox"] { width:auto; margin-right:6px; }
         .modal .btn-primary { width:100%; justify-content:center; margin-top:4px; }
         .modal .error-msg { color:var(--accent-red); font-size:11px; margin-top:4px; text-align:center; }
         @media (max-width:600px) { .modal { padding:20px 16px; } .form-row { grid-template-columns:1fr; } }
@@ -160,9 +172,19 @@
         .access-denied i { font-size:64px; color:var(--accent-red); margin-bottom:20px; }
         .access-denied h1 { font-size:24px; margin-bottom:8px; }
         .access-denied p { color:var(--text-secondary); font-size:14px; margin-bottom:20px; max-width:400px; }
+        .status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
+        .status-dot.online { background:var(--accent-green); }
+        .status-dot.offline { background:var(--text-muted); }
+        .status-dot.pending { background:var(--accent-orange); }
         @keyframes fadeInUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .quick-actions { display:flex; gap:10px; flex-wrap:wrap; margin:0 16px 24px; }
+        .quick-action { background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; transition:all 0.3s; flex:1; min-width:150px; }
+        .quick-action:hover { background:var(--bg-card-hover); border-color:rgba(124,58,237,0.2); transform:translateY(-2px); }
+        .quick-action i { font-size:20px; width:32px; text-align:center; }
+        .quick-action .info .title { font-size:13px; font-weight:600; }
+        .quick-action .info .desc { font-size:11px; color:var(--text-muted); }
+        @media (max-width:600px) { .quick-actions { flex-direction:column; margin:0 10px 16px; } }
     </style>
-<base target="_blank">
 </head>
 <body>
     <div class="loading-overlay" id="loadingScreen"><div class="spinner"></div><p>Loading Admin Panel...</p></div>
@@ -187,6 +209,7 @@
                     <button class="nav-item" data-section="users" onclick="showSection('users')"><i class="fas fa-users"></i><span>Users</span></button>
                     <button class="nav-item" data-section="courses" onclick="showSection('courses')"><i class="fas fa-graduation-cap"></i><span>Courses</span></button>
                     <button class="nav-item" data-section="classes" onclick="showSection('classes')"><i class="fas fa-calendar-alt"></i><span>Classes</span></button>
+                    <button class="nav-item" data-section="enrollments" onclick="showSection('enrollments')"><i class="fas fa-book-open"></i><span>Enrollments</span></button>
                 </div>
                 <div class="sidebar-divider"></div>
                 <div class="nav-section"><div class="nav-section-title">Content</div>
@@ -213,7 +236,7 @@
                     <div class="page-title" id="pageTitle">Admin Overview</div>
                 </div>
                 <div class="top-actions">
-                    <button class="icon-btn" onclick="refreshAll()"><i class="fas fa-sync-alt"></i></button>
+                    <button class="icon-btn" onclick="refreshAll()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
                     <div class="user-profile" id="userProfile">
                         <img src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff&size=100" alt="Admin" id="userProfileImg">
                         <div class="name" id="userName">Admin</div>
@@ -221,6 +244,27 @@
                     <button class="btn-danger btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
             </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="showSection('courses');openCourseModal()">
+                    <i class="fas fa-plus-circle" style="color:var(--accent-purple);"></i>
+                    <div class="info"><div class="title">Add Course</div><div class="desc">Create new course</div></div>
+                </div>
+                <div class="quick-action" onclick="showSection('classes');openClassModal()">
+                    <i class="fas fa-calendar-plus" style="color:var(--accent-cyan);"></i>
+                    <div class="info"><div class="title">Add Class</div><div class="desc">Schedule new class</div></div>
+                </div>
+                <div class="quick-action" onclick="showSection('projects');openProjectModal()">
+                    <i class="fas fa-folder-plus" style="color:var(--accent-orange);"></i>
+                    <div class="info"><div class="title">Add Project</div><div class="desc">Create new project</div></div>
+                </div>
+                <div class="quick-action" onclick="showSection('premium_requests')">
+                    <i class="fas fa-crown" style="color:var(--accent-orange);"></i>
+                    <div class="info"><div class="title">Premium Requests</div><div class="desc" id="pendingCount">0 pending</div></div>
+                </div>
+            </div>
+
             <div class="section active" id="section-overview">
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-header"><div class="stat-icon purple"><i class="fas fa-users"></i></div></div><div class="stat-value" id="statTotalUsers">0</div><div class="stat-label">Total Users</div></div>
@@ -230,7 +274,11 @@
                     <div class="stat-card"><div class="stat-header"><div class="stat-icon cyan"><i class="fas fa-folder"></i></div></div><div class="stat-value" id="statTotalProjects">0</div><div class="stat-label">Projects</div></div>
                     <div class="stat-card"><div class="stat-header"><div class="stat-icon red"><i class="fas fa-clock"></i></div></div><div class="stat-value" id="statPendingRequests">0</div><div class="stat-label">Pending Requests</div></div>
                     <div class="stat-card"><div class="stat-header"><div class="stat-icon purple"><i class="fas fa-calendar-alt"></i></div></div><div class="stat-value" id="statUpcomingClasses">0</div><div class="stat-label">Upcoming Classes</div></div>
-                    <div class="stat-card"><div class="stat-header"><div class="stat-icon blue"><i class="fas fa-wrench"></i></div></div><div class="stat-value" id="statTotalTools">0</div><div class="stat-label">Tools</div></div>
+                    <div class="stat-card"><div class="stat-header"><div class="stat-icon blue"><i class="fas fa-book-open"></i></div></div><div class="stat-value" id="statTotalEnrollments">0</div><div class="stat-label">Total Enrollments</div></div>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-card"><h3><i class="fas fa-chart-bar" style="color:var(--accent-violet);margin-right:8px;"></i>User Growth</h3><canvas id="userChart"></canvas></div>
+                    <div class="chart-card"><h3><i class="fas fa-chart-pie" style="color:var(--accent-orange);margin-right:8px;"></i>Enrollment Stats</h3><canvas id="enrollmentChart"></canvas></div>
                 </div>
                 <div class="section-header"><h2><i class="fas fa-history" style="color:var(--accent-violet);margin-right:8px;"></i>Recent Activity</h2></div>
                 <div class="data-table-wrapper">
@@ -239,16 +287,18 @@
                     </table>
                 </div>
             </div>
+
             <div class="section" id="section-users">
                 <div class="section-header"><h2><i class="fas fa-users" style="color:var(--accent-violet);margin-right:8px;"></i>All Users</h2>
                     <div class="section-actions"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers(this.value)"></div></div>
                 </div>
                 <div class="data-table-wrapper">
-                    <table class="data-table"><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
-                    <tbody id="usersTable"><tr><td colspan="6" class="empty-state"><i class="fas fa-users"></i><p>Loading users...</p></td></tr></tbody>
+                    <table class="data-table"><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Enrolled</th><th>Joined</th><th>Actions</th></tr></thead>
+                    <tbody id="usersTable"><tr><td colspan="7" class="empty-state"><i class="fas fa-users"></i><p>Loading users...</p></td></tr></tbody>
                     </table>
                 </div>
             </div>
+
             <div class="section" id="section-courses">
                 <div class="section-header"><h2><i class="fas fa-graduation-cap" style="color:var(--accent-violet);margin-right:8px;"></i>Courses</h2>
                     <div class="section-actions"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="courseSearch" placeholder="Search courses..." oninput="filterCourses(this.value)"></div><button class="btn-primary btn-sm" onclick="openCourseModal()"><i class="fas fa-plus"></i> Add Course</button></div>
@@ -259,6 +309,7 @@
                     </table>
                 </div>
             </div>
+
             <div class="section" id="section-classes">
                 <div class="section-header"><h2><i class="fas fa-calendar-alt" style="color:var(--accent-cyan);margin-right:8px;"></i>Classes</h2>
                     <div class="section-actions"><button class="btn-primary btn-sm" onclick="openClassModal()"><i class="fas fa-plus"></i> Add Class</button></div>
@@ -269,9 +320,21 @@
                     </table>
                 </div>
             </div>
+
+            <div class="section" id="section-enrollments">
+                <div class="section-header"><h2><i class="fas fa-book-open" style="color:var(--accent-violet);margin-right:8px;"></i>Enrollments</h2>
+                    <div class="section-actions"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="enrollmentSearch" placeholder="Search enrollments..." oninput="filterEnrollments(this.value)"></div></div>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table"><thead><tr><th>Student</th><th>Course</th><th>Progress</th><th>Status</th><th>Enrolled</th><th>Actions</th></tr></thead>
+                    <tbody id="enrollmentsTable"><tr><td colspan="6" class="empty-state"><i class="fas fa-book-open"></i><p>Loading enrollments...</p></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="section" id="section-projects">
                 <div class="section-header"><h2><i class="fas fa-folder" style="color:var(--accent-violet);margin-right:8px;"></i>Projects</h2>
-                    <div class="section-actions"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="projectSearch" placeholder="Search projects..." oninput="filterProjects(this.value)"></div></div>
+                    <div class="section-actions"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="projectSearch" placeholder="Search projects..." oninput="filterProjects(this.value)"></div><button class="btn-primary btn-sm" onclick="openProjectModal()"><i class="fas fa-plus"></i> Add Project</button></div>
                 </div>
                 <div class="data-table-wrapper">
                     <table class="data-table"><thead><tr><th>Project</th><th>Author</th><th>Status</th><th>Likes</th><th>Date</th><th>Actions</th></tr></thead>
@@ -279,6 +342,7 @@
                     </table>
                 </div>
             </div>
+
             <div class="section" id="section-tools">
                 <div class="section-header"><h2><i class="fas fa-wrench" style="color:var(--accent-violet);margin-right:8px;"></i>Tools</h2>
                     <div class="section-actions"><button class="btn-primary btn-sm" onclick="openToolModal()"><i class="fas fa-plus"></i> Add Tool</button></div>
@@ -289,6 +353,7 @@
                     </table>
                 </div>
             </div>
+
             <div class="section" id="section-resources">
                 <div class="section-header"><h2><i class="fas fa-file-alt" style="color:var(--accent-violet);margin-right:8px;"></i>Resources</h2>
                     <div class="section-actions"><button class="btn-primary btn-sm" onclick="openResourceModal()"><i class="fas fa-plus"></i> Add Resource</button></div>
@@ -299,6 +364,7 @@
                     </table>
                 </div>
             </div>
+
             <div class="section" id="section-payments">
                 <div class="section-header"><h2><i class="fas fa-credit-card" style="color:var(--accent-green);margin-right:8px;"></i>Payments</h2></div>
                 <div class="data-table-wrapper">
@@ -307,6 +373,7 @@
                     </table>
                 </div>
             </div>
+
             <div class="section" id="section-premium_requests">
                 <div class="section-header"><h2><i class="fas fa-crown" style="color:var(--accent-orange);margin-right:8px;"></i>Premium Requests</h2></div>
                 <div class="data-table-wrapper">
@@ -315,6 +382,7 @@
                     </table>
                 </div>
             </div>
+
             <div class="section" id="section-settings">
                 <div class="section-header"><h2><i class="fas fa-cog" style="color:var(--accent-violet);margin-right:8px;"></i>Site Settings</h2><button class="btn-primary btn-sm" onclick="openSettingModal()"><i class="fas fa-plus"></i> Add Setting</button></div>
                 <div class="data-table-wrapper">
@@ -323,6 +391,7 @@
                     </table>
                 </div>
             </div>
+
             <div class="section" id="section-activity">
                 <div class="section-header"><h2><i class="fas fa-history" style="color:var(--accent-violet);margin-right:8px;"></i>Activity Log</h2></div>
                 <div class="data-table-wrapper">
@@ -366,23 +435,28 @@
             </form>
         </div>
     </div>
+
     <!-- Class Modal -->
     <div class="modal-overlay" id="classModal">
         <div class="modal">
             <button class="close-btn" onclick="closeModal('classModal')"><i class="fas fa-times"></i></button>
             <h2 id="classModalTitle">Add Class</h2>
-            <p>Schedule a new class.</p>
+            <p>Schedule a new class linked to a course.</p>
             <form id="classForm" onsubmit="handleClassSubmit(event)">
                 <input type="hidden" id="classId">
                 <div class="form-group"><label>Title</label><input type="text" id="classTitle" required></div>
-                <div class="form-group"><label>Course Name</label><input type="text" id="classCourse" required></div>
+                <div class="form-group"><label>Course</label>
+                    <select id="classCourseId" required>
+                        <option value="">Select a course...</option>
+                    </select>
+                </div>
                 <div class="form-row">
                     <div class="form-group"><label>Date & Time</label><input type="datetime-local" id="classDate" required></div>
                     <div class="form-group"><label>Duration (hours)</label><input type="number" id="classDuration" value="2"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Class Type</label><select id="classType"><option value="free">Free</option><option value="premium">Premium</option><option value="paid">Paid</option></select></div>
-                    <div class="form-group"><label>Capacity</label><input type="number" id="classCapacity" value="50"></div>
+                    <div class="form-group"><label>Class Type</label><select id="classType"><option value="live">Live</option><option value="recorded">Recorded</option><option value="workshop">Workshop</option></select></div>
+                    <div class="form-group"><label>Requires Enrollment</label><select id="classRequiresEnrollment"><option value="true">Yes (enrolled users only)</option><option value="false">No (everyone)</option></select></div>
                 </div>
                 <div class="form-group"><label>Description</label><textarea id="classDesc" rows="2"></textarea></div>
                 <div class="form-row">
@@ -402,6 +476,38 @@
             </form>
         </div>
     </div>
+
+    <!-- Project Modal -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('projectModal')"><i class="fas fa-times"></i></button>
+            <h2 id="projectModalTitle">Add Project</h2>
+            <form id="projectForm" onsubmit="handleProjectSubmit(event)">
+                <input type="hidden" id="projectId">
+                <div class="form-group"><label>Title</label><input type="text" id="projectTitle" required></div>
+                <div class="form-group"><label>Description</label><textarea id="projectDesc" rows="3"></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Author Name</label><input type="text" id="projectAuthor" required></div>
+                    <div class="form-group"><label>Author Email</label><input type="email" id="projectAuthorEmail"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Category</label><select id="projectCategory"><option value="design">Design</option><option value="development">Development</option><option value="branding">Branding</option><option value="ui/ux">UI/UX</option><option value="other">Other</option></select></div>
+                    <div class="form-group"><label>Status</label><select id="projectStatus"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Image URL</label><input type="text" id="projectImage" placeholder="https://..."></div>
+                    <div class="form-group"><label>Demo Link</label><input type="text" id="projectDemoLink" placeholder="https://..."></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><input type="checkbox" id="projectIsFeatured" style="width:auto;margin-right:6px;">Featured</label></div>
+                    <div class="form-group"><label><input type="checkbox" id="projectIsActive" checked style="width:auto;margin-right:6px;">Active</label></div>
+                </div>
+                <div class="error-msg" id="projectError"></div>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Project</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Tool Modal -->
     <div class="modal-overlay" id="toolModal">
         <div class="modal">
@@ -428,6 +534,7 @@
             </form>
         </div>
     </div>
+
     <!-- Resource Modal -->
     <div class="modal-overlay" id="resourceModal">
         <div class="modal">
@@ -450,6 +557,7 @@
             </form>
         </div>
     </div>
+
     <!-- Setting Modal -->
     <div class="modal-overlay" id="settingModal">
         <div class="modal">
@@ -469,6 +577,7 @@
             </form>
         </div>
     </div>
+
     <!-- User Edit Modal -->
     <div class="modal-overlay" id="userModal">
         <div class="modal">
@@ -491,6 +600,7 @@
             </form>
         </div>
     </div>
+
     <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg">Success!</span></div>
 
     <script>
@@ -507,6 +617,8 @@
         let currentUser = null;
         let isAdmin = false;
         let dataCache = {};
+        let userChart = null;
+        let enrollmentChart = null;
 
         function showToast(msg, type='success') {
             const t = document.getElementById('toast');
@@ -533,7 +645,7 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('section-' + name).classList.add('active');
             document.querySelector('.nav-item[data-section="' + name + '"]').classList.add('active');
-            const titles = {overview:'Admin Overview', users:'Manage Users', courses:'Manage Courses', classes:'Manage Classes', projects:'Manage Projects', tools:'Manage Tools', resources:'Manage Resources', payments:'Payments', premium_requests:'Premium Requests', settings:'Site Settings', activity:'Activity Log'};
+            const titles = {overview:'Admin Overview', users:'Manage Users', courses:'Manage Courses', classes:'Manage Classes', enrollments:'Manage Enrollments', projects:'Manage Projects', tools:'Manage Tools', resources:'Manage Resources', payments:'Payments', premium_requests:'Premium Requests', settings:'Site Settings', activity:'Activity Log'};
             document.getElementById('pageTitle').textContent = titles[name] || 'Admin';
         };
 
@@ -569,10 +681,13 @@
 
         window.refreshAll = async function() {
             await Promise.all([
-                loadStats(), loadUsers(), loadCourses(), loadClasses(), loadProjects(),
-                loadTools(), loadResources(), loadPayments(), loadPremiumRequests(),
-                loadSettings(), loadActivity()
+                loadStats(), loadUsers(), loadCourses(), loadClasses(), loadEnrollments(),
+                loadProjects(), loadTools(), loadResources(), loadPayments(), 
+                loadPremiumRequests(), loadSettings(), loadActivity()
             ]);
+            await loadCourseOptions();
+            updateCharts();
+            updatePendingCount();
         };
 
         window.logout = async function() {
@@ -580,17 +695,31 @@
             window.location.href = 'index.html';
         };
 
+        function updatePendingCount() {
+            const pending = dataCache.premiumRequests?.filter(r => r.status === 'pending').length || 0;
+            document.getElementById('pendingCount').textContent = pending + ' pending';
+        }
+
+        async function loadCourseOptions() {
+            const { data } = await supabase.from('courses').select('id, title').eq('is_active', true);
+            const select = document.getElementById('classCourseId');
+            if (!select) return;
+            select.innerHTML = '<option value="">Select a course...</option>' + 
+                (data||[]).map(c => '<option value="' + c.id + '">' + c.title + '</option>').join('');
+        }
+
         // Stats
         async function loadStats() {
             try {
-                const [{count:users}, {count:premium}, {count:courses}, {count:projects}, {count:tools}, {count:pending}, {count:classes}] = await Promise.all([
+                const [{count:users}, {count:premium}, {count:courses}, {count:projects}, {count:tools}, {count:pending}, {count:classes}, {count:enrollments}] = await Promise.all([
                     supabase.from('users').select('*', {count:'exact', head:true}),
                     supabase.from('users').select('*', {count:'exact', head:true}).eq('is_premium', true),
                     supabase.from('courses').select('*', {count:'exact', head:true}),
                     supabase.from('projects').select('*', {count:'exact', head:true}),
                     supabase.from('tools').select('*', {count:'exact', head:true}),
                     supabase.from('premium_requests').select('*', {count:'exact', head:true}).eq('status', 'pending'),
-                    supabase.from('classes').select('*', {count:'exact', head:true}).gte('date', new Date().toISOString())
+                    supabase.from('classes').select('*', {count:'exact', head:true}).gte('date', new Date().toISOString()),
+                    supabase.from('enrollments').select('*', {count:'exact', head:true})
                 ]);
                 document.getElementById('statTotalUsers').textContent = users || 0;
                 document.getElementById('statPremiumUsers').textContent = premium || 0;
@@ -599,6 +728,7 @@
                 document.getElementById('statTotalTools').textContent = tools || 0;
                 document.getElementById('statPendingRequests').textContent = pending || 0;
                 document.getElementById('statUpcomingClasses').textContent = classes || 0;
+                document.getElementById('statTotalEnrollments').textContent = enrollments || 0;
 
                 const { data: payments } = await supabase.from('payments').select('amount').eq('status', 'completed');
                 const revenue = (payments || []).reduce((a,b) => a + (b.amount||0), 0);
@@ -615,12 +745,13 @@
 
         function renderUsers(users) {
             const tbody = document.getElementById('usersTable');
-            if (!users?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-users"></i><p>No users found</p></td></tr>'; return; }
+            if (!users?.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-users"></i><p>No users found</p></td></tr>'; return; }
             tbody.innerHTML = users.map(u => {
                 const roleBadge = u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : (u.role === 'instructor' ? '<span class="badge badge-premium">Instructor</span>' : '<span class="badge badge-free">Student</span>');
                 const statusBadge = u.status === 'active' ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">' + u.status + '</span>';
                 const premiumBadge = u.is_premium ? '<span class="badge badge-premium" style="margin-left:4px;"><i class="fas fa-crown"></i></span>' : '';
-                return `<tr><td><div class="cell-title">${u.full_name || 'Unknown'} ${premiumBadge}</div></td><td>${u.email}</td><td>${roleBadge}</td><td>${statusBadge}</td><td class="cell-meta">${formatDate(u.created_at)}</td><td><div class="table-actions"><button onclick="editUser('${u.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteUser('${u.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
+                const enrolled = u.enrollment_count || 0;
+                return `<tr><td><div class="cell-title">${u.full_name || 'Unknown'} ${premiumBadge}</div></td><td>${u.email}</td><td>${roleBadge}</td><td>${statusBadge}</td><td>${enrolled}</td><td class="cell-meta">${formatDate(u.created_at)}</td><td><div class="table-actions"><button onclick="editUser('${u.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteUser('${u.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
             }).join('');
         }
 
@@ -654,14 +785,14 @@
             };
             const { error } = await supabase.from('users').update(updates).eq('id', id);
             if (error) { showToast(error.message, 'error'); return; }
-            showToast('User updated'); closeModal('userModal'); await loadUsers();
+            showToast('User updated'); closeModal('userModal'); await loadUsers(); await loadStats();
         };
 
         window.deleteUser = async function(id) {
             if (!confirm('Delete this user?')) return;
             const { error } = await supabase.from('users').delete().eq('id', id);
             if (error) { showToast(error.message, 'error'); return; }
-            showToast('User deleted'); await loadUsers();
+            showToast('User deleted'); await loadUsers(); await loadStats();
         };
 
         // Courses
@@ -739,14 +870,16 @@
                 error = res.error;
             }
             if (error) { document.getElementById('courseError').textContent = error.message; return; }
-            showToast(id ? 'Course updated' : 'Course created'); closeModal('courseModal'); await loadCourses();
+            showToast(id ? 'Course updated' : 'Course created'); closeModal('courseModal'); 
+            await loadCourses(); await loadStats(); await loadCourseOptions();
+            await logActivity(id ? 'updated' : 'created', 'course', payload.title);
         };
 
         window.deleteCourse = async function(id) {
             if (!confirm('Delete this course?')) return;
             const { error } = await supabase.from('courses').delete().eq('id', id);
             if (error) { showToast(error.message, 'error'); return; }
-            showToast('Course deleted'); await loadCourses();
+            showToast('Course deleted'); await loadCourses(); await loadStats(); await loadCourseOptions();
         };
 
         // Classes
@@ -762,7 +895,8 @@
             tbody.innerHTML = classes.map(c => {
                 const typeBadge = c.class_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : (c.class_type === 'paid' ? '<span class="badge badge-admin">Paid</span>' : '<span class="badge badge-free">Free</span>');
                 const status = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
-                return `<tr><td><div class="cell-title">${c.title}</div></td><td>${c.course}</td><td class="cell-meta">${formatDate(c.date)}</td><td>${typeBadge}</td><td>${status}</td><td><div class="table-actions"><button onclick="editClass('${c.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteClass('${c.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
+                const requiresEnroll = c.requires_enrollment !== false ? '🔒 Enrolled only' : '🌐 Everyone';
+                return `<tr><td><div class="cell-title">${c.title}</div><div class="cell-meta">${requiresEnroll}</div></td><td>${c.course || c.course_id || '—'}</td><td class="cell-meta">${formatDate(c.date)}</td><td>${typeBadge}</td><td>${status}</td><td><div class="table-actions"><button onclick="editClass('${c.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteClass('${c.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
             }).join('');
         }
 
@@ -780,15 +914,15 @@
             document.getElementById('classModalTitle').textContent = 'Edit Class';
             document.getElementById('classId').value = c.id;
             document.getElementById('classTitle').value = c.title || '';
-            document.getElementById('classCourse').value = c.course || '';
+            document.getElementById('classCourseId').value = c.course_id || '';
             document.getElementById('classDate').value = c.date ? new Date(c.date).toISOString().slice(0,16) : '';
             document.getElementById('classDuration').value = c.duration || 2;
-            document.getElementById('classType').value = c.class_type || 'free';
-            document.getElementById('classCapacity').value = c.capacity || 50;
+            document.getElementById('classType').value = c.class_type || 'live';
+            document.getElementById('classRequiresEnrollment').value = c.requires_enrollment !== false ? 'true' : 'false';
             document.getElementById('classDesc').value = c.description || '';
             document.getElementById('classWhatsapp').value = c.whatsapp || '';
             document.getElementById('classTelegram').value = c.telegram || '';
-            document.getElementById('classZoom').value = c.zoom_link || '';
+            document.getElementById('classZoom').value = c.meeting_link || c.zoom_link || '';
             document.getElementById('classRecording').value = c.recording_url || '';
             document.getElementById('classIsActive').checked = c.is_active !== false;
             document.getElementById('classIsRecorded').checked = c.is_recorded || false;
@@ -799,16 +933,19 @@
         window.handleClassSubmit = async function(e) {
             e.preventDefault();
             const id = document.getElementById('classId').value;
+            const courseId = document.getElementById('classCourseId').value;
             const payload = {
                 title: document.getElementById('classTitle').value,
-                course: document.getElementById('classCourse').value,
+                course_id: courseId,
+                course: dataCache.courses?.find(c => c.id === courseId)?.title || '',
                 date: document.getElementById('classDate').value ? new Date(document.getElementById('classDate').value).toISOString() : null,
                 duration: parseInt(document.getElementById('classDuration').value) || 2,
                 class_type: document.getElementById('classType').value,
-                capacity: parseInt(document.getElementById('classCapacity').value) || 50,
+                requires_enrollment: document.getElementById('classRequiresEnrollment').value === 'true',
                 description: document.getElementById('classDesc').value,
                 whatsapp: document.getElementById('classWhatsapp').value,
                 telegram: document.getElementById('classTelegram').value,
+                meeting_link: document.getElementById('classZoom').value,
                 zoom_link: document.getElementById('classZoom').value,
                 recording_url: document.getElementById('classRecording').value,
                 is_active: document.getElementById('classIsActive').checked,
@@ -823,14 +960,60 @@
                 error = res.error;
             }
             if (error) { document.getElementById('classError').textContent = error.message; return; }
-            showToast(id ? 'Class updated' : 'Class created'); closeModal('classModal'); await loadClasses();
+            showToast(id ? 'Class updated' : 'Class created'); closeModal('classModal'); 
+            await loadClasses(); await loadStats();
+            await logActivity(id ? 'updated' : 'created', 'class', payload.title);
         };
 
         window.deleteClass = async function(id) {
             if (!confirm('Delete this class?')) return;
             const { error } = await supabase.from('classes').delete().eq('id', id);
             if (error) { showToast(error.message, 'error'); return; }
-            showToast('Class deleted'); await loadClasses();
+            showToast('Class deleted'); await loadClasses(); await loadStats();
+        };
+
+        // Enrollments
+        async function loadEnrollments() {
+            const { data } = await supabase
+                .from('enrollments')
+                .select(`
+                    *,
+                    users:user_id (id, full_name, email),
+                    courses:course_id (id, title)
+                `)
+                .order('enrolled_at', {ascending:false});
+            dataCache.enrollments = data || [];
+            renderEnrollments(dataCache.enrollments);
+        }
+
+        function renderEnrollments(enrollments) {
+            const tbody = document.getElementById('enrollmentsTable');
+            if (!enrollments?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-book-open"></i><p>No enrollments found</p></td></tr>'; return; }
+            tbody.innerHTML = enrollments.map(e => {
+                const user = e.users || {};
+                const course = e.courses || {};
+                const statusBadge = e.status === 'active' ? '<span class="badge badge-active">Active</span>' : 
+                    (e.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : 
+                    '<span class="badge badge-inactive">' + e.status + '</span>');
+                const progress = e.progress || 0;
+                return `<tr><td><div class="cell-title">${user.full_name || 'Unknown'}</div><div class="cell-meta">${user.email || ''}</div></td><td>${course.title || e.course_id || 'Unknown'}</td><td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:4px;background:var(--bg-primary);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${progress}%;background:var(--gradient-purple);border-radius:2px;"></div></div><span style="font-size:11px;font-weight:600;">${progress}%</span></div></td><td>${statusBadge}</td><td class="cell-meta">${formatDate(e.enrolled_at || e.created_at)}</td><td><div class="table-actions"><button class="delete" onclick="deleteEnrollment('${e.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
+            }).join('');
+        }
+
+        window.filterEnrollments = function(q) {
+            const term = q.toLowerCase();
+            renderEnrollments(dataCache.enrollments.filter(e => 
+                (e.users?.full_name||'').toLowerCase().includes(term) || 
+                (e.users?.email||'').toLowerCase().includes(term) ||
+                (e.courses?.title||'').toLowerCase().includes(term)
+            ));
+        };
+
+        window.deleteEnrollment = async function(id) {
+            if (!confirm('Delete this enrollment?')) return;
+            const { error } = await supabase.from('enrollments').delete().eq('id', id);
+            if (error) { showToast(error.message, 'error'); return; }
+            showToast('Enrollment deleted'); await loadEnrollments(); await loadStats();
         };
 
         // Projects
@@ -844,14 +1027,73 @@
             const tbody = document.getElementById('projectsTable');
             if (!projects?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-folder"></i><p>No projects found</p></td></tr>'; return; }
             tbody.innerHTML = projects.map(p => {
-                const statusBadge = p.status === 'completed' ? '<span class="badge badge-active">Completed</span>' : (p.status === 'in-progress' ? '<span class="badge badge-premium">In Progress</span>' : '<span class="badge badge-pending">Pending</span>');
-                return `<tr><td><div class="cell-title">${p.title}</div></td><td>${p.author_name || 'Unknown'}</td><td>${statusBadge}</td><td>${p.likes || 0}</td><td class="cell-meta">${formatDate(p.created_at)}</td><td><div class="table-actions"><button onclick="toggleProjectFeature('${p.id}', ${!p.is_featured})" title="Toggle Feature"><i class="fas ${p.is_featured ? 'fa-star' : 'far fa-star'}"></i></button><button class="delete" onclick="deleteProject('${p.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
+                const statusBadge = p.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : 
+                    (p.status === 'in-progress' ? '<span class="badge badge-premium">In Progress</span>' : 
+                    '<span class="badge badge-pending">Pending</span>');
+                const featured = p.is_featured ? '<span class="badge badge-premium" style="margin-left:4px;"><i class="fas fa-star"></i></span>' : '';
+                return `<tr><td><div class="cell-title">${p.title} ${featured}</div></td><td>${p.author_name || 'Unknown'}</td><td>${statusBadge}</td><td>${p.likes || 0}</td><td class="cell-meta">${formatDate(p.created_at)}</td><td><div class="table-actions"><button onclick="editProject('${p.id}')" title="Edit"><i class="fas fa-edit"></i></button><button onclick="toggleProjectFeature('${p.id}', ${!p.is_featured})" title="Toggle Feature"><i class="fas ${p.is_featured ? 'fa-star' : 'far fa-star'}"></i></button><button class="delete" onclick="deleteProject('${p.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
             }).join('');
         }
 
         window.filterProjects = function(q) {
             const term = q.toLowerCase();
             renderProjects(dataCache.projects.filter(p => (p.title||'').toLowerCase().includes(term) || (p.author_name||'').toLowerCase().includes(term)));
+        };
+
+        window.openProjectModal = function() {
+            document.getElementById('projectModalTitle').textContent = 'Add Project';
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectId').value = '';
+            document.getElementById('projectError').textContent = '';
+            openModal('projectModal');
+        };
+
+        window.editProject = function(id) {
+            const p = dataCache.projects.find(x => x.id === id);
+            if (!p) return;
+            document.getElementById('projectModalTitle').textContent = 'Edit Project';
+            document.getElementById('projectId').value = p.id;
+            document.getElementById('projectTitle').value = p.title || '';
+            document.getElementById('projectDesc').value = p.description || '';
+            document.getElementById('projectAuthor').value = p.author_name || '';
+            document.getElementById('projectAuthorEmail').value = p.author_email || '';
+            document.getElementById('projectCategory').value = p.category || 'design';
+            document.getElementById('projectStatus').value = p.status || 'pending';
+            document.getElementById('projectImage').value = p.image || '';
+            document.getElementById('projectDemoLink').value = p.demo_link || '';
+            document.getElementById('projectIsFeatured').checked = p.is_featured || false;
+            document.getElementById('projectIsActive').checked = p.is_active !== false;
+            document.getElementById('projectError').textContent = '';
+            openModal('projectModal');
+        };
+
+        window.handleProjectSubmit = async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('projectId').value;
+            const payload = {
+                title: document.getElementById('projectTitle').value,
+                description: document.getElementById('projectDesc').value,
+                author_name: document.getElementById('projectAuthor').value,
+                author_email: document.getElementById('projectAuthorEmail').value,
+                category: document.getElementById('projectCategory').value,
+                status: document.getElementById('projectStatus').value,
+                image: document.getElementById('projectImage').value,
+                demo_link: document.getElementById('projectDemoLink').value,
+                is_featured: document.getElementById('projectIsFeatured').checked,
+                is_active: document.getElementById('projectIsActive').checked
+            };
+            let error;
+            if (id) {
+                const res = await supabase.from('projects').update(payload).eq('id', id);
+                error = res.error;
+            } else {
+                const res = await supabase.from('projects').insert([payload]);
+                error = res.error;
+            }
+            if (error) { document.getElementById('projectError').textContent = error.message; return; }
+            showToast(id ? 'Project updated' : 'Project created'); closeModal('projectModal'); 
+            await loadProjects(); await loadStats();
+            await logActivity(id ? 'updated' : 'created', 'project', payload.title);
         };
 
         window.toggleProjectFeature = async function(id, featured) {
@@ -864,7 +1106,7 @@
             if (!confirm('Delete this project?')) return;
             const { error } = await supabase.from('projects').delete().eq('id', id);
             if (error) { showToast(error.message, 'error'); return; }
-            showToast('Project deleted'); await loadProjects();
+            showToast('Project deleted'); await loadProjects(); await loadStats();
         };
 
         // Tools
@@ -931,14 +1173,14 @@
                 error = res.error;
             }
             if (error) { document.getElementById('toolError').textContent = error.message; return; }
-            showToast(id ? 'Tool updated' : 'Tool created'); closeModal('toolModal'); await loadTools();
+            showToast(id ? 'Tool updated' : 'Tool created'); closeModal('toolModal'); await loadTools(); await loadStats();
         };
 
         window.deleteTool = async function(id) {
             if (!confirm('Delete this tool?')) return;
             const { error } = await supabase.from('tools').delete().eq('id', id);
             if (error) { showToast(error.message, 'error'); return; }
-            showToast('Tool deleted'); await loadTools();
+            showToast('Tool deleted'); await loadTools(); await loadStats();
         };
 
         // Resources
@@ -1001,14 +1243,14 @@
                 error = res.error;
             }
             if (error) { document.getElementById('resourceError').textContent = error.message; return; }
-            showToast(id ? 'Resource updated' : 'Resource created'); closeModal('resourceModal'); await loadResources();
+            showToast(id ? 'Resource updated' : 'Resource created'); closeModal('resourceModal'); await loadResources(); await loadStats();
         };
 
         window.deleteResource = async function(id) {
             if (!confirm('Delete this resource?')) return;
             const { error } = await supabase.from('resources').delete().eq('id', id);
             if (error) { showToast(error.message, 'error'); return; }
-            showToast('Resource deleted'); await loadResources();
+            showToast('Resource deleted'); await loadResources(); await loadStats();
         };
 
         // Payments
@@ -1023,7 +1265,7 @@
             if (!payments?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-credit-card"></i><p>No payments found</p></td></tr>'; return; }
             tbody.innerHTML = payments.map(p => {
                 const status = p.status === 'completed' ? '<span class="badge badge-active">Completed</span>' : (p.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + p.status + '</span>');
-                return `<tr><td>${p.user_email || 'Unknown'}</td><td>${formatCurrency(p.amount)}</td><td>${p.payment_type || ''}</td><td>${status}</td><td class="cell-meta">${formatDate(p.created_at)}</td><td><div class="table-actions">${p.status === 'pending' ? `<button class="success" onclick="confirmPayment('${p.id}')" title="Confirm"><i class="fas fa-check"></i></button>` : ''}<button class="delete" onclick="deletePayment('${p.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
+                return `<tr><td>${p.user_email || 'Unknown'}</td><td>${formatCurrency(p.amount)}</td><td>${p.payment_type || p.type || ''}</td><td>${status}</td><td class="cell-meta">${formatDate(p.created_at)}</td><td><div class="table-actions">${p.status === 'pending' ? `<button class="success" onclick="confirmPayment('${p.id}')" title="Confirm"><i class="fas fa-check"></i></button>` : ''}<button class="delete" onclick="deletePayment('${p.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
             }).join('');
         }
 
@@ -1031,13 +1273,14 @@
             const { error } = await supabase.from('payments').update({status: 'completed', confirmed_by: currentUser.id, confirmed_at: new Date().toISOString()}).eq('id', id);
             if (error) { showToast(error.message, 'error'); return; }
             showToast('Payment confirmed'); await loadPayments(); await loadStats();
+            await logActivity('confirmed', 'payment', 'Payment confirmed');
         };
 
         window.deletePayment = async function(id) {
             if (!confirm('Delete this payment record?')) return;
             const { error } = await supabase.from('payments').delete().eq('id', id);
             if (error) { showToast(error.message, 'error'); return; }
-            showToast('Payment deleted'); await loadPayments();
+            showToast('Payment deleted'); await loadPayments(); await loadStats();
         };
 
         // Premium Requests
@@ -1045,6 +1288,7 @@
             const { data } = await supabase.from('premium_requests').select('*').order('created_at', {ascending:false});
             dataCache.premiumRequests = data || [];
             renderPremiumRequests(dataCache.premiumRequests);
+            updatePendingCount();
         }
 
         function renderPremiumRequests(requests) {
@@ -1052,16 +1296,35 @@
             if (!requests?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-crown"></i><p>No premium requests found</p></td></tr>'; return; }
             tbody.innerHTML = requests.map(r => {
                 const status = r.status === 'confirmed' ? '<span class="badge badge-active">Confirmed</span>' : (r.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">Rejected</span>');
-                return `<tr><td>${r.user_name || 'Unknown'}</td><td>${r.user_email || ''}</td><td>${formatCurrency(r.amount)}</td><td>${status}</td><td class="cell-meta">${formatDate(r.created_at)}</td><td><div class="table-actions">${r.status === 'pending' ? `<button class="success" onclick="approveRequest('${r.id}', '${r.user_id}')" title="Approve"><i class="fas fa-check"></i></button><button class="delete" onclick="rejectRequest('${r.id}')" title="Reject"><i class="fas fa-times"></i></button>` : ''}<button class="delete" onclick="deleteRequest('${r.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
+                return `<tr><td>${r.user_name || 'Unknown'}</td><td>${r.user_email || ''}</td><td>${formatCurrency(r.amount || 13500)}</td><td>${status}</td><td class="cell-meta">${formatDate(r.created_at)}</td><td><div class="table-actions">${r.status === 'pending' ? `<button class="success" onclick="approveRequest('${r.id}', '${r.user_id}')" title="Approve"><i class="fas fa-check"></i></button><button class="delete" onclick="rejectRequest('${r.id}')" title="Reject"><i class="fas fa-times"></i></button>` : ''}<button class="delete" onclick="deleteRequest('${r.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>`;
             }).join('');
         }
 
         window.approveRequest = async function(id, userId) {
             const { error: reqErr } = await supabase.from('premium_requests').update({status: 'confirmed', confirmed_by: currentUser.id, confirmed_at: new Date().toISOString()}).eq('id', id);
             if (reqErr) { showToast(reqErr.message, 'error'); return; }
-            const { error: userErr } = await supabase.from('users').update({is_premium: true, subscription_status: 'active', premium_start: new Date().toISOString(), premium_end: new Date(Date.now() + 180*24*60*60*1000).toISOString()}).eq('id', userId);
+            const { error: userErr } = await supabase.from('users').update({
+                is_premium: true, 
+                subscription_status: 'active', 
+                premium_start: new Date().toISOString(), 
+                premium_end: new Date(Date.now() + 180*24*60*60*1000).toISOString()
+            }).eq('id', userId);
             if (userErr) { showToast(userErr.message, 'error'); return; }
-            showToast('Premium request approved'); await loadPremiumRequests(); await loadStats(); await loadUsers();
+            // Record payment
+            await supabase.from('payments').insert({
+                user_id: userId,
+                user_email: dataCache.users?.find(u => u.id === userId)?.email || '',
+                amount: 13500,
+                payment_type: 'premium',
+                item: 'Premium Subscription (6 months)',
+                status: 'completed',
+                confirmed_by: currentUser.id,
+                confirmed_at: new Date().toISOString(),
+                created_at: new Date().toISOString()
+            });
+            showToast('Premium request approved! 🎉'); 
+            await loadPremiumRequests(); await loadStats(); await loadUsers(); await loadPayments();
+            await logActivity('approved', 'premium_request', 'Approved premium for user');
         };
 
         window.rejectRequest = async function(id) {
@@ -1144,12 +1407,11 @@
             showToast('Setting deleted'); await loadSettings();
         };
 
-        // Activity
+        // Activity Log
         async function loadActivity() {
             const { data } = await supabase.from('activity_log').select('*').order('created_at', {ascending:false}).limit(50);
             dataCache.activity = data || [];
             renderActivity(dataCache.activity);
-            // Also update recent activity on overview
             renderRecentActivity(dataCache.activity.slice(0, 5));
         }
 
@@ -1163,6 +1425,81 @@
             const tbody = document.getElementById('recentActivityTable');
             if (!activity?.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-history"></i><p>No recent activity</p></td></tr>'; return; }
             tbody.innerHTML = activity.map(a => `<tr><td><div class="cell-title">${a.action}</div></td><td>${a.entity_type || ''}</td><td class="cell-meta">${a.user_id ? a.user_id.slice(0,8)+'...' : 'System'}</td><td class="cell-meta">${formatDate(a.created_at)}</td></tr>`).join('');
+        }
+
+        async function logActivity(action, entityType, details) {
+            try {
+                await supabase.from('activity_log').insert({
+                    action: action,
+                    entity_type: entityType,
+                    details: { message: details },
+                    user_id: currentUser.id,
+                    created_at: new Date().toISOString()
+                });
+            } catch(e) { console.error('Log error:', e); }
+        }
+
+        // Charts
+        function updateCharts() {
+            // User Growth Chart
+            const ctx1 = document.getElementById('userChart')?.getContext('2d');
+            if (ctx1) {
+                if (userChart) userChart.destroy();
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const userCounts = months.map((_, i) => {
+                    const monthStart = new Date(2026, i, 1);
+                    const monthEnd = new Date(2026, i + 1, 1);
+                    return dataCache.users?.filter(u => {
+                        const d = new Date(u.created_at);
+                        return d >= monthStart && d < monthEnd;
+                    }).length || 0;
+                });
+                userChart = new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'New Users',
+                            data: userCounts,
+                            borderColor: '#7c3aed',
+                            backgroundColor: 'rgba(124,58,237,0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { labels: { color: '#94a3b8' } } },
+                        scales: {
+                            x: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b' } },
+                            y: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b' } }
+                        }
+                    }
+                });
+            }
+
+            // Enrollment Stats Chart
+            const ctx2 = document.getElementById('enrollmentChart')?.getContext('2d');
+            if (ctx2) {
+                if (enrollmentChart) enrollmentChart.destroy();
+                const total = dataCache.enrollments?.length || 0;
+                const completed = dataCache.enrollments?.filter(e => e.progress === 100).length || 0;
+                const active = dataCache.enrollments?.filter(e => e.status === 'active' && e.progress < 100).length || 0;
+                enrollmentChart = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Completed', 'Active', 'Inactive'],
+                        datasets: [{
+                            data: [completed, active, total - completed - active],
+                            backgroundColor: ['#22c55e', '#7c3aed', '#64748b']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
+                    }
+                });
+            }
         }
 
         // Sidebar
