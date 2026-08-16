@@ -1500,7 +1500,10 @@
         <span id="toastMsg">Success!</span>
     </div>
 
-  <script>
+ <script>
+// ============================================================
+// PROFILE APP - COMPLETE WITH ENROLLMENT DISPLAY
+// ============================================================
 
 (function() {
     // ============================================================
@@ -1577,369 +1580,6 @@
     }
 
     // ============================================================
-    // 🔥 USER ACTIVITY FUNCTIONS
-    // ============================================================
-
-    // 1. ENROLL IN COURSE
-    async function enrollInCourse(courseId) {
-        if (!currentUser) {
-            showToast('Please sign in first', 'error');
-            return false;
-        }
-
-        if (!supabaseConfigured) {
-            showToast('Supabase not configured', 'error');
-            return false;
-        }
-
-        try {
-            // Check if already enrolled
-            const { data: existing } = await supabaseClient
-                .from('enrollments')
-                .select('id')
-                .eq('user_id', currentUser.id)
-                .eq('course_id', courseId)
-                .single();
-
-            if (existing) {
-                showToast('Already enrolled in this course', 'info');
-                return true;
-            }
-
-            // Create enrollment
-            const { data, error } = await supabaseClient
-                .from('enrollments')
-                .insert({
-                    user_id: currentUser.id,
-                    course_id: courseId,
-                    progress: 0,
-                    status: 'active',
-                    enrolled_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                })
-                .select()
-                .single();
-
-            if (error) throw error;
-
-            // Add XP for enrolling
-            await addXP(currentUser.id, 10, 'Course Enrollment');
-
-            showToast('Successfully enrolled in course! 🎉', 'success');
-            await loadUserData();
-            return true;
-        } catch (e) {
-            console.error('Enrollment error:', e);
-            showToast('Error enrolling: ' + e.message, 'error');
-            return false;
-        }
-    }
-
-    // 2. UPDATE COURSE PROGRESS
-    async function updateCourseProgress(courseId, progress) {
-        if (!currentUser) {
-            showToast('Please sign in first', 'error');
-            return false;
-        }
-
-        if (!supabaseConfigured) {
-            showToast('Supabase not configured', 'error');
-            return false;
-        }
-
-        try {
-            const { data: enrollment, error: fetchError } = await supabaseClient
-                .from('enrollments')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .eq('course_id', courseId)
-                .single();
-
-            if (fetchError) {
-                if (fetchError.code === 'PGRST116') {
-                    showToast('You are not enrolled in this course', 'error');
-                    return false;
-                }
-                throw fetchError;
-            }
-
-            if (progress <= enrollment.progress) return true;
-            if (enrollment.progress === 100) {
-                showToast('Course already completed! 🏆', 'info');
-                return true;
-            }
-
-            const newProgress = Math.min(100, progress);
-            const { error: updateError } = await supabaseClient
-                .from('enrollments')
-                .update({
-                    progress: newProgress,
-                    updated_at: new Date().toISOString(),
-                    completed_at: newProgress === 100 ? new Date().toISOString() : null,
-                    status: newProgress === 100 ? 'completed' : 'active'
-                })
-                .eq('id', enrollment.id);
-
-            if (updateError) throw updateError;
-
-            const xpGained = Math.floor((newProgress - enrollment.progress) / 10) * 5;
-            if (xpGained > 0) {
-                await addXP(currentUser.id, xpGained, 'Course Progress');
-            }
-
-            if (newProgress === 100) {
-                showToast('Course completed! 🏆 Great job!', 'success');
-                await addXP(currentUser.id, 50, 'Course Completion');
-                await generateCertificate(currentUser.id, courseId);
-                await checkAchievements(currentUser.id);
-            } else {
-                showToast(`Progress updated to ${newProgress}%`, 'success');
-            }
-
-            await loadUserData();
-            return true;
-        } catch (e) {
-            console.error('Progress update error:', e);
-            showToast('Error updating progress: ' + e.message, 'error');
-            return false;
-        }
-    }
-
-    // 3. ADD XP
-    async function addXP(userId, amount, reason) {
-        if (!supabaseConfigured) return false;
-
-        try {
-            const { data: user } = await supabaseClient
-                .from('users')
-                .select('total_xp')
-                .eq('id', userId)
-                .single();
-
-            const newXP = (user?.total_xp || 0) + amount;
-
-            const { error } = await supabaseClient
-                .from('users')
-                .update({
-                    total_xp: newXP,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', userId);
-
-            if (error) throw error;
-
-            // Log XP transaction
-            try {
-                await supabaseClient
-                    .from('xp_transactions')
-                    .insert({
-                        user_id: userId,
-                        amount: amount,
-                        reason: reason || 'Activity',
-                        created_at: new Date().toISOString()
-                    });
-            } catch (logError) {
-                console.warn('XP transaction log error:', logError);
-            }
-
-            return true;
-        } catch (e) {
-            console.error('XP update error:', e);
-            return false;
-        }
-    }
-
-    // 4. GENERATE CERTIFICATE
-    async function generateCertificate(userId, courseId) {
-        if (!supabaseConfigured) return false;
-
-        try {
-            const { data: existing } = await supabaseClient
-                .from('user_certificates')
-                .select('id')
-                .eq('user_id', userId)
-                .eq('course_id', courseId)
-                .single();
-
-            if (existing) return true;
-
-            const { data: course } = await supabaseClient
-                .from('courses')
-                .select('id, title, instructor')
-                .eq('id', courseId)
-                .single();
-
-            if (!course) return false;
-
-            const { error } = await supabaseClient
-                .from('user_certificates')
-                .insert({
-                    user_id: userId,
-                    course_id: courseId,
-                    certificate_name: `Certificate of Completion: ${course.title}`,
-                    issued_at: new Date().toISOString(),
-                    expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-                    created_at: new Date().toISOString()
-                });
-
-            if (error) throw error;
-
-            try {
-                await supabaseClient
-                    .from('notifications')
-                    .insert({
-                        user_id: userId,
-                        type: 'success',
-                        title: 'Certificate Earned! 🎓',
-                        message: `You earned a certificate for completing "${course.title}"!`,
-                        created_at: new Date().toISOString()
-                    });
-            } catch (notifError) {
-                console.warn('Notification error:', notifError);
-            }
-
-            return true;
-        } catch (e) {
-            console.error('Certificate generation error:', e);
-            return false;
-        }
-    }
-
-    // 5. CHECK ACHIEVEMENTS
-    async function checkAchievements(userId) {
-        if (!supabaseConfigured) return false;
-
-        try {
-            const { data: user } = await supabaseClient
-                .from('users')
-                .select('total_xp, is_premium')
-                .eq('id', userId)
-                .single();
-
-            const { data: enrollments } = await supabaseClient
-                .from('enrollments')
-                .select('*')
-                .eq('user_id', userId);
-
-            const { data: existing } = await supabaseClient
-                .from('user_achievements')
-                .select('achievement_id')
-                .eq('user_id', userId)
-                .eq('is_complete', true);
-
-            const unlockedIds = new Set(existing?.map(a => a.achievement_id) || []);
-            const completedCourses = enrollments?.filter(e => e.progress === 100).length || 0;
-            const totalEnrolled = enrollments?.length || 0;
-            const totalXP = user?.total_xp || 0;
-
-            const achievements = [
-                { id: 1, name: 'First Course', condition: () => totalEnrolled >= 1 },
-                { id: 2, name: '5 Courses', condition: () => totalEnrolled >= 5 },
-                { id: 3, name: '10 Courses', condition: () => totalEnrolled >= 10 },
-                { id: 4, name: '100 XP', condition: () => totalXP >= 100 },
-                { id: 5, name: '500 XP', condition: () => totalXP >= 500 },
-                { id: 6, name: 'Perfect Score', condition: () => completedCourses >= 3 },
-                { id: 7, name: 'Community Member', condition: () => true },
-                { id: 8, name: 'Premium Member', condition: () => user?.is_premium || false }
-            ];
-
-            for (const ach of achievements) {
-                if (!unlockedIds.has(ach.id) && ach.condition()) {
-                    try {
-                        await supabaseClient
-                            .from('user_achievements')
-                            .insert({
-                                user_id: userId,
-                                achievement_id: ach.id,
-                                is_complete: true,
-                                unlocked_at: new Date().toISOString(),
-                                created_at: new Date().toISOString()
-                            });
-
-                        await supabaseClient
-                            .from('notifications')
-                            .insert({
-                                user_id: userId,
-                                type: 'success',
-                                title: 'Achievement Unlocked! 🏆',
-                                message: `You earned the "${ach.name}" achievement!`,
-                                created_at: new Date().toISOString()
-                            });
-                    } catch (achError) {
-                        console.warn('Achievement unlock error:', achError);
-                    }
-                }
-            }
-
-            return true;
-        } catch (e) {
-            console.error('Achievement check error:', e);
-            return false;
-        }
-    }
-
-    // 6. UPDATE STREAK
-    async function updateStreak(userId) {
-        if (!supabaseConfigured) return false;
-
-        try {
-            const { data: user } = await supabaseClient
-                .from('users')
-                .select('streak_days, last_activity')
-                .eq('id', userId)
-                .single();
-
-            const today = new Date().toDateString();
-            const lastActivity = user?.last_activity ? new Date(user.last_activity).toDateString() : null;
-
-            let streak = user?.streak_days || 0;
-
-            if (lastActivity === today) {
-                return true;
-            }
-
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = yesterday.toDateString();
-
-            if (lastActivity === yesterdayStr) {
-                streak += 1;
-            } else if (lastActivity !== today) {
-                streak = 1;
-            }
-
-            const { error } = await supabaseClient
-                .from('users')
-                .update({
-                    streak_days: streak,
-                    last_activity: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', userId);
-
-            if (error) throw error;
-
-            if (streak % 7 === 0 && streak > 0) {
-                await addXP(userId, 20, `7-Day Streak Bonus! 🔥`);
-                showToast(`🔥 ${streak} day streak! +20 bonus XP!`, 'success');
-            }
-
-            return true;
-        } catch (e) {
-            console.error('Streak update error:', e);
-            return false;
-        }
-    }
-
-    // 7. UPDATE ACTIVITY ON PAGE LOAD
-    async function updateUserActivity() {
-        if (!currentUser) return;
-        await updateStreak(currentUser.id);
-        await checkAchievements(currentUser.id);
-        await loadUserData();
-    }
-
-    // ============================================================
     // STORAGE HELPERS
     // ============================================================
     async function uploadAvatar(file, userId) {
@@ -2001,7 +1641,6 @@
                     console.warn('Profile fetch error:', e);
                 }
                 await updateUIForUser(user);
-                await updateUserActivity();
             } else {
                 showNoUserState();
             }
@@ -2320,10 +1959,13 @@
     }
 
     // ============================================================
-    // LOAD USER DATA
+    // LOAD USER DATA - FIXED WITH COURSE DETAILS
     // ============================================================
     async function loadUserData() {
-        if (!currentUser) return;
+        if (!currentUser) {
+            console.log('No current user');
+            return;
+        }
 
         if (!supabaseConfigured) {
             showToast('Supabase not configured.', 'error');
@@ -2331,6 +1973,8 @@
         }
 
         try {
+            console.log('Loading user data for:', currentUser.id);
+
             // Get user profile
             var { data: profile } = await supabaseClient
                 .from('users')
@@ -2344,18 +1988,43 @@
                 document.getElementById('editPhone').value = profile.phone || '';
             }
 
-            // Get enrollments with course details
-            var { data: enrollments } = await supabaseClient
+            // Get enrollments WITH course details
+            var { data: enrollments, error: enrollError } = await supabaseClient
                 .from('enrollments')
-                .select('*, courses(*)')
+                .select(`
+                    *,
+                    courses:course_id (
+                        id,
+                        title,
+                        image,
+                        instructor,
+                        duration,
+                        description,
+                        is_free,
+                        price
+                    )
+                `)
                 .eq('user_id', currentUser.id);
+
+            if (enrollError) {
+                console.error('Enrollments error:', enrollError);
+            } else {
+                console.log('✅ Enrollments loaded:', enrollments?.length || 0);
+            }
 
             allEnrollments = enrollments || [];
 
             // Get certificates
             var { data: certificates } = await supabaseClient
                 .from('user_certificates')
-                .select('*, certificates(*)')
+                .select(`
+                    *,
+                    certificates:certificate_id (
+                        id,
+                        name,
+                        icon
+                    )
+                `)
                 .eq('user_id', currentUser.id);
 
             allCertificates = certificates || [];
@@ -2363,29 +2032,43 @@
             // Get achievements
             var { data: achievements } = await supabaseClient
                 .from('user_achievements')
-                .select('*, achievements(*)')
-                .eq('user_id', currentUser.id);
+                .select(`
+                    *,
+                    achievements:achievement_id (
+                        id,
+                        name,
+                        icon,
+                        description
+                    )
+                `)
+                .eq('user_id', currentUser.id)
+                .eq('is_complete', true);
 
             allAchievements = achievements || [];
 
             // Update stats
-            document.getElementById('totalCourses').textContent = allEnrollments.length;
-            document.getElementById('completedCourses').textContent = allEnrollments.filter(function(e) { return e
-                    .progress === 100; }).length;
-            document.getElementById('totalXP').textContent = userProfile?.total_xp || 0;
-            document.getElementById('streakDays').textContent = userProfile?.streak_days || 0;
-            document.getElementById('statCourses').textContent = allEnrollments.length;
-            document.getElementById('statCerts').textContent = allCertificates.length;
-            document.getElementById('statXP').textContent = userProfile?.total_xp || 0;
-            document.getElementById('achCount').textContent = allAchievements.filter(function(a) { return a
-                .is_complete; }).length || 0;
+            var totalCourses = allEnrollments.length || 0;
+            var completedCourses = allEnrollments.filter(function(e) { return e.progress === 100; }).length || 0;
+            var totalXP = userProfile?.total_xp || 0;
+            var streakDays = userProfile?.streak_days || 0;
+            var certCount = allCertificates.length || 0;
+
+            document.getElementById('totalCourses').textContent = totalCourses;
+            document.getElementById('completedCourses').textContent = completedCourses;
+            document.getElementById('totalXP').textContent = totalXP;
+            document.getElementById('streakDays').textContent = streakDays;
+            document.getElementById('statCourses').textContent = totalCourses;
+            document.getElementById('statCerts').textContent = certCount;
+            document.getElementById('statXP').textContent = totalXP;
+            document.getElementById('achCount').textContent = allAchievements.length || 0;
 
             // Profile completion
             var fields = [
                 profile?.full_name,
                 profile?.avatar_url,
                 profile?.bio,
-                profile?.total_xp > 0
+                profile?.total_xp > 0,
+                totalCourses > 0
             ];
             var completed = fields.filter(Boolean).length;
             var percent = Math.round((completed / fields.length) * 100);
@@ -2398,7 +2081,7 @@
 
         } catch (e) {
             console.error('Load user data error:', e);
-            showToast('Error loading user data', 'error');
+            showToast('Error loading user data: ' + e.message, 'error');
         }
     }
 
@@ -2407,43 +2090,77 @@
     // ============================================================
     function renderEnrollments(enrollments) {
         var container = document.getElementById('enrollmentsList');
+        if (!container) {
+            console.error('enrollmentsList element not found');
+            return;
+        }
+
         if (!enrollments || enrollments.length === 0) {
             container.innerHTML =
-                '<div class="empty-state"><i class="fas fa-play-circle"></i><p>No courses enrolled yet. Start learning today!</p><button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href=\'academy.html\'">Browse Courses</button></div>';
+                '<div class="empty-state"><i class="fas fa-play-circle"></i><p>No courses enrolled yet. Start learning today!</p>' +
+                '<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href=\'academy.html\'">Browse Courses</button></div>';
             return;
         }
 
         container.innerHTML = enrollments.slice(0, 4).map(function(e) {
             var course = e.courses || e;
-            return '<div class="enrollment-item"><img src="' + (course.image ||
-                'https://via.placeholder.com/60/1a1a3e/7c3aed?text=Course') + '" alt="' + (course.title ||
-                'Course') + '"><div class="info"><div class="title">' + (course.title || 'Course') +
-                '</div><div class="meta">' + (course.instructor || 'Instructor') + ' • ' + (course
-                .duration || '0h') +
-                '</div></div><div class="progress-wrap"><div class="progress-bar"><div class="fill" style="width:' +
-                (e.progress || 0) + '%;"></div></div><div class="percent">' + (e.progress || 0) +
-                '%</div></div></div>';
+            var courseTitle = course?.title || 'Untitled Course';
+            var instructor = course?.instructor || 'Instructor';
+            var duration = course?.duration || '0h';
+            var image = course?.image || 'https://via.placeholder.com/60/1a1a3e/7c3aed?text=' + encodeURIComponent(courseTitle);
+            var progress = e.progress || 0;
+
+            return '<div class="enrollment-item">' +
+                '<img src="' + image + '" alt="' + courseTitle + '">' +
+                '<div class="info">' +
+                '<div class="title">' + courseTitle + '</div>' +
+                '<div class="meta">' + instructor + ' • ' + duration +
+                (course?.is_free ? ' • Free' : '') +
+                '</div>' +
+                '</div>' +
+                '<div class="progress-wrap">' +
+                '<div class="progress-bar"><div class="fill" style="width:' + progress + '%;"></div></div>' +
+                '<div class="percent">' + progress + '%</div>' +
+                '</div>' +
+                '</div>';
         }).join('');
     }
 
     function renderCertificates(certificates) {
         var container = document.getElementById('certGrid');
+        if (!container) {
+            console.error('certGrid element not found');
+            return;
+        }
+
         if (!certificates || certificates.length === 0) {
             container.innerHTML =
-                '<div style="grid-column:1/-1;"><div class="empty-state"><i class="fas fa-certificate"></i><p>No certificates yet</p><button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href=\'academy.html\'">Start Learning</button></div></div>';
+                '<div style="grid-column:1/-1;"><div class="empty-state"><i class="fas fa-certificate"></i><p>No certificates yet</p>' +
+                '<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href=\'academy.html\'">Start Learning</button></div></div>';
             return;
         }
 
         container.innerHTML = certificates.slice(0, 4).map(function(c) {
             var cert = c.certificates || c;
-            return '<div class="cert-item"><i class="fas ' + (cert.icon || 'fa-medal') +
-                '"></i><div class="cert-name">' + (cert.name || 'Certificate') +
-                '</div><div class="cert-date">' + formatDate(c.created_at || c.date) + '</div></div>';
+            var certName = cert?.name || 'Certificate';
+            var icon = cert?.icon || 'fa-medal';
+            var date = c.created_at || c.issued_at || c.date;
+
+            return '<div class="cert-item">' +
+                '<i class="fas ' + icon + '"></i>' +
+                '<div class="cert-name">' + certName + '</div>' +
+                '<div class="cert-date">' + formatDate(date) + '</div>' +
+                '</div>';
         }).join('');
     }
 
     function renderAchievements(achievements) {
         var container = document.getElementById('achGrid');
+        if (!container) {
+            console.error('achGrid element not found');
+            return;
+        }
+
         if (!achievements || achievements.length === 0) {
             container.innerHTML =
                 '<div style="grid-column:1/-1;"><div class="empty-state"><i class="fas fa-trophy"></i><p>No achievements yet</p></div></div>';
@@ -2451,29 +2168,21 @@
         }
 
         var allAchievements = [
-            { id: 1, name: 'First Course', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
-                    .achievement_id === 1 && a.is_complete; }) },
-            { id: 2, name: '5 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
-                    .achievement_id === 2 && a.is_complete; }) },
-            { id: 3, name: '10 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a
-                    .achievement_id === 3 && a.is_complete; }) },
-            { id: 4, name: '100 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a
-                    .achievement_id === 4 && a.is_complete; }) },
-            { id: 5, name: '500 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a
-                    .achievement_id === 5 && a.is_complete; }) },
-            { id: 6, name: 'Perfect Score', icon: 'fa-check-circle', unlocked: achievements.some(function(a) { return a
-                    .achievement_id === 6 && a.is_complete; }) },
-            { id: 7, name: 'Community Member', icon: 'fa-users', unlocked: achievements.some(function(a) { return a
-                    .achievement_id === 7 && a.is_complete; }) },
-            { id: 8, name: 'Premium Member', icon: 'fa-crown', unlocked: achievements.some(function(a) { return a
-                    .achievement_id === 8 && a.is_complete; }) || isPremium }
+            { id: 1, name: 'First Course', icon: 'fa-star', unlocked: achievements.some(function(a) { return a.achievement_id === 1 && a.is_complete; }) },
+            { id: 2, name: '5 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a.achievement_id === 2 && a.is_complete; }) },
+            { id: 3, name: '10 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a.achievement_id === 3 && a.is_complete; }) },
+            { id: 4, name: '100 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id === 4 && a.is_complete; }) },
+            { id: 5, name: '500 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id === 5 && a.is_complete; }) },
+            { id: 6, name: 'Perfect Score', icon: 'fa-check-circle', unlocked: achievements.some(function(a) { return a.achievement_id === 6 && a.is_complete; }) },
+            { id: 7, name: 'Community Member', icon: 'fa-users', unlocked: achievements.some(function(a) { return a.achievement_id === 7 && a.is_complete; }) },
+            { id: 8, name: 'Premium Member', icon: 'fa-crown', unlocked: achievements.some(function(a) { return a.achievement_id === 8 && a.is_complete; }) || isPremium }
         ];
 
         container.innerHTML = allAchievements.map(function(a) {
-            return '<div class="ach-item ' + (a.unlocked ? 'unlocked' : 'locked') + '" title="' + a.name +
-                '"><i class="fas ' + a.icon + '" style="color:' + (a.unlocked ?
-                'var(--accent-orange)' : 'var(--text-muted)') + ';"></i><div class="ach-name">' + a
-                .name + '</div></div>';
+            return '<div class="ach-item ' + (a.unlocked ? 'unlocked' : 'locked') + '" title="' + a.name + '">' +
+                '<i class="fas ' + a.icon + '" style="color:' + (a.unlocked ? 'var(--accent-orange)' : 'var(--text-muted)') + ';"></i>' +
+                '<div class="ach-name">' + a.name + '</div>' +
+                '</div>';
         }).join('');
     }
 
@@ -2546,6 +2255,24 @@
     window.addEventListener('resize', autoDetectDevice);
 
     // ============================================================
+    // EXPOSE FUNCTIONS TO GLOBAL
+    // ============================================================
+    window.showToast = showToast;
+    window.handleLogout = handleLogout;
+    window.openEditProfileModal = openEditProfileModal;
+    window.closeEditProfileModal = closeEditProfileModal;
+    window.handleEditProfile = handleEditProfile;
+    window.handleAvatarUpload = handleAvatarUpload;
+    window.openPremiumModal = openPremiumModal;
+    window.closePremiumModal = closePremiumModal;
+    window.initiatePremiumPayment = initiatePremiumPayment;
+    window.upgradeUserToPremium = upgradeUserToPremium;
+    window.loadUserData = loadUserData;
+    window.renderEnrollments = renderEnrollments;
+    window.renderCertificates = renderCertificates;
+    window.renderAchievements = renderAchievements;
+
+    // ============================================================
     // INIT
     // ============================================================
     async function init() {
@@ -2568,29 +2295,6 @@
         }, 600);
     }
 
-    // ============================================================
-    // EXPOSE FUNCTIONS TO GLOBAL
-    // ============================================================
-    window.showToast = showToast;
-    window.handleLogout = handleLogout;
-    window.openEditProfileModal = openEditProfileModal;
-    window.closeEditProfileModal = closeEditProfileModal;
-    window.handleEditProfile = handleEditProfile;
-    window.handleAvatarUpload = handleAvatarUpload;
-    window.openPremiumModal = openPremiumModal;
-    window.closePremiumModal = closePremiumModal;
-    window.initiatePremiumPayment = initiatePremiumPayment;
-    window.upgradeUserToPremium = upgradeUserToPremium;
-    
-    // 🔥 Expose activity functions
-    window.enrollInCourse = enrollInCourse;
-    window.updateCourseProgress = updateCourseProgress;
-    window.addXP = addXP;
-    window.generateCertificate = generateCertificate;
-    window.checkAchievements = checkAchievements;
-    window.updateStreak = updateStreak;
-    window.updateUserActivity = updateUserActivity;
-
     // Run init when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
@@ -2598,8 +2302,8 @@
         init();
     }
 
-})(); 
-    </script>
+})();
+</script>
 
 </body>
 </html>
