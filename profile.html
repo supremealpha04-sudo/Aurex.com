@@ -1656,95 +1656,41 @@
         }
 
         try {
-            console.log('🔍 DEBUG: Loading user data for:', currentUser.id);
+            console.log('Loading user data for:', currentUser.id);
 
-            // STEP 1: Get raw enrollments first
-            console.log('📊 STEP 1: Getting raw enrollments...');
-            var { data: rawEnrollments, error: rawError } = await supabaseClient
+            var { data: profile } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (profile) {
+                userProfile = profile;
+                document.getElementById('editBio').value = profile.bio || '';
+                document.getElementById('editPhone').value = profile.phone || '';
+            }
+
+            var { data: rawEnrollments } = await supabaseClient
                 .from('enrollments')
                 .select('*')
                 .eq('user_id', currentUser.id);
 
-            if (rawError) {
-                console.error('❌ Raw enrollments error:', rawError);
-            } else {
-                console.log('✅ Raw enrollments found:', rawEnrollments?.length || 0);
-                console.log('📋 Raw enrollment data:', JSON.stringify(rawEnrollments, null, 2));
-            }
-
-            // STEP 2: Get courses to check what's available
-            console.log('📊 STEP 2: Getting all courses...');
-            var { data: allCourses, error: coursesError } = await supabaseClient
+            var { data: allCourses } = await supabaseClient
                 .from('courses')
                 .select('id, title, image, instructor, duration, is_free, price');
 
-            if (coursesError) {
-                console.error('❌ Courses error:', coursesError);
-            } else {
-                console.log('✅ Courses found:', allCourses?.length || 0);
-                console.log('📋 Courses data:', JSON.stringify(allCourses, null, 2));
+            var enrollments = [];
+            if (rawEnrollments && allCourses) {
+                enrollments = rawEnrollments.map(function(e) {
+                    var course = allCourses.find(function(c) { return c.id === e.course_id; });
+                    return {
+                        ...e,
+                        courses: course || null
+                    };
+                });
             }
+            allEnrollments = enrollments || [];
 
-            // STEP 3: Get enrollments with JOIN to courses
-            console.log('📊 STEP 3: Getting enrollments with course join...');
-            var { data: enrollments, error: enrollError } = await supabaseClient
-                .from('enrollments')
-                .select(`
-                    id,
-                    user_id,
-                    course_id,
-                    progress,
-                    status,
-                    enrolled_at,
-                    created_at,
-                    courses:course_id (
-                        id,
-                        title,
-                        image,
-                        instructor,
-                        duration,
-                        is_free,
-                        price
-                    )
-                `)
-                .eq('user_id', currentUser.id);
-
-            if (enrollError) {
-                console.error('❌ Enrollments with join error:', enrollError);
-                
-                // Fallback: manually join data
-                console.log('📊 STEP 3b: Manually joining data...');
-                if (rawEnrollments && allCourses) {
-                    var manualJoin = rawEnrollments.map(function(e) {
-                        var course = allCourses.find(function(c) { return c.id === e.course_id; });
-                        return {
-                            ...e,
-                            courses: course || null
-                        };
-                    });
-                    allEnrollments = manualJoin;
-                    console.log('✅ Manual join complete:', allEnrollments.length);
-                    console.log('📋 Manual join data:', JSON.stringify(allEnrollments, null, 2));
-                } else {
-                    allEnrollments = rawEnrollments || [];
-                }
-            } else {
-                console.log('✅ Enrollments with join loaded:', enrollments?.length || 0);
-                console.log('📋 Enrollments with join data:', JSON.stringify(enrollments, null, 2));
-                allEnrollments = enrollments || [];
-            }
-
-            // STEP 4: Check for missing course data
-            console.log('📊 STEP 4: Checking for missing course data...');
-            var missingCourses = allEnrollments.filter(function(e) {
-                return !e.courses || (Array.isArray(e.courses) && e.courses.length === 0) || !e.courses?.title;
-            });
-            if (missingCourses.length > 0) {
-                console.warn('⚠️ Found enrollments with missing course data:', missingCourses.length);
-                console.log('⚠️ Missing course IDs:', missingCourses.map(function(e) { return e.course_id; }));
-            }
-
-            // STEP 5: Get certificates
             var { data: certificates } = await supabaseClient
                 .from('user_certificates')
                 .select(`
@@ -1758,7 +1704,6 @@
                 .eq('user_id', currentUser.id);
             allCertificates = certificates || [];
 
-            // STEP 6: Get achievements
             var { data: achievements } = await supabaseClient
                 .from('user_achievements')
                 .select(`
@@ -1774,7 +1719,6 @@
                 .eq('is_complete', true);
             allAchievements = achievements || [];
 
-            // Update stats
             var totalCourses = allEnrollments.length || 0;
             var completedCourses = allEnrollments.filter(function(e) { return e.progress === 100; }).length || 0;
             var totalXP = userProfile?.total_xp || 0;
@@ -1806,10 +1750,8 @@
             renderCertificates(allCertificates);
             renderAchievements(allAchievements);
 
-            console.log('✅ DEBUG COMPLETE: Total courses displayed:', totalCourses);
-
         } catch (e) {
-            console.error('❌ Load user data error:', e);
+            console.error('Load user data error:', e);
             showToast('Error loading user data: ' + e.message, 'error');
         }
     }
@@ -1825,21 +1767,13 @@
             return;
         }
 
-        console.log('🎯 Rendering', enrollments.length, 'enrollments');
-
-        container.innerHTML = enrollments.slice(0, 4).map(function(e, index) {
+        container.innerHTML = enrollments.slice(0, 4).map(function(e) {
             var course = e.courses || e;
             if (Array.isArray(course)) {
                 course = course[0] || {};
             }
-            
-            // Log each course to see what's happening
-            console.log('📋 Course', index + 1, ':', course);
-            console.log('📋 Course title:', course?.title);
-            console.log('📋 Course ID:', e.course_id);
-
-            var courseTitle = course?.title || e.course_title || 'Untitled Course (ID: ' + e.course_id + ')';
-            var instructor = course?.instructor || 'No Instructor';
+            var courseTitle = course?.title || 'Untitled Course';
+            var instructor = course?.instructor || 'Instructor';
             var duration = course?.duration || '0h';
             var image = course?.image || 'https://via.placeholder.com/60/1a1a3e/7c3aed?text=' + encodeURIComponent(courseTitle);
             var progress = e.progress || 0;
@@ -2219,7 +2153,7 @@
 
     async function init() {
         autoDetectDevice();
-        console.log('🚀 Initializing Profile App with DEBUG mode...');
+        console.log('Initializing Profile App...');
         await checkAuth();
         setTimeout(function() {
             document.getElementById('loadingScreen').classList.add('hidden');
