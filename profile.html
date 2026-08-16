@@ -1500,59 +1500,35 @@
         <span id="toastMsg">Success!</span>
     </div>
 
- <script>
-// ============================================================
-// PROFILE APP - COMPLETE WITH ENROLLMENT DISPLAY
-// ============================================================
-
+<script>
 (function() {
-    // ============================================================
-    // SUPABASE CONFIG
-    // ============================================================
     var CONFIG = {
         supabase: {
             url: 'https://brmoagghggdeumkfijmm.supabase.co',
             anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
         },
-        app: {
-            name: 'Aurex Designs',
-            url: 'https://aurex-design.vercel.app',
-            storageBucket: 'aurex-assets'
-        },
-        premium: { price: '13500', duration: '6', discount: '45' },
         adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
     };
 
-    // ============================================================
-    // INITIALIZE SUPABASE
-    // ============================================================
     var supabaseClient = null;
     var supabaseConfigured = false;
+    var currentUser = null;
+    var isPremium = false;
+    var allEnrollments = [];
+    var allCertificates = [];
+    var allAchievements = [];
+    var mobileSidebarOpen = false;
 
     try {
         var { createClient } = window.supabase;
         supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
         supabaseConfigured = true;
-        console.log('✅ Supabase connected successfully');
+        console.log('✅ Supabase connected');
     } catch (e) {
-        console.error('❌ Supabase error:', e.message);
+        console.error('❌ Supabase error:', e);
         supabaseConfigured = false;
     }
 
-    // ============================================================
-    // STATE
-    // ============================================================
-    var currentUser = null;
-    var isPremium = false;
-    var mobileSidebarOpen = false;
-    var userProfile = null;
-    var allEnrollments = [];
-    var allCertificates = [];
-    var allAchievements = [];
-
-    // ============================================================
-    // HELPERS
-    // ============================================================
     function showToast(msg, type) {
         type = type || 'success';
         var t = document.getElementById('toast');
@@ -1579,79 +1555,49 @@
         document.body.style.overflow = '';
     }
 
-    // ============================================================
-    // STORAGE HELPERS
-    // ============================================================
-    async function uploadAvatar(file, userId) {
-        if (!supabaseConfigured) {
-            showToast('Supabase not configured', 'error');
-            return { publicUrl: null, error: 'Supabase not configured' };
-        }
-
-        try {
-            var bucket = CONFIG.app.storageBucket || 'aurex-assets';
-            var fileExt = file.name.split('.').pop();
-            var fileName = 'avatars/' + userId + '/profile.' + fileExt;
-
-            var { error } = await supabaseClient.storage
-                .from(bucket)
-                .upload(fileName, file, { upsert: true });
-
-            if (error) throw error;
-
-            var { data: urlData } = supabaseClient.storage
-                .from(bucket)
-                .getPublicUrl(fileName);
-
-            return { publicUrl: urlData.publicUrl, error: null };
-        } catch (error) {
-            console.error('Upload error:', error);
-            return { publicUrl: null, error: error.message };
-        }
-    }
-
-    // ============================================================
-    // AUTH CHECK
-    // ============================================================
     async function checkAuth() {
         if (!supabaseConfigured) {
-            showToast('⚠️ Supabase not configured. Please check your URL and Key.', 'error');
-            showNoUserState();
+            showToast('⚠️ Supabase not configured.', 'error');
             return;
         }
 
         try {
             var { data: { user }, error } = await supabaseClient.auth.getUser();
 
-            if (error) {
-                console.warn('Auth error:', error.message);
+            if (error || !user) {
+                console.log('No user found');
                 showNoUserState();
                 return;
             }
 
-            if (user) {
-                try {
-                    var { data: profile } = await supabaseClient.from('users').select('*').eq('id', user.id)
-                        .single();
-                    if (profile) {
-                        user.user_metadata = { ...user.user_metadata, ...profile };
-                        userProfile = profile;
-                    }
-                } catch (e) {
-                    console.warn('Profile fetch error:', e);
-                }
-                await updateUIForUser(user);
+            console.log('✅ User found:', user.email);
+            currentUser = user;
+            
+            var { data: profile } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (profile) {
+                console.log('✅ Profile loaded');
+                isPremium = profile.is_premium || false;
+                updateUI(profile);
+                await loadUserData();
             } else {
-                showNoUserState();
+                console.log('⚠️ No profile found');
+                updateUI(user);
             }
+
         } catch (e) {
-            console.error('Auth check error:', e);
+            console.error('Auth error:', e);
             showNoUserState();
         }
     }
 
     function showNoUserState() {
         document.getElementById('userProfile').style.display = 'none';
+        document.getElementById('profileContent').style.display = 'none';
         document.getElementById('profileHeader').innerHTML = `
             <div style="text-align:center;padding:40px 20px;width:100%;">
                 <i class="fas fa-user-lock" style="font-size:48px;color:var(--text-muted);margin-bottom:16px;display:block;"></i>
@@ -1662,41 +1608,20 @@
                 </button>
             </div>
         `;
-        document.getElementById('profileContent').style.display = 'none';
     }
 
-    // ============================================================
-    // UPDATE UI FOR USER
-    // ============================================================
-    async function updateUIForUser(user) {
-        currentUser = user;
+    function updateUI(user) {
+        var name = user?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
         document.getElementById('userProfile').style.display = 'flex';
-
-        var name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
         document.getElementById('userName').textContent = name;
         document.getElementById('profileName').textContent = name;
+        document.getElementById('profileEmail').textContent = user?.email || '';
+        document.getElementById('profileContent').style.display = 'grid';
 
-        var avatar = user?.user_metadata?.avatar_url ||
+        var avatar = user?.avatar_url || user?.user_metadata?.avatar_url ||
             'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=7c3aed&color=fff&size=200';
         document.getElementById('profileAvatar').src = avatar;
         document.getElementById('userProfileImg').src = avatar.replace('size=200', 'size=100');
-
-        document.getElementById('profileEmail').textContent = user?.email || '';
-
-        if (supabaseConfigured) {
-            try {
-                var { data: profile } = await supabaseClient.from('users').select('*').eq('id', user.id)
-                    .single();
-                if (profile) {
-                    isPremium = profile.is_premium || false;
-                    userProfile = profile;
-                    document.getElementById('editBio').value = profile.bio || '';
-                    document.getElementById('editPhone').value = profile.phone || '';
-                }
-            } catch (e) {
-                isPremium = user?.user_metadata?.is_premium || false;
-            }
-        }
 
         var badgeRow = document.getElementById('badgeRow');
         var badges = '';
@@ -1719,10 +1644,236 @@
             badges += '<span class="badge badge-admin">Admin</span>';
             document.getElementById('adminBadge').style.display = 'flex';
         }
-
         badgeRow.innerHTML = badges;
-        document.getElementById('profileContent').style.display = 'grid';
-        await loadUserData();
+    }
+
+    async function loadUserData() {
+        if (!currentUser) {
+            console.log('No current user');
+            return;
+        }
+
+        if (!supabaseConfigured) {
+            showToast('Supabase not configured.', 'error');
+            return;
+        }
+
+        try {
+            console.log('Loading user data for:', currentUser.id);
+
+            var { data: profile } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (profile) {
+                userProfile = profile;
+                document.getElementById('editBio').value = profile.bio || '';
+                document.getElementById('editPhone').value = profile.phone || '';
+            }
+
+            var { data: enrollments, error: enrollError } = await supabaseClient
+                .from('enrollments')
+                .select(`
+                    id,
+                    user_id,
+                    course_id,
+                    progress,
+                    status,
+                    enrolled_at,
+                    created_at,
+                    courses:course_id (
+                        id,
+                        title,
+                        image,
+                        instructor,
+                        duration,
+                        is_free,
+                        price
+                    )
+                `)
+                .eq('user_id', currentUser.id);
+
+            if (enrollError) {
+                console.error('Enrollments error:', enrollError);
+                var { data: altEnrollments, error: altError } = await supabaseClient
+                    .from('enrollments')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
+                
+                if (altError) {
+                    console.error('Alternative query failed:', altError);
+                    allEnrollments = [];
+                } else {
+                    console.log('Alternative query succeeded:', altEnrollments?.length || 0);
+                    allEnrollments = altEnrollments || [];
+                }
+            } else {
+                console.log('Enrollments loaded:', enrollments?.length || 0);
+                allEnrollments = enrollments || [];
+            }
+
+            var { data: certificates } = await supabaseClient
+                .from('user_certificates')
+                .select(`
+                    *,
+                    certificates:certificate_id (
+                        id,
+                        name,
+                        icon
+                    )
+                `)
+                .eq('user_id', currentUser.id);
+
+            allCertificates = certificates || [];
+
+            var { data: achievements } = await supabaseClient
+                .from('user_achievements')
+                .select(`
+                    *,
+                    achievements:achievement_id (
+                        id,
+                        name,
+                        icon,
+                        description
+                    )
+                `)
+                .eq('user_id', currentUser.id)
+                .eq('is_complete', true);
+
+            allAchievements = achievements || [];
+
+            var totalCourses = allEnrollments.length || 0;
+            var completedCourses = allEnrollments.filter(function(e) { return e.progress === 100; }).length || 0;
+            var totalXP = userProfile?.total_xp || 0;
+            var streakDays = userProfile?.streak_days || 0;
+            var certCount = allCertificates.length || 0;
+
+            document.getElementById('totalCourses').textContent = totalCourses;
+            document.getElementById('completedCourses').textContent = completedCourses;
+            document.getElementById('totalXP').textContent = totalXP;
+            document.getElementById('streakDays').textContent = streakDays;
+            document.getElementById('statCourses').textContent = totalCourses;
+            document.getElementById('statCerts').textContent = certCount;
+            document.getElementById('statXP').textContent = totalXP;
+            document.getElementById('achCount').textContent = allAchievements.length || 0;
+
+            var fields = [
+                profile?.full_name,
+                profile?.avatar_url,
+                profile?.bio,
+                profile?.total_xp > 0,
+                totalCourses > 0
+            ];
+            var completed = fields.filter(Boolean).length;
+            var percent = Math.round((completed / fields.length) * 100);
+            document.getElementById('completionPercent').textContent = percent + '%';
+            document.getElementById('completionFill').style.width = percent + '%';
+
+            renderEnrollments(allEnrollments);
+            renderCertificates(allCertificates);
+            renderAchievements(allAchievements);
+
+        } catch (e) {
+            console.error('Load user data error:', e);
+            showToast('Error loading user data: ' + e.message, 'error');
+        }
+    }
+
+    function renderEnrollments(enrollments) {
+        var container = document.getElementById('enrollmentsList');
+        if (!container) {
+            console.error('enrollmentsList element not found');
+            return;
+        }
+
+        if (!enrollments || enrollments.length === 0) {
+            container.innerHTML =
+                '<div class="empty-state"><i class="fas fa-play-circle"></i><p>No courses enrolled yet. Start learning today!</p>' +
+                '<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href=\'academy.html\'">Browse Courses</button></div>';
+            return;
+        }
+
+        container.innerHTML = enrollments.slice(0, 4).map(function(e) {
+            var course = e.courses || e;
+            if (Array.isArray(course)) {
+                course = course[0] || {};
+            }
+            var courseTitle = course?.title || e.course_title || 'Untitled Course';
+            var instructor = course?.instructor || 'Instructor';
+            var duration = course?.duration || '0h';
+            var image = course?.image || 'https://via.placeholder.com/60/1a1a3e/7c3aed?text=' + encodeURIComponent(courseTitle);
+            var progress = e.progress || 0;
+
+            return '<div class="enrollment-item">' +
+                '<img src="' + image + '" alt="' + courseTitle + '">' +
+                '<div class="info">' +
+                '<div class="title">' + courseTitle + '</div>' +
+                '<div class="meta">' + instructor + ' • ' + duration +
+                (course?.is_free ? ' • Free' : '') +
+                '</div>' +
+                '</div>' +
+                '<div class="progress-wrap">' +
+                '<div class="progress-bar"><div class="fill" style="width:' + progress + '%;"></div></div>' +
+                '<div class="percent">' + progress + '%</div>' +
+                '</div>' +
+                '</div>';
+        }).join('');
+    }
+
+    function renderCertificates(certificates) {
+        var container = document.getElementById('certGrid');
+        if (!container) return;
+
+        if (!certificates || certificates.length === 0) {
+            container.innerHTML =
+                '<div style="grid-column:1/-1;"><div class="empty-state"><i class="fas fa-certificate"></i><p>No certificates yet</p>' +
+                '<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href=\'academy.html\'">Start Learning</button></div></div>';
+            return;
+        }
+
+        container.innerHTML = certificates.slice(0, 4).map(function(c) {
+            var cert = c.certificates || c;
+            var certName = cert?.name || 'Certificate';
+            var icon = cert?.icon || 'fa-medal';
+            var date = c.created_at || c.issued_at || c.date;
+
+            return '<div class="cert-item">' +
+                '<i class="fas ' + icon + '"></i>' +
+                '<div class="cert-name">' + certName + '</div>' +
+                '<div class="cert-date">' + formatDate(date) + '</div>' +
+                '</div>';
+        }).join('');
+    }
+
+    function renderAchievements(achievements) {
+        var container = document.getElementById('achGrid');
+        if (!container) return;
+
+        if (!achievements || achievements.length === 0) {
+            container.innerHTML =
+                '<div style="grid-column:1/-1;"><div class="empty-state"><i class="fas fa-trophy"></i><p>No achievements yet</p></div></div>';
+            return;
+        }
+
+        var allAchievements = [
+            { id: 1, name: 'First Course', icon: 'fa-star', unlocked: achievements.some(function(a) { return a.achievement_id === 1 && a.is_complete; }) },
+            { id: 2, name: '5 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a.achievement_id === 2 && a.is_complete; }) },
+            { id: 3, name: '10 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a.achievement_id === 3 && a.is_complete; }) },
+            { id: 4, name: '100 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id === 4 && a.is_complete; }) },
+            { id: 5, name: '500 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id === 5 && a.is_complete; }) },
+            { id: 6, name: 'Perfect Score', icon: 'fa-check-circle', unlocked: achievements.some(function(a) { return a.achievement_id === 6 && a.is_complete; }) },
+            { id: 7, name: 'Community Member', icon: 'fa-users', unlocked: achievements.some(function(a) { return a.achievement_id === 7 && a.is_complete; }) },
+            { id: 8, name: 'Premium Member', icon: 'fa-crown', unlocked: achievements.some(function(a) { return a.achievement_id === 8 && a.is_complete; }) || isPremium }
+        ];
+
+        container.innerHTML = allAchievements.map(function(a) {
+            return '<div class="ach-item ' + (a.unlocked ? 'unlocked' : 'locked') + '" title="' + a.name + '">' +
+                '<i class="fas ' + a.icon + '" style="color:' + (a.unlocked ? 'var(--accent-orange)' : 'var(--text-muted)') + ';"></i>' +
+                '<div class="ach-name">' + a.name + '</div>' +
+                '</div>';
+        }).join('');
     }
 
     function handleLogout() {
@@ -1733,9 +1884,6 @@
         setTimeout(function() { window.location.href = 'index.html'; }, 800);
     }
 
-    // ============================================================
-    // PROFILE EDIT
-    // ============================================================
     function openEditProfileModal() {
         if (!currentUser) {
             showToast('Please sign in first', 'error');
@@ -1793,9 +1941,6 @@
         }
     }
 
-    // ============================================================
-    // AVATAR UPLOAD
-    // ============================================================
     function handleAvatarUpload(event) {
         var file = event.target.files[0];
         if (!file) return;
@@ -1824,35 +1969,42 @@
             return;
         }
 
-        var result = await uploadAvatar(file, currentUser.id);
-        if (result.error) {
-            showToast('Error uploading avatar: ' + result.error, 'error');
-            return;
+        try {
+            var bucket = 'aurex-assets';
+            var fileExt = file.name.split('.').pop();
+            var fileName = 'avatars/' + currentUser.id + '/profile.' + fileExt;
+
+            var { error: uploadError } = await supabaseClient.storage
+                .from(bucket)
+                .upload(fileName, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            var { data: urlData } = supabaseClient.storage
+                .from(bucket)
+                .getPublicUrl(fileName);
+
+            var { error: updateError } = await supabaseClient
+                .from('users')
+                .update({
+                    avatar_url: urlData.publicUrl,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', currentUser.id);
+
+            if (updateError) throw updateError;
+
+            await supabaseClient.auth.updateUser({ data: { avatar_url: urlData.publicUrl } });
+
+            document.getElementById('profileAvatar').src = urlData.publicUrl;
+            document.getElementById('userProfileImg').src = urlData.publicUrl;
+            showToast('Avatar updated successfully!', 'success');
+        } catch (e) {
+            console.error('Avatar error:', e);
+            showToast('Error uploading avatar: ' + e.message, 'error');
         }
-
-        var { error } = await supabaseClient
-            .from('users')
-            .update({
-                avatar_url: result.publicUrl,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', currentUser.id);
-
-        if (error) {
-            showToast('Error updating profile: ' + error.message, 'error');
-            return;
-        }
-
-        await supabaseClient.auth.updateUser({ data: { avatar_url: result.publicUrl } });
-
-        document.getElementById('profileAvatar').src = result.publicUrl;
-        document.getElementById('userProfileImg').src = result.publicUrl;
-        showToast('Avatar updated successfully!', 'success');
     }
 
-    // ============================================================
-    // PREMIUM UPGRADE
-    // ============================================================
     function openPremiumModal() {
         if (!currentUser) {
             showToast('Please sign in first', 'error');
@@ -1931,9 +2083,7 @@
                     status: 'completed',
                     created_at: new Date().toISOString()
                 });
-            } catch (payError) {
-                console.warn('Payment log error:', payError);
-            }
+            } catch (payError) {}
 
             try {
                 await supabaseClient.from('notifications').insert({
@@ -1943,252 +2093,19 @@
                     message: 'Your premium account has been activated. Enjoy all premium features!',
                     created_at: new Date().toISOString()
                 });
-            } catch (notifError) {
-                console.warn('Notification error:', notifError);
-            }
+            } catch (notifError) {}
 
             isPremium = true;
             currentUser.user_metadata.is_premium = true;
             showToast('Premium activated successfully! 🎉', 'success');
             closePremiumModal();
-            await updateUIForUser(currentUser);
+            await updateUI(currentUser);
         } catch (e) {
             console.error('Premium upgrade error:', e);
             showToast('Error upgrading: ' + e.message, 'error');
         }
     }
 
-    // ============================================================
-    // LOAD USER DATA - FIXED WITH COURSE DETAILS
-    // ============================================================
-    async function loadUserData() {
-        if (!currentUser) {
-            console.log('No current user');
-            return;
-        }
-
-        if (!supabaseConfigured) {
-            showToast('Supabase not configured.', 'error');
-            return;
-        }
-
-        try {
-            console.log('Loading user data for:', currentUser.id);
-
-            // Get user profile
-            var { data: profile } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('id', currentUser.id)
-                .single();
-
-            if (profile) {
-                userProfile = profile;
-                document.getElementById('editBio').value = profile.bio || '';
-                document.getElementById('editPhone').value = profile.phone || '';
-            }
-
-            // Get enrollments WITH course details
-            var { data: enrollments, error: enrollError } = await supabaseClient
-                .from('enrollments')
-                .select(`
-                    *,
-                    courses:course_id (
-                        id,
-                        title,
-                        image,
-                        instructor,
-                        duration,
-                        description,
-                        is_free,
-                        price
-                    )
-                `)
-                .eq('user_id', currentUser.id);
-
-            if (enrollError) {
-                console.error('Enrollments error:', enrollError);
-            } else {
-                console.log('✅ Enrollments loaded:', enrollments?.length || 0);
-            }
-
-            allEnrollments = enrollments || [];
-
-            // Get certificates
-            var { data: certificates } = await supabaseClient
-                .from('user_certificates')
-                .select(`
-                    *,
-                    certificates:certificate_id (
-                        id,
-                        name,
-                        icon
-                    )
-                `)
-                .eq('user_id', currentUser.id);
-
-            allCertificates = certificates || [];
-
-            // Get achievements
-            var { data: achievements } = await supabaseClient
-                .from('user_achievements')
-                .select(`
-                    *,
-                    achievements:achievement_id (
-                        id,
-                        name,
-                        icon,
-                        description
-                    )
-                `)
-                .eq('user_id', currentUser.id)
-                .eq('is_complete', true);
-
-            allAchievements = achievements || [];
-
-            // Update stats
-            var totalCourses = allEnrollments.length || 0;
-            var completedCourses = allEnrollments.filter(function(e) { return e.progress === 100; }).length || 0;
-            var totalXP = userProfile?.total_xp || 0;
-            var streakDays = userProfile?.streak_days || 0;
-            var certCount = allCertificates.length || 0;
-
-            document.getElementById('totalCourses').textContent = totalCourses;
-            document.getElementById('completedCourses').textContent = completedCourses;
-            document.getElementById('totalXP').textContent = totalXP;
-            document.getElementById('streakDays').textContent = streakDays;
-            document.getElementById('statCourses').textContent = totalCourses;
-            document.getElementById('statCerts').textContent = certCount;
-            document.getElementById('statXP').textContent = totalXP;
-            document.getElementById('achCount').textContent = allAchievements.length || 0;
-
-            // Profile completion
-            var fields = [
-                profile?.full_name,
-                profile?.avatar_url,
-                profile?.bio,
-                profile?.total_xp > 0,
-                totalCourses > 0
-            ];
-            var completed = fields.filter(Boolean).length;
-            var percent = Math.round((completed / fields.length) * 100);
-            document.getElementById('completionPercent').textContent = percent + '%';
-            document.getElementById('completionFill').style.width = percent + '%';
-
-            renderEnrollments(allEnrollments);
-            renderCertificates(allCertificates);
-            renderAchievements(allAchievements);
-
-        } catch (e) {
-            console.error('Load user data error:', e);
-            showToast('Error loading user data: ' + e.message, 'error');
-        }
-    }
-
-    // ============================================================
-    // RENDER FUNCTIONS
-    // ============================================================
-    function renderEnrollments(enrollments) {
-        var container = document.getElementById('enrollmentsList');
-        if (!container) {
-            console.error('enrollmentsList element not found');
-            return;
-        }
-
-        if (!enrollments || enrollments.length === 0) {
-            container.innerHTML =
-                '<div class="empty-state"><i class="fas fa-play-circle"></i><p>No courses enrolled yet. Start learning today!</p>' +
-                '<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href=\'academy.html\'">Browse Courses</button></div>';
-            return;
-        }
-
-        container.innerHTML = enrollments.slice(0, 4).map(function(e) {
-            var course = e.courses || e;
-            var courseTitle = course?.title || 'Untitled Course';
-            var instructor = course?.instructor || 'Instructor';
-            var duration = course?.duration || '0h';
-            var image = course?.image || 'https://via.placeholder.com/60/1a1a3e/7c3aed?text=' + encodeURIComponent(courseTitle);
-            var progress = e.progress || 0;
-
-            return '<div class="enrollment-item">' +
-                '<img src="' + image + '" alt="' + courseTitle + '">' +
-                '<div class="info">' +
-                '<div class="title">' + courseTitle + '</div>' +
-                '<div class="meta">' + instructor + ' • ' + duration +
-                (course?.is_free ? ' • Free' : '') +
-                '</div>' +
-                '</div>' +
-                '<div class="progress-wrap">' +
-                '<div class="progress-bar"><div class="fill" style="width:' + progress + '%;"></div></div>' +
-                '<div class="percent">' + progress + '%</div>' +
-                '</div>' +
-                '</div>';
-        }).join('');
-    }
-
-    function renderCertificates(certificates) {
-        var container = document.getElementById('certGrid');
-        if (!container) {
-            console.error('certGrid element not found');
-            return;
-        }
-
-        if (!certificates || certificates.length === 0) {
-            container.innerHTML =
-                '<div style="grid-column:1/-1;"><div class="empty-state"><i class="fas fa-certificate"></i><p>No certificates yet</p>' +
-                '<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:11px;" onclick="window.location.href=\'academy.html\'">Start Learning</button></div></div>';
-            return;
-        }
-
-        container.innerHTML = certificates.slice(0, 4).map(function(c) {
-            var cert = c.certificates || c;
-            var certName = cert?.name || 'Certificate';
-            var icon = cert?.icon || 'fa-medal';
-            var date = c.created_at || c.issued_at || c.date;
-
-            return '<div class="cert-item">' +
-                '<i class="fas ' + icon + '"></i>' +
-                '<div class="cert-name">' + certName + '</div>' +
-                '<div class="cert-date">' + formatDate(date) + '</div>' +
-                '</div>';
-        }).join('');
-    }
-
-    function renderAchievements(achievements) {
-        var container = document.getElementById('achGrid');
-        if (!container) {
-            console.error('achGrid element not found');
-            return;
-        }
-
-        if (!achievements || achievements.length === 0) {
-            container.innerHTML =
-                '<div style="grid-column:1/-1;"><div class="empty-state"><i class="fas fa-trophy"></i><p>No achievements yet</p></div></div>';
-            return;
-        }
-
-        var allAchievements = [
-            { id: 1, name: 'First Course', icon: 'fa-star', unlocked: achievements.some(function(a) { return a.achievement_id === 1 && a.is_complete; }) },
-            { id: 2, name: '5 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a.achievement_id === 2 && a.is_complete; }) },
-            { id: 3, name: '10 Courses', icon: 'fa-star', unlocked: achievements.some(function(a) { return a.achievement_id === 3 && a.is_complete; }) },
-            { id: 4, name: '100 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id === 4 && a.is_complete; }) },
-            { id: 5, name: '500 XP', icon: 'fa-bolt', unlocked: achievements.some(function(a) { return a.achievement_id === 5 && a.is_complete; }) },
-            { id: 6, name: 'Perfect Score', icon: 'fa-check-circle', unlocked: achievements.some(function(a) { return a.achievement_id === 6 && a.is_complete; }) },
-            { id: 7, name: 'Community Member', icon: 'fa-users', unlocked: achievements.some(function(a) { return a.achievement_id === 7 && a.is_complete; }) },
-            { id: 8, name: 'Premium Member', icon: 'fa-crown', unlocked: achievements.some(function(a) { return a.achievement_id === 8 && a.is_complete; }) || isPremium }
-        ];
-
-        container.innerHTML = allAchievements.map(function(a) {
-            return '<div class="ach-item ' + (a.unlocked ? 'unlocked' : 'locked') + '" title="' + a.name + '">' +
-                '<i class="fas ' + a.icon + '" style="color:' + (a.unlocked ? 'var(--accent-orange)' : 'var(--text-muted)') + ';"></i>' +
-                '<div class="ach-name">' + a.name + '</div>' +
-                '</div>';
-        }).join('');
-    }
-
-    // ============================================================
-    // SIDEBAR / NAV
-    // ============================================================
     document.getElementById('sidebarToggle')?.addEventListener('click', function() {
         var s = document.getElementById('sidebar');
         var mc = document.getElementById('mainContent');
@@ -2207,15 +2124,13 @@
             o.classList.toggle('active', mobileSidebarOpen);
         });
     }
+
     document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
         document.getElementById('sidebar').classList.remove('mobile-open');
         document.getElementById('sidebarOverlay').classList.remove('active');
         mobileSidebarOpen = false;
     });
 
-    // ============================================================
-    // KEYBOARD
-    // ============================================================
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeEditProfileModal();
@@ -2228,9 +2143,6 @@
         }
     });
 
-    // ============================================================
-    // SCROLL EFFECT
-    // ============================================================
     window.addEventListener('scroll', function() {
         var topBar = document.getElementById('topBar');
         if (window.scrollY > 20) {
@@ -2240,9 +2152,6 @@
         }
     });
 
-    // ============================================================
-    // AUTO DETECT DEVICE
-    // ============================================================
     function autoDetectDevice() {
         var isMobile = window.innerWidth <= 900;
         if (mmb) mmb.style.display = isMobile ? 'flex' : 'none';
@@ -2254,9 +2163,6 @@
     }
     window.addEventListener('resize', autoDetectDevice);
 
-    // ============================================================
-    // EXPOSE FUNCTIONS TO GLOBAL
-    // ============================================================
     window.showToast = showToast;
     window.handleLogout = handleLogout;
     window.openEditProfileModal = openEditProfileModal;
@@ -2272,30 +2178,15 @@
     window.renderCertificates = renderCertificates;
     window.renderAchievements = renderAchievements;
 
-    // ============================================================
-    // INIT
-    // ============================================================
     async function init() {
         autoDetectDevice();
-
         console.log('🚀 Initializing Profile App...');
-        console.log('🔑 Supabase configured:', supabaseConfigured);
-
-        if (supabaseConfigured) {
-            console.log('✅ Supabase is configured and ready');
-        } else {
-            console.warn('❌ Supabase is NOT configured.');
-            showToast('⚠️ Supabase not configured. Please check your URL and Key.', 'error');
-        }
-
         await checkAuth();
-
         setTimeout(function() {
             document.getElementById('loadingScreen').classList.add('hidden');
         }, 600);
     }
 
-    // Run init when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
@@ -2304,6 +2195,5 @@
 
 })();
 </script>
-
 </body>
 </html>
