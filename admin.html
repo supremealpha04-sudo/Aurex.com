@@ -640,15 +640,33 @@
         return '\u20A6' + (n||0).toLocaleString();
     }
 
-    window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
-    window.openModal = function(id) { document.getElementById(id).classList.add('active'); };
+    window.closeModal = function(id) {
+        document.getElementById(id).classList.remove('active');
+    };
+
+    window.openModal = function(id) {
+        document.getElementById(id).classList.add('active');
+    };
 
     window.showSection = function(name) {
         document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
         document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
         document.getElementById('section-' + name).classList.add('active');
         document.querySelector('.nav-item[data-section="' + name + '"]').classList.add('active');
-        const titles = {overview:'Admin Overview', users:'Manage Users', courses:'Manage Courses', classes:'Manage Classes', enrollments:'Manage Enrollments', projects:'Manage Projects', tools:'Manage Tools', resources:'Manage Resources', payments:'Payments', premium_requests:'Premium Requests', settings:'Site Settings', activity:'Activity Log'};
+        const titles = {
+            overview: 'Admin Overview',
+            users: 'Manage Users',
+            courses: 'Manage Courses',
+            classes: 'Manage Classes',
+            enrollments: 'Manage Enrollments',
+            projects: 'Manage Projects',
+            tools: 'Manage Tools',
+            resources: 'Manage Resources',
+            payments: 'Payments',
+            premium_requests: 'Premium Requests',
+            settings: 'Site Settings',
+            activity: 'Activity Log'
+        };
         document.getElementById('pageTitle').textContent = titles[name] || 'Admin';
     };
 
@@ -681,7 +699,10 @@
         }
 
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) { window.location.href = 'auth.html'; return; }
+        if (!user) {
+            window.location.href = 'auth.html';
+            return;
+        }
 
         currentUser = user;
         document.getElementById('userName').textContent = user.email?.split('@')[0] || 'Admin';
@@ -703,9 +724,18 @@
 
     window.refreshAll = async function() {
         await Promise.all([
-            loadStats(), loadUsers(), loadCourses(), loadClasses(), loadEnrollments(),
-            loadProjects(), loadTools(), loadResources(), loadPayments(),
-            loadPremiumRequests(), loadSettings(), loadActivity()
+            loadStats(),
+            loadUsers(),
+            loadCourses(),
+            loadClasses(),
+            loadEnrollments(),
+            loadProjects(),
+            loadTools(),
+            loadResources(),
+            loadPayments(),
+            loadPremiumRequests(),
+            loadSettings(),
+            loadActivity()
         ]);
         await loadCourseOptions();
         updateCharts();
@@ -754,7 +784,9 @@
             const { data: payments } = await supabase.from('payments').select('amount').eq('status', 'completed');
             const revenue = (payments || []).reduce(function(a,b) { return a + (b.amount||0); }, 0);
             document.getElementById('statRevenue').textContent = formatCurrency(revenue);
-        } catch(e) { console.error('Stats error', e); }
+        } catch(e) {
+            console.error('Stats error', e);
+        }
     }
 
     async function loadUsers() {
@@ -765,7 +797,10 @@
 
     function renderUsers(users) {
         const tbody = document.getElementById('usersTable');
-        if (!users || users.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-users"></i><p>No users found</p></td></tr>'; return; }
+        if (!users || users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-users"></i><p>No users found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = users.map(function(u) {
             const roleBadge = u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : (u.role === 'instructor' ? '<span class="badge badge-premium">Instructor</span>' : '<span class="badge badge-free">Student</span>');
             const statusBadge = u.status === 'active' ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">' + u.status + '</span>';
@@ -805,14 +840,19 @@
         };
         const { error } = await supabase.from('users').update(updates).eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('User updated'); closeModal('userModal'); await loadUsers(); await loadStats();
+        showToast('User updated');
+        closeModal('userModal');
+        await loadUsers();
+        await loadStats();
     };
 
     window.deleteUser = async function(id) {
         if (!confirm('Delete this user?')) return;
         const { error } = await supabase.from('users').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('User deleted'); await loadUsers(); await loadStats();
+        showToast('User deleted');
+        await loadUsers();
+        await loadStats();
     };
 
     async function loadCourses() {
@@ -823,7 +863,10 @@
 
     function renderCourses(courses) {
         const tbody = document.getElementById('coursesTable');
-        if (!courses || courses.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-graduation-cap"></i><p>No courses found</p></td></tr>'; return; }
+        if (!courses || courses.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-graduation-cap"></i><p>No courses found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = courses.map(function(c) {
             const price = c.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(c.price);
             const status = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
@@ -903,9 +946,15 @@
             const res = await supabase.from('courses').insert([payload]);
             error = res.error;
         }
-        if (error) { document.getElementById('courseError').textContent = error.message; return; }
-        showToast(id ? 'Course updated' : 'Course created'); closeModal('courseModal');
-        await loadCourses(); await loadStats(); await loadCourseOptions();
+        if (error) {
+            document.getElementById('courseError').textContent = error.message;
+            return;
+        }
+        showToast(id ? 'Course updated' : 'Course created');
+        closeModal('courseModal');
+        await loadCourses();
+        await loadStats();
+        await loadCourseOptions();
         await logActivity(id ? 'updated' : 'created', 'course', payload.title);
     };
 
@@ -913,7 +962,10 @@
         if (!confirm('Delete this course?')) return;
         const { error } = await supabase.from('courses').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Course deleted'); await loadCourses(); await loadStats(); await loadCourseOptions();
+        showToast('Course deleted');
+        await loadCourses();
+        await loadStats();
+        await loadCourseOptions();
     };
 
     async function loadClasses() {
@@ -924,7 +976,10 @@
 
     function renderClasses(classes) {
         const tbody = document.getElementById('classesTable');
-        if (!classes || classes.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-calendar-alt"></i><p>No classes found</p></td></tr>'; return; }
+        if (!classes || classes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-calendar-alt"></i><p>No classes found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = classes.map(function(c) {
             const typeBadge = c.class_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : (c.class_type === 'paid' ? '<span class="badge badge-admin">Paid</span>' : '<span class="badge badge-free">Free</span>');
             const status = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
@@ -993,9 +1048,14 @@
             const res = await supabase.from('classes').insert([payload]);
             error = res.error;
         }
-        if (error) { document.getElementById('classError').textContent = error.message; return; }
-        showToast(id ? 'Class updated' : 'Class created'); closeModal('classModal');
-        await loadClasses(); await loadStats();
+        if (error) {
+            document.getElementById('classError').textContent = error.message;
+            return;
+        }
+        showToast(id ? 'Class updated' : 'Class created');
+        closeModal('classModal');
+        await loadClasses();
+        await loadStats();
         await logActivity(id ? 'updated' : 'created', 'class', payload.title);
     };
 
@@ -1003,7 +1063,9 @@
         if (!confirm('Delete this class?')) return;
         const { error } = await supabase.from('classes').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Class deleted'); await loadClasses(); await loadStats();
+        showToast('Class deleted');
+        await loadClasses();
+        await loadStats();
     };
 
     async function loadEnrollments() {
@@ -1021,7 +1083,10 @@
 
     function renderEnrollments(enrollments) {
         const tbody = document.getElementById('enrollmentsTable');
-        if (!enrollments || enrollments.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-book-open"></i><p>No enrollments found</p></td></tr>'; return; }
+        if (!enrollments || enrollments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-book-open"></i><p>No enrollments found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = enrollments.map(function(e) {
             const user = e.users || {};
             const course = e.courses || {};
@@ -1046,7 +1111,9 @@
         if (!confirm('Delete this enrollment?')) return;
         const { error } = await supabase.from('enrollments').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Enrollment deleted'); await loadEnrollments(); await loadStats();
+        showToast('Enrollment deleted');
+        await loadEnrollments();
+        await loadStats();
     };
 
     async function loadProjects() {
@@ -1057,7 +1124,10 @@
 
     function renderProjects(projects) {
         const tbody = document.getElementById('projectsTable');
-        if (!projects || projects.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-folder"></i><p>No projects found</p></td></tr>'; return; }
+        if (!projects || projects.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-folder"></i><p>No projects found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = projects.map(function(p) {
             const statusBadge = p.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' :
                 (p.status === 'in-progress' ? '<span class="badge badge-premium">In Progress</span>' :
@@ -1137,23 +1207,31 @@
             const res = await supabase.from('projects').insert([payload]);
             error = res.error;
         }
-        if (error) { document.getElementById('projectError').textContent = error.message; return; }
-        showToast(id ? 'Project updated' : 'Project created'); closeModal('projectModal');
-        await loadProjects(); await loadStats();
+        if (error) {
+            document.getElementById('projectError').textContent = error.message;
+            return;
+        }
+        showToast(id ? 'Project updated' : 'Project created');
+        closeModal('projectModal');
+        await loadProjects();
+        await loadStats();
         await logActivity(id ? 'updated' : 'created', 'project', payload.title);
     };
 
     window.toggleProjectFeature = async function(id, featured) {
         const { error } = await supabase.from('projects').update({is_featured: featured}).eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast(featured ? 'Project featured' : 'Project unfeatured'); await loadProjects();
+        showToast(featured ? 'Project featured' : 'Project unfeatured');
+        await loadProjects();
     };
 
     window.deleteProject = async function(id) {
         if (!confirm('Delete this project?')) return;
         const { error } = await supabase.from('projects').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Project deleted'); await loadProjects(); await loadStats();
+        showToast('Project deleted');
+        await loadProjects();
+        await loadStats();
     };
 
     async function loadTools() {
@@ -1164,7 +1242,10 @@
 
     function renderTools(tools) {
         const tbody = document.getElementById('toolsTable');
-        if (!tools || tools.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-wrench"></i><p>No tools found</p></td></tr>'; return; }
+        if (!tools || tools.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-wrench"></i><p>No tools found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = tools.map(function(t) {
             const status = t.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
             const price = t.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(t.price);
@@ -1233,15 +1314,23 @@
             const res = await supabase.from('tools').insert([payload]);
             error = res.error;
         }
-        if (error) { document.getElementById('toolError').textContent = error.message; return; }
-        showToast(id ? 'Tool updated' : 'Tool created'); closeModal('toolModal'); await loadTools(); await loadStats();
+        if (error) {
+            document.getElementById('toolError').textContent = error.message;
+            return;
+        }
+        showToast(id ? 'Tool updated' : 'Tool created');
+        closeModal('toolModal');
+        await loadTools();
+        await loadStats();
     };
 
     window.deleteTool = async function(id) {
         if (!confirm('Delete this tool?')) return;
         const { error } = await supabase.from('tools').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Tool deleted'); await loadTools(); await loadStats();
+        showToast('Tool deleted');
+        await loadTools();
+        await loadStats();
     };
 
     async function loadResources() {
@@ -1252,7 +1341,10 @@
 
     function renderResources(resources) {
         const tbody = document.getElementById('resourcesTable');
-        if (!resources || resources.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-file-alt"></i><p>No resources found</p></td></tr>'; return; }
+        if (!resources || resources.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-file-alt"></i><p>No resources found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = resources.map(function(r) {
             const typeBadge = r.resource_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : (r.resource_type === 'paid' ? '<span class="badge badge-admin">Paid</span>' : '<span class="badge badge-free">Free</span>');
             const status = r.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
@@ -1310,15 +1402,23 @@
             const res = await supabase.from('resources').insert([payload]);
             error = res.error;
         }
-        if (error) { document.getElementById('resourceError').textContent = error.message; return; }
-        showToast(id ? 'Resource updated' : 'Resource created'); closeModal('resourceModal'); await loadResources(); await loadStats();
+        if (error) {
+            document.getElementById('resourceError').textContent = error.message;
+            return;
+        }
+        showToast(id ? 'Resource updated' : 'Resource created');
+        closeModal('resourceModal');
+        await loadResources();
+        await loadStats();
     };
 
     window.deleteResource = async function(id) {
         if (!confirm('Delete this resource?')) return;
         const { error } = await supabase.from('resources').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Resource deleted'); await loadResources(); await loadStats();
+        showToast('Resource deleted');
+        await loadResources();
+        await loadStats();
     };
 
     async function loadPayments() {
@@ -1329,7 +1429,10 @@
 
     function renderPayments(payments) {
         const tbody = document.getElementById('paymentsTable');
-        if (!payments || payments.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-credit-card"></i><p>No payments found</p></td></tr>'; return; }
+        if (!payments || payments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-credit-card"></i><p>No payments found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = payments.map(function(p) {
             const status = p.status === 'completed' ? '<span class="badge badge-active">Completed</span>' : (p.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + p.status + '</span>');
             return '<tr><td>' + (p.user_email || 'Unknown') + '</td><td>' + formatCurrency(p.amount) + '</td><td>' + (p.payment_type || p.type || '') + '</td><td>' + status + '</td><td class="cell-meta">' + formatDate(p.created_at) + '</td><td><div class="table-actions">' + (p.status === 'pending' ? '<button class="success" onclick="confirmPayment(\'' + p.id + '\')" title="Confirm"><i class="fas fa-check"></i></button>' : '') + '<button class="delete" onclick="deletePayment(\'' + p.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
@@ -1337,9 +1440,15 @@
     }
 
     window.confirmPayment = async function(id) {
-        const { error } = await supabase.from('payments').update({status: 'completed', confirmed_by: currentUser.id, confirmed_at: new Date().toISOString()}).eq('id', id);
+        const { error } = await supabase.from('payments').update({
+            status: 'completed',
+            confirmed_by: currentUser.id,
+            confirmed_at: new Date().toISOString()
+        }).eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Payment confirmed'); await loadPayments(); await loadStats();
+        showToast('Payment confirmed');
+        await loadPayments();
+        await loadStats();
         await logActivity('confirmed', 'payment', 'Payment confirmed');
     };
 
@@ -1347,7 +1456,9 @@
         if (!confirm('Delete this payment record?')) return;
         const { error } = await supabase.from('payments').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Payment deleted'); await loadPayments(); await loadStats();
+        showToast('Payment deleted');
+        await loadPayments();
+        await loadStats();
     };
 
     async function loadPremiumRequests() {
@@ -1359,7 +1470,10 @@
 
     function renderPremiumRequests(requests) {
         const tbody = document.getElementById('premiumRequestsTable');
-        if (!requests || requests.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-crown"></i><p>No premium requests found</p></td></tr>'; return; }
+        if (!requests || requests.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-crown"></i><p>No premium requests found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = requests.map(function(r) {
             const status = r.status === 'confirmed' ? '<span class="badge badge-active">Confirmed</span>' : (r.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">Rejected</span>');
             return '<tr><td>' + (r.user_name || 'Unknown') + '</td><td>' + (r.user_email || '') + '</td><td>' + formatCurrency(r.amount || 13500) + '</td><td>' + status + '</td><td class="cell-meta">' + formatDate(r.created_at) + '</td><td><div class="table-actions">' + (r.status === 'pending' ? '<button class="success" onclick="approveRequest(\'' + r.id + '\', \'' + r.user_id + '\')" title="Approve"><i class="fas fa-check"></i></button><button class="delete" onclick="rejectRequest(\'' + r.id + '\')" title="Reject"><i class="fas fa-times"></i></button>' : '') + '<button class="delete" onclick="deleteRequest(\'' + r.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
@@ -1367,15 +1481,21 @@
     }
 
     window.approveRequest = async function(id, userId) {
-        const { error: reqErr } = await supabase.from('premium_requests').update({status: 'confirmed', confirmed_by: currentUser.id, confirmed_at: new Date().toISOString()}).eq('id', id);
+        const { error: reqErr } = await supabase.from('premium_requests').update({
+            status: 'confirmed',
+            confirmed_by: currentUser.id,
+            confirmed_at: new Date().toISOString()
+        }).eq('id', id);
         if (reqErr) { showToast(reqErr.message, 'error'); return; }
+
         const { error: userErr } = await supabase.from('users').update({
             is_premium: true,
             subscription_status: 'active',
             premium_start: new Date().toISOString(),
-            premium_end: new Date(Date.now() + 180*24*60*60*1000).toISOString()
+            premium_end: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()
         }).eq('id', userId);
         if (userErr) { showToast(userErr.message, 'error'); return; }
+
         await supabase.from('payments').insert({
             user_id: userId,
             user_email: (dataCache.users || []).find(function(u) { return u.id === userId; })?.email || '',
@@ -1387,22 +1507,28 @@
             confirmed_at: new Date().toISOString(),
             created_at: new Date().toISOString()
         });
+
         showToast('Premium request approved! 🎉');
-        await loadPremiumRequests(); await loadStats(); await loadUsers(); await loadPayments();
+        await loadPremiumRequests();
+        await loadStats();
+        await loadUsers();
+        await loadPayments();
         await logActivity('approved', 'premium_request', 'Approved premium for user');
     };
 
     window.rejectRequest = async function(id) {
         const { error } = await supabase.from('premium_requests').update({status: 'rejected'}).eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Premium request rejected'); await loadPremiumRequests();
+        showToast('Premium request rejected');
+        await loadPremiumRequests();
     };
 
     window.deleteRequest = async function(id) {
         if (!confirm('Delete this request?')) return;
         const { error } = await supabase.from('premium_requests').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Request deleted'); await loadPremiumRequests();
+        showToast('Request deleted');
+        await loadPremiumRequests();
     };
 
     async function loadSettings() {
@@ -1413,7 +1539,10 @@
 
     function renderSettings(settings) {
         const tbody = document.getElementById('settingsTable');
-        if (!settings || settings.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-cog"></i><p>No settings found</p></td></tr>'; return; }
+        if (!settings || settings.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-cog"></i><p>No settings found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = settings.map(function(s) {
             const pub = s.is_public ? '<span class="badge badge-active">Yes</span>' : '<span class="badge badge-inactive">No</span>';
             return '<tr><td><div class="cell-title">' + s.key + '</div></td><td>' + s.value + '</td><td>' + s.type + '</td><td>' + pub + '</td><td class="cell-meta">' + (s.description || '') + '</td><td><div class="table-actions"><button onclick="editSetting(\'' + s.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteSetting(\'' + s.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
@@ -1460,15 +1589,21 @@
             const res = await supabase.from('site_settings').insert([payload]);
             error = res.error;
         }
-        if (error) { document.getElementById('settingError').textContent = error.message; return; }
-        showToast(id ? 'Setting updated' : 'Setting created'); closeModal('settingModal'); await loadSettings();
+        if (error) {
+            document.getElementById('settingError').textContent = error.message;
+            return;
+        }
+        showToast(id ? 'Setting updated' : 'Setting created');
+        closeModal('settingModal');
+        await loadSettings();
     };
 
     window.deleteSetting = async function(id) {
         if (!confirm('Delete this setting?')) return;
         const { error } = await supabase.from('site_settings').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
-        showToast('Setting deleted'); await loadSettings();
+        showToast('Setting deleted');
+        await loadSettings();
     };
 
     async function loadActivity() {
@@ -1480,7 +1615,10 @@
 
     function renderActivity(activity) {
         const tbody = document.getElementById('activityTable');
-        if (!activity || activity.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-history"></i><p>No activity found</p></td></tr>'; return; }
+        if (!activity || activity.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-history"></i><p>No activity found</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = activity.map(function(a) {
             return '<tr><td><div class="cell-title">' + a.action + '</div></td><td>' + (a.entity_type || '') + (a.entity_id ? ' (' + a.entity_id.slice(0,8) + '...)' : '') + '</td><td class="cell-meta">' + (a.details ? JSON.stringify(a.details).slice(0,60) : '') + '</td><td class="cell-meta">' + formatDate(a.created_at) + '</td></tr>';
         }).join('');
@@ -1488,7 +1626,10 @@
 
     function renderRecentActivity(activity) {
         const tbody = document.getElementById('recentActivityTable');
-        if (!activity || activity.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-history"></i><p>No recent activity</p></td></tr>'; return; }
+        if (!activity || activity.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-history"></i><p>No recent activity</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = activity.map(function(a) {
             return '<tr><td><div class="cell-title">' + a.action + '</div></td><td>' + (a.entity_type || '') + '</td><td class="cell-meta">' + (a.user_id ? a.user_id.slice(0,8) + '...' : 'System') + '</td><td class="cell-meta">' + formatDate(a.created_at) + '</td></tr>';
         }).join('');
@@ -1503,7 +1644,9 @@
                 user_id: currentUser.id,
                 created_at: new Date().toISOString()
             });
-        } catch(e) { console.error('Log error:', e); }
+        } catch(e) {
+            console.error('Log error:', e);
+        }
     }
 
     function updateCharts() {
@@ -1534,7 +1677,9 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8' } }
+                    },
                     scales: {
                         x: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b' } },
                         y: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b' } }
@@ -1560,7 +1705,9 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8' } }
+                    }
                 }
             });
         }
@@ -1595,7 +1742,9 @@
 
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            document.querySelectorAll('.modal-overlay').forEach(function(m) { m.classList.remove('active'); });
+            document.querySelectorAll('.modal-overlay').forEach(function(m) {
+                m.classList.remove('active');
+            });
         }
     });
 
