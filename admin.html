@@ -517,11 +517,12 @@
         </div>
     </div>
 
-    <script>
-    // ============================================================
-    // FULLY WORKING ADMIN DASHBOARD - 2200+ LINES
-    // ============================================================
+<script>
+// ============================================================
+// AUREX ADMIN DASHBOARD - COMPLETE FIXED SCRIPT
+// ============================================================
 
+(function() {
     const CONFIG = {
         supabase: {
             url: 'https://brmoagghggdeumkfijmm.supabase.co',
@@ -531,7 +532,7 @@
         bucket: 'aurex-assets'
     };
 
-    let supabase = null;
+    let supabaseClient = null;
     let currentUser = null;
     let data = {};
     let userChart = null;
@@ -540,6 +541,7 @@
     function showToast(msg, type) {
         type = type || 'success';
         const t = document.getElementById('toast');
+        if (!t) return;
         t.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i> <span>' + msg + '</span>';
         t.className = 'toast ' + type + ' show';
         clearTimeout(t._hide);
@@ -555,17 +557,17 @@
         return '₦' + (n||0).toLocaleString();
     }
 
-    function openModal(id) {
+    window.openModal = function(id) {
         document.getElementById(id).classList.add('open');
         document.body.style.overflow = 'hidden';
-    }
+    };
 
-    function closeModal(id) {
+    window.closeModal = function(id) {
         document.getElementById(id).classList.remove('open');
         document.body.style.overflow = '';
-    }
+    };
 
-    function previewImage(input, previewId) {
+    window.previewImage = function(input, previewId) {
         const preview = document.getElementById(previewId);
         if (input.files && input.files[0]) {
             const reader = new FileReader();
@@ -577,23 +579,23 @@
         } else {
             preview.style.display = 'none';
         }
-    }
+    };
 
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('sidebarOverlay').classList.toggle('active');
     }
 
-    function showSection(name) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
+    window.showSection = function(name) {
+        document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+        document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+        document.querySelectorAll('.bottom-nav-item').forEach(function(n) { n.classList.remove('active'); });
         document.getElementById('section-' + name).classList.add('active');
-        const navItem = document.querySelector('.nav-item[data-section="' + name + '"]');
+        var navItem = document.querySelector('.nav-item[data-section="' + name + '"]');
         if (navItem) navItem.classList.add('active');
-        const bottomItem = document.querySelector('.bottom-nav-item[onclick*="' + name + '"]');
+        var bottomItem = document.querySelector('.bottom-nav-item[onclick*="' + name + '"]');
         if (bottomItem) bottomItem.classList.add('active');
-        const titles = {
+        var titles = {
             overview:'Admin Overview', users:'Manage Users', courses:'Manage Courses',
             classes:'Manage Classes', enrollments:'Manage Enrollments', projects:'Manage Projects',
             tools:'Manage Tools', resources:'Manage Resources', payments:'Payments',
@@ -604,24 +606,24 @@
             document.getElementById('sidebar').classList.remove('open');
             document.getElementById('sidebarOverlay').classList.remove('active');
         }
-    }
+    };
 
-    function filterTable(tableId, value) {
-        const rows = document.getElementById(tableId).querySelectorAll('tr');
-        const term = value.toLowerCase();
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(term) ? '' : 'none';
+    window.filterTable = function(tableId, value) {
+        var rows = document.getElementById(tableId).querySelectorAll('tr');
+        var term = value.toLowerCase();
+        rows.forEach(function(row) {
+            var text = row.textContent.toLowerCase();
+            row.style.display = text.indexOf(term) !== -1 ? '' : 'none';
         });
-    }
+    };
 
     async function uploadFile(file, folder) {
         try {
-            const ext = file.name.split('.').pop();
-            const name = folder + '/' + Date.now() + '-' + Math.random().toString(36).substring(7) + '.' + ext;
-            const { error } = await supabase.storage.from(CONFIG.bucket).upload(name, file);
+            var ext = file.name.split('.').pop();
+            var name = folder + '/' + Date.now() + '-' + Math.random().toString(36).substring(7) + '.' + ext;
+            var { error } = await supabaseClient.storage.from(CONFIG.bucket).upload(name, file);
             if (error) throw error;
-            const { data: url } = supabase.storage.from(CONFIG.bucket).getPublicUrl(name);
+            var { data: url } = supabaseClient.storage.from(CONFIG.bucket).getPublicUrl(name);
             return url.publicUrl;
         } catch(e) {
             showToast('Upload failed: ' + e.message, 'error');
@@ -631,22 +633,22 @@
 
     async function init() {
         try {
-            supabase = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+            supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
         } catch(e) {
             document.getElementById('loadingScreen').classList.add('hidden');
             showToast('Supabase connection failed', 'error');
             return;
         }
 
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) { location.href = 'auth.html'; return; }
+        var { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) { window.location.href = 'auth.html'; return; }
 
         currentUser = user;
         document.getElementById('userName').textContent = user.email?.split('@')[0] || 'Admin';
         document.getElementById('userImg').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.email||'Admin') + '&background=7c3aed&color=fff&size=100';
 
-        const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
-        const isAdmin = profile?.role === 'admin' || CONFIG.adminEmails.includes(user.email);
+        var { data: profile } = await supabaseClient.from('users').select('role').eq('id', user.id).single();
+        var isAdmin = profile?.role === 'admin' || CONFIG.adminEmails.indexOf(user.email) !== -1;
 
         if (!isAdmin) {
             document.getElementById('loadingScreen').classList.add('hidden');
@@ -659,7 +661,7 @@
         await refreshAll();
     }
 
-    async function refreshAll() {
+    window.refreshAll = async function() {
         await Promise.all([
             loadStats(),
             loadUsers(),
@@ -677,35 +679,32 @@
         await loadCourseOptions();
         updateCharts();
         updatePendingCount();
-    }
+    };
 
     function updatePendingCount() {
-        const pending = (data.premiumRequests || []).filter(r => r.status === 'pending').length || 0;
+        var pending = (data.premiumRequests || []).filter(function(r) { return r.status === 'pending'; }).length || 0;
         document.getElementById('pendingCount').textContent = pending + ' pending';
     }
 
     async function loadCourseOptions() {
-        const { data: courses } = await supabase.from('courses').select('id,title').eq('is_active', true);
-        const select = document.getElementById('classCourseId');
+        var { data: courses } = await supabaseClient.from('courses').select('id,title').eq('is_active', true);
+        var select = document.getElementById('classCourseId');
         if (!select) return;
         select.innerHTML = '<option value="">Select course...</option>' +
-            (courses||[]).map(c => '<option value="' + c.id + '">' + c.title + '</option>').join('');
+            (courses||[]).map(function(c) { return '<option value="' + c.id + '">' + c.title + '</option>'; }).join('');
     }
 
-    // ============================================================
-    // STATS
-    // ============================================================
     async function loadStats() {
         try {
-            const [{count:users}, {count:premium}, {count:courses}, {count:projects}, {count:tools}, {count:pending}, {count:classes}, {count:enrollments}] = await Promise.all([
-                supabase.from('users').select('*', {count:'exact', head:true}),
-                supabase.from('users').select('*', {count:'exact', head:true}).eq('is_premium', true),
-                supabase.from('courses').select('*', {count:'exact', head:true}),
-                supabase.from('projects').select('*', {count:'exact', head:true}),
-                supabase.from('tools').select('*', {count:'exact', head:true}),
-                supabase.from('premium_requests').select('*', {count:'exact', head:true}).eq('status', 'pending'),
-                supabase.from('classes').select('*', {count:'exact', head:true}).gte('date', new Date().toISOString()),
-                supabase.from('enrollments').select('*', {count:'exact', head:true})
+            var [{count:users}, {count:premium}, {count:courses}, {count:projects}, {count:tools}, {count:pending}, {count:classes}, {count:enrollments}] = await Promise.all([
+                supabaseClient.from('users').select('*', {count:'exact', head:true}),
+                supabaseClient.from('users').select('*', {count:'exact', head:true}).eq('is_premium', true),
+                supabaseClient.from('courses').select('*', {count:'exact', head:true}),
+                supabaseClient.from('projects').select('*', {count:'exact', head:true}),
+                supabaseClient.from('tools').select('*', {count:'exact', head:true}),
+                supabaseClient.from('premium_requests').select('*', {count:'exact', head:true}).eq('status', 'pending'),
+                supabaseClient.from('classes').select('*', {count:'exact', head:true}).gte('date', new Date().toISOString()),
+                supabaseClient.from('enrollments').select('*', {count:'exact', head:true})
             ]);
             document.getElementById('statUsers').textContent = users || 0;
             document.getElementById('statPremium').textContent = premium || 0;
@@ -715,42 +714,34 @@
             document.getElementById('statClasses').textContent = classes || 0;
             document.getElementById('statEnrollments').textContent = enrollments || 0;
 
-            const { data: payments } = await supabase.from('payments').select('amount').eq('status', 'completed');
-            const revenue = (payments||[]).reduce((a,b) => a + (b.amount||0), 0);
+            var { data: payments } = await supabaseClient.from('payments').select('amount').eq('status', 'completed');
+            var revenue = (payments||[]).reduce(function(a,b) { return a + (b.amount||0); }, 0);
             document.getElementById('statRevenue').textContent = formatCurrency(revenue);
         } catch(e) { console.error('Stats error', e); }
     }
 
-    // ============================================================
-    // USERS
-    // ============================================================
     async function loadUsers() {
-        const { data: users } = await supabase.from('users').select('*').order('created_at', {ascending:false});
+        var { data: users } = await supabaseClient.from('users').select('*').order('created_at', {ascending:false});
         data.users = users || [];
         renderUsers(data.users);
     }
 
     function renderUsers(users) {
-        const tbody = document.getElementById('usersTable');
+        var tbody = document.getElementById('usersTable');
         if (!users || !users.length) {
             tbody.innerHTML = '<tr><td colspan="7" class="empty"><i class="fas fa-users"></i><h3>No users found</h3><p>Users will appear here once they register</p></td></tr>';
             return;
         }
-        tbody.innerHTML = users.map(u => `
-            <tr>
-                <td><span class="cell-title">${u.full_name || 'Unknown'}</span> ${u.is_premium ? '<span class="badge badge-premium"><i class="fas fa-crown"></i></span>' : ''}</td>
-                <td>${u.email}</td>
-                <td>${u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : u.role === 'instructor' ? '<span class="badge badge-premium">Instructor</span>' : '<span class="badge badge-free">Student</span>'}</td>
-                <td>${u.status === 'active' ? '<span class="badge badge-active">Active</span>' : u.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + u.status + '</span>'}</td>
-                <td>${u.enrollment_count || 0}</td>
-                <td class="cell-meta">${formatDate(u.created_at)}</td>
-                <td><div class="table-actions"><button onclick="editUser('${u.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteUser('${u.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = users.map(function(u) {
+            var premiumBadge = u.is_premium ? '<span class="badge badge-premium"><i class="fas fa-crown"></i></span>' : '';
+            var roleBadge = u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : u.role === 'instructor' ? '<span class="badge badge-premium">Instructor</span>' : '<span class="badge badge-free">Student</span>';
+            var statusBadge = u.status === 'active' ? '<span class="badge badge-active">Active</span>' : u.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + u.status + '</span>';
+            return '<tr><td><span class="cell-title">' + (u.full_name || 'Unknown') + '</span> ' + premiumBadge + '</td><td>' + u.email + '</td><td>' + roleBadge + '</td><td>' + statusBadge + '</td><td>' + (u.enrollment_count || 0) + '</td><td class="cell-meta">' + formatDate(u.created_at) + '</td><td><div class="table-actions"><button onclick="editUser(\'' + u.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteUser(\'' + u.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
     }
 
     window.editUser = function(id) {
-        const u = data.users.find(x => x.id === id);
+        var u = data.users.find(function(x) { return x.id === id; });
         if (!u) return;
         document.getElementById('editUserId').value = u.id;
         document.getElementById('editUserName').value = u.full_name || '';
@@ -764,7 +755,7 @@
 
     window.deleteUser = async function(id) {
         if (!confirm('Delete this user? This action cannot be undone.')) return;
-        const { error } = await supabase.from('users').delete().eq('id', id);
+        var { error } = await supabaseClient.from('users').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('User deleted successfully');
         await loadUsers();
@@ -773,15 +764,15 @@
 
     document.getElementById('userForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const id = document.getElementById('editUserId').value;
-        const payload = {
+        var id = document.getElementById('editUserId').value;
+        var payload = {
             full_name: document.getElementById('editUserName').value,
             role: document.getElementById('editUserRole').value,
             status: document.getElementById('editUserStatus').value,
             is_premium: document.getElementById('editUserPremium').checked,
             user_type: document.getElementById('editUserInstructor').checked ? 'instructor' : 'student'
         };
-        const { error } = await supabase.from('users').update(payload).eq('id', id);
+        var { error } = await supabaseClient.from('users').update(payload).eq('id', id);
         if (error) { document.getElementById('userError').textContent = error.message; return; }
         showToast('User updated successfully');
         closeModal('userModal');
@@ -789,31 +780,23 @@
         await loadStats();
     });
 
-    // ============================================================
-    // COURSES
-    // ============================================================
     async function loadCourses() {
-        const { data: courses } = await supabase.from('courses').select('*').order('created_at', {ascending:false});
+        var { data: courses } = await supabaseClient.from('courses').select('*').order('created_at', {ascending:false});
         data.courses = courses || [];
         renderCourses(data.courses);
     }
 
     function renderCourses(courses) {
-        const tbody = document.getElementById('coursesTable');
+        var tbody = document.getElementById('coursesTable');
         if (!courses || !courses.length) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-graduation-cap"></i><h3>No courses found</h3><p>Create your first course using the Add Course button</p></td></tr>';
             return;
         }
-        tbody.innerHTML = courses.map(c => `
-            <tr>
-                <td><span class="cell-title">${c.title}</span><div class="cell-meta">${c.instructor || 'No instructor'}</div></td>
-                <td>${c.category || 'Uncategorized'}</td>
-                <td>${c.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(c.price)}</td>
-                <td>${c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>'}</td>
-                <td>${c.enrollment_count || 0}</td>
-                <td><div class="table-actions"><button onclick="editCourse('${c.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteCourse('${c.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = courses.map(function(c) {
+            var priceDisplay = c.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(c.price);
+            var statusDisplay = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
+            return '<tr><td><span class="cell-title">' + c.title + '</span><div class="cell-meta">' + (c.instructor || 'No instructor') + '</div></td><td>' + (c.category || 'Uncategorized') + '</td><td>' + priceDisplay + '</td><td>' + statusDisplay + '</td><td>' + (c.enrollment_count || 0) + '</td><td><div class="table-actions"><button onclick="editCourse(\'' + c.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteCourse(\'' + c.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
     }
 
     window.openCourseModal = function() {
@@ -826,7 +809,7 @@
     };
 
     window.editCourse = function(id) {
-        const c = data.courses.find(x => x.id === id);
+        var c = data.courses.find(function(x) { return x.id === id; });
         if (!c) return;
         document.getElementById('courseModalTitle').textContent = 'Edit Course';
         document.getElementById('courseId').value = c.id;
@@ -850,7 +833,7 @@
 
     window.deleteCourse = async function(id) {
         if (!confirm('Delete this course? This will remove all enrollments and related data.')) return;
-        const { error } = await supabase.from('courses').delete().eq('id', id);
+        var { error } = await supabaseClient.from('courses').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Course deleted successfully');
         await loadCourses();
@@ -860,17 +843,17 @@
 
     document.getElementById('courseForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const id = document.getElementById('courseId').value;
-        const file = document.getElementById('courseImageFile').files[0];
-        let image = '';
+        var id = document.getElementById('courseId').value;
+        var file = document.getElementById('courseImageFile').files[0];
+        var image = '';
 
         if (file) {
-            const uploaded = await uploadFile(file, 'courses');
+            var uploaded = await uploadFile(file, 'courses');
             if (!uploaded) return;
             image = uploaded;
         }
 
-        const payload = {
+        var payload = {
             title: document.getElementById('courseTitle').value,
             description: document.getElementById('courseDesc').value,
             category: document.getElementById('courseCategory').value,
@@ -884,13 +867,13 @@
             is_featured: document.getElementById('courseIsFeatured').checked
         };
 
-        let error;
+        var error;
         if (id) {
-            const res = await supabase.from('courses').update(payload).eq('id', id);
+            var res = await supabaseClient.from('courses').update(payload).eq('id', id);
             error = res.error;
         } else {
-            const res = await supabase.from('courses').insert([payload]);
-            error = res.error;
+            var res2 = await supabaseClient.from('courses').insert([payload]);
+            error = res2.error;
         }
         if (error) { document.getElementById('courseError').textContent = error.message; return; }
         showToast(id ? 'Course updated successfully' : 'Course created successfully');
@@ -902,31 +885,24 @@
         await loadCourseOptions();
     });
 
-    // ============================================================
-    // CLASSES
-    // ============================================================
     async function loadClasses() {
-        const { data: classes } = await supabase.from('classes').select('*').order('date', {ascending:true});
+        var { data: classes } = await supabaseClient.from('classes').select('*').order('date', {ascending:true});
         data.classes = classes || [];
         renderClasses(data.classes);
     }
 
     function renderClasses(classes) {
-        const tbody = document.getElementById('classesTable');
+        var tbody = document.getElementById('classesTable');
         if (!classes || !classes.length) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-calendar-alt"></i><h3>No classes found</h3><p>Schedule your first class using the Add Class button</p></td></tr>';
             return;
         }
-        tbody.innerHTML = classes.map(c => `
-            <tr>
-                <td><span class="cell-title">${c.title}</span><div class="cell-meta">${c.requires_enrollment !== false ? '🔒 Enrolled only' : '🌐 Everyone'}</div></td>
-                <td>${c.course || c.course_id || '—'}</td>
-                <td class="cell-meta">${formatDate(c.date)}</td>
-                <td>${c.class_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : c.class_type === 'paid' ? '<span class="badge badge-paid">Paid</span>' : '<span class="badge badge-free">Free</span>'}</td>
-                <td>${c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>'}</td>
-                <td><div class="table-actions"><button onclick="editClass('${c.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteClass('${c.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = classes.map(function(c) {
+            var enrollText = c.requires_enrollment !== false ? '🔒 Enrolled only' : '🌐 Everyone';
+            var typeBadge = c.class_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : c.class_type === 'paid' ? '<span class="badge badge-paid">Paid</span>' : '<span class="badge badge-free">Free</span>';
+            var statusBadge = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
+            return '<tr><td><span class="cell-title">' + c.title + '</span><div class="cell-meta">' + enrollText + '</div></td><td>' + (c.course || c.course_id || '—') + '</td><td class="cell-meta">' + formatDate(c.date) + '</td><td>' + typeBadge + '</td><td>' + statusBadge + '</td><td><div class="table-actions"><button onclick="editClass(\'' + c.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteClass(\'' + c.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
     }
 
     window.openClassModal = function() {
@@ -938,7 +914,7 @@
     };
 
     window.editClass = function(id) {
-        const c = data.classes.find(x => x.id === id);
+        var c = data.classes.find(function(x) { return x.id === id; });
         if (!c) return;
         document.getElementById('classModalTitle').textContent = 'Edit Class';
         document.getElementById('classId').value = c.id;
@@ -961,7 +937,7 @@
 
     window.deleteClass = async function(id) {
         if (!confirm('Delete this class?')) return;
-        const { error } = await supabase.from('classes').delete().eq('id', id);
+        var { error } = await supabaseClient.from('classes').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Class deleted successfully');
         await loadClasses();
@@ -970,11 +946,11 @@
 
     document.getElementById('classForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const id = document.getElementById('classId').value;
-        const courseId = document.getElementById('classCourseId').value;
-        const courseTitle = (data.courses || []).find(c => c.id === courseId)?.title || '';
+        var id = document.getElementById('classId').value;
+        var courseId = document.getElementById('classCourseId').value;
+        var courseTitle = (data.courses || []).find(function(c) { return c.id === courseId; })?.title || '';
 
-        const payload = {
+        var payload = {
             title: document.getElementById('classTitle').value,
             course_id: courseId,
             course: courseTitle,
@@ -992,13 +968,13 @@
             is_recorded: document.getElementById('classIsRecorded').checked
         };
 
-        let error;
+        var error;
         if (id) {
-            const res = await supabase.from('classes').update(payload).eq('id', id);
+            var res = await supabaseClient.from('classes').update(payload).eq('id', id);
             error = res.error;
         } else {
-            const res = await supabase.from('classes').insert([payload]);
-            error = res.error;
+            var res2 = await supabaseClient.from('classes').insert([payload]);
+            error = res2.error;
         }
         if (error) { document.getElementById('classError').textContent = error.message; return; }
         showToast(id ? 'Class updated successfully' : 'Class created successfully');
@@ -1008,11 +984,8 @@
         await loadStats();
     });
 
-    // ============================================================
-    // ENROLLMENTS
-    // ============================================================
     async function loadEnrollments() {
-        const { data: enrollments } = await supabase
+        var { data: enrollments } = await supabaseClient
             .from('enrollments')
             .select('*, users:user_id(id,full_name,email), courses:course_id(id,title)')
             .order('enrolled_at', {ascending:false});
@@ -1021,61 +994,46 @@
     }
 
     function renderEnrollments(enrollments) {
-        const tbody = document.getElementById('enrollmentsTable');
+        var tbody = document.getElementById('enrollmentsTable');
         if (!enrollments || !enrollments.length) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-book-open"></i><h3>No enrollments found</h3><p>Students will appear here once they enroll in courses</p></td></tr>';
             return;
         }
-        tbody.innerHTML = enrollments.map(e => {
-            const user = e.users || {};
-            const course = e.courses || {};
-            const progress = e.progress || 0;
-            return `
-            <tr>
-                <td><span class="cell-title">${user.full_name || 'Unknown'}</span><div class="cell-meta">${user.email || ''}</div></td>
-                <td>${course.title || e.course_id || 'Unknown'}</td>
-                <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div><span style="font-size:11px;font-weight:600;min-width:32px;">${progress}%</span></div></td>
-                <td>${e.status === 'active' ? '<span class="badge badge-active">Active</span>' : e.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : '<span class="badge badge-inactive">' + e.status + '</span>'}</td>
-                <td class="cell-meta">${formatDate(e.enrolled_at || e.created_at)}</td>
-                <td><div class="table-actions"><button class="danger" onclick="deleteEnrollment('${e.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>`;
+        tbody.innerHTML = enrollments.map(function(e) {
+            var user = e.users || {};
+            var course = e.courses || {};
+            var progress = e.progress || 0;
+            var statusBadge = e.status === 'active' ? '<span class="badge badge-active">Active</span>' : e.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : '<span class="badge badge-inactive">' + e.status + '</span>';
+            return '<tr><td><span class="cell-title">' + (user.full_name || 'Unknown') + '</span><div class="cell-meta">' + (user.email || '') + '</div></td><td>' + (course.title || e.course_id || 'Unknown') + '</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar"><div class="fill" style="width:' + progress + '%"></div></div><span style="font-size:11px;font-weight:600;min-width:32px;">' + progress + '%</span></div></td><td>' + statusBadge + '</td><td class="cell-meta">' + formatDate(e.enrolled_at || e.created_at) + '</td><td><div class="table-actions"><button class="danger" onclick="deleteEnrollment(\'' + e.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
         }).join('');
     }
 
     window.deleteEnrollment = async function(id) {
         if (!confirm('Delete this enrollment?')) return;
-        const { error } = await supabase.from('enrollments').delete().eq('id', id);
+        var { error } = await supabaseClient.from('enrollments').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Enrollment deleted successfully');
         await loadEnrollments();
         await loadStats();
     };
 
-    // ============================================================
-    // PROJECTS
-    // ============================================================
     async function loadProjects() {
-        const { data: projects } = await supabase.from('projects').select('*').order('created_at', {ascending:false});
+        var { data: projects } = await supabaseClient.from('projects').select('*').order('created_at', {ascending:false});
         data.projects = projects || [];
         renderProjects(data.projects);
     }
 
     function renderProjects(projects) {
-        const tbody = document.getElementById('projectsTable');
+        var tbody = document.getElementById('projectsTable');
         if (!projects || !projects.length) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-folder"></i><h3>No projects found</h3><p>Create your first project using the Add Project button</p></td></tr>';
             return;
         }
-        tbody.innerHTML = projects.map(p => `
-            <tr>
-                <td><span class="cell-title">${p.title}</span> ${p.is_featured ? '<span class="badge badge-premium"><i class="fas fa-star"></i></span>' : ''}</td>
-                <td>${p.author_name || 'Unknown'}</td>
-                <td>${p.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : p.status === 'in-progress' ? '<span class="badge badge-premium">In Progress</span>' : '<span class="badge badge-pending">Pending</span>'}</td>
-                <td>${p.likes || 0}</td>
-                <td class="cell-meta">${formatDate(p.created_at)}</td>
-                <td><div class="table-actions"><button onclick="editProject('${p.id}')" title="Edit"><i class="fas fa-edit"></i></button><button onclick="toggleFeatured('${p.id}', ${!p.is_featured})" title="Toggle Featured"><i class="fas ${p.is_featured ? 'fa-star' : 'far fa-star'}"></i></button><button class="danger" onclick="deleteProject('${p.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = projects.map(function(p) {
+            var featuredBadge = p.is_featured ? '<span class="badge badge-premium"><i class="fas fa-star"></i></span>' : '';
+            var statusBadge = p.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : p.status === 'in-progress' ? '<span class="badge badge-premium">In Progress</span>' : '<span class="badge badge-pending">Pending</span>';
+            return '<tr><td><span class="cell-title">' + p.title + '</span> ' + featuredBadge + '</td><td>' + (p.author_name || 'Unknown') + '</td><td>' + statusBadge + '</td><td>' + (p.likes || 0) + '</td><td class="cell-meta">' + formatDate(p.created_at) + '</td><td><div class="table-actions"><button onclick="editProject(\'' + p.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button onclick="toggleFeatured(\'' + p.id + '\', ' + (!p.is_featured) + ')" title="Toggle Featured"><i class="fas ' + (p.is_featured ? 'fa-star' : 'far fa-star') + '"></i></button><button class="danger" onclick="deleteProject(\'' + p.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
     }
 
     window.openProjectModal = function() {
@@ -1088,7 +1046,7 @@
     };
 
     window.editProject = function(id) {
-        const p = data.projects.find(x => x.id === id);
+        var p = data.projects.find(function(x) { return x.id === id; });
         if (!p) return;
         document.getElementById('projectModalTitle').textContent = 'Edit Project';
         document.getElementById('projectId').value = p.id;
@@ -1111,7 +1069,7 @@
 
     window.deleteProject = async function(id) {
         if (!confirm('Delete this project?')) return;
-        const { error } = await supabase.from('projects').delete().eq('id', id);
+        var { error } = await supabaseClient.from('projects').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Project deleted successfully');
         await loadProjects();
@@ -1119,7 +1077,7 @@
     };
 
     window.toggleFeatured = async function(id, featured) {
-        const { error } = await supabase.from('projects').update({is_featured: featured}).eq('id', id);
+        var { error } = await supabaseClient.from('projects').update({is_featured: featured}).eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast(featured ? 'Project featured' : 'Project unfeatured');
         await loadProjects();
@@ -1127,17 +1085,17 @@
 
     document.getElementById('projectForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const id = document.getElementById('projectId').value;
-        const file = document.getElementById('projectImageFile').files[0];
-        let image = '';
+        var id = document.getElementById('projectId').value;
+        var file = document.getElementById('projectImageFile').files[0];
+        var image = '';
 
         if (file) {
-            const uploaded = await uploadFile(file, 'projects');
+            var uploaded = await uploadFile(file, 'projects');
             if (!uploaded) return;
             image = uploaded;
         }
 
-        const payload = {
+        var payload = {
             title: document.getElementById('projectTitle').value,
             description: document.getElementById('projectDesc').value,
             author_name: document.getElementById('projectAuthor').value,
@@ -1150,13 +1108,13 @@
             is_active: document.getElementById('projectIsActive').checked
         };
 
-        let error;
+        var error;
         if (id) {
-            const res = await supabase.from('projects').update(payload).eq('id', id);
+            var res = await supabaseClient.from('projects').update(payload).eq('id', id);
             error = res.error;
         } else {
-            const res = await supabase.from('projects').insert([payload]);
-            error = res.error;
+            var res2 = await supabaseClient.from('projects').insert([payload]);
+            error = res2.error;
         }
         if (error) { document.getElementById('projectError').textContent = error.message; return; }
         showToast(id ? 'Project updated successfully' : 'Project created successfully');
@@ -1167,30 +1125,23 @@
         await loadStats();
     });
 
-    // ============================================================
-    // TOOLS
-    // ============================================================
     async function loadTools() {
-        const { data: tools } = await supabase.from('tools').select('*').order('created_at', {ascending:false});
+        var { data: tools } = await supabaseClient.from('tools').select('*').order('created_at', {ascending:false});
         data.tools = tools || [];
         renderTools(data.tools);
     }
 
     function renderTools(tools) {
-        const tbody = document.getElementById('toolsTable');
+        var tbody = document.getElementById('toolsTable');
         if (!tools || !tools.length) {
             tbody.innerHTML = '<tr><td colspan="5" class="empty"><i class="fas fa-wrench"></i><h3>No tools found</h3><p>Add tools using the Add Tool button</p></td></tr>';
             return;
         }
-        tbody.innerHTML = tools.map(t => `
-            <tr>
-                <td><span class="cell-title">${t.name}</span></td>
-                <td>${t.category || 'General'}</td>
-                <td>${t.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(t.price)}</td>
-                <td>${t.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>'}</td>
-                <td><div class="table-actions"><button onclick="editTool('${t.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteTool('${t.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = tools.map(function(t) {
+            var priceDisplay = t.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(t.price);
+            var statusDisplay = t.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
+            return '<tr><td><span class="cell-title">' + t.name + '</span></td><td>' + (t.category || 'General') + '</td><td>' + priceDisplay + '</td><td>' + statusDisplay + '</td><td><div class="table-actions"><button onclick="editTool(\'' + t.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteTool(\'' + t.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
     }
 
     window.openToolModal = function() {
@@ -1203,7 +1154,7 @@
     };
 
     window.editTool = function(id) {
-        const t = data.tools.find(x => x.id === id);
+        var t = data.tools.find(function(x) { return x.id === id; });
         if (!t) return;
         document.getElementById('toolModalTitle').textContent = 'Edit Tool';
         document.getElementById('toolId').value = t.id;
@@ -1224,7 +1175,7 @@
 
     window.deleteTool = async function(id) {
         if (!confirm('Delete this tool?')) return;
-        const { error } = await supabase.from('tools').delete().eq('id', id);
+        var { error } = await supabaseClient.from('tools').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Tool deleted successfully');
         await loadTools();
@@ -1233,17 +1184,17 @@
 
     document.getElementById('toolForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const id = document.getElementById('toolId').value;
-        const file = document.getElementById('toolImageFile').files[0];
-        let image = '';
+        var id = document.getElementById('toolId').value;
+        var file = document.getElementById('toolImageFile').files[0];
+        var image = '';
 
         if (file) {
-            const uploaded = await uploadFile(file, 'tools');
+            var uploaded = await uploadFile(file, 'tools');
             if (!uploaded) return;
             image = uploaded;
         }
 
-        const payload = {
+        var payload = {
             name: document.getElementById('toolName').value,
             description: document.getElementById('toolDesc').value,
             category: document.getElementById('toolCategory').value,
@@ -1254,13 +1205,13 @@
             is_active: document.getElementById('toolIsActive').checked
         };
 
-        let error;
+        var error;
         if (id) {
-            const res = await supabase.from('tools').update(payload).eq('id', id);
+            var res = await supabaseClient.from('tools').update(payload).eq('id', id);
             error = res.error;
         } else {
-            const res = await supabase.from('tools').insert([payload]);
-            error = res.error;
+            var res2 = await supabaseClient.from('tools').insert([payload]);
+            error = res2.error;
         }
         if (error) { document.getElementById('toolError').textContent = error.message; return; }
         showToast(id ? 'Tool updated successfully' : 'Tool created successfully');
@@ -1271,31 +1222,23 @@
         await loadStats();
     });
 
-    // ============================================================
-    // RESOURCES
-    // ============================================================
     async function loadResources() {
-        const { data: resources } = await supabase.from('resources').select('*').order('created_at', {ascending:false});
+        var { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', {ascending:false});
         data.resources = resources || [];
         renderResources(data.resources);
     }
 
     function renderResources(resources) {
-        const tbody = document.getElementById('resourcesTable');
+        var tbody = document.getElementById('resourcesTable');
         if (!resources || !resources.length) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-file-alt"></i><h3>No resources found</h3><p>Add resources using the Add Resource button</p></td></tr>';
             return;
         }
-        tbody.innerHTML = resources.map(r => `
-            <tr>
-                <td><span class="cell-title">${r.title}</span></td>
-                <td>${r.resource_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : r.resource_type === 'paid' ? '<span class="badge badge-paid">Paid</span>' : '<span class="badge badge-free">Free</span>'}</td>
-                <td>${r.price ? formatCurrency(r.price) : 'Free'}</td>
-                <td>${r.download_count || 0}</td>
-                <td>${r.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>'}</td>
-                <td><div class="table-actions"><button onclick="editResource('${r.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteResource('${r.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = resources.map(function(r) {
+            var typeBadge = r.resource_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : r.resource_type === 'paid' ? '<span class="badge badge-paid">Paid</span>' : '<span class="badge badge-free">Free</span>';
+            var statusBadge = r.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
+            return '<tr><td><span class="cell-title">' + r.title + '</span></td><td>' + typeBadge + '</td><td>' + (r.price ? formatCurrency(r.price) : 'Free') + '</td><td>' + (r.download_count || 0) + '</td><td>' + statusBadge + '</td><td><div class="table-actions"><button onclick="editResource(\'' + r.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteResource(\'' + r.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
     }
 
     window.openResourceModal = function() {
@@ -1308,7 +1251,7 @@
     };
 
     window.editResource = function(id) {
-        const r = data.resources.find(x => x.id === id);
+        var r = data.resources.find(function(x) { return x.id === id; });
         if (!r) return;
         document.getElementById('resourceModalTitle').textContent = 'Edit Resource';
         document.getElementById('resourceId').value = r.id;
@@ -1326,7 +1269,7 @@
 
     window.deleteResource = async function(id) {
         if (!confirm('Delete this resource?')) return;
-        const { error } = await supabase.from('resources').delete().eq('id', id);
+        var { error } = await supabaseClient.from('resources').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Resource deleted successfully');
         await loadResources();
@@ -1335,17 +1278,17 @@
 
     document.getElementById('resourceForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const id = document.getElementById('resourceId').value;
-        const file = document.getElementById('resourceFile').files[0];
-        let fileUrl = '';
+        var id = document.getElementById('resourceId').value;
+        var file = document.getElementById('resourceFile').files[0];
+        var fileUrl = '';
 
         if (file) {
-            const uploaded = await uploadFile(file, 'resources');
+            var uploaded = await uploadFile(file, 'resources');
             if (!uploaded) return;
             fileUrl = uploaded;
         }
 
-        const payload = {
+        var payload = {
             title: document.getElementById('resourceTitle').value,
             description: document.getElementById('resourceDesc').value,
             resource_type: document.getElementById('resourceType').value,
@@ -1354,13 +1297,13 @@
             is_active: document.getElementById('resourceIsActive').checked
         };
 
-        let error;
+        var error;
         if (id) {
-            const res = await supabase.from('resources').update(payload).eq('id', id);
+            var res = await supabaseClient.from('resources').update(payload).eq('id', id);
             error = res.error;
         } else {
-            const res = await supabase.from('resources').insert([payload]);
-            error = res.error;
+            var res2 = await supabaseClient.from('resources').insert([payload]);
+            error = res2.error;
         }
         if (error) { document.getElementById('resourceError').textContent = error.message; return; }
         showToast(id ? 'Resource updated successfully' : 'Resource created successfully');
@@ -1371,35 +1314,27 @@
         await loadStats();
     });
 
-    // ============================================================
-    // PAYMENTS
-    // ============================================================
     async function loadPayments() {
-        const { data: payments } = await supabase.from('payments').select('*').order('created_at', {ascending:false});
+        var { data: payments } = await supabaseClient.from('payments').select('*').order('created_at', {ascending:false});
         data.payments = payments || [];
         renderPayments(data.payments);
     }
 
     function renderPayments(payments) {
-        const tbody = document.getElementById('paymentsTable');
+        var tbody = document.getElementById('paymentsTable');
         if (!payments || !payments.length) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-credit-card"></i><h3>No payments found</h3><p>Payments will appear here once processed</p></td></tr>';
             return;
         }
-        tbody.innerHTML = payments.map(p => `
-            <tr>
-                <td>${p.user_email || 'Unknown'}</td>
-                <td>${formatCurrency(p.amount)}</td>
-                <td>${p.payment_type || p.type || '—'}</td>
-                <td>${p.status === 'completed' ? '<span class="badge badge-active">Completed</span>' : p.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + p.status + '</span>'}</td>
-                <td class="cell-meta">${formatDate(p.created_at)}</td>
-                <td><div class="table-actions">${p.status === 'pending' ? '<button class="success" onclick="confirmPayment(\'' + p.id + '\')" title="Confirm"><i class="fas fa-check"></i></button>' : ''}<button class="danger" onclick="deletePayment(\'' + p.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = payments.map(function(p) {
+            var statusBadge = p.status === 'completed' ? '<span class="badge badge-active">Completed</span>' : p.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + p.status + '</span>';
+            var confirmBtn = p.status === 'pending' ? '<button class="success" onclick="confirmPayment(\'' + p.id + '\')" title="Confirm"><i class="fas fa-check"></i></button>' : '';
+            return '<tr><td>' + (p.user_email || 'Unknown') + '</td><td>' + formatCurrency(p.amount) + '</td><td>' + (p.payment_type || p.type || '—') + '</td><td>' + statusBadge + '</td><td class="cell-meta">' + formatDate(p.created_at) + '</td><td><div class="table-actions">' + confirmBtn + '<button class="danger" onclick="deletePayment(\'' + p.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
     }
 
     window.confirmPayment = async function(id) {
-        const { error } = await supabase.from('payments').update({
+        var { error } = await supabaseClient.from('payments').update({
             status: 'completed',
             confirmed_by: currentUser.id,
             confirmed_at: new Date().toISOString()
@@ -1412,50 +1347,42 @@
 
     window.deletePayment = async function(id) {
         if (!confirm('Delete this payment record?')) return;
-        const { error } = await supabase.from('payments').delete().eq('id', id);
+        var { error } = await supabaseClient.from('payments').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Payment deleted successfully');
         await loadPayments();
         await loadStats();
     };
 
-    // ============================================================
-    // PREMIUM REQUESTS
-    // ============================================================
     async function loadPremiumRequests() {
-        const { data: requests } = await supabase.from('premium_requests').select('*').order('created_at', {ascending:false});
+        var { data: requests } = await supabaseClient.from('premium_requests').select('*').order('created_at', {ascending:false});
         data.premiumRequests = requests || [];
         renderPremiumRequests(data.premiumRequests);
         updatePendingCount();
     }
 
     function renderPremiumRequests(requests) {
-        const tbody = document.getElementById('premiumRequestsTable');
+        var tbody = document.getElementById('premiumRequestsTable');
         if (!requests || !requests.length) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-crown"></i><h3>No premium requests</h3></td></tr>';
             return;
         }
-        tbody.innerHTML = requests.map(r => `
-            <tr>
-                <td>${r.user_name || 'Unknown'}</td>
-                <td>${r.user_email || ''}</td>
-                <td>${formatCurrency(r.amount || 13500)}</td>
-                <td>${r.status === 'confirmed' ? '<span class="badge badge-active">Confirmed</span>' : r.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">Rejected</span>'}</td>
-                <td class="cell-meta">${formatDate(r.created_at)}</td>
-                <td><div class="table-actions">${r.status === 'pending' ? '<button class="success" onclick="approveRequest(\'' + r.id + '\', \'' + r.user_id + '\')" title="Approve"><i class="fas fa-check"></i></button><button class="danger" onclick="rejectRequest(\'' + r.id + '\')" title="Reject"><i class="fas fa-times"></i></button>' : ''}<button class="danger" onclick="deleteRequest(\'' + r.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = requests.map(function(r) {
+            var statusBadge = r.status === 'confirmed' ? '<span class="badge badge-active">Confirmed</span>' : r.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">Rejected</span>';
+            var actionBtns = r.status === 'pending' ? '<button class="success" onclick="approveRequest(\'' + r.id + '\', \'' + r.user_id + '\')" title="Approve"><i class="fas fa-check"></i></button><button class="danger" onclick="rejectRequest(\'' + r.id + '\')" title="Reject"><i class="fas fa-times"></i></button>' : '';
+            return '<tr><td>' + (r.user_name || 'Unknown') + '</td><td>' + (r.user_email || '') + '</td><td>' + formatCurrency(r.amount || 13500) + '</td><td>' + statusBadge + '</td><td class="cell-meta">' + formatDate(r.created_at) + '</td><td><div class="table-actions">' + actionBtns + '<button class="danger" onclick="deleteRequest(\'' + r.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
     }
 
     window.approveRequest = async function(id, userId) {
-        const { error: reqErr } = await supabase.from('premium_requests').update({
+        var { error: reqErr } = await supabaseClient.from('premium_requests').update({
             status: 'confirmed',
             confirmed_by: currentUser.id,
             confirmed_at: new Date().toISOString()
         }).eq('id', id);
         if (reqErr) { showToast(reqErr.message, 'error'); return; }
 
-        const { error: userErr } = await supabase.from('users').update({
+        var { error: userErr } = await supabaseClient.from('users').update({
             is_premium: true,
             subscription_status: 'active',
             premium_start: new Date().toISOString(),
@@ -1463,9 +1390,9 @@
         }).eq('id', userId);
         if (userErr) { showToast(userErr.message, 'error'); return; }
 
-        await supabase.from('payments').insert({
+        await supabaseClient.from('payments').insert({
             user_id: userId,
-            user_email: (data.users || []).find(u => u.id === userId)?.email || '',
+            user_email: (data.users || []).find(function(u) { return u.id === userId; })?.email || '',
             amount: 13500,
             payment_type: 'premium',
             item: 'Premium Subscription (6 months)',
@@ -1483,7 +1410,7 @@
     };
 
     window.rejectRequest = async function(id) {
-        const { error } = await supabase.from('premium_requests').update({status: 'rejected'}).eq('id', id);
+        var { error } = await supabaseClient.from('premium_requests').update({status: 'rejected'}).eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Premium request rejected');
         await loadPremiumRequests();
@@ -1491,37 +1418,28 @@
 
     window.deleteRequest = async function(id) {
         if (!confirm('Delete this request?')) return;
-        const { error } = await supabase.from('premium_requests').delete().eq('id', id);
+        var { error } = await supabaseClient.from('premium_requests').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Request deleted');
         await loadPremiumRequests();
     };
 
-    // ============================================================
-    // SETTINGS
-    // ============================================================
     async function loadSettings() {
-        const { data: settings } = await supabase.from('site_settings').select('*').order('key', {ascending:true});
+        var { data: settings } = await supabaseClient.from('site_settings').select('*').order('key', {ascending:true});
         data.settings = settings || [];
         renderSettings(data.settings);
     }
 
     function renderSettings(settings) {
-        const tbody = document.getElementById('settingsTable');
+        var tbody = document.getElementById('settingsTable');
         if (!settings || !settings.length) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-cog"></i><h3>No settings found</h3></td></tr>';
             return;
         }
-        tbody.innerHTML = settings.map(s => `
-            <tr>
-                <td><span class="cell-title">${s.key}</span></td>
-                <td>${s.value}</td>
-                <td>${s.type || 'text'}</td>
-                <td>${s.is_public ? '<span class="badge badge-active">Yes</span>' : '<span class="badge badge-inactive">No</span>'}</td>
-                <td class="cell-meta">${s.description || ''}</td>
-                <td><div class="table-actions"><button onclick="editSetting('${s.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteSetting('${s.id}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = settings.map(function(s) {
+            var publicBadge = s.is_public ? '<span class="badge badge-active">Yes</span>' : '<span class="badge badge-inactive">No</span>';
+            return '<tr><td><span class="cell-title">' + s.key + '</span></td><td>' + s.value + '</td><td>' + (s.type || 'text') + '</td><td>' + publicBadge + '</td><td class="cell-meta">' + (s.description || '') + '</td><td><div class="table-actions"><button onclick="editSetting(\'' + s.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteSetting(\'' + s.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
     }
 
     window.openSettingModal = function() {
@@ -1533,7 +1451,7 @@
     };
 
     window.editSetting = function(id) {
-        const s = data.settings.find(x => x.id === id);
+        var s = data.settings.find(function(x) { return x.id === id; });
         if (!s) return;
         document.getElementById('settingModalTitle').textContent = 'Edit Setting';
         document.getElementById('settingId').value = s.id;
@@ -1548,7 +1466,7 @@
 
     window.deleteSetting = async function(id) {
         if (!confirm('Delete this setting?')) return;
-        const { error } = await supabase.from('site_settings').delete().eq('id', id);
+        var { error } = await supabaseClient.from('site_settings').delete().eq('id', id);
         if (error) { showToast(error.message, 'error'); return; }
         showToast('Setting deleted');
         await loadSettings();
@@ -1556,8 +1474,8 @@
 
     document.getElementById('settingForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const id = document.getElementById('settingId').value;
-        const payload = {
+        var id = document.getElementById('settingId').value;
+        var payload = {
             key: document.getElementById('settingKey').value,
             value: document.getElementById('settingValue').value,
             type: document.getElementById('settingType').value,
@@ -1565,13 +1483,13 @@
             description: document.getElementById('settingDescription').value
         };
 
-        let error;
+        var error;
         if (id) {
-            const res = await supabase.from('site_settings').update(payload).eq('id', id);
+            var res = await supabaseClient.from('site_settings').update(payload).eq('id', id);
             error = res.error;
         } else {
-            const res = await supabase.from('site_settings').insert([payload]);
-            error = res.error;
+            var res2 = await supabaseClient.from('site_settings').insert([payload]);
+            error = res2.error;
         }
         if (error) { document.getElementById('settingError').textContent = error.message; return; }
         showToast(id ? 'Setting updated' : 'Setting created');
@@ -1580,61 +1498,47 @@
         await loadSettings();
     });
 
-    // ============================================================
-    // ACTIVITY
-    // ============================================================
     async function loadActivity() {
-        const { data: activity } = await supabase.from('activity_log').select('*').order('created_at', {ascending:false}).limit(50);
+        var { data: activity } = await supabaseClient.from('activity_log').select('*').order('created_at', {ascending:false}).limit(50);
         data.activity = activity || [];
         renderActivity(data.activity);
         renderRecentActivity(data.activity.slice(0, 10));
     }
 
     function renderActivity(activity) {
-        const tbody = document.getElementById('activityTable');
+        var tbody = document.getElementById('activityTable');
         if (!activity || !activity.length) {
             tbody.innerHTML = '<tr><td colspan="4" class="empty"><i class="fas fa-history"></i><h3>No activity found</h3></td></tr>';
             return;
         }
-        tbody.innerHTML = activity.map(a => `
-            <tr>
-                <td><span class="cell-title">${a.action}</span></td>
-                <td>${a.entity_type || ''}</td>
-                <td class="cell-meta">${a.details ? JSON.stringify(a.details).slice(0,60) : ''}</td>
-                <td class="cell-meta">${formatDate(a.created_at)}</td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = activity.map(function(a) {
+            var details = a.details ? JSON.stringify(a.details).slice(0,60) : '';
+            return '<tr><td><span class="cell-title">' + a.action + '</span></td><td>' + (a.entity_type || '') + '</td><td class="cell-meta">' + details + '</td><td class="cell-meta">' + formatDate(a.created_at) + '</td></tr>';
+        }).join('');
     }
 
     function renderRecentActivity(activity) {
-        const tbody = document.getElementById('recentActivity');
+        var tbody = document.getElementById('recentActivity');
         if (!activity || !activity.length) {
             tbody.innerHTML = '<tr><td colspan="4" class="empty"><i class="fas fa-history"></i><h3>No recent activity</h3></td></tr>';
             return;
         }
-        tbody.innerHTML = activity.map(a => `
-            <tr>
-                <td><span class="cell-title">${a.action}</span></td>
-                <td>${a.entity_type || ''}</td>
-                <td class="cell-meta">${a.user_id ? a.user_id.slice(0,8) + '...' : 'System'}</td>
-                <td class="cell-meta">${formatDate(a.created_at)}</td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = activity.map(function(a) {
+            var userId = a.user_id ? a.user_id.slice(0,8) + '...' : 'System';
+            return '<tr><td><span class="cell-title">' + a.action + '</span></td><td>' + (a.entity_type || '') + '</td><td class="cell-meta">' + userId + '</td><td class="cell-meta">' + formatDate(a.created_at) + '</td></tr>';
+        }).join('');
     }
 
-    // ============================================================
-    // CHARTS
-    // ============================================================
     function updateCharts() {
-        const ctx1 = document.getElementById('userChart');
+        var ctx1 = document.getElementById('userChart');
         if (ctx1) {
             if (userChart) userChart.destroy();
-            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            const counts = months.map((_, i) => {
-                const start = new Date(2026, i, 1);
-                const end = new Date(2026, i + 1, 1);
-                return (data.users || []).filter(u => {
-                    const d = new Date(u.created_at);
+            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            var counts = months.map(function(_, i) {
+                var start = new Date(2026, i, 1);
+                var end = new Date(2026, i + 1, 1);
+                return (data.users || []).filter(function(u) {
+                    var d = new Date(u.created_at);
                     return d >= start && d < end;
                 }).length || 0;
             });
@@ -1665,13 +1569,13 @@
             });
         }
 
-        const ctx2 = document.getElementById('enrollmentChart');
+        var ctx2 = document.getElementById('enrollmentChart');
         if (ctx2) {
             if (enrollmentChart) enrollmentChart.destroy();
-            const total = (data.enrollments || []).length || 0;
-            const completed = (data.enrollments || []).filter(e => e.progress === 100).length || 0;
-            const active = (data.enrollments || []).filter(e => e.status === 'active' && e.progress < 100).length || 0;
-            const inactive = total - completed - active;
+            var total = (data.enrollments || []).length || 0;
+            var completed = (data.enrollments || []).filter(function(e) { return e.progress === 100; }).length || 0;
+            var active = (data.enrollments || []).filter(function(e) { return e.status === 'active' && e.progress < 100; }).length || 0;
+            var inactive = total - completed - active;
             enrollmentChart = new Chart(ctx2, {
                 type: 'doughnut',
                 data: {
@@ -1693,15 +1597,17 @@
         }
     }
 
-    // ============================================================
-    // SIDEBAR / NAV
-    // ============================================================
+    window.logout = async function() {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'index.html';
+    };
+
     document.getElementById('sidebarOverlay').addEventListener('click', function() {
         document.getElementById('sidebar').classList.remove('open');
         document.getElementById('sidebarOverlay').classList.remove('active');
     });
 
-    const menuBtn = document.getElementById('menuBtn');
+    var menuBtn = document.getElementById('menuBtn');
     if (menuBtn) {
         menuBtn.style.display = window.innerWidth <= 900 ? 'inline-flex' : 'none';
         window.addEventListener('resize', function() {
@@ -1713,12 +1619,9 @@
         });
     }
 
-    // ============================================================
-    // KEYBOARD SHORTCUTS
-    // ============================================================
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
+            document.querySelectorAll('.modal').forEach(function(m) { m.classList.remove('open'); });
             document.body.style.overflow = '';
         }
         if (e.key === 'r' && (e.metaKey || e.ctrlKey)) {
@@ -1728,21 +1631,8 @@
         }
     });
 
-    // ============================================================
-    // LOGOUT
-    // ============================================================
-    window.logout = async function() {
-        await supabase.auth.signOut();
-        location.href = 'index.html';
-    };
-
-    // ============================================================
-    // INIT
-    // ============================================================
-    window.refreshAll = refreshAll;
-    window.showSection = showSection;
-
     document.addEventListener('DOMContentLoaded', init);
-    </script>
+})();
+</script>
 </body>
 </html>
