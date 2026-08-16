@@ -12,9 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* ============================================
-           COMPLETE ACADEMY STYLES
-           ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -72,8 +69,6 @@
             position: relative;
             overflow-x: hidden;
         }
-
-        /* ===== SIDEBAR ===== */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--bg-secondary);
@@ -205,7 +200,6 @@
                 margin: 12px 10px;
             }
         }
-
         .sidebar-logo {
             display: flex;
             align-items: center;
@@ -422,8 +416,6 @@
             cursor: not-allowed;
             transform: none;
         }
-
-        /* ===== MAIN ===== */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -442,8 +434,6 @@
                 margin-left: 0 !important;
             }
         }
-
-        /* ===== TOP BAR ===== */
         .top-bar {
             position: sticky;
             top: 8px;
@@ -634,8 +624,6 @@
                 font-size: 10px;
             }
         }
-
-        /* ===== HERO ===== */
         .hero {
             background: linear-gradient(135deg, #0f0c29 0%, #1a1647 40%, #0f0c29 100%);
             border-radius: 28px;
@@ -730,11 +718,6 @@
             color: var(--text-primary);
             font-weight: 600;
         }
-        .hero-visual {
-            display: none;
-        }
-
-        /* ===== STATS ROW ===== */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -791,8 +774,6 @@
             font-size: 11px;
             color: var(--text-muted);
         }
-
-        /* ===== SECTION HEADER ===== */
         .section-header {
             display: flex;
             align-items: center;
@@ -820,8 +801,6 @@
         .section-header .view-all:hover {
             gap: 8px;
         }
-
-        /* ===== CATEGORIES ===== */
         .categories-grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
@@ -862,8 +841,6 @@
             font-weight: 500;
             color: var(--text-secondary);
         }
-
-        /* ===== COURSES GRID ===== */
         .courses-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1059,8 +1036,6 @@
             border-radius: 2px;
             transition: width 0.5s ease;
         }
-
-        /* ===== CLASSES SECTION ===== */
         .classes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -1156,8 +1131,6 @@
             transform: none;
             box-shadow: none;
         }
-
-        /* ===== SETUP REQUIRED ===== */
         .setup-required {
             text-align: center;
             padding: 80px 20px;
@@ -1215,8 +1188,6 @@
             font-weight: 700;
             flex-shrink: 0;
         }
-
-        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -1255,8 +1226,6 @@
         .toast.error i {
             color: #ef4444;
         }
-
-        /* ===== LOADING ===== */
         .loading-overlay {
             position: fixed;
             inset: 0;
@@ -1288,8 +1257,6 @@
             color: var(--text-muted);
             font-size: 12px;
         }
-
-        /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -1310,8 +1277,6 @@
             font-size: 13px;
             color: var(--text-muted);
         }
-
-        /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             display: none;
             position: fixed;
@@ -1363,7 +1328,6 @@
                 padding-bottom: 60px;
             }
         }
-
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(24px); }
             to { opacity: 1; transform: translateY(0); }
@@ -1372,8 +1336,6 @@
             animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             opacity: 0;
         }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 1400px) {
             .categories-grid {
                 grid-template-columns: repeat(6, 1fr);
@@ -1457,7 +1419,6 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="app-container">
-        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <div class="logo-icon">
@@ -1498,9 +1459,7 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="main-content" id="mainContent">
-            <!-- TOP BAR -->
             <div class="top-bar" id="topBar">
                 <div style="display:flex;align-items:center;gap:10px;">
                     <button class="icon-btn" id="mobileMenuBtn" style="display:none;"><i class="fas fa-bars"></i></button>
@@ -1524,7 +1483,6 @@
                 </div>
             </div>
 
-            <!-- ===== HERO SECTION ===== -->
             <section class="hero animate-in" id="heroSection">
                 <div class="hero-content">
                     <div class="hero-label"><i class="fas fa-graduation-cap"></i> AUREX ACADEMY</div>
@@ -1544,16 +1502,8 @@
                         <span><strong id="heroStudentCount">--</strong> Students are learning now</span>
                     </div>
                 </div>
-                <div class="hero-visual">
-                    <div class="graduation-cap"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="floating-icon"><i class="fab fa-figma"></i></div>
-                    <div class="floating-icon"><i class="fas fa-pen-nib"></i></div>
-                    <div class="floating-icon"><i class="fas fa-palette"></i></div>
-                    <div class="floating-icon"><i class="fas fa-cube"></i></div>
-                </div>
             </section>
 
-            <!-- ===== STATS ===== -->
             <div class="stats-row animate-in" style="animation-delay:0.05s;" id="statsRow">
                 <div class="stat-card-mini">
                     <div class="icon purple"><i class="fas fa-graduation-cap"></i></div>
@@ -1585,39 +1535,28 @@
                 </div>
             </div>
 
-            <!-- ===== CONTENT - Populated by JavaScript ===== -->
             <div id="mainContentArea">
-                <!-- Categories -->
                 <div class="section-header animate-in" style="animation-delay:0.1s;">
                     <h2><i class="fas fa-tags" style="color:var(--accent-violet);margin-right:8px;"></i>Explore Categories</h2>
                     <a class="view-all" onclick="loadCategories()">View All <i class="fas fa-chevron-right"></i></a>
                 </div>
-                <div class="categories-grid animate-in" style="animation-delay:0.15s;" id="categoriesGrid">
-                    <!-- Will be populated by JavaScript -->
-                </div>
+                <div class="categories-grid animate-in" style="animation-delay:0.15s;" id="categoriesGrid"></div>
 
-                <!-- Courses -->
                 <div class="section-header animate-in" style="animation-delay:0.2s;" id="coursesSection">
                     <h2><i class="fas fa-graduation-cap" style="color:var(--accent-violet);margin-right:8px;"></i>Featured Courses</h2>
                     <a class="view-all" onclick="loadCourses()">View All <i class="fas fa-chevron-right"></i></a>
                 </div>
-                <div class="courses-grid animate-in" style="animation-delay:0.25s;" id="coursesGrid">
-                    <!-- Will be populated by JavaScript -->
-                </div>
+                <div class="courses-grid animate-in" style="animation-delay:0.25s;" id="coursesGrid"></div>
 
-                <!-- Classes -->
                 <div class="section-header animate-in" style="animation-delay:0.3s;" id="classesSection">
                     <h2><i class="fas fa-calendar-alt" style="color:var(--accent-cyan);margin-right:8px;"></i>Upcoming Classes</h2>
                     <a class="view-all" onclick="loadClasses()">View All <i class="fas fa-chevron-right"></i></a>
                 </div>
-                <div class="classes-grid animate-in" style="animation-delay:0.35s;" id="classesGrid">
-                    <!-- Will be populated by JavaScript -->
-                </div>
+                <div class="classes-grid animate-in" style="animation-delay:0.35s;" id="classesGrid"></div>
             </div>
         </main>
     </div>
 
-    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
         <a href="index.html" class="bottom-nav-item"><i class="fas fa-home"></i>Home</a>
         <a href="projects.html" class="bottom-nav-item"><i class="fas fa-folder"></i>Projects</a>
@@ -1625,748 +1564,780 @@
         <a href="profile.html" class="bottom-nav-item"><i class="fas fa-user"></i>Profile</a>
     </nav>
 
-    <!-- TOAST -->
     <div class="toast" id="toast">
         <i class="fas fa-check-circle"></i>
         <span id="toastMsg">Success!</span>
     </div>
 
     <script>
-        // ============================================================
-        // ACADEMY APP - All data from Supabase only
-        // ============================================================
+    (function() {
+        var CONFIG = {
+            supabase: {
+                url: 'https://brmoagghggdeumkfijmm.supabase.co',
+                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
+            },
+            adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
+        };
 
-        (function() {
-            // ============================================================
-            // SUPABASE CONFIG
-            // ============================================================
-            var CONFIG = {
-                supabase: {
-                    url: 'https://brmoagghggdeumkfijmm.supabase.co',
-                    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
-                },
-                app: {
-                    name: 'Aurex Designs',
-                    url: 'https://aurex-design.vercel.app',
-                    storageBucket: 'aurex-assets'
-                },
-                premium: { price: '13500', duration: '6', discount: '45' },
-                adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
-            };
+        var supabaseClient = null;
+        var supabaseConfigured = false;
+        var tablesExist = false;
+        var currentUser = null;
+        var isPremium = false;
+        var isAdmin = false;
+        var allCourses = [];
+        var allCategories = [];
+        var allEnrollments = [];
+        var allClasses = [];
+        var mobileSidebarOpen = false;
 
-            console.log('✅ Academy page loaded');
+        try {
+            var { createClient } = window.supabase;
+            supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+            supabaseConfigured = true;
+        } catch (e) {
+            supabaseConfigured = false;
+        }
 
-            // ============================================================
-            // INITIALIZE SUPABASE
-            // ============================================================
-            var supabaseClient = null;
-            var supabaseConfigured = false;
-            var tablesExist = false;
+        function showToast(msg, type) {
+            type = type || 'success';
+            var t = document.getElementById('toast');
+            if (!t) return;
+            t.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i> ' + msg;
+            t.className = 'toast ' + type + ' show';
+            clearTimeout(t._hide);
+            t._hide = setTimeout(function() { t.classList.remove('show'); }, 3500);
+        }
 
-            try {
-                var { createClient } = window.supabase;
-                supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
-                supabaseConfigured = true;
-                console.log('✅ Supabase connected');
-            } catch (e) {
-                console.error('❌ Supabase error:', e.message);
-                supabaseConfigured = false;
-            }
+        function formatCurrency(amount) {
+            if (!amount) return 'Free';
+            return '₦' + amount.toLocaleString();
+        }
 
-            // ============================================================
-            // STATE
-            // ============================================================
-            var currentUser = null;
-            var isPremium = false;
-            var isAdmin = false;
-            var allCourses = [];
-            var allCategories = [];
-            var allEnrollments = [];
-            var allClasses = [];
-            var mobileSidebarOpen = false;
+        function formatDate(d) {
+            if (!d) return '—';
+            var dt = new Date(d);
+            return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
 
-            // ============================================================
-            // HELPERS
-            // ============================================================
-            function showToast(msg, type) {
-                type = type || 'success';
-                var t = document.getElementById('toast');
-                if (!t) return;
-                t.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i> ' + msg;
-                t.className = 'toast ' + type + ' show';
-                clearTimeout(t._hide);
-                t._hide = setTimeout(function() { t.classList.remove('show'); }, 3500);
-            }
+        function formatTime(d) {
+            if (!d) return '—';
+            var dt = new Date(d);
+            return dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
 
-            function formatCurrency(amount) {
-                if (!amount) return 'Free';
-                return '₦' + amount.toLocaleString();
-            }
+        function getTimeRemaining(dateStr) {
+            var now = new Date();
+            var target = new Date(dateStr);
+            var diff = target - now;
+            if (diff < 0) return 'Started';
+            var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            if (days > 0) return days + 'd';
+            var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            if (hours > 0) return hours + 'h';
+            var mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            return mins + 'm';
+        }
 
-            function formatDate(d) {
-                if (!d) return '—';
-                var dt = new Date(d);
-                return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            }
-
-            function formatTime(d) {
-                if (!d) return '—';
-                var dt = new Date(d);
-                return dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            }
-
-            function getTimeRemaining(dateStr) {
-                var now = new Date();
-                var target = new Date(dateStr);
-                var diff = target - now;
-                if (diff < 0) return 'Started';
-                var days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                if (days > 0) return days + 'd';
-                var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                if (hours > 0) return hours + 'h';
-                var mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                return mins + 'm';
-            }
-
-            function showSetupRequired() {
-                var html = `
-                    <div class="setup-required">
-                        <i class="fas fa-database"></i>
-                        <h2>Database Setup Required</h2>
-                        <p>It looks like your Supabase database tables haven't been created yet. Please run the schema setup to create the required tables.</p>
-                        <div class="steps">
-                            <li><span class="num">1</span> Go to your Supabase Dashboard → SQL Editor</li>
-                            <li><span class="num">2</span> Copy and paste the schema from the documentation</li>
-                            <li><span class="num">3</span> Click "Run" to create all tables</li>
-                            <li><span class="num">4</span> Refresh this page</li>
-                        </div>
-                        <button class="btn-primary" onclick="location.reload()">
-                            <i class="fas fa-sync-alt"></i> Refresh Page
-                        </button>
+        function showSetupRequired() {
+            var html = `
+                <div class="setup-required">
+                    <i class="fas fa-database"></i>
+                    <h2>Database Setup Required</h2>
+                    <p>It looks like your Supabase database tables haven't been created yet. Please run the schema setup to create the required tables.</p>
+                    <div class="steps">
+                        <li><span class="num">1</span> Go to your Supabase Dashboard → SQL Editor</li>
+                        <li><span class="num">2</span> Copy and paste the schema from the documentation</li>
+                        <li><span class="num">3</span> Click "Run" to create all tables</li>
+                        <li><span class="num">4</span> Refresh this page</li>
                     </div>
-                `;
+                    <button class="btn-primary" onclick="location.reload()">
+                        <i class="fas fa-sync-alt"></i> Refresh Page
+                    </button>
+                </div>
+            `;
+            document.getElementById('categoriesGrid').innerHTML = html;
+            document.getElementById('coursesGrid').innerHTML = '';
+            document.getElementById('classesGrid').innerHTML = '';
+            document.getElementById('statsRow').style.display = 'none';
+        }
 
-                document.getElementById('categoriesGrid').innerHTML = html;
-                document.getElementById('coursesGrid').innerHTML = '';
-                document.getElementById('classesGrid').innerHTML = '';
-                document.getElementById('statsRow').style.display = 'none';
-            }
-
-            // ============================================================
-            // CHECK IF TABLES EXIST
-            // ============================================================
-            async function checkTablesExist() {
-                if (!supabaseConfigured) return false;
-
-                try {
-                    // Try to get a single row from users table
-                    var { data, error } = await supabaseClient
-                        .from('users')
-                        .select('id')
-                        .limit(1);
-
-                    if (error && error.code === '42P01') {
-                        // Table doesn't exist
-                        tablesExist = false;
-                        return false;
-                    }
-
-                    tablesExist = true;
-                    return true;
-                } catch (e) {
+        async function checkTablesExist() {
+            if (!supabaseConfigured) return false;
+            try {
+                var { error } = await supabaseClient.from('users').select('id').limit(1);
+                if (error && error.code === '42P01') {
                     tablesExist = false;
                     return false;
                 }
+                tablesExist = true;
+                return true;
+            } catch (e) {
+                tablesExist = false;
+                return false;
             }
+        }
 
-            // ============================================================
-            // AUTH
-            // ============================================================
-            async function checkAuth() {
-                if (!supabaseConfigured || !tablesExist) {
-                    document.getElementById('authBtn').style.display = 'flex';
-                    document.getElementById('userProfile').style.display = 'none';
-                    return;
-                }
-
-                var { data: { user } } = await supabaseClient.auth.getUser();
-                if (user) {
-                    try {
-                        var { data: profile } = await supabaseClient.from('users').select('*').eq('id', user.id).single();
-                        if (profile) {
-                            user.user_metadata = { ...user.user_metadata, ...profile };
-                            isPremium = profile.is_premium || false;
-                            isAdmin = CONFIG.adminEmails.includes(user.email) || profile.role === 'admin';
-                        }
-                    } catch (e) {
-                        isPremium = user.user_metadata?.is_premium || false;
-                        isAdmin = CONFIG.adminEmails.includes(user.email);
-                    }
-                    updateUIForUser(user);
-                }
-
-                supabaseClient.auth.onAuthStateChange(function(event, session) {
-                    if (event === 'SIGNED_IN' && session?.user) {
-                        isAdmin = CONFIG.adminEmails.includes(session.user.email);
-                        updateUIForUser(session.user);
-                        loadCourses();
-                        loadClasses();
-                    }
-                    if (event === 'SIGNED_OUT') {
-                        currentUser = null;
-                        isPremium = false;
-                        isAdmin = false;
-                        document.getElementById('authBtn').style.display = 'flex';
-                        document.getElementById('adminBtn').style.display = 'none';
-                        document.getElementById('userProfile').style.display = 'none';
-                        loadCourses();
-                        loadClasses();
-                    }
-                });
+        async function checkAuth() {
+            if (!supabaseConfigured || !tablesExist) {
+                document.getElementById('authBtn').style.display = 'flex';
+                document.getElementById('userProfile').style.display = 'none';
+                return;
             }
-
-            function updateUIForUser(user) {
-                currentUser = user;
-                document.getElementById('authBtn').style.display = 'none';
-                document.getElementById('userProfile').style.display = 'flex';
-
-                var name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
-                document.getElementById('userName').textContent = name;
-                document.getElementById('userProfileImg').src =
-                    'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=7c3aed&color=fff&size=100';
-
-                if (isPremium || user?.user_metadata?.is_premium) {
-                    document.getElementById('userStatus').textContent = 'Premium';
-                    document.getElementById('userStatus').className = 'status premium';
-                    document.getElementById('userStatus').innerHTML = 'Premium <i class="fas fa-crown" style="font-size:8px;"></i>';
-                    document.getElementById('upgradeBtn').disabled = true;
-                    document.getElementById('upgradeBtn').textContent = '✓ Premium Active';
-                } else {
-                    document.getElementById('userStatus').textContent = 'Free';
-                    document.getElementById('userStatus').className = 'status';
-                    document.getElementById('upgradeBtn').disabled = false;
-                    document.getElementById('upgradeBtn').textContent = 'Upgrade Now';
-                }
-
-                if (isAdmin || CONFIG.adminEmails.includes(user?.email)) {
-                    document.getElementById('adminBtn').style.display = 'inline-flex';
-                    document.getElementById('adminBadge').style.display = 'flex';
-                } else {
-                    document.getElementById('adminBtn').style.display = 'none';
-                }
-            }
-
-            // ============================================================
-            // LOAD STATS
-            // ============================================================
-            async function loadStats() {
-                if (!supabaseConfigured || !tablesExist) {
-                    document.getElementById('statCourses').textContent = '0';
-                    document.getElementById('statStudents').textContent = '0';
-                    document.getElementById('statCerts').textContent = '0';
-                    document.getElementById('statHours').textContent = '0';
-                    return;
-                }
-
+            var { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
                 try {
-                    var [coursesCount, usersCount, certsCount, hoursData] = await Promise.all([
-                        supabaseClient.from('courses').select('*', { count: 'exact', head: true }),
-                        supabaseClient.from('users').select('*', { count: 'exact', head: true }),
-                        supabaseClient.from('user_certificates').select('*', { count: 'exact', head: true }),
-                        supabaseClient.from('courses').select('duration_hours')
-                    ]);
-
-                    document.getElementById('statCourses').textContent = coursesCount.count || 0;
-                    document.getElementById('statStudents').textContent = (usersCount.count || 0).toLocaleString();
-                    document.getElementById('statCerts').textContent = (certsCount.count || 0).toLocaleString();
-
-                    var totalHours = 0;
-                    if (hoursData.data) {
-                        hoursData.data.forEach(function(c) {
-                            totalHours += c.duration_hours || 0;
-                        });
-                    }
-                    document.getElementById('statHours').textContent = totalHours || 0;
-
-                } catch (e) {
-                    console.error('Stats error:', e);
-                }
-            }
-
-            // ============================================================
-            // LOAD CATEGORIES
-            // ============================================================
-            async function loadCategories() {
-                var grid = document.getElementById('categoriesGrid');
-
-                if (!supabaseConfigured || !tablesExist) {
-                    showSetupRequired();
-                    return;
-                }
-
-                try {
-                    var { data, error } = await supabaseClient.from('categories').select('*').order('display_order', { ascending: true });
-                    if (!error && data && data.length > 0) {
-                        renderCategories(data);
-                    } else {
-                        grid.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><h3>No categories available</h3><p>Categories will appear here once added.</p></div>';
+                    var { data: profile } = await supabaseClient.from('users').select('*').eq('id', user.id).single();
+                    if (profile) {
+                        user.user_metadata = { ...user.user_metadata, ...profile };
+                        isPremium = profile.is_premium || false;
+                        isAdmin = CONFIG.adminEmails.includes(user.email) || profile.role === 'admin';
                     }
                 } catch (e) {
-                    console.error('Categories error:', e);
-                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><h3>Error loading categories</h3><p>Please refresh the page.</p></div>';
+                    isPremium = user.user_metadata?.is_premium || false;
+                    isAdmin = CONFIG.adminEmails.includes(user.email);
                 }
+                updateUIForUser(user);
             }
-
-            function renderCategories(categories) {
-                var grid = document.getElementById('categoriesGrid');
-                if (!categories || categories.length === 0) {
-                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><h3>No categories</h3></div>';
-                    return;
-                }
-
-                grid.innerHTML = categories.slice(0, 8).map(function(cat) {
-                    var color = cat.color || '#7c3aed';
-                    return '<div class="category-card" onclick="filterByCategory(\'' + (cat.name || cat.slug || '') + '\')">' +
-                        '<div class="cat-icon" style="background: ' + color + '15; color: ' + color + ';">' +
-                        '<i class="fas ' + (cat.icon || 'fa-circle') + '"></i>' +
-                        '</div>' +
-                        '<div class="cat-name">' + (cat.name || 'Category') + '</div>' +
-                        '</div>';
-                }).join('');
-            }
-
-            function filterByCategory(category) {
-                showToast('Showing: ' + category, 'info');
-                var filtered = allCourses.filter(function(c) {
-                    return c.category === category || c.category === category.toLowerCase();
-                });
-                if (filtered.length === 0) {
-                    showToast('No courses found in this category', 'warning');
+            supabaseClient.auth.onAuthStateChange(function(event, session) {
+                if (event === 'SIGNED_IN' && session?.user) {
+                    isAdmin = CONFIG.adminEmails.includes(session.user.email);
+                    updateUIForUser(session.user);
                     loadCourses();
-                } else {
-                    renderCourses(filtered);
+                    loadClasses();
                 }
-            }
-
-            // ============================================================
-            // LOAD COURSES
-            // ============================================================
-            async function loadCourses() {
-                var grid = document.getElementById('coursesGrid');
-
-                if (!supabaseConfigured || !tablesExist) {
-                    return;
+                if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    isPremium = false;
+                    isAdmin = false;
+                    document.getElementById('authBtn').style.display = 'flex';
+                    document.getElementById('adminBtn').style.display = 'none';
+                    document.getElementById('userProfile').style.display = 'none';
+                    loadCourses();
+                    loadClasses();
                 }
-
-                try {
-                    var { data, error } = await supabaseClient
-                        .from('courses')
-                        .select('*')
-                        .eq('is_active', true)
-                        .order('created_at', { ascending: false });
-
-                    if (!error && data && data.length > 0) {
-                        allCourses = data;
-                        renderCourses(allCourses);
-                    } else {
-                        allCourses = [];
-                        grid.innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No courses available</h3><p>Check back soon for new courses!</p></div>';
-                    }
-                } catch (e) {
-                    console.error('Courses error:', e);
-                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><h3>Error loading courses</h3><p>Please refresh the page.</p></div>';
-                }
-            }
-
-            function renderCourses(courses) {
-                var grid = document.getElementById('coursesGrid');
-                if (!courses || courses.length === 0) {
-                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No courses available</h3><p>Check back soon for new courses!</p></div>';
-                    return;
-                }
-
-                grid.innerHTML = courses.map(function(c) {
-                    var enrollment = allEnrollments.find(function(e) { return e.course_id === c.id; });
-                    var isEnrolled = !!enrollment;
-                    var progress = enrollment ? enrollment.progress || 0 : 0;
-
-                    var priceDisplay = c.is_free ?
-                        '<span style="color:var(--accent-green);">Free</span>' :
-                        (isPremium ? '<span style="color:var(--accent-cyan);">' + formatCurrency(c.price * 0.55) + '</span>' :
-                            '<span>' + formatCurrency(c.price) + '</span>');
-
-                    var originalPrice = (!c.is_free && isPremium) ?
-                        '<span class="original">' + formatCurrency(c.price) + '</span>' :
-                        '';
-
-                    var discountBadge = (!c.is_free && isPremium) ?
-                        '<span class="discount">-45%</span>' :
-                        '';
-
-                    var enrollText = isEnrolled ? 'Continue Learning' : (c.is_free ? 'Start Free' : (isPremium ?
-                        'Enroll Now' : 'Premium Only'));
-
-                    var progressBar = isEnrolled ?
-                        '<div class="progress-bar"><div class="fill" style="width:' + progress + '%;"></div></div>' :
-                        '';
-
-                    return '<div class="course-card">' +
-                        '<div class="course-image">' +
-                        '<img src="' + (c.image || 'https://via.placeholder.com/400x250/1a1a3e/7c3aed?text=' + encodeURIComponent(c
-                            .title)) + '" alt="' + c.title + '" loading="lazy">' +
-                        (c.badge ? '<span class="course-badge badge-' + c.badge.toLowerCase() + '">' + c.badge + '</span>' :
-                            '') +
-                        '<div class="price-tag">' + originalPrice + ' ' + priceDisplay + ' ' + discountBadge + '</div>' +
-                        '<button class="heart-btn" onclick="event.stopPropagation(); toggleFavorite(\'' + c.id + '\')">' +
-                        '<i class="far fa-heart"></i>' +
-                        '</button>' +
-                        '</div>' +
-                        '<div class="course-body">' +
-                        '<div class="course-title">' + c.title + '</div>' +
-                        '<div class="course-instructor">' +
-                        '<img src="https://ui-avatars.com/api/?name=' + encodeURIComponent(c.instructor || 'Instructor') +
-                        '&background=7c3aed&color=fff&size=100" alt="' + (c.instructor || 'Instructor') + '">' +
-                        '<span>' + (c.instructor || 'Instructor') + '</span>' +
-                        '</div>' +
-                        '<div class="course-meta">' +
-                        '<div class="rating"><span class="stars"><i class="fas fa-star"></i> ' + (c.rating || '0.0') +
-                        '</span><span class="count">(' + (c.review_count || 0) + ')</span></div>' +
-                        '<div class="duration"><i class="far fa-clock"></i> ' + (c.duration || '0h') + '</div>' +
-                        '</div>' +
-                        progressBar +
-                        '<button class="enroll-btn" onclick="enrollCourse(\'' + c.id + '\')" ' + (!currentUser ?
-                            'disabled' : '') + '>' +
-                        (isEnrolled ? '✅ ' : '') + enrollText +
-                        '</button>' +
-                        '</div>' +
-                        '</div>';
-                }).join('');
-            }
-
-            // ============================================================
-            // ENROLLMENT
-            // ============================================================
-            async function enrollCourse(courseId) {
-                if (!currentUser) {
-                    showToast('Please sign in first to enroll', 'error');
-                    window.location.href = 'auth.html';
-                    return;
-                }
-
-                if (!tablesExist) {
-                    showToast('Database tables not set up. Please contact the administrator.', 'error');
-                    return;
-                }
-
-                var course = allCourses.find(function(c) { return c.id === courseId; });
-                if (!course) {
-                    showToast('Course not found', 'error');
-                    return;
-                }
-
-                if (allEnrollments.some(function(e) { return e.course_id === courseId; })) {
-                    showToast('You are already enrolled in this course 🎓', 'info');
-                    return;
-                }
-
-                if (!course.is_free && !isPremium) {
-                    showToast('This course requires a premium subscription', 'error');
-                    window.location.href = 'profile.html';
-                    return;
-                }
-
-                var btn = event?.target;
-                var originalText = btn ? btn.textContent : 'Enrolling...';
-                if (btn) {
-                    btn.textContent = '⏳ Enrolling...';
-                    btn.disabled = true;
-                }
-
-                try {
-                    var { error } = await supabaseClient.from('enrollments').insert({
-                        user_id: currentUser.id,
-                        course_id: courseId,
-                        progress: 0,
-                        status: 'active',
-                        started_at: new Date().toISOString()
-                    });
-
-                    if (error) throw error;
-
-                    showToast('🎉 Successfully enrolled in ' + course.title + '!', 'success');
-                    await loadUserEnrollments();
-                    renderCourses(allCourses);
-
-                } catch (e) {
-                    showToast('Error enrolling: ' + e.message, 'error');
-                    if (btn) {
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }
-                }
-            }
-
-            // ============================================================
-            // FAVORITES
-            // ============================================================
-            function toggleFavorite(courseId) {
-                if (!currentUser) {
-                    showToast('Please sign in first', 'error');
-                    window.location.href = 'auth.html';
-                    return;
-                }
-                showToast('❤️ Added to favorites!', 'success');
-            }
-
-            // ============================================================
-            // LOAD CLASSES
-            // ============================================================
-            async function loadClasses() {
-                var grid = document.getElementById('classesGrid');
-
-                if (!supabaseConfigured || !tablesExist) {
-                    return;
-                }
-
-                try {
-                    var { data, error } = await supabaseClient
-                        .from('classes')
-                        .select('*')
-                        .eq('is_active', true)
-                        .order('date', { ascending: true });
-
-                    if (!error && data && data.length > 0) {
-                        allClasses = data;
-                        renderClasses(allClasses);
-                    } else {
-                        allClasses = [];
-                        grid.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><h3>No classes scheduled</h3><p>Check back soon for upcoming classes!</p></div>';
-                    }
-                } catch (e) {
-                    console.error('Classes error:', e);
-                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><h3>Error loading classes</h3><p>Please refresh the page.</p></div>';
-                }
-            }
-
-            function renderClasses(classes) {
-                var grid = document.getElementById('classesGrid');
-                if (!classes || classes.length === 0) {
-                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><h3>No classes scheduled</h3><p>Check back soon for upcoming classes!</p></div>';
-                    return;
-                }
-
-                grid.innerHTML = classes.map(function(c) {
-                    var isEnrolled = c.course_id ? allEnrollments.some(function(e) { return e.course_id === c.course_id; }) : true;
-                    var canJoin = currentUser && isEnrolled;
-                    var timeRemaining = getTimeRemaining(c.date);
-                    var isSoon = timeRemaining !== 'Started' && parseInt(timeRemaining) < 3;
-
-                    return '<div class="class-card">' +
-                        '<div class="class-title">' + c.title +
-                        (isSoon ? ' <span style="font-size:9px;color:var(--accent-orange);font-weight:600;">🔴 Soon</span>' : '') +
-                        '</div>' +
-                        '<div class="class-course"><i class="fas fa-graduation-cap"></i> ' + c.course + '</div>' +
-                        '<div class="class-meta">' +
-                        '<span><i class="fas fa-calendar"></i> ' + formatDate(c.date) + '</span>' +
-                        '<span><i class="fas fa-clock"></i> ' + formatTime(c.date) + '</span>' +
-                        '<span><i class="fas fa-hourglass-half"></i> ' + c.duration + 'h</span>' +
-                        (timeRemaining !== 'Started' ? '<span style="color:var(--accent-cyan);font-weight:600;">⏱️ ' + timeRemaining + ' left</span>' : '') +
-                        '</div>' +
-                        '<div class="class-desc">' + (c.description || '') + '</div>' +
-                        '<div class="class-links">' +
-                        (c.whatsapp ? '<a href="' + c.whatsapp + '" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Group</a>' : '') +
-                        (c.telegram ? '<a href="' + c.telegram + '" target="_blank"><i class="fab fa-telegram"></i> Telegram Group</a>' : '') +
-                        '</div>' +
-                        '<button class="class-join-btn" onclick="joinClass(\'' + c.id + '\')" ' + (!canJoin ? 'disabled' : '') + '>' +
-                        (!currentUser ? '🔒 Sign in to Join' :
-                            !isEnrolled ? '📚 Enroll to Join' :
-                            '🚀 Join Class') +
-                        '</button>' +
-                        '</div>';
-                }).join('');
-            }
-
-            // ============================================================
-            // JOIN CLASS
-            // ============================================================
-            function joinClass(classId) {
-                if (!currentUser) {
-                    showToast('Please sign in first', 'error');
-                    window.location.href = 'auth.html';
-                    return;
-                }
-
-                var cls = allClasses.find(function(c) { return c.id === classId; });
-                if (!cls) {
-                    showToast('Class not found', 'error');
-                    return;
-                }
-
-                var isEnrolled = cls.course_id ? allEnrollments.some(function(e) { return e.course_id === cls.course_id; }) : true;
-                if (!isEnrolled) {
-                    showToast('Please enroll in the course first', 'error');
-                    return;
-                }
-
-                var link = cls.whatsapp || cls.telegram;
-                if (link) {
-                    window.open(link, '_blank');
-                    showToast('Joining class...', 'success');
-                } else {
-                    showToast('No group link available for this class', 'warning');
-                }
-            }
-
-            // ============================================================
-            // HERO AVATARS
-            // ============================================================
-            async function loadHeroAvatars() {
-                if (!supabaseConfigured || !tablesExist) {
-                    document.getElementById('heroStudentCount').textContent = '0';
-                    return;
-                }
-
-                try {
-                    var { data } = await supabaseClient.from('users').select('avatar_url').limit(4);
-                    var container = document.getElementById('heroAvatars');
-                    if (data && data.length > 0) {
-                        container.innerHTML = data.map(function(p) {
-                            return '<img src="' + (p.avatar_url ||
-                                'https://ui-avatars.com/api/?name=Student&background=7c3aed&color=fff&size=100') +
-                                '" alt="">';
-                        }).join('');
-                    }
-
-                    var { count } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
-                    document.getElementById('heroStudentCount').textContent = (count || 0).toLocaleString() + '+';
-                } catch (e) {
-                    console.error('Hero avatars error:', e);
-                }
-            }
-
-            // ============================================================
-            // LOAD USER ENROLLMENTS
-            // ============================================================
-            async function loadUserEnrollments() {
-                if (!currentUser || !supabaseConfigured || !tablesExist) return;
-
-                try {
-                    var { data } = await supabaseClient.from('enrollments').select('*').eq('user_id', currentUser.id);
-                    allEnrollments = data || [];
-                } catch (e) {
-                    console.error('Load enrollments error:', e);
-                }
-            }
-
-            // ============================================================
-            // SIDEBAR / NAV
-            // ============================================================
-            document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-                document.getElementById('sidebar').classList.toggle('collapsed');
-                document.getElementById('mainContent').classList.toggle('sidebar-collapsed');
             });
+        }
 
-            var mmb = document.getElementById('mobileMenuBtn');
-            if (mmb) {
-                mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
-                mmb.addEventListener('click', function() {
-                    document.getElementById('sidebar').classList.toggle('mobile-open');
-                    document.getElementById('sidebarOverlay').classList.toggle('active');
-                });
+        function updateUIForUser(user) {
+            currentUser = user;
+            document.getElementById('authBtn').style.display = 'none';
+            document.getElementById('userProfile').style.display = 'flex';
+            var name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userProfileImg').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=7c3aed&color=fff&size=100';
+            if (isPremium || user?.user_metadata?.is_premium) {
+                document.getElementById('userStatus').textContent = 'Premium';
+                document.getElementById('userStatus').className = 'status premium';
+                document.getElementById('userStatus').innerHTML = 'Premium <i class="fas fa-crown" style="font-size:8px;"></i>';
+                document.getElementById('upgradeBtn').disabled = true;
+                document.getElementById('upgradeBtn').textContent = '✓ Premium Active';
+            } else {
+                document.getElementById('userStatus').textContent = 'Free';
+                document.getElementById('userStatus').className = 'status';
+                document.getElementById('upgradeBtn').disabled = false;
+                document.getElementById('upgradeBtn').textContent = 'Upgrade Now';
             }
-            document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
+            if (isAdmin || CONFIG.adminEmails.includes(user?.email)) {
+                document.getElementById('adminBtn').style.display = 'inline-flex';
+                document.getElementById('adminBadge').style.display = 'flex';
+            } else {
+                document.getElementById('adminBtn').style.display = 'none';
+            }
+        }
+
+        async function loadStats() {
+            if (!supabaseConfigured || !tablesExist) {
+                document.getElementById('statCourses').textContent = '0';
+                document.getElementById('statStudents').textContent = '0';
+                document.getElementById('statCerts').textContent = '0';
+                document.getElementById('statHours').textContent = '0';
+                return;
+            }
+            try {
+                var [coursesCount, usersCount, certsCount, hoursData] = await Promise.all([
+                    supabaseClient.from('courses').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('users').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('user_certificates').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('courses').select('duration_hours')
+                ]);
+                document.getElementById('statCourses').textContent = coursesCount.count || 0;
+                document.getElementById('statStudents').textContent = (usersCount.count || 0).toLocaleString();
+                document.getElementById('statCerts').textContent = (certsCount.count || 0).toLocaleString();
+                var totalHours = 0;
+                if (hoursData.data) {
+                    hoursData.data.forEach(function(c) { totalHours += c.duration_hours || 0; });
+                }
+                document.getElementById('statHours').textContent = totalHours || 0;
+            } catch (e) {
+                console.error('Stats error:', e);
+            }
+        }
+
+        async function loadCategories() {
+            var grid = document.getElementById('categoriesGrid');
+            if (!supabaseConfigured || !tablesExist) {
+                showSetupRequired();
+                return;
+            }
+            try {
+                var { data, error } = await supabaseClient.from('categories').select('*').order('display_order', { ascending: true });
+                if (!error && data && data.length > 0) {
+                    renderCategories(data);
+                } else {
+                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><h3>No categories available</h3><p>Categories will appear here once added.</p></div>';
+                }
+            } catch (e) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><h3>Error loading categories</h3><p>Please refresh the page.</p></div>';
+            }
+        }
+
+        function renderCategories(categories) {
+            var grid = document.getElementById('categoriesGrid');
+            if (!categories || categories.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><h3>No categories</h3></div>';
+                return;
+            }
+            grid.innerHTML = categories.slice(0, 8).map(function(cat) {
+                var color = cat.color || '#7c3aed';
+                return '<div class="category-card" onclick="filterByCategory(\'' + (cat.name || cat.slug || '') + '\')">' +
+                    '<div class="cat-icon" style="background: ' + color + '15; color: ' + color + ';">' +
+                    '<i class="fas ' + (cat.icon || 'fa-circle') + '"></i>' +
+                    '</div>' +
+                    '<div class="cat-name">' + (cat.name || 'Category') + '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function filterByCategory(category) {
+            showToast('Showing: ' + category, 'info');
+            var filtered = allCourses.filter(function(c) { return c.category === category || c.category === category.toLowerCase(); });
+            if (filtered.length === 0) {
+                showToast('No courses found in this category', 'warning');
+                loadCourses();
+            } else {
+                renderCourses(filtered);
+            }
+        }
+
+        async function loadCourses() {
+            var grid = document.getElementById('coursesGrid');
+            if (!supabaseConfigured || !tablesExist) return;
+            try {
+                var { data, error } = await supabaseClient.from('courses').select('*').eq('is_active', true).order('created_at', { ascending: false });
+                if (!error && data && data.length > 0) {
+                    allCourses = data;
+                    renderCourses(allCourses);
+                } else {
+                    allCourses = [];
+                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No courses available</h3><p>Check back soon for new courses!</p></div>';
+                }
+            } catch (e) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><h3>Error loading courses</h3><p>Please refresh the page.</p></div>';
+            }
+        }
+
+        function renderCourses(courses) {
+            var grid = document.getElementById('coursesGrid');
+            if (!courses || courses.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No courses available</h3><p>Check back soon for new courses!</p></div>';
+                return;
+            }
+            grid.innerHTML = courses.map(function(c) {
+                var enrollment = allEnrollments.find(function(e) { return e.course_id === c.id; });
+                var isEnrolled = !!enrollment;
+                var progress = enrollment ? enrollment.progress || 0 : 0;
+                var priceDisplay = c.is_free ? '<span style="color:var(--accent-green);">Free</span>' :
+                    (isPremium ? '<span style="color:var(--accent-cyan);">' + formatCurrency(c.price * 0.55) + '</span>' :
+                        '<span>' + formatCurrency(c.price) + '</span>');
+                var originalPrice = (!c.is_free && isPremium) ? '<span class="original">' + formatCurrency(c.price) + '</span>' : '';
+                var discountBadge = (!c.is_free && isPremium) ? '<span class="discount">-45%</span>' : '';
+                var enrollText = isEnrolled ? 'Continue Learning' : (c.is_free ? 'Start Free' : (isPremium ? 'Enroll Now' : 'Premium Only'));
+                var progressBar = isEnrolled ? '<div class="progress-bar"><div class="fill" style="width:' + progress + '%;"></div></div>' : '';
+                return '<div class="course-card">' +
+                    '<div class="course-image">' +
+                    '<img src="' + (c.image || 'https://via.placeholder.com/400x250/1a1a3e/7c3aed?text=' + encodeURIComponent(c.title)) + '" alt="' + c.title + '" loading="lazy">' +
+                    (c.badge ? '<span class="course-badge badge-' + c.badge.toLowerCase() + '">' + c.badge + '</span>' : '') +
+                    '<div class="price-tag">' + originalPrice + ' ' + priceDisplay + ' ' + discountBadge + '</div>' +
+                    '<button class="heart-btn" onclick="event.stopPropagation(); toggleFavorite(\'' + c.id + '\')">' +
+                    '<i class="far fa-heart"></i>' +
+                    '</button>' +
+                    '</div>' +
+                    '<div class="course-body">' +
+                    '<div class="course-title">' + c.title + '</div>' +
+                    '<div class="course-instructor">' +
+                    '<img src="https://ui-avatars.com/api/?name=' + encodeURIComponent(c.instructor || 'Instructor') + '&background=7c3aed&color=fff&size=100" alt="' + (c.instructor || 'Instructor') + '">' +
+                    '<span>' + (c.instructor || 'Instructor') + '</span>' +
+                    '</div>' +
+                    '<div class="course-meta">' +
+                    '<div class="rating"><span class="stars"><i class="fas fa-star"></i> ' + (c.rating || '0.0') + '</span><span class="count">(' + (c.review_count || 0) + ')</span></div>' +
+                    '<div class="duration"><i class="far fa-clock"></i> ' + (c.duration || '0h') + '</div>' +
+                    '</div>' +
+                    progressBar +
+                    '<button class="enroll-btn" onclick="enrollCourse(\'' + c.id + '\')" ' + (!currentUser ? 'disabled' : '') + '>' +
+                    (isEnrolled ? '✅ ' : '') + enrollText +
+                    '</button>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        async function enrollCourse(courseId) {
+            if (!currentUser) {
+                showToast('Please sign in first to enroll', 'error');
+                window.location.href = 'auth.html';
+                return;
+            }
+            if (!tablesExist) {
+                showToast('Database tables not set up. Please contact the administrator.', 'error');
+                return;
+            }
+            var course = allCourses.find(function(c) { return c.id === courseId; });
+            if (!course) {
+                showToast('Course not found', 'error');
+                return;
+            }
+            if (allEnrollments.some(function(e) { return e.course_id === courseId; })) {
+                showToast('You are already enrolled in this course 🎓', 'info');
+                return;
+            }
+            if (!course.is_free && !isPremium) {
+                showToast('This course requires a premium subscription', 'error');
+                window.location.href = 'profile.html';
+                return;
+            }
+            var btn = event?.target;
+            if (btn) {
+                btn.textContent = '⏳ Enrolling...';
+                btn.disabled = true;
+            }
+            try {
+                var { error: enrollError } = await supabaseClient.from('enrollments').insert({
+                    user_id: currentUser.id,
+                    course_id: courseId,
+                    progress: 0,
+                    status: 'active',
+                    enrolled_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                });
+                if (enrollError) throw enrollError;
+                await addXP(currentUser.id, 10, 'Enrolled in ' + course.title);
+                await updateStreak(currentUser.id);
+                await checkAchievements(currentUser.id);
+                try {
+                    await supabaseClient.from('notifications').insert({
+                        user_id: currentUser.id,
+                        type: 'success',
+                        title: '🎉 New Course Enrolled!',
+                        message: 'You enrolled in "' + course.title + '". Start learning now!',
+                        created_at: new Date().toISOString()
+                    });
+                } catch (notifError) {}
+                showToast('🎉 Successfully enrolled in ' + course.title + '!', 'success');
+                await loadUserEnrollments();
+                renderCourses(allCourses);
+            } catch (e) {
+                showToast('Error enrolling: ' + e.message, 'error');
+                if (btn) {
+                    btn.textContent = 'Enroll Now';
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        async function addXP(userId, amount, reason) {
+            if (!supabaseConfigured || !tablesExist) return false;
+            try {
+                var { data: user } = await supabaseClient.from('users').select('total_xp').eq('id', userId).single();
+                var newXP = (user?.total_xp || 0) + amount;
+                var { error } = await supabaseClient.from('users').update({ total_xp: newXP, updated_at: new Date().toISOString() }).eq('id', userId);
+                if (error) throw error;
+                try {
+                    await supabaseClient.from('xp_transactions').insert({
+                        user_id: userId,
+                        amount: amount,
+                        reason: reason || 'Activity',
+                        created_at: new Date().toISOString()
+                    });
+                } catch (logError) {}
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function updateStreak(userId) {
+            if (!supabaseConfigured || !tablesExist) return false;
+            try {
+                var { data: user } = await supabaseClient.from('users').select('streak_days, last_activity').eq('id', userId).single();
+                var today = new Date().toDateString();
+                var lastActivity = user?.last_activity ? new Date(user.last_activity).toDateString() : null;
+                if (lastActivity === today) return true;
+                var yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                var yesterdayStr = yesterday.toDateString();
+                var streak = user?.streak_days || 0;
+                if (lastActivity === yesterdayStr) {
+                    streak += 1;
+                } else if (lastActivity !== today) {
+                    streak = 1;
+                }
+                var { error } = await supabaseClient.from('users').update({
+                    streak_days: streak,
+                    last_activity: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                }).eq('id', userId);
+                if (error) throw error;
+                if (streak % 7 === 0 && streak > 0) {
+                    await addXP(userId, 20, '🔥 7-Day Streak Bonus!');
+                    showToast('🔥 ' + streak + ' day streak! +20 XP!', 'success');
+                }
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function checkAchievements(userId) {
+            if (!supabaseConfigured || !tablesExist) return false;
+            try {
+                var { data: user } = await supabaseClient.from('users').select('total_xp, is_premium').eq('id', userId).single();
+                var { data: enrollments } = await supabaseClient.from('enrollments').select('*').eq('user_id', userId);
+                var { data: existing } = await supabaseClient.from('user_achievements').select('achievement_id').eq('user_id', userId).eq('is_complete', true);
+                var unlockedIds = new Set(existing?.map(function(a) { return a.achievement_id; }) || []);
+                var completedCourses = enrollments?.filter(function(e) { return e.progress === 100; }).length || 0;
+                var totalEnrolled = enrollments?.length || 0;
+                var totalXP = user?.total_xp || 0;
+                var achievements = [
+                    { id: 1, name: 'First Course', condition: function() { return totalEnrolled >= 1; } },
+                    { id: 2, name: '5 Courses', condition: function() { return totalEnrolled >= 5; } },
+                    { id: 3, name: '10 Courses', condition: function() { return totalEnrolled >= 10; } },
+                    { id: 4, name: '100 XP', condition: function() { return totalXP >= 100; } },
+                    { id: 5, name: '500 XP', condition: function() { return totalXP >= 500; } },
+                    { id: 6, name: 'Perfect Score', condition: function() { return completedCourses >= 3; } },
+                    { id: 7, name: 'Community Member', condition: function() { return true; } },
+                    { id: 8, name: 'Premium Member', condition: function() { return user?.is_premium || false; } }
+                ];
+                for (var i = 0; i < achievements.length; i++) {
+                    var ach = achievements[i];
+                    if (!unlockedIds.has(ach.id) && ach.condition()) {
+                        try {
+                            await supabaseClient.from('user_achievements').insert({
+                                user_id: userId,
+                                achievement_id: ach.id,
+                                is_complete: true,
+                                unlocked_at: new Date().toISOString(),
+                                created_at: new Date().toISOString()
+                            });
+                            showToast('🏆 Achievement: ' + ach.name + '!', 'success');
+                            try {
+                                await supabaseClient.from('notifications').insert({
+                                    user_id: userId,
+                                    type: 'success',
+                                    title: '🏆 Achievement Unlocked!',
+                                    message: 'You earned the "' + ach.name + '" achievement!',
+                                    created_at: new Date().toISOString()
+                                });
+                            } catch (notifError) {}
+                        } catch (achError) {}
+                    }
+                }
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function updateCourseProgress(courseId, progress) {
+            if (!currentUser) {
+                showToast('Please sign in first', 'error');
+                return false;
+            }
+            try {
+                var { data: enrollment, error: fetchError } = await supabaseClient
+                    .from('enrollments')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('course_id', courseId)
+                    .single();
+                if (fetchError) {
+                    showToast('You are not enrolled in this course', 'error');
+                    return false;
+                }
+                if (progress <= enrollment.progress) return true;
+                if (enrollment.progress === 100) {
+                    showToast('Course already completed! 🏆', 'info');
+                    return true;
+                }
+                var newProgress = Math.min(100, progress);
+                var xpGained = Math.floor((newProgress - enrollment.progress) / 10) * 5;
+                var { error: updateError } = await supabaseClient
+                    .from('enrollments')
+                    .update({
+                        progress: newProgress,
+                        updated_at: new Date().toISOString(),
+                        completed_at: newProgress === 100 ? new Date().toISOString() : null,
+                        status: newProgress === 100 ? 'completed' : 'active'
+                    })
+                    .eq('id', enrollment.id);
+                if (updateError) throw updateError;
+                if (xpGained > 0) {
+                    await addXP(currentUser.id, xpGained, 'Progress in course');
+                }
+                await updateStreak(currentUser.id);
+                if (newProgress === 100) {
+                    showToast('🏆 Course Complete! +50 XP!', 'success');
+                    await addXP(currentUser.id, 50, 'Completed course');
+                    await generateCertificate(currentUser.id, courseId);
+                    await checkAchievements(currentUser.id);
+                    try {
+                        await supabaseClient.from('notifications').insert({
+                            user_id: currentUser.id,
+                            type: 'success',
+                            title: '🏆 Course Completed!',
+                            message: 'Congratulations! You completed the course!',
+                            created_at: new Date().toISOString()
+                        });
+                    } catch (notifError) {}
+                } else {
+                    showToast('📊 Progress: ' + newProgress + '%', 'success');
+                }
+                await loadUserEnrollments();
+                renderCourses(allCourses);
+                return true;
+            } catch (e) {
+                showToast('Error updating progress: ' + e.message, 'error');
+                return false;
+            }
+        }
+
+        async function generateCertificate(userId, courseId) {
+            if (!supabaseConfigured || !tablesExist) return false;
+            try {
+                var { data: existing } = await supabaseClient.from('user_certificates').select('id').eq('user_id', userId).eq('course_id', courseId).single();
+                if (existing) return true;
+                var { data: course } = await supabaseClient.from('courses').select('title').eq('id', courseId).single();
+                if (!course) return false;
+                var { error } = await supabaseClient.from('user_certificates').insert({
+                    user_id: userId,
+                    course_id: courseId,
+                    certificate_name: 'Certificate: ' + course.title,
+                    issued_at: new Date().toISOString(),
+                    expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+                    created_at: new Date().toISOString()
+                });
+                if (error) throw error;
+                showToast('🎓 Certificate Earned!', 'success');
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function toggleFavorite(courseId) {
+            if (!currentUser) {
+                showToast('Please sign in first', 'error');
+                window.location.href = 'auth.html';
+                return;
+            }
+            showToast('❤️ Added to favorites!', 'success');
+        }
+
+        async function loadClasses() {
+            var grid = document.getElementById('classesGrid');
+            if (!supabaseConfigured || !tablesExist) return;
+            try {
+                var { data, error } = await supabaseClient.from('classes').select('*').eq('is_active', true).order('date', { ascending: true });
+                if (!error && data && data.length > 0) {
+                    allClasses = data;
+                    renderClasses(allClasses);
+                } else {
+                    allClasses = [];
+                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><h3>No classes scheduled</h3><p>Check back soon for upcoming classes!</p></div>';
+                }
+            } catch (e) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><h3>Error loading classes</h3><p>Please refresh the page.</p></div>';
+            }
+        }
+
+        function renderClasses(classes) {
+            var grid = document.getElementById('classesGrid');
+            if (!classes || classes.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><h3>No classes scheduled</h3><p>Check back soon for upcoming classes!</p></div>';
+                return;
+            }
+            grid.innerHTML = classes.map(function(c) {
+                var isEnrolled = c.course_id ? allEnrollments.some(function(e) { return e.course_id === c.course_id; }) : true;
+                var canJoin = currentUser && isEnrolled;
+                var timeRemaining = getTimeRemaining(c.date);
+                var isSoon = timeRemaining !== 'Started' && parseInt(timeRemaining) < 3;
+                return '<div class="class-card">' +
+                    '<div class="class-title">' + c.title +
+                    (isSoon ? ' <span style="font-size:9px;color:var(--accent-orange);font-weight:600;">🔴 Soon</span>' : '') +
+                    '</div>' +
+                    '<div class="class-course"><i class="fas fa-graduation-cap"></i> ' + c.course + '</div>' +
+                    '<div class="class-meta">' +
+                    '<span><i class="fas fa-calendar"></i> ' + formatDate(c.date) + '</span>' +
+                    '<span><i class="fas fa-clock"></i> ' + formatTime(c.date) + '</span>' +
+                    '<span><i class="fas fa-hourglass-half"></i> ' + c.duration + 'h</span>' +
+                    (timeRemaining !== 'Started' ? '<span style="color:var(--accent-cyan);font-weight:600;">⏱️ ' + timeRemaining + ' left</span>' : '') +
+                    '</div>' +
+                    '<div class="class-desc">' + (c.description || '') + '</div>' +
+                    '<div class="class-links">' +
+                    (c.whatsapp ? '<a href="' + c.whatsapp + '" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Group</a>' : '') +
+                    (c.telegram ? '<a href="' + c.telegram + '" target="_blank"><i class="fab fa-telegram"></i> Telegram Group</a>' : '') +
+                    '</div>' +
+                    '<button class="class-join-btn" onclick="joinClass(\'' + c.id + '\')" ' + (!canJoin ? 'disabled' : '') + '>' +
+                    (!currentUser ? '🔒 Sign in to Join' :
+                        !isEnrolled ? '📚 Enroll to Join' :
+                        '🚀 Join Class') +
+                    '</button>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function joinClass(classId) {
+            if (!currentUser) {
+                showToast('Please sign in first', 'error');
+                window.location.href = 'auth.html';
+                return;
+            }
+            var cls = allClasses.find(function(c) { return c.id === classId; });
+            if (!cls) {
+                showToast('Class not found', 'error');
+                return;
+            }
+            var isEnrolled = cls.course_id ? allEnrollments.some(function(e) { return e.course_id === cls.course_id; }) : true;
+            if (!isEnrolled) {
+                showToast('Please enroll in the course first', 'error');
+                return;
+            }
+            var link = cls.whatsapp || cls.telegram;
+            if (link) {
+                window.open(link, '_blank');
+                showToast('Joining class...', 'success');
+            } else {
+                showToast('No group link available for this class', 'warning');
+            }
+        }
+
+        async function loadHeroAvatars() {
+            if (!supabaseConfigured || !tablesExist) {
+                document.getElementById('heroStudentCount').textContent = '0';
+                return;
+            }
+            try {
+                var { data } = await supabaseClient.from('users').select('avatar_url').limit(4);
+                var container = document.getElementById('heroAvatars');
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(function(p) {
+                        return '<img src="' + (p.avatar_url || 'https://ui-avatars.com/api/?name=Student&background=7c3aed&color=fff&size=100') + '" alt="">';
+                    }).join('');
+                }
+                var { count } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+                document.getElementById('heroStudentCount').textContent = (count || 0).toLocaleString() + '+';
+            } catch (e) {}
+        }
+
+        async function loadUserEnrollments() {
+            if (!currentUser || !supabaseConfigured || !tablesExist) return;
+            try {
+                var { data } = await supabaseClient.from('enrollments').select('*').eq('user_id', currentUser.id);
+                allEnrollments = data || [];
+            } catch (e) {}
+        }
+
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('sidebar-collapsed');
+        });
+
+        var mmb = document.getElementById('mobileMenuBtn');
+        if (mmb) {
+            mmb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
+            mmb.addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('mobile-open');
+                document.getElementById('sidebarOverlay').classList.toggle('active');
+            });
+        }
+        document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        });
+
+        window.addEventListener('scroll', function() {
+            var topBar = document.getElementById('topBar');
+            if (window.scrollY > 20) {
+                topBar.classList.add('scrolled');
+            } else {
+                topBar.classList.remove('scrolled');
+            }
+        });
+
+        function autoDetectDevice() {
+            var isMobile = window.innerWidth <= 900;
+            if (mmb) mmb.style.display = isMobile ? 'flex' : 'none';
+            if (!isMobile) {
                 document.getElementById('sidebar').classList.remove('mobile-open');
                 document.getElementById('sidebarOverlay').classList.remove('active');
-            });
+            }
+        }
+        window.addEventListener('resize', autoDetectDevice);
 
-            // ============================================================
-            // SCROLL EFFECT
-            // ============================================================
-            window.addEventListener('scroll', function() {
-                var topBar = document.getElementById('topBar');
-                if (window.scrollY > 20) {
-                    topBar.classList.add('scrolled');
-                } else {
-                    topBar.classList.remove('scrolled');
-                }
-            });
-
-            // ============================================================
-            // AUTO DETECT DEVICE
-            // ============================================================
-            function autoDetectDevice() {
-                var isMobile = window.innerWidth <= 900;
-                if (mmb) mmb.style.display = isMobile ? 'flex' : 'none';
-                if (!isMobile) {
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (mobileSidebarOpen) {
                     document.getElementById('sidebar').classList.remove('mobile-open');
                     document.getElementById('sidebarOverlay').classList.remove('active');
+                    mobileSidebarOpen = false;
                 }
             }
-            window.addEventListener('resize', autoDetectDevice);
+        });
 
-            // ============================================================
-            // KEYBOARD SHORTCUTS
-            // ============================================================
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    if (mobileSidebarOpen) {
-                        document.getElementById('sidebar').classList.remove('mobile-open');
-                        document.getElementById('sidebarOverlay').classList.remove('active');
-                        mobileSidebarOpen = false;
-                    }
-                }
-            });
+        window.enrollCourse = enrollCourse;
+        window.updateCourseProgress = updateCourseProgress;
+        window.loadCourses = loadCourses;
+        window.loadCategories = loadCategories;
+        window.loadClasses = loadClasses;
+        window.joinClass = joinClass;
+        window.toggleFavorite = toggleFavorite;
+        window.filterByCategory = filterByCategory;
+        window.showToast = showToast;
+        window.addXP = addXP;
+        window.checkAchievements = checkAchievements;
+        window.updateStreak = updateStreak;
+        window.generateCertificate = generateCertificate;
 
-            // ============================================================
-            // INIT
-            // ============================================================
-            async function init() {
-                autoDetectDevice();
-
-                console.log('🚀 Initializing Academy App');
-
-                // First check if tables exist
-                var tablesOk = await checkTablesExist();
-
-                if (!tablesOk) {
-                    showSetupRequired();
-                    document.getElementById('loadingScreen').classList.add('hidden');
-                    return;
-                }
-
-                // Load data
-                await checkAuth();
-                await loadUserEnrollments();
-                await loadStats();
-                await loadCategories();
-                await loadCourses();
-                await loadClasses();
-                await loadHeroAvatars();
-
-                // Hide loading screen
-                setTimeout(function() {
-                    document.getElementById('loadingScreen').classList.add('hidden');
-                }, 600);
+        async function init() {
+            autoDetectDevice();
+            var tablesOk = await checkTablesExist();
+            if (!tablesOk) {
+                showSetupRequired();
+                document.getElementById('loadingScreen').classList.add('hidden');
+                return;
             }
-
-            // Expose globally
-            window.loadCourses = loadCourses;
-            window.loadCategories = loadCategories;
-            window.loadClasses = loadClasses;
-            window.enrollCourse = enrollCourse;
-            window.joinClass = joinClass;
-            window.toggleFavorite = toggleFavorite;
-            window.filterByCategory = filterByCategory;
-            window.showToast = showToast;
-
-            // Run init when DOM is ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
+            await checkAuth();
+            await loadUserEnrollments();
+            await loadStats();
+            await loadCategories();
+            await loadCourses();
+            await loadClasses();
+            await loadHeroAvatars();
+            if (currentUser) {
+                await updateStreak(currentUser.id);
+                await checkAchievements(currentUser.id);
             }
+            setTimeout(function() {
+                document.getElementById('loadingScreen').classList.add('hidden');
+            }, 600);
+        }
 
-        })();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
     </script>
 
 </body>
