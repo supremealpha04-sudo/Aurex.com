@@ -8,152 +8,777 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        /* ============================================
+           COMPLETE ADMIN STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         :root {
-            --bg-primary: #0a0a12; --bg-secondary: #111125; --bg-card: #18183a;
-            --bg-card-hover: #22224a; --bg-elevated: #2a2a5a;
-            --accent: #7c3aed; --accent-light: #a855f7; --accent-blue: #3b82f6;
-            --accent-cyan: #06b6d4; --accent-green: #22c55e; --accent-orange: #f59e0b;
-            --accent-red: #ef4444; --accent-pink: #ec4899;
-            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
-            --border-color: rgba(148,163,184,0.08);
-            --shadow: 0 8px 32px rgba(0,0,0,0.4);
-            --shadow-glow: 0 0 60px rgba(124,58,237,0.15);
-            --radius: 16px; --radius-sm: 10px;
-            --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+            --bg-primary: #0a0a12;
+            --bg-secondary: #111125;
+            --bg-card: #18183a;
+            --bg-card-hover: #22224a;
+            --bg-elevated: #2a2a5a;
+            --accent: #7c3aed;
+            --accent-light: #a855f7;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #22c55e;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-pink: #ec4899;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: rgba(148, 163, 184, 0.08);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 60px rgba(124, 58, 237, 0.15);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --sidebar-width: 260px;
         }
-        body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); min-height:100vh; }
-        ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.3);border-radius:10px}
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(124, 58, 237, 0.3);
+            border-radius: 10px;
+        }
 
-        .sidebar { position:fixed; left:0; top:0; width:var(--sidebar-width); height:100vh; background:var(--bg-secondary); border-right:1px solid var(--border-color); z-index:1000; display:flex; flex-direction:column; transition:transform 0.3s ease; }
-        .sidebar-brand { padding:24px 20px; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:12px; }
-        .sidebar-brand .logo { width:40px; height:40px; background:var(--accent); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:white; }
-        .sidebar-brand .brand-text { font-size:18px; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--accent-light)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-        .sidebar-brand .brand-sub { font-size:10px; color:var(--text-muted); display:block; -webkit-text-fill-color:var(--text-muted); }
-        .sidebar-nav { flex:1; padding:16px 12px; overflow-y:auto; }
-        .sidebar-nav .nav-section-title { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); padding:8px 12px; font-weight:600; }
-        .sidebar-nav .nav-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:var(--radius-sm); color:var(--text-secondary); cursor:pointer; transition:var(--transition); text-decoration:none; font-size:14px; font-weight:500; border:none; background:none; width:100%; text-align:left; }
-        .sidebar-nav .nav-item:hover { background:rgba(124,58,237,0.08); color:var(--text-primary); }
-        .sidebar-nav .nav-item.active { background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(124,58,237,0.05)); color:var(--accent-light); border:1px solid rgba(124,58,237,0.15); }
-        .sidebar-nav .nav-item i { width:20px; text-align:center; }
-        .sidebar-nav .nav-item .badge { margin-left:auto; background:var(--accent-red); color:white; font-size:10px; padding:2px 8px; border-radius:20px; font-weight:700; }
-        .sidebar-footer { padding:16px 20px; border-top:1px solid var(--border-color); }
-        .sidebar-footer .user-card { display:flex; align-items:center; gap:12px; padding:12px; background:var(--bg-card); border-radius:var(--radius-sm); }
-        .sidebar-footer .user-card img { width:36px; height:36px; border-radius:50%; object-fit:cover; }
-        .sidebar-footer .user-card .user-info { flex:1; }
-        .sidebar-footer .user-card .user-name { font-size:13px; font-weight:600; }
-        .sidebar-footer .user-card .user-role { font-size:10px; color:var(--accent-light); }
-        .sidebar-footer .logout-btn { width:32px; height:32px; border-radius:8px; background:rgba(239,68,68,0.1); border:none; color:var(--accent-red); cursor:pointer; transition:var(--transition); }
-        .sidebar-footer .logout-btn:hover { background:var(--accent-red); color:white; }
-        .mobile-menu-btn { display:none; }
-        @media (max-width:768px) { .sidebar { transform:translateX(-100%); } .sidebar.mobile-open { transform:translateX(0); } .mobile-menu-btn { display:flex !important; } }
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-brand {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-brand .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+        }
+        .sidebar-brand .brand-text {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sidebar-brand .brand-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            display: block;
+            -webkit-text-fill-color: var(--text-muted);
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+        .sidebar-nav .nav-section-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            font-weight: 600;
+        }
+        .sidebar-nav .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar-nav .nav-item:hover {
+            background: rgba(124, 58, 237, 0.08);
+            color: var(--text-primary);
+        }
+        .sidebar-nav .nav-item.active {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(124, 58, 237, 0.05));
+            color: var(--accent-light);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+        }
+        .sidebar-nav .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-nav .nav-item .badge {
+            margin-left: auto;
+            background: var(--accent-red);
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        .sidebar-footer .user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+        }
+        .sidebar-footer .user-card img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .sidebar-footer .user-card .user-info {
+            flex: 1;
+        }
+        .sidebar-footer .user-card .user-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .sidebar-footer .user-card .user-role {
+            font-size: 10px;
+            color: var(--accent-light);
+        }
+        .sidebar-footer .logout-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border: none;
+            color: var(--accent-red);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .sidebar-footer .logout-btn:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+        .mobile-menu-btn {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .mobile-menu-btn {
+                display: flex !important;
+            }
+        }
 
-        .main-content { margin-left:var(--sidebar-width); min-height:100vh; }
-        @media (max-width:768px) { .main-content { margin-left:0; } }
-        .top-bar { position:sticky; top:0; z-index:100; background:var(--bg-secondary); border-bottom:1px solid var(--border-color); padding:16px 32px; display:flex; align-items:center; justify-content:space-between; backdrop-filter:blur(20px); }
-        .top-bar .page-title { font-size:20px; font-weight:700; background:linear-gradient(135deg,#fff,var(--accent-light)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-        .top-actions { display:flex; align-items:center; gap:12px; }
-        .icon-btn { width:40px; height:40px; border-radius:10px; background:var(--bg-card); border:1px solid var(--border-color); color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
-        .icon-btn:hover { background:var(--bg-card-hover); color:var(--text-primary); }
-        .content-area { padding:24px 32px 100px; }
+        /* ===== MAIN ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(20px);
+        }
+        .top-bar .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .icon-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+        .content-area {
+            padding: 24px 32px 100px;
+        }
 
-        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
-        .stat-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:20px 24px; transition:var(--transition); }
-        .stat-card:hover { border-color:rgba(124,58,237,0.2); transform:translateY(-2px); box-shadow:var(--shadow-glow); }
-        .stat-card .stat-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:12px; }
-        .stat-card .stat-icon.purple { background:rgba(124,58,237,0.12); color:var(--accent-light); }
-        .stat-card .stat-icon.blue { background:rgba(59,130,246,0.12); color:var(--accent-blue); }
-        .stat-card .stat-icon.green { background:rgba(34,197,94,0.12); color:var(--accent-green); }
-        .stat-card .stat-icon.orange { background:rgba(245,158,11,0.12); color:var(--accent-orange); }
-        .stat-card .stat-icon.pink { background:rgba(236,72,153,0.12); color:var(--accent-pink); }
-        .stat-card .stat-icon.cyan { background:rgba(6,182,212,0.12); color:var(--accent-cyan); }
-        .stat-card .stat-value { font-size:28px; font-weight:800; letter-spacing:-0.5px; }
-        .stat-card .stat-label { font-size:13px; color:var(--text-secondary); }
-        .stat-card .stat-change { font-size:11px; font-weight:600; margin-top:4px; }
-        .stat-card .stat-change.up { color:var(--accent-green); }
-        .stat-card .stat-change.down { color:var(--accent-red); }
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            border-color: rgba(124, 58, 237, 0.2);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+        .stat-card .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        .stat-card .stat-icon.purple {
+            background: rgba(124, 58, 237, 0.12);
+            color: var(--accent-light);
+        }
+        .stat-card .stat-icon.blue {
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--accent-blue);
+        }
+        .stat-card .stat-icon.green {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--accent-green);
+        }
+        .stat-card .stat-icon.orange {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-orange);
+        }
+        .stat-card .stat-icon.pink {
+            background: rgba(236, 72, 153, 0.12);
+            color: var(--accent-pink);
+        }
+        .stat-card .stat-icon.cyan {
+            background: rgba(6, 182, 212, 0.12);
+            color: var(--accent-cyan);
+        }
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .stat-card .stat-change {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .stat-card .stat-change.up {
+            color: var(--accent-green);
+        }
+        .stat-card .stat-change.down {
+            color: var(--accent-red);
+        }
 
-        .card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:24px; margin-bottom:20px; transition:var(--transition); }
-        .card:hover { border-color:rgba(124,58,237,0.1); }
-        .card .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px; }
-        .card .card-header h3 { font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; }
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        .card:hover {
+            border-color: rgba(124, 58, 237, 0.1);
+        }
+        .card .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card .card-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        .btn { padding:8px 18px; border-radius:var(--radius-sm); font-size:13px; font-weight:600; cursor:pointer; transition:var(--transition); border:none; font-family:inherit; display:inline-flex; align-items:center; gap:6px; }
-        .btn-primary { background:linear-gradient(135deg,var(--accent),#6366f1); color:white; }
-        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 25px rgba(124,58,237,0.3); }
-        .btn-secondary { background:var(--bg-elevated); color:var(--text-secondary); border:1px solid var(--border-color); }
-        .btn-secondary:hover { background:var(--bg-card-hover); color:var(--text-primary); }
-        .btn-success { background:rgba(34,197,94,0.12); color:var(--accent-green); border:1px solid rgba(34,197,94,0.2); }
-        .btn-success:hover { background:var(--accent-green); color:white; }
-        .btn-danger { background:rgba(239,68,68,0.12); color:var(--accent-red); border:1px solid rgba(239,68,68,0.2); }
-        .btn-danger:hover { background:var(--accent-red); color:white; }
-        .btn-sm { padding:6px 12px; font-size:11px; }
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+        }
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+        .btn-success {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--accent-green);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        .btn-success:hover {
+            background: var(--accent-green);
+            color: white;
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .btn-danger:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 11px;
+        }
 
-        .table-wrapper { overflow-x:auto; }
-        .data-table { width:100%; border-collapse:collapse; }
-        .data-table th { text-align:left; padding:12px 16px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); border-bottom:1px solid var(--border-color); font-weight:600; }
-        .data-table td { padding:12px 16px; font-size:13px; border-bottom:1px solid var(--border-color); color:var(--text-secondary); }
-        .data-table tr:hover td { background:rgba(124,58,237,0.03); }
+        /* ===== TABLE ===== */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+        .data-table td {
+            padding: 12px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .data-table tr:hover td {
+            background: rgba(124, 58, 237, 0.03);
+        }
 
-        .badge { display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; }
-        .badge-success { background:rgba(34,197,94,0.12); color:var(--accent-green); }
-        .badge-warning { background:rgba(245,158,11,0.12); color:var(--accent-orange); }
-        .badge-danger { background:rgba(239,68,68,0.12); color:var(--accent-red); }
-        .badge-info { background:rgba(59,130,246,0.12); color:var(--accent-blue); }
-        .badge-premium { background:rgba(124,58,237,0.12); color:var(--accent-light); }
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-success {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--accent-green);
+        }
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-orange);
+        }
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--accent-red);
+        }
+        .badge-info {
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--accent-blue);
+        }
+        .badge-premium {
+            background: rgba(124, 58, 237, 0.12);
+            color: var(--accent-light);
+        }
 
-        .status-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; }
-        .status-pill.active { background:rgba(34,197,94,0.12); color:var(--accent-green); }
-        .status-pill.pending { background:rgba(245,158,11,0.12); color:var(--accent-orange); }
-        .status-pill.inactive { background:rgba(100,116,139,0.12); color:var(--text-muted); }
-        .status-pill.completed { background:rgba(34,197,94,0.12); color:var(--accent-green); }
-        .status-pill.in-progress { background:rgba(59,130,246,0.12); color:var(--accent-blue); }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .status-pill.active {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--accent-green);
+        }
+        .status-pill.pending {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-orange);
+        }
+        .status-pill.inactive {
+            background: rgba(100, 116, 139, 0.12);
+            color: var(--text-muted);
+        }
+        .status-pill.completed {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--accent-green);
+        }
+        .status-pill.in-progress {
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--accent-blue);
+        }
 
-        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(12px); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
-        .modal-overlay.active { display:flex; }
-        .modal { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius); max-width:540px; width:100%; max-height:90vh; overflow-y:auto; padding:32px; animation:modalIn 0.3s ease; }
-        @keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
-        .modal .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
-        .modal .modal-header h2 { font-size:20px; font-weight:700; }
-        .modal .modal-header .close-btn { width:32px; height:32px; border-radius:8px; border:1px solid var(--border-color); background:transparent; color:var(--text-secondary); cursor:pointer; transition:var(--transition); }
-        .modal .modal-header .close-btn:hover { background:var(--accent-red); color:white; border-color:var(--accent-red); }
-        .modal .form-group { margin-bottom:16px; }
-        .modal .form-group label { display:block; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:4px; }
-        .modal .form-group input,.modal .form-group select,.modal .form-group textarea { width:100%; padding:10px 14px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:13px; outline:none; transition:var(--transition); font-family:inherit; }
-        .modal .form-group input:focus,.modal .form-group select:focus,.modal .form-group textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,58,237,0.08); }
-        .modal .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-        .modal .btn { width:100%; justify-content:center; }
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            max-width: 540px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .modal .modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .modal .modal-header .close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .modal .modal-header .close-btn:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+        .modal .form-group {
+            margin-bottom: 16px;
+        }
+        .modal .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .modal .form-group input,
+        .modal .form-group select,
+        .modal .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .modal .form-group input:focus,
+        .modal .form-group select:focus,
+        .modal .form-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
+        }
+        .modal .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .modal .btn {
+            width: 100%;
+            justify-content: center;
+        }
 
-        .toast-container { position:fixed; top:80px; right:24px; z-index:3000; display:flex; flex-direction:column; gap:8px; }
-        .toast { padding:14px 20px; border-radius:var(--radius-sm); color:white; font-size:13px; font-weight:500; transform:translateX(120%); opacity:0; transition:all 0.4s ease; max-width:340px; backdrop-filter:blur(10px); display:flex; align-items:center; gap:10px; box-shadow:var(--shadow); }
-        .toast.show { transform:translateX(0); opacity:1; }
-        .toast-success { background:rgba(34,197,94,0.95); }
-        .toast-error { background:rgba(239,68,68,0.95); }
-        .toast-warning { background:rgba(245,158,11,0.95); }
-        .toast-info { background:rgba(124,58,237,0.95); }
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 340px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .toast-success {
+            background: rgba(34, 197, 94, 0.95);
+        }
+        .toast-error {
+            background: rgba(239, 68, 68, 0.95);
+        }
+        .toast-warning {
+            background: rgba(245, 158, 11, 0.95);
+        }
+        .toast-info {
+            background: rgba(124, 58, 237, 0.95);
+        }
 
-        .loading-overlay { position:fixed; inset:0; background:var(--bg-primary); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s; }
-        .loading-overlay.hidden { opacity:0; pointer-events:none; }
-        .spinner { width:40px; height:40px; border:3px solid rgba(124,58,237,0.15); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        .loading-overlay p { margin-top:12px; color:var(--text-muted); font-size:13px; }
+        /* ===== LOADING ===== */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s;
+        }
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(124, 58, 237, 0.15);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .loading-overlay p {
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
 
-        .search-bar { display:flex; align-items:center; gap:8px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:8px 12px; margin-bottom:16px; }
-        .search-bar i { color:var(--text-muted); font-size:12px; }
-        .search-bar input { background:transparent; border:none; color:var(--text-primary); font-size:12px; outline:none; flex:1; font-family:inherit; }
-        .search-bar input::placeholder { color:var(--text-muted); }
+        /* ===== SEARCH ===== */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 16px;
+        }
+        .search-bar i {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            flex: 1;
+            font-family: inherit;
+        }
+        .search-bar input::placeholder {
+            color: var(--text-muted);
+        }
 
-        .filter-bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
-        .filter-bar select { padding:6px 12px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px; color:var(--text-primary); font-size:11px; outline:none; font-family:inherit; }
+        /* ===== FILTER ===== */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .filter-bar select {
+            padding: 6px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 11px;
+            outline: none;
+            font-family: inherit;
+        }
 
-        .empty-state { text-align:center; padding:40px 20px; }
-        .empty-state i { font-size:48px; color:var(--text-muted); margin-bottom:16px; opacity:0.3; }
-        .empty-state h3 { font-size:16px; margin-bottom:8px; }
-        .empty-state p { color:var(--text-muted); font-size:13px; }
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .empty-state i {
+            font-size: 48px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        .empty-state h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
 
-        @media (max-width:768px) { .content-area { padding:16px; } .top-bar { padding:12px 16px; } .top-bar .page-title { font-size:16px; } .stats-grid { grid-template-columns:1fr 1fr; } .modal .form-row { grid-template-columns:1fr; } }
-        @media (max-width:480px) { .stats-grid { grid-template-columns:1fr; } }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 16px;
+            }
+            .top-bar {
+                padding: 12px 16px;
+            }
+            .top-bar .page-title {
+                font-size: 16px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .modal .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -165,6 +790,7 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="logo">A</div>
@@ -211,6 +837,7 @@
         </div>
     </aside>
 
+    <!-- ===== MAIN ===== -->
     <main class="main-content">
         <header class="top-bar">
             <div style="display:flex;align-items:center;gap:12px;">
@@ -230,7 +857,7 @@
         </header>
 
         <div class="content-area">
-            <!-- DASHBOARD -->
+            <!-- ===== DASHBOARD ===== -->
             <div id="section-dashboard">
                 <div class="stats-grid" id="statsGrid"></div>
                 <div class="card">
@@ -244,14 +871,16 @@
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>User</th><th>Action</th><th>Time</th></tr></thead>
+                            <thead>
+                                <tr><th>User</th><th>Action</th><th>Time</th></tr>
+                            </thead>
                             <tbody id="activityBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- USERS -->
+            <!-- ===== USERS ===== -->
             <div id="section-users" style="display:none;">
                 <div class="card">
                     <div class="card-header">
@@ -287,14 +916,16 @@
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Premium</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Premium</th><th>Actions</th></tr>
+                            </thead>
                             <tbody id="usersBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- PROJECTS -->
+            <!-- ===== PROJECTS ===== -->
             <div id="section-projects" style="display:none;">
                 <div class="card">
                     <div class="card-header">
@@ -311,14 +942,16 @@
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Likes</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr><th>Title</th><th>Author</th><th>Category</th><th>Likes</th><th>Status</th><th>Actions</th></tr>
+                            </thead>
                             <tbody id="projectsBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- COURSES -->
+            <!-- ===== COURSES ===== -->
             <div id="section-courses" style="display:none;">
                 <div class="card">
                     <div class="card-header">
@@ -331,14 +964,16 @@
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>Title</th><th>Instructor</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr><th>Title</th><th>Instructor</th><th>Category</th><th>Price</th><th>Actions</th></tr>
+                            </thead>
                             <tbody id="coursesBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- PREMIUM -->
+            <!-- ===== PREMIUM ===== -->
             <div id="section-premium" style="display:none;">
                 <div class="stats-grid" id="premiumStats"></div>
                 <div class="card">
@@ -352,7 +987,9 @@
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>User</th><th>Email</th><th>Started</th><th>Expires</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr><th>User</th><th>Email</th><th>Started</th><th>Expires</th><th>Actions</th></tr>
+                            </thead>
                             <tbody id="premiumBody"></tbody>
                         </table>
                     </div>
@@ -363,14 +1000,16 @@
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>User</th><th>Email</th><th>Amount</th><th>Requested</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr><th>User</th><th>Email</th><th>Amount</th><th>Requested</th><th>Actions</th></tr>
+                            </thead>
                             <tbody id="pendingBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- PAYMENTS -->
+            <!-- ===== PAYMENTS ===== -->
             <div id="section-payments" style="display:none;">
                 <div class="stats-grid" id="paymentStats"></div>
                 <div class="card">
@@ -379,7 +1018,9 @@
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+                            <thead>
+                                <tr><th>User</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr>
+                            </thead>
                             <tbody id="paymentsBody"></tbody>
                         </table>
                     </div>
@@ -388,7 +1029,7 @@
         </div>
     </main>
 
-    <!-- MODALS -->
+    <!-- ===== MODALS ===== -->
 
     <!-- User Modal -->
     <div class="modal-overlay" id="userModal">
@@ -448,207 +1089,206 @@
         // ADMIN APP - Same config as auth.html (COMPLETE)
         // ============================================================
 
-        (function() {
-            // ============================================================
-            // CONFIG - Same as auth.html
-            // ============================================================
-            var CONFIG = {
-                supabase: {
-                    url: 'https://brmoagghggdeumkfijmm.supabase.co',
-                    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
-                },
-                app: {
-                    name: 'Aurex Designs',
-                    url: 'https://aurex-design.vercel.app',
-                    storageBucket: 'aurex-assets'
-                },
-                premium: { price: '13500', duration: '6', discount: '45' },
-                adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
-            };
+        // ============================================================
+        // CONFIG - Same as auth.html
+        // ============================================================
+        var CONFIG = {
+            supabase: {
+                url: 'https://brmoagghggdeumkfijmm.supabase.co',
+                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
+            },
+            app: {
+                name: 'Aurex Designs',
+                url: 'https://aurex-design.vercel.app',
+                storageBucket: 'aurex-assets'
+            },
+            premium: { price: '13500', duration: '6', discount: '45' },
+            adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
+        };
 
-            console.log('Admin page loaded. Config:', {
-                supabaseUrl: CONFIG.supabase.url ? 'Set' : 'Missing',
-                supabaseKey: CONFIG.supabase.anonKey ? 'Set' : 'Missing'
-            });
+        console.log('Admin page loaded. Config:', {
+            supabaseUrl: CONFIG.supabase.url ? 'Set' : 'Missing',
+            supabaseKey: CONFIG.supabase.anonKey ? 'Set' : 'Missing'
+        });
 
-            // ============================================================
-            // SUPABASE INIT
-            // ============================================================
-            var supabaseClient = null;
-            var supabaseConfigured = false;
-            var ADMIN_EMAILS = CONFIG.adminEmails || [];
+        // ============================================================
+        // SUPABASE INIT
+        // ============================================================
+        var supabaseClient = null;
+        var supabaseConfigured = false;
+        var ADMIN_EMAILS = CONFIG.adminEmails || [];
 
-            try {
-                var { createClient } = window.supabase;
-                supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
-                supabaseConfigured = true;
-                console.log('✅ Supabase connected');
-            } catch (e) {
-                console.warn('❌ Supabase error:', e.message);
+        try {
+            var { createClient } = window.supabase;
+            supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+            supabaseConfigured = true;
+            console.log('✅ Supabase connected');
+        } catch (e) {
+            console.warn('❌ Supabase error:', e.message);
+        }
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        var allUsers = [];
+        var allProjects = [];
+        var allCourses = [];
+        var allPayments = [];
+        var allPremiumUsers = [];
+        var allPendingRequests = [];
+        var currentUser = null;
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function showToast(msg, type) {
+            type = type || 'success';
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') +
+                '"></i> ' + msg;
+            container.appendChild(toast);
+            requestAnimationFrame(function() { toast.classList.add('show'); });
+            setTimeout(function() {
+                toast.classList.remove('show');
+                setTimeout(function() { toast.remove(); }, 400);
+            }, 3000);
+        }
+
+        function formatDate(date) {
+            if (!date) return '—';
+            return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatCurrency(amount) {
+            if (!amount) return '₦0';
+            return '₦' + parseInt(amount).toLocaleString();
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // ============================================================
+        // AUTH
+        // ============================================================
+        function checkAuth() {
+            if (!supabaseConfigured) {
+                showToast('⚠️ Supabase not configured.', 'error');
+                return false;
             }
 
-            // ============================================================
-            // STATE
-            // ============================================================
-            var allUsers = [];
-            var allProjects = [];
-            var allCourses = [];
-            var allPayments = [];
-            var allPremiumUsers = [];
-            var allPendingRequests = [];
-            var currentUser = null;
-
-            // ============================================================
-            // HELPERS
-            // ============================================================
-            function showToast(msg, type) {
-                type = type || 'success';
-                var container = document.getElementById('toastContainer');
-                var toast = document.createElement('div');
-                toast.className = 'toast toast-' + type;
-                toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') +
-                    '"></i> ' + msg;
-                container.appendChild(toast);
-                requestAnimationFrame(function() { toast.classList.add('show'); });
-                setTimeout(function() {
-                    toast.classList.remove('show');
-                    setTimeout(function() { toast.remove(); }, 400);
-                }, 3000);
-            }
-
-            function formatDate(date) {
-                if (!date) return '—';
-                return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            }
-
-            function formatCurrency(amount) {
-                if (!amount) return '₦0';
-                return '₦' + parseInt(amount).toLocaleString();
-            }
-
-            function openModal(id) {
-                document.getElementById(id).classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeModal(id) {
-                document.getElementById(id).classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            // ============================================================
-            // AUTH
-            // ============================================================
-            function checkAuth() {
-                if (!supabaseConfigured) {
-                    showToast('⚠️ Supabase not configured.', 'error');
-                    return false;
-                }
-
-                supabaseClient.auth.getSession().then(function(result) {
-                    if (!result.data.session) {
-                        window.location.href = 'auth.html';
-                        return;
-                    }
-                    var userEmail = result.data.session.user.email;
-                    if (!ADMIN_EMAILS.includes(userEmail)) {
-                        showToast('❌ Access denied. Admin only.', 'error');
-                        setTimeout(function() { window.location.href = 'index.html'; }, 1500);
-                        return;
-                    }
-                    currentUser = result.data.session.user;
-                    document.getElementById('adminName').textContent = userEmail.split('@')[0];
-                    document.getElementById('adminAvatar').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(
-                        userEmail.split('@')[0]) + '&background=7c3aed&color=fff';
-                }).catch(function() {
+            supabaseClient.auth.getSession().then(function(result) {
+                if (!result.data.session) {
                     window.location.href = 'auth.html';
-                });
-                return true;
-            }
-
-            function handleLogout() {
-                if (supabaseConfigured) supabaseClient.auth.signOut();
-                showToast('Logged out', 'success');
-                setTimeout(function() { window.location.href = 'index.html'; }, 800);
-            }
-
-            // ============================================================
-            // NAVIGATION
-            // ============================================================
-            function toggleMobileSidebar() {
-                document.getElementById('sidebar').classList.toggle('mobile-open');
-            }
-
-            function showSection(section) {
-                document.querySelectorAll('[id^="section-"]').forEach(function(el) {
-                    el.style.display = 'none';
-                });
-                document.getElementById('section-' + section).style.display = 'block';
-
-                document.querySelectorAll('.nav-item').forEach(function(el) {
-                    el.classList.remove('active');
-                });
-                var navItem = document.querySelector('.nav-item[data-section="' + section + '"]');
-                if (navItem) navItem.classList.add('active');
-
-                var titles = {
-                    dashboard: 'Dashboard',
-                    users: 'Users',
-                    projects: 'Projects',
-                    courses: 'Courses',
-                    premium: 'Premium',
-                    payments: 'Payments'
-                };
-                document.getElementById('pageTitle').textContent = titles[section] || section;
-
-                document.getElementById('sidebar').classList.remove('mobile-open');
-
-                if (section === 'dashboard') loadDashboard();
-                if (section === 'users') loadUsers();
-                if (section === 'projects') loadProjects();
-                if (section === 'courses') loadCourses();
-                if (section === 'premium') loadPremium();
-                if (section === 'payments') loadPayments();
-            }
-
-            function refreshData() {
-                var active = document.querySelector('.nav-item.active');
-                var section = active ? active.dataset.section : 'dashboard';
-                if (section === 'dashboard') loadDashboard();
-                if (section === 'users') loadUsers();
-                if (section === 'projects') loadProjects();
-                if (section === 'courses') loadCourses();
-                if (section === 'premium') loadPremium();
-                if (section === 'payments') loadPayments();
-                showToast('Data refreshed', 'success');
-            }
-
-            // ============================================================
-            // DASHBOARD
-            // ============================================================
-            async function loadDashboard() {
-                if (!supabaseConfigured) {
-                    showToast('⚠️ Supabase not configured', 'error');
                     return;
                 }
+                var userEmail = result.data.session.user.email;
+                if (!ADMIN_EMAILS.includes(userEmail)) {
+                    showToast('❌ Access denied. Admin only.', 'error');
+                    setTimeout(function() { window.location.href = 'index.html'; }, 1500);
+                    return;
+                }
+                currentUser = result.data.session.user;
+                document.getElementById('adminName').textContent = userEmail.split('@')[0];
+                document.getElementById('adminAvatar').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(
+                    userEmail.split('@')[0]) + '&background=7c3aed&color=fff';
+            }).catch(function() {
+                window.location.href = 'auth.html';
+            });
+            return true;
+        }
 
-                try {
-                    var [users, projects, courses, payments] = await Promise.all([
-                        supabaseClient.from('users').select('*'),
-                        supabaseClient.from('projects').select('*'),
-                        supabaseClient.from('courses').select('*'),
-                        supabaseClient.from('payments').select('*')
-                    ]);
+        function handleLogout() {
+            if (supabaseConfigured) supabaseClient.auth.signOut();
+            showToast('Logged out', 'success');
+            setTimeout(function() { window.location.href = 'index.html'; }, 800);
+        }
 
-                    allUsers = users.data || [];
-                    allProjects = projects.data || [];
-                    allCourses = courses.data || [];
-                    allPayments = payments.data || [];
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        function toggleMobileSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+        }
 
-                    var premiumCount = allUsers.filter(function(u) { return u.is_premium; }).length;
-                    var totalRevenue = allPayments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
+        function showSection(section) {
+            document.querySelectorAll('[id^="section-"]').forEach(function(el) {
+                el.style.display = 'none';
+            });
+            document.getElementById('section-' + section).style.display = 'block';
 
-                    document.getElementById('statsGrid').innerHTML = `
+            document.querySelectorAll('.nav-item').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            var navItem = document.querySelector('.nav-item[data-section="' + section + '"]');
+            if (navItem) navItem.classList.add('active');
+
+            var titles = {
+                dashboard: 'Dashboard',
+                users: 'Users',
+                projects: 'Projects',
+                courses: 'Courses',
+                premium: 'Premium',
+                payments: 'Payments'
+            };
+            document.getElementById('pageTitle').textContent = titles[section] || section;
+
+            document.getElementById('sidebar').classList.remove('mobile-open');
+
+            if (section === 'dashboard') loadDashboard();
+            if (section === 'users') loadUsers();
+            if (section === 'projects') loadProjects();
+            if (section === 'courses') loadCourses();
+            if (section === 'premium') loadPremium();
+            if (section === 'payments') loadPayments();
+        }
+
+        function refreshData() {
+            var active = document.querySelector('.nav-item.active');
+            var section = active ? active.dataset.section : 'dashboard';
+            if (section === 'dashboard') loadDashboard();
+            if (section === 'users') loadUsers();
+            if (section === 'projects') loadProjects();
+            if (section === 'courses') loadCourses();
+            if (section === 'premium') loadPremium();
+            if (section === 'payments') loadPayments();
+            showToast('Data refreshed', 'success');
+        }
+
+        // ============================================================
+        // DASHBOARD
+        // ============================================================
+        async function loadDashboard() {
+            if (!supabaseConfigured) {
+                showToast('⚠️ Supabase not configured', 'error');
+                return;
+            }
+
+            try {
+                var [users, projects, courses, payments] = await Promise.all([
+                    supabaseClient.from('users').select('*'),
+                    supabaseClient.from('projects').select('*'),
+                    supabaseClient.from('courses').select('*'),
+                    supabaseClient.from('payments').select('*')
+                ]);
+
+                allUsers = users.data || [];
+                allProjects = projects.data || [];
+                allCourses = courses.data || [];
+                allPayments = payments.data || [];
+
+                var premiumCount = allUsers.filter(function(u) { return u.is_premium; }).length;
+                var totalRevenue = allPayments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
+
+                document.getElementById('statsGrid').innerHTML = `
                         <div class="stat-card">
                             <div class="stat-icon purple"><i class="fas fa-users"></i></div>
                             <div class="stat-value">${allUsers.length}</div>
@@ -689,343 +1329,344 @@
                         </div>
                     `;
 
-                    document.getElementById('userBadge').textContent = allUsers.length;
-                    document.getElementById('premiumBadge').textContent = premiumCount;
+                document.getElementById('userBadge').textContent = allUsers.length;
+                document.getElementById('premiumBadge').textContent = premiumCount;
 
-                    var activity = allUsers.slice(0, 5).map(function(u) {
-                        return '<tr><td>' + (u.full_name || 'User') + '</td><td>Signed up</td><td>' + formatDate(u
-                            .created_at) + '</td></tr>';
-                    }).join('');
-
-                    document.getElementById('activityBody').innerHTML = activity ||
-                        '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:20px;">No activity</td></tr>';
-
-                } catch (e) {
-                    console.error('Dashboard error:', e);
-                    showToast('Error loading dashboard', 'error');
-                }
-            }
-
-            // ============================================================
-            // USERS CRUD
-            // ============================================================
-            async function loadUsers() {
-                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
-
-                try {
-                    var { data } = await supabaseClient.from('users').select('*').order('created_at', { ascending: false });
-                    allUsers = data || [];
-                    renderUsers(allUsers);
-                } catch (e) {
-                    showToast('Error loading users', 'error');
-                }
-            }
-
-            function renderUsers(users) {
-                var tbody = document.getElementById('usersBody');
-                if (!users || users.length === 0) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No users found</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = users.map(function(u) {
-                    var roleBadge = u.role === 'admin' ? 'badge-danger' : u.role === 'instructor' ? 'badge-info' :
-                        'badge-success';
-                    var statusBadge = u.status === 'active' ? 'status-pill active' : u.status === 'pending' ?
-                        'status-pill pending' : 'status-pill inactive';
-                    var premiumBadge = u.is_premium ?
-                        '<span class="badge badge-premium"><i class="fas fa-crown"></i> Premium</span>' :
-                        '<span class="badge badge-warning">Free</span>';
-
-                    return '<tr>' +
-                        '<td><strong style="color:var(--text-primary);">' + (u.full_name || 'Unknown') + '</strong></td>' +
-                        '<td>' + (u.email || '') + '</td>' +
-                        '<td><span class="badge ' + roleBadge + '">' + (u.role || 'student') + '</span></td>' +
-                        '<td><span class="' + statusBadge + '">' + (u.status || 'active') + '</span></td>' +
-                        '<td>' + premiumBadge + '</td>' +
-                        '<td>' +
-                        '<button class="btn btn-sm btn-secondary" onclick="togglePremium(\'' + u.id + '\')" title="Toggle Premium"><i class="fas fa-crown"></i></button> ' +
-                        '<button class="btn btn-sm btn-danger" onclick="deleteUser(\'' + u.id + '\')" title="Delete"><i class="fas fa-trash"></i></button>' +
-                        '</td>' +
-                        '</tr>';
+                var activity = allUsers.slice(0, 5).map(function(u) {
+                    return '<tr><td>' + (u.full_name || 'User') + '</td><td>Signed up</td><td>' + formatDate(u
+                        .created_at) + '</td></tr>';
                 }).join('');
+
+                document.getElementById('activityBody').innerHTML = activity ||
+                    '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:20px;">No activity</td></tr>';
+
+            } catch (e) {
+                console.error('Dashboard error:', e);
+                showToast('Error loading dashboard', 'error');
+            }
+        }
+
+        // ============================================================
+        // USERS CRUD
+        // ============================================================
+        async function loadUsers() {
+            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+
+            try {
+                var { data } = await supabaseClient.from('users').select('*').order('created_at', { ascending: false });
+                allUsers = data || [];
+                renderUsers(allUsers);
+            } catch (e) {
+                showToast('Error loading users', 'error');
+            }
+        }
+
+        function renderUsers(users) {
+            var tbody = document.getElementById('usersBody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No users found</td></tr>';
+                return;
             }
 
-            function filterUsers() {
-                var query = document.getElementById('userSearch').value.toLowerCase();
-                var role = document.getElementById('userRoleFilter').value;
-                var status = document.getElementById('userStatusFilter').value;
-                var premium = document.getElementById('userPremiumFilter').value;
+            tbody.innerHTML = users.map(function(u) {
+                var roleBadge = u.role === 'admin' ? 'badge-danger' : u.role === 'instructor' ? 'badge-info' :
+                    'badge-success';
+                var statusBadge = u.status === 'active' ? 'status-pill active' : u.status === 'pending' ?
+                    'status-pill pending' : 'status-pill inactive';
+                var premiumBadge = u.is_premium ?
+                    '<span class="badge badge-premium"><i class="fas fa-crown"></i> Premium</span>' :
+                    '<span class="badge badge-warning">Free</span>';
 
-                var filtered = allUsers.filter(function(u) {
-                    var matchName = (u.full_name || '').toLowerCase().includes(query);
-                    var matchEmail = (u.email || '').toLowerCase().includes(query);
-                    var matchRole = !role || u.role === role;
-                    var matchStatus = !status || u.status === status;
-                    var matchPremium = premium === '' || String(u.is_premium) === premium;
-                    return (matchName || matchEmail) && matchRole && matchStatus && matchPremium;
-                });
+                return '<tr>' +
+                    '<td><strong style="color:var(--text-primary);">' + (u.full_name || 'Unknown') + '</strong></td>' +
+                    '<td>' + (u.email || '') + '</td>' +
+                    '<td><span class="badge ' + roleBadge + '">' + (u.role || 'student') + '</span></td>' +
+                    '<td><span class="' + statusBadge + '">' + (u.status || 'active') + '</span></td>' +
+                    '<td>' + premiumBadge + '</td>' +
+                    '<td>' +
+                    '<button class="btn btn-sm btn-secondary" onclick="togglePremium(\'' + u.id + '\')" title="Toggle Premium"><i class="fas fa-crown"></i></button> ' +
+                    '<button class="btn btn-sm btn-danger" onclick="deleteUser(\'' + u.id + '\')" title="Delete"><i class="fas fa-trash"></i></button>' +
+                    '</td>' +
+                    '</tr>';
+            }).join('');
+        }
 
-                renderUsers(filtered);
+        function filterUsers() {
+            var query = document.getElementById('userSearch').value.toLowerCase();
+            var role = document.getElementById('userRoleFilter').value;
+            var status = document.getElementById('userStatusFilter').value;
+            var premium = document.getElementById('userPremiumFilter').value;
+
+            var filtered = allUsers.filter(function(u) {
+                var matchName = (u.full_name || '').toLowerCase().includes(query);
+                var matchEmail = (u.email || '').toLowerCase().includes(query);
+                var matchRole = !role || u.role === role;
+                var matchStatus = !status || u.status === status;
+                var matchPremium = premium === '' || String(u.is_premium) === premium;
+                return (matchName || matchEmail) && matchRole && matchStatus && matchPremium;
+            });
+
+            renderUsers(filtered);
+        }
+
+        async function saveUser() {
+            var id = document.getElementById('editUserId').value;
+            var name = document.getElementById('userName').value.trim();
+            var email = document.getElementById('userEmail').value.trim();
+            var role = document.getElementById('userRole').value;
+            var status = document.getElementById('userStatus').value;
+
+            if (!name || !email) {
+                showToast('Please fill in all fields', 'error');
+                return;
             }
 
-            async function saveUser() {
-                var id = document.getElementById('editUserId').value;
-                var name = document.getElementById('userName').value.trim();
-                var email = document.getElementById('userEmail').value.trim();
-                var role = document.getElementById('userRole').value;
-                var status = document.getElementById('userStatus').value;
+            var payload = {
+                full_name: name,
+                email: email,
+                role: role,
+                status: status,
+                updated_at: new Date().toISOString()
+            };
 
-                if (!name || !email) {
-                    showToast('Please fill in all fields', 'error');
-                    return;
-                }
-
-                var payload = {
-                    full_name: name,
-                    email: email,
-                    role: role,
-                    status: status,
-                    updated_at: new Date().toISOString()
-                };
-
-                if (id) {
-                    var { error } = await supabaseClient.from('users').update(payload).eq('id', id);
-                    if (error) { showToast('Error updating user', 'error'); return; }
-                    showToast('User updated', 'success');
-                } else {
-                    var password = document.getElementById('userPassword').value;
-                    if (!password) { showToast('Please enter a password', 'error'); return; }
-                    payload.password = password;
-                    payload.is_premium = false;
-                    payload.created_at = new Date().toISOString();
-                    var { error } = await supabaseClient.from('users').insert(payload);
-                    if (error) { showToast('Error creating user', 'error'); return; }
-                    showToast('User created', 'success');
-                }
-
-                closeModal('userModal');
-                resetUserForm();
-                loadUsers();
-                loadDashboard();
+            if (id) {
+                var { error } = await supabaseClient.from('users').update(payload).eq('id', id);
+                if (error) { showToast('Error updating user', 'error'); return; }
+                showToast('User updated', 'success');
+            } else {
+                var password = document.getElementById('userPassword').value;
+                if (!password) { showToast('Please enter a password', 'error'); return; }
+                payload.password = password;
+                payload.is_premium = false;
+                payload.created_at = new Date().toISOString();
+                var { error } = await supabaseClient.from('users').insert(payload);
+                if (error) { showToast('Error creating user', 'error'); return; }
+                showToast('User created', 'success');
             }
 
-            function resetUserForm() {
-                document.getElementById('editUserId').value = '';
-                document.getElementById('userName').value = '';
-                document.getElementById('userEmail').value = '';
-                document.getElementById('userPassword').value = '';
-                document.getElementById('userModalTitle').textContent = 'Add User';
-                document.getElementById('passwordGroup').style.display = 'block';
+            closeModal('userModal');
+            resetUserForm();
+            loadUsers();
+            loadDashboard();
+        }
+
+        function resetUserForm() {
+            document.getElementById('editUserId').value = '';
+            document.getElementById('userName').value = '';
+            document.getElementById('userEmail').value = '';
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userModalTitle').textContent = 'Add User';
+            document.getElementById('passwordGroup').style.display = 'block';
+        }
+
+        async function togglePremium(id) {
+            var user = allUsers.find(function(u) { return u.id === id; });
+            if (!user) return;
+
+            var newStatus = !user.is_premium;
+            var { error } = await supabaseClient.from('users').update({
+                is_premium: newStatus,
+                premium_start: newStatus ? new Date().toISOString() : null,
+                premium_end: newStatus ? new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString() : null
+            }).eq('id', id);
+
+            if (error) { showToast('Error updating premium', 'error'); return; }
+            showToast(user.full_name + ' is now ' + (newStatus ? 'Premium' : 'Free'), 'success');
+            loadUsers();
+            loadDashboard();
+            loadPremium();
+        }
+
+        async function deleteUser(id) {
+            if (!confirm('Delete this user?')) return;
+            var { error } = await supabaseClient.from('users').delete().eq('id', id);
+            if (error) { showToast('Error deleting user', 'error'); return; }
+            showToast('User deleted', 'success');
+            loadUsers();
+            loadDashboard();
+            loadPremium();
+        }
+
+        // ============================================================
+        // PROJECTS CRUD
+        // ============================================================
+        async function loadProjects() {
+            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+
+            try {
+                var { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
+                allProjects = data || [];
+                renderProjects(allProjects);
+            } catch (e) {
+                showToast('Error loading projects', 'error');
+            }
+        }
+
+        function renderProjects(projects) {
+            var tbody = document.getElementById('projectsBody');
+            if (!projects || projects.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No projects found</td></tr>';
+                return;
             }
 
-            async function togglePremium(id) {
-                var user = allUsers.find(function(u) { return u.id === id; });
-                if (!user) return;
+            tbody.innerHTML = projects.map(function(p) {
+                var statusBadge = p.status === 'completed' ? 'status-pill completed' : p.status === 'in-progress' ?
+                    'status-pill in-progress' : 'status-pill pending';
+                return '<tr>' +
+                    '<td><strong style="color:var(--text-primary);">' + (p.title || 'Untitled') + '</strong></td>' +
+                    '<td>' + (p.author_name || 'Anonymous') + '</td>' +
+                    '<td><span class="badge badge-info">' + (p.category || 'General') + '</span></td>' +
+                    '<td>❤️ ' + (p.likes || 0) + '</td>' +
+                    '<td><span class="' + statusBadge + '">' + (p.status || 'pending') + '</span></td>' +
+                    '<td>' +
+                    '<button class="btn btn-sm btn-danger" onclick="deleteProject(\'' + p.id + '\')"><i class="fas fa-trash"></i></button>' +
+                    '</td>' +
+                    '</tr>';
+            }).join('');
+        }
 
-                var newStatus = !user.is_premium;
-                var { error } = await supabaseClient.from('users').update({
-                    is_premium: newStatus,
-                    premium_start: newStatus ? new Date().toISOString() : null,
-                    premium_end: newStatus ? new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString() : null
-                }).eq('id', id);
+        function filterProjects() {
+            var query = document.getElementById('projectSearch').value.toLowerCase();
+            var filtered = allProjects.filter(function(p) {
+                return (p.title || '').toLowerCase().includes(query) ||
+                    (p.author_name || '').toLowerCase().includes(query);
+            });
+            renderProjects(filtered);
+        }
 
-                if (error) { showToast('Error updating premium', 'error'); return; }
-                showToast(user.full_name + ' is now ' + (newStatus ? 'Premium' : 'Free'), 'success');
-                loadUsers();
-                loadDashboard();
-                loadPremium();
+        async function saveProject() {
+            var title = document.getElementById('projectTitle').value.trim();
+            var desc = document.getElementById('projectDesc').value.trim();
+            var category = document.getElementById('projectCategory').value;
+            var status = document.getElementById('projectStatus').value;
+            var author = document.getElementById('projectAuthor').value.trim() || 'Admin';
+
+            if (!title) { showToast('Please enter a title', 'error'); return; }
+
+            var { error } = await supabaseClient.from('projects').insert({
+                title: title,
+                description: desc || 'No description provided.',
+                category: category,
+                status: status,
+                likes: 0,
+                comments_count: 0,
+                author_name: author,
+                author_avatar: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(author) +
+                    '&background=7c3aed&color=fff&size=100',
+                is_active: true,
+                created_at: new Date().toISOString()
+            });
+
+            if (error) {
+                console.error('Error saving project:', error);
+                showToast('Error creating project: ' + error.message, 'error');
+                return;
+            }
+            showToast('Project created', 'success');
+            closeModal('projectModal');
+            loadProjects();
+            loadDashboard();
+        }
+
+        async function deleteProject(id) {
+            if (!confirm('Delete this project?')) return;
+            var { error } = await supabaseClient.from('projects').delete().eq('id', id);
+            if (error) { showToast('Error deleting project', 'error'); return; }
+            showToast('Project deleted', 'success');
+            loadProjects();
+            loadDashboard();
+        }
+
+        // ============================================================
+        // COURSES CRUD
+        // ============================================================
+        async function loadCourses() {
+            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+
+            try {
+                var { data } = await supabaseClient.from('courses').select('*').order('created_at', { ascending: false });
+                allCourses = data || [];
+                renderCourses(allCourses);
+            } catch (e) {
+                showToast('Error loading courses', 'error');
+            }
+        }
+
+        function renderCourses(courses) {
+            var tbody = document.getElementById('coursesBody');
+            if (!courses || courses.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No courses found</td></tr>';
+                return;
             }
 
-            async function deleteUser(id) {
-                if (!confirm('Delete this user?')) return;
-                var { error } = await supabaseClient.from('users').delete().eq('id', id);
-                if (error) { showToast('Error deleting user', 'error'); return; }
-                showToast('User deleted', 'success');
-                loadUsers();
-                loadDashboard();
-                loadPremium();
-            }
+            tbody.innerHTML = courses.map(function(c) {
+                return '<tr>' +
+                    '<td><strong style="color:var(--text-primary);">' + (c.title || 'Untitled') + '</strong></td>' +
+                    '<td>' + (c.instructor || 'Unknown') + '</td>' +
+                    '<td><span class="badge badge-info">' + (c.category || 'General') + '</span></td>' +
+                    '<td>' + (c.is_free ? 'Free' : formatCurrency(c.price)) + '</td>' +
+                    '<td>' +
+                    '<button class="btn btn-sm btn-danger" onclick="deleteCourse(\'' + c.id + '\')"><i class="fas fa-trash"></i></button>' +
+                    '</td>' +
+                    '</tr>';
+            }).join('');
+        }
 
-            // ============================================================
-            // PROJECTS CRUD
-            // ============================================================
-            async function loadProjects() {
-                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+        async function saveCourse() {
+            var title = document.getElementById('courseTitle').value.trim();
+            var instructor = document.getElementById('courseInstructor').value.trim();
+            var category = document.getElementById('courseCategory').value;
+            var price = parseInt(document.getElementById('coursePrice').value) || 0;
+            var duration = parseInt(document.getElementById('courseDuration').value) || 10;
 
-                try {
-                    var { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
-                    allProjects = data || [];
-                    renderProjects(allProjects);
-                } catch (e) {
-                    showToast('Error loading projects', 'error');
-                }
-            }
+            if (!title) { showToast('Please enter a title', 'error'); return; }
 
-            function renderProjects(projects) {
-                var tbody = document.getElementById('projectsBody');
-                if (!projects || projects.length === 0) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No projects found</td></tr>';
-                    return;
-                }
+            var { error } = await supabaseClient.from('courses').insert({
+                title: title,
+                instructor: instructor || 'Admin',
+                category: category,
+                price: price,
+                is_free: price === 0,
+                duration_hours: duration,
+                is_active: true,
+                created_at: new Date().toISOString()
+            });
 
-                tbody.innerHTML = projects.map(function(p) {
-                    var statusBadge = p.status === 'completed' ? 'status-pill completed' : p.status === 'in-progress' ?
-                        'status-pill in-progress' : 'status-pill pending';
-                    return '<tr>' +
-                        '<td><strong style="color:var(--text-primary);">' + (p.title || 'Untitled') + '</strong></td>' +
-                        '<td>' + (p.author_name || 'Anonymous') + '</td>' +
-                        '<td><span class="badge badge-info">' + (p.category || 'General') + '</span></td>' +
-                        '<td>❤️ ' + (p.likes || 0) + '</td>' +
-                        '<td><span class="' + statusBadge + '">' + (p.status || 'pending') + '</span></td>' +
-                        '<td>' +
-                        '<button class="btn btn-sm btn-danger" onclick="deleteProject(\'' + p.id + '\')"><i class="fas fa-trash"></i></button>' +
-                        '</td>' +
-                        '</tr>';
-                }).join('');
-            }
+            if (error) { showToast('Error creating course', 'error'); return; }
+            showToast('Course created', 'success');
+            closeModal('courseModal');
+            loadCourses();
+            loadDashboard();
+        }
 
-            function filterProjects() {
-                var query = document.getElementById('projectSearch').value.toLowerCase();
-                var filtered = allProjects.filter(function(p) {
-                    return (p.title || '').toLowerCase().includes(query) ||
-                           (p.author_name || '').toLowerCase().includes(query);
-                });
-                renderProjects(filtered);
-            }
+        async function deleteCourse(id) {
+            if (!confirm('Delete this course?')) return;
+            var { error } = await supabaseClient.from('courses').delete().eq('id', id);
+            if (error) { showToast('Error deleting course', 'error'); return; }
+            showToast('Course deleted', 'success');
+            loadCourses();
+            loadDashboard();
+        }
 
-            async function saveProject() {
-                var title = document.getElementById('projectTitle').value.trim();
-                var desc = document.getElementById('projectDesc').value.trim();
-                var category = document.getElementById('projectCategory').value;
-                var status = document.getElementById('projectStatus').value;
-                var author = document.getElementById('projectAuthor').value.trim() || 'Admin';
+        // ============================================================
+        // PREMIUM MANAGEMENT
+        // ============================================================
+        async function loadPremium() {
+            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
 
-                if (!title) { showToast('Please enter a title', 'error'); return; }
+            try {
+                var [premiumUsers, pendingRequests] = await Promise.all([
+                    supabaseClient.from('users').select('*').eq('is_premium', true).order('premium_start', { ascending: false }),
+                    supabaseClient.from('premium_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false })
+                ]);
 
-                var { error } = await supabaseClient.from('projects').insert({
-                    title: title,
-                    description: desc || 'No description provided.',
-                    category: category,
-                    status: status,
-                    likes: 0,
-                    comments_count: 0,
-                    author_name: author,
-                    author_avatar: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(author) + '&background=7c3aed&color=fff&size=100',
-                    is_active: true,
-                    created_at: new Date().toISOString()
-                });
+                allPremiumUsers = premiumUsers.data || [];
+                allPendingRequests = pendingRequests.data || [];
 
-                if (error) { 
-                    console.error('Error saving project:', error);
-                    showToast('Error creating project: ' + error.message, 'error'); 
-                    return; 
-                }
-                showToast('Project created', 'success');
-                closeModal('projectModal');
-                loadProjects();
-                loadDashboard();
-            }
-
-            async function deleteProject(id) {
-                if (!confirm('Delete this project?')) return;
-                var { error } = await supabaseClient.from('projects').delete().eq('id', id);
-                if (error) { showToast('Error deleting project', 'error'); return; }
-                showToast('Project deleted', 'success');
-                loadProjects();
-                loadDashboard();
-            }
-
-            // ============================================================
-            // COURSES CRUD
-            // ============================================================
-            async function loadCourses() {
-                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
-
-                try {
-                    var { data } = await supabaseClient.from('courses').select('*').order('created_at', { ascending: false });
-                    allCourses = data || [];
-                    renderCourses(allCourses);
-                } catch (e) {
-                    showToast('Error loading courses', 'error');
-                }
-            }
-
-            function renderCourses(courses) {
-                var tbody = document.getElementById('coursesBody');
-                if (!courses || courses.length === 0) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No courses found</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = courses.map(function(c) {
-                    return '<tr>' +
-                        '<td><strong style="color:var(--text-primary);">' + (c.title || 'Untitled') + '</strong></td>' +
-                        '<td>' + (c.instructor || 'Unknown') + '</td>' +
-                        '<td><span class="badge badge-info">' + (c.category || 'General') + '</span></td>' +
-                        '<td>' + (c.is_free ? 'Free' : formatCurrency(c.price)) + '</td>' +
-                        '<td>' +
-                        '<button class="btn btn-sm btn-danger" onclick="deleteCourse(\'' + c.id + '\')"><i class="fas fa-trash"></i></button>' +
-                        '</td>' +
-                        '</tr>';
-                }).join('');
-            }
-
-            async function saveCourse() {
-                var title = document.getElementById('courseTitle').value.trim();
-                var instructor = document.getElementById('courseInstructor').value.trim();
-                var category = document.getElementById('courseCategory').value;
-                var price = parseInt(document.getElementById('coursePrice').value) || 0;
-                var duration = parseInt(document.getElementById('courseDuration').value) || 10;
-
-                if (!title) { showToast('Please enter a title', 'error'); return; }
-
-                var { error } = await supabaseClient.from('courses').insert({
-                    title: title,
-                    instructor: instructor || 'Admin',
-                    category: category,
-                    price: price,
-                    is_free: price === 0,
-                    duration_hours: duration,
-                    is_active: true,
-                    created_at: new Date().toISOString()
-                });
-
-                if (error) { showToast('Error creating course', 'error'); return; }
-                showToast('Course created', 'success');
-                closeModal('courseModal');
-                loadCourses();
-                loadDashboard();
-            }
-
-            async function deleteCourse(id) {
-                if (!confirm('Delete this course?')) return;
-                var { error } = await supabaseClient.from('courses').delete().eq('id', id);
-                if (error) { showToast('Error deleting course', 'error'); return; }
-                showToast('Course deleted', 'success');
-                loadCourses();
-                loadDashboard();
-            }
-
-            // ============================================================
-            // PREMIUM MANAGEMENT
-            // ============================================================
-            async function loadPremium() {
-                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
-
-                try {
-                    var [premiumUsers, pendingRequests] = await Promise.all([
-                        supabaseClient.from('users').select('*').eq('is_premium', true).order('premium_start', { ascending: false }),
-                        supabaseClient.from('premium_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false })
-                    ]);
-
-                    allPremiumUsers = premiumUsers.data || [];
-                    allPendingRequests = pendingRequests.data || [];
-
-                    document.getElementById('premiumStats').innerHTML = `
+                document.getElementById('premiumStats').innerHTML = `
                         <div class="stat-card">
                             <div class="stat-icon orange"><i class="fas fa-crown"></i></div>
                             <div class="stat-value">${allPremiumUsers.length}</div>
@@ -1043,117 +1684,117 @@
                         </div>
                     `;
 
-                    renderPremium(allPremiumUsers);
-                    renderPending(allPendingRequests);
+                renderPremium(allPremiumUsers);
+                renderPending(allPendingRequests);
 
-                } catch (e) {
-                    showToast('Error loading premium', 'error');
-                }
+            } catch (e) {
+                showToast('Error loading premium', 'error');
+            }
+        }
+
+        function renderPremium(users) {
+            var tbody = document.getElementById('premiumBody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No premium users</td></tr>';
+                return;
             }
 
-            function renderPremium(users) {
-                var tbody = document.getElementById('premiumBody');
-                if (!users || users.length === 0) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No premium users</td></tr>';
-                    return;
-                }
+            tbody.innerHTML = users.map(function(u) {
+                return '<tr>' +
+                    '<td><strong style="color:var(--text-primary);">' + (u.full_name || 'Unknown') + '</strong></td>' +
+                    '<td>' + (u.email || '') + '</td>' +
+                    '<td>' + formatDate(u.premium_start) + '</td>' +
+                    '<td>' + formatDate(u.premium_end) + '</td>' +
+                    '<td><button class="btn btn-sm btn-danger" onclick="togglePremium(\'' + u.id + '\')"><i class="fas fa-crown"></i> Revoke</button></td>' +
+                    '</tr>';
+            }).join('');
+        }
 
-                tbody.innerHTML = users.map(function(u) {
-                    return '<tr>' +
-                        '<td><strong style="color:var(--text-primary);">' + (u.full_name || 'Unknown') + '</strong></td>' +
-                        '<td>' + (u.email || '') + '</td>' +
-                        '<td>' + formatDate(u.premium_start) + '</td>' +
-                        '<td>' + formatDate(u.premium_end) + '</td>' +
-                        '<td><button class="btn btn-sm btn-danger" onclick="togglePremium(\'' + u.id + '\')"><i class="fas fa-crown"></i> Revoke</button></td>' +
-                        '</tr>';
-                }).join('');
+        function renderPending(requests) {
+            var tbody = document.getElementById('pendingBody');
+            if (!requests || requests.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No pending requests</td></tr>';
+                return;
             }
 
-            function renderPending(requests) {
-                var tbody = document.getElementById('pendingBody');
-                if (!requests || requests.length === 0) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No pending requests</td></tr>';
-                    return;
-                }
+            tbody.innerHTML = requests.map(function(r) {
+                return '<tr>' +
+                    '<td><strong style="color:var(--text-primary);">' + (r.user_name || 'Unknown') + '</strong></td>' +
+                    '<td>' + (r.user_email || '') + '</td>' +
+                    '<td>' + formatCurrency(r.amount || 13500) + '</td>' +
+                    '<td>' + formatDate(r.created_at) + '</td>' +
+                    '<td>' +
+                    '<button class="btn btn-sm btn-success" onclick="confirmPremium(\'' + r.id + '\', \'confirm\')"><i class="fas fa-check"></i></button> ' +
+                    '<button class="btn btn-sm btn-danger" onclick="confirmPremium(\'' + r.id + '\', \'reject\')"><i class="fas fa-times"></i></button>' +
+                    '</td>' +
+                    '</tr>';
+            }).join('');
+        }
 
-                tbody.innerHTML = requests.map(function(r) {
-                    return '<tr>' +
-                        '<td><strong style="color:var(--text-primary);">' + (r.user_name || 'Unknown') + '</strong></td>' +
-                        '<td>' + (r.user_email || '') + '</td>' +
-                        '<td>' + formatCurrency(r.amount || 13500) + '</td>' +
-                        '<td>' + formatDate(r.created_at) + '</td>' +
-                        '<td>' +
-                        '<button class="btn btn-sm btn-success" onclick="confirmPremium(\'' + r.id + '\', \'confirm\')"><i class="fas fa-check"></i></button> ' +
-                        '<button class="btn btn-sm btn-danger" onclick="confirmPremium(\'' + r.id + '\', \'reject\')"><i class="fas fa-times"></i></button>' +
-                        '</td>' +
-                        '</tr>';
-                }).join('');
+        async function confirmPremium(requestId, action) {
+            var request = allPendingRequests.find(function(r) { return r.id === requestId; });
+            if (!request) return;
+
+            if (action === 'confirm') {
+                var { error: userError } = await supabaseClient.from('users').update({
+                    is_premium: true,
+                    premium_start: new Date().toISOString(),
+                    premium_end: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
+                    payment_status: 'confirmed'
+                }).eq('id', request.user_id);
+
+                if (userError) { showToast('Error updating user', 'error'); return; }
+
+                await supabaseClient.from('premium_requests').update({
+                    status: 'confirmed',
+                    confirmed_by: currentUser?.id,
+                    confirmed_at: new Date().toISOString()
+                }).eq('id', requestId);
+
+                await supabaseClient.from('payments').insert({
+                    user_id: request.user_id,
+                    user_email: request.user_email,
+                    amount: request.amount || 13500,
+                    payment_type: 'premium',
+                    item: 'Premium Subscription',
+                    status: 'completed',
+                    created_at: new Date().toISOString()
+                });
+
+                showToast('Premium confirmed for ' + (request.user_name || 'user'), 'success');
+                loadPremium();
+                loadUsers();
+                loadDashboard();
+
+            } else {
+                await supabaseClient.from('premium_requests').update({
+                    status: 'rejected',
+                    confirmed_by: currentUser?.id,
+                    confirmed_at: new Date().toISOString()
+                }).eq('id', requestId);
+
+                showToast('Premium request rejected', 'warning');
+                loadPremium();
             }
+        }
 
-            async function confirmPremium(requestId, action) {
-                var request = allPendingRequests.find(function(r) { return r.id === requestId; });
-                if (!request) return;
+        // ============================================================
+        // PAYMENTS
+        // ============================================================
+        async function loadPayments() {
+            if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
 
-                if (action === 'confirm') {
-                    var { error: userError } = await supabaseClient.from('users').update({
-                        is_premium: true,
-                        premium_start: new Date().toISOString(),
-                        premium_end: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
-                        payment_status: 'confirmed'
-                    }).eq('id', request.user_id);
+            try {
+                var { data } = await supabaseClient.from('payments').select('*').order('created_at', { ascending: false });
+                allPayments = data || [];
 
-                    if (userError) { showToast('Error updating user', 'error'); return; }
+                var totalRevenue = allPayments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
+                var completed = allPayments.filter(function(p) { return p.status === 'completed'; });
+                var pending = allPayments.filter(function(p) { return p.status === 'pending'; });
 
-                    await supabaseClient.from('premium_requests').update({
-                        status: 'confirmed',
-                        confirmed_by: currentUser?.id,
-                        confirmed_at: new Date().toISOString()
-                    }).eq('id', requestId);
-
-                    await supabaseClient.from('payments').insert({
-                        user_id: request.user_id,
-                        user_email: request.user_email,
-                        amount: request.amount || 13500,
-                        payment_type: 'premium',
-                        item: 'Premium Subscription',
-                        status: 'completed',
-                        created_at: new Date().toISOString()
-                    });
-
-                    showToast('Premium confirmed for ' + (request.user_name || 'user'), 'success');
-                    loadPremium();
-                    loadUsers();
-                    loadDashboard();
-
-                } else {
-                    await supabaseClient.from('premium_requests').update({
-                        status: 'rejected',
-                        confirmed_by: currentUser?.id,
-                        confirmed_at: new Date().toISOString()
-                    }).eq('id', requestId);
-
-                    showToast('Premium request rejected', 'warning');
-                    loadPremium();
-                }
-            }
-
-            // ============================================================
-            // PAYMENTS
-            // ============================================================
-            async function loadPayments() {
-                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
-
-                try {
-                    var { data } = await supabaseClient.from('payments').select('*').order('created_at', { ascending: false });
-                    allPayments = data || [];
-
-                    var totalRevenue = allPayments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
-                    var completed = allPayments.filter(function(p) { return p.status === 'completed'; });
-                    var pending = allPayments.filter(function(p) { return p.status === 'pending'; });
-
-                    document.getElementById('paymentStats').innerHTML = `
+                document.getElementById('paymentStats').innerHTML = `
                         <div class="stat-card">
                             <div class="stat-icon green"><i class="fas fa-money-bill-wave"></i></div>
                             <div class="stat-value">${formatCurrency(totalRevenue)}</div>
@@ -1171,95 +1812,94 @@
                         </div>
                     `;
 
-                    renderPayments(allPayments);
-                } catch (e) {
-                    showToast('Error loading payments', 'error');
-                }
+                renderPayments(allPayments);
+            } catch (e) {
+                showToast('Error loading payments', 'error');
+            }
+        }
+
+        function renderPayments(payments) {
+            var tbody = document.getElementById('paymentsBody');
+            if (!payments || payments.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No payments found</td></tr>';
+                return;
             }
 
-            function renderPayments(payments) {
-                var tbody = document.getElementById('paymentsBody');
-                if (!payments || payments.length === 0) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No payments found</td></tr>';
-                    return;
-                }
+            var typeMap = {
+                'premium': '<span class="badge badge-premium"><i class="fas fa-crown"></i> Premium</span>',
+                'course': '<span class="badge badge-info"><i class="fas fa-graduation-cap"></i> Course</span>',
+                'tool': '<span class="badge badge-warning"><i class="fas fa-tools"></i> Tool</span>'
+            };
 
-                var typeMap = {
-                    'premium': '<span class="badge badge-premium"><i class="fas fa-crown"></i> Premium</span>',
-                    'course': '<span class="badge badge-info"><i class="fas fa-graduation-cap"></i> Course</span>',
-                    'tool': '<span class="badge badge-warning"><i class="fas fa-tools"></i> Tool</span>'
-                };
+            tbody.innerHTML = payments.map(function(p) {
+                var statusBadge = p.status === 'completed' ? 'status-pill completed' : p.status === 'pending' ?
+                    'status-pill pending' : 'status-pill inactive';
+                return '<tr>' +
+                    '<td>' + (p.user_email || 'Unknown') + '</td>' +
+                    '<td><strong style="color:var(--accent-green);">' + formatCurrency(p.amount) +
+                    '</strong></td>' +
+                    '<td>' + (typeMap[p.payment_type] || p.payment_type || '—') + '</td>' +
+                    '<td><span class="' + statusBadge + '">' + (p.status || 'pending') + '</span></td>' +
+                    '<td>' + formatDate(p.created_at) + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
 
-                tbody.innerHTML = payments.map(function(p) {
-                    var statusBadge = p.status === 'completed' ? 'status-pill completed' : p.status === 'pending' ?
-                        'status-pill pending' : 'status-pill inactive';
-                    return '<tr>' +
-                        '<td>' + (p.user_email || 'Unknown') + '</td>' +
-                        '<td><strong style="color:var(--accent-green);">' + formatCurrency(p.amount) + '</strong></td>' +
-                        '<td>' + (typeMap[p.payment_type] || p.payment_type || '—') + '</td>' +
-                        '<td><span class="' + statusBadge + '">' + (p.status || 'pending') + '</span></td>' +
-                        '<td>' + formatDate(p.created_at) + '</td>' +
-                        '</tr>';
-                }).join('');
+        // ============================================================
+        // KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(function(el) {
+                    el.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
             }
+        });
 
-            // ============================================================
-            // KEYBOARD SHORTCUTS
-            // ============================================================
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal-overlay.active').forEach(function(el) {
-                        el.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                }
-            });
+        // ============================================================
+        // INIT
+        // ============================================================
+        function init() {
+            checkAuth();
+            loadDashboard();
+            loadUsers();
+            loadProjects();
+            loadCourses();
+            loadPremium();
+            loadPayments();
 
-            // ============================================================
-            // INIT
-            // ============================================================
-            function init() {
-                checkAuth();
-                loadDashboard();
-                loadUsers();
-                loadProjects();
-                loadCourses();
-                loadPremium();
-                loadPayments();
+            setTimeout(function() {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }, 800);
+        }
 
-                setTimeout(function() {
-                    document.getElementById('loadingOverlay').classList.add('hidden');
-                }, 800);
-            }
+        // Expose globally
+        window.showSection = showSection;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.saveUser = saveUser;
+        window.togglePremium = togglePremium;
+        window.deleteUser = deleteUser;
+        window.saveProject = saveProject;
+        window.deleteProject = deleteProject;
+        window.saveCourse = saveCourse;
+        window.deleteCourse = deleteCourse;
+        window.confirmPremium = confirmPremium;
+        window.loadPremium = loadPremium;
+        window.toggleMobileSidebar = toggleMobileSidebar;
+        window.handleLogout = handleLogout;
+        window.refreshData = refreshData;
+        window.showToast = showToast;
+        window.filterUsers = filterUsers;
+        window.filterProjects = filterProjects;
 
-            // Expose globally
-            window.showSection = showSection;
-            window.openModal = openModal;
-            window.closeModal = closeModal;
-            window.saveUser = saveUser;
-            window.togglePremium = togglePremium;
-            window.deleteUser = deleteUser;
-            window.saveProject = saveProject;
-            window.deleteProject = deleteProject;
-            window.saveCourse = saveCourse;
-            window.deleteCourse = deleteCourse;
-            window.confirmPremium = confirmPremium;
-            window.loadPremium = loadPremium;
-            window.toggleMobileSidebar = toggleMobileSidebar;
-            window.handleLogout = handleLogout;
-            window.refreshData = refreshData;
-            window.showToast = showToast;
-            window.filterUsers = filterUsers;
-            window.filterProjects = filterProjects;
-
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
-
-        })();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 
 </body>
