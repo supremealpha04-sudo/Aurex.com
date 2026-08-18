@@ -2,1637 +2,1265 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#070714">
-    <title>Aurex Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Aurex Designs</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        :root{--bg:#070714;--bg2:#0d0d1f;--card:#13132a;--hover:#1a1a3e;--purple:#7c3aed;--violet:#a855f7;--blue:#3b82f6;--cyan:#06b6d4;--pink:#ec4899;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--text:#f8fafc;--text2:#94a3b8;--muted:#64748b;--border:rgba(148,163,184,0.08);--shadow:0 8px 32px rgba(0,0,0,0.3);--radius:16px}
-        body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
-        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.3);border-radius:10px}
-        .loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.6s}
-        .loading.hidden{opacity:0;pointer-events:none}
-        .spinner{width:40px;height:40px;border:3px solid rgba(124,58,237,0.15);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .loading p{margin-top:14px;color:var(--muted);font-size:12px}
-        .app{display:flex;min-height:100vh}
-        .sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);padding:16px 12px;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:300;transition:transform 0.35s cubic-bezier(0.4,0,0.2,1)}
-        @media(max-width:900px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}}
-        .sidebar .logo{display:flex;align-items:center;gap:10px;padding:0 8px 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
-        .sidebar .logo .icon{width:36px;height:36px;min-width:36px;background:linear-gradient(135deg,#7c3aed,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.3)}
-        .sidebar .logo .text{font-size:18px;font-weight:700;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .sidebar .logo .sub{font-size:9px;color:var(--muted);letter-spacing:2px}
-        .sidebar .admin-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.15);margin:0 8px 12px}
-        .sidebar .admin-badge i{color:var(--red);font-size:11px}
-        .sidebar .admin-badge span{font-size:10px;color:var(--red);font-weight:600}
-        .sidebar .nav-section{margin-bottom:4px}
-        .sidebar .nav-title{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:0 12px;margin-bottom:6px}
-        .sidebar .nav-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:all 0.2s;color:var(--text2);font-size:12px;font-weight:500;border:none;background:transparent;width:100%;font-family:inherit;margin-bottom:2px;text-align:left}
-        .sidebar .nav-item:hover{background:rgba(124,58,237,0.08);color:var(--text)}
-        .sidebar .nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,0.15),rgba(124,58,237,0.05));color:var(--violet)}
-        .sidebar .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;background:linear-gradient(135deg,#7c3aed,#6366f1);border-radius:0 3px 3px 0}
-        .sidebar .nav-item{position:relative}
-        .sidebar .nav-item i{width:20px;text-align:center;font-size:14px}
-        .sidebar .divider{height:1px;background:var(--border);margin:10px 8px}
-        .main{flex:1;margin-left:240px;padding:0 16px 32px;max-width:100vw}
-        @media(max-width:900px){.main{margin-left:0}}
-        .topbar{position:sticky;top:8px;z-index:150;display:flex;align-items:center;justify-content:space-between;margin:8px 0 20px;padding:10px 16px;background:rgba(13,13,31,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);flex-wrap:wrap;gap:8px}
-        .topbar .title{font-size:16px;font-weight:700;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .topbar .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-        .topbar .actions .btn-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s}
-        .topbar .actions .btn-icon:hover{background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.2);color:var(--text)}
-        .topbar .user{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:4px 10px 4px 4px;cursor:pointer;transition:all 0.2s}
-        .topbar .user:hover{background:rgba(255,255,255,0.05);border-color:rgba(124,58,237,0.15)}
-        .topbar .user img{width:26px;height:26px;border-radius:8px;object-fit:cover}
-        .topbar .user .name{font-size:11px;font-weight:600}
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;font-family:inherit;text-decoration:none}
-        .btn-primary{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff}
-        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(124,58,237,0.3)}
-        .btn-secondary{background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text)}
-        .btn-secondary:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12)}
-        .btn-danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
-        .btn-danger:hover{background:rgba(239,68,68,0.2)}
-        .btn-success{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:var(--green)}
-        .btn-success:hover{background:rgba(34,197,94,0.2)}
-        .btn-sm{padding:6px 12px;font-size:11px}
-        .btn-block{width:100%;justify-content:center}
-        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-        .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:all 0.3s}
-        .stat:hover{background:var(--hover);border-color:rgba(124,58,237,0.12);transform:translateY(-2px)}
-        .stat .icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px}
-        .stat .icon.purple{background:rgba(124,58,237,0.12);color:var(--violet)}
-        .stat .icon.orange{background:rgba(245,158,11,0.12);color:var(--orange)}
-        .stat .icon.blue{background:rgba(59,130,246,0.12);color:var(--blue)}
-        .stat .icon.green{background:rgba(34,197,94,0.12);color:var(--green)}
-        .stat .icon.cyan{background:rgba(6,182,212,0.12);color:var(--cyan)}
-        .stat .icon.red{background:rgba(239,68,68,0.12);color:var(--red)}
-        .stat .icon.pink{background:rgba(236,72,153,0.12);color:var(--pink)}
-        .stat .value{font-size:28px;font-weight:800;letter-spacing:-0.5px}
-        .stat .label{font-size:12px;color:var(--muted)}
-        @media(max-width:1200px){.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.stats{grid-template-columns:1fr}}
-        .quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
-        .quick{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.3s;flex:1;min-width:150px}
-        .quick:hover{background:var(--hover);border-color:rgba(124,58,237,0.2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2)}
-        .quick i{font-size:20px;width:32px;text-align:center}
-        .quick .info .title{font-size:13px;font-weight:600}
-        .quick .info .desc{font-size:11px;color:var(--muted)}
-        @media(max-width:600px){.quick-actions{flex-direction:column}}
-        .chart-row{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px}
-        .chart-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
-        .chart-box h3{font-size:14px;font-weight:600;margin-bottom:12px}
-        .chart-box canvas{max-height:200px;max-width:100%}
-        @media(max-width:900px){.chart-row{grid-template-columns:1fr}}
-        .section{display:none;animation:fadeIn 0.3s ease}
-        .section.active{display:block}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-        .section-header h2{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
-        .section-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-        .search{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 12px;flex:1;max-width:300px}
-        .search input{background:transparent;border:none;color:var(--text);font-size:12px;outline:none;width:100%;font-family:inherit}
-        .search input::placeholder{color:var(--muted)}
-        .search i{color:var(--muted);font-size:14px}
-        .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-        .table-wrap table{width:100%;border-collapse:collapse;font-size:12px}
-        .table-wrap thead{background:var(--bg2)}
-        .table-wrap th{padding:12px 16px;text-align:left;font-weight:600;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}
-        .table-wrap td{padding:12px 16px;border-top:1px solid var(--border);color:var(--text2)}
-        .table-wrap tr:hover td{background:rgba(124,58,237,0.03);color:var(--text)}
-        .table-wrap .cell-title{font-weight:600;color:var(--text)}
-        .table-wrap .cell-meta{font-size:11px;color:var(--muted)}
-        .badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;display:inline-block;white-space:nowrap}
-        .badge-active{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.15)}
-        .badge-pending{background:rgba(245,158,11,0.1);color:var(--orange);border:1px solid rgba(245,158,11,0.15)}
-        .badge-inactive{background:rgba(100,116,139,0.1);color:var(--muted);border:1px solid var(--border)}
-        .badge-premium{background:rgba(245,158,11,0.1);color:var(--orange);border:1px solid rgba(245,158,11,0.15)}
-        .badge-admin{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.15)}
-        .badge-completed{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.15)}
-        .badge-free{background:rgba(100,116,139,0.1);color:var(--muted);border:1px solid var(--border)}
-        .badge-paid{background:rgba(59,130,246,0.1);color:var(--blue);border:1px solid rgba(59,130,246,0.15)}
-        .table-actions{display:flex;gap:6px}
-        .table-actions button{width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all 0.2s}
-        .table-actions button:hover{background:rgba(124,58,237,0.1);color:var(--violet);border-color:rgba(124,58,237,0.2)}
-        .table-actions button.danger:hover{background:rgba(239,68,68,0.1);color:var(--red);border-color:rgba(239,68,68,0.2)}
-        .table-actions button.success:hover{background:rgba(34,197,94,0.1);color:var(--green);border-color:rgba(34,197,94,0.2)}
-        .empty{text-align:center;padding:40px 20px}
-        .empty i{font-size:40px;color:var(--muted);margin-bottom:12px;opacity:0.3;display:block}
-        .empty h3{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--text)}
-        .empty p{font-size:12px;color:var(--muted)}
-        .progress-bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;flex:1}
-        .progress-bar .fill{height:100%;background:linear-gradient(135deg,#7c3aed,#6366f1);border-radius:2px;transition:width 0.5s}
-        .preview-img{max-width:100px;max-height:100px;border-radius:8px;margin-top:4px;display:none;object-fit:cover}
-        .modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;overflow-y:auto}
-        .modal.open{display:flex}
-        .modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px;width:560px;max-width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.5)}
-        .modal-box .close{position:absolute;top:14px;right:14px;width:28px;height:28px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all 0.2s}
-        .modal-box .close:hover{background:rgba(255,255,255,0.08);color:var(--text)}
-        .modal-box h2{font-size:20px;font-weight:700;margin-bottom:4px}
-        .modal-box p{font-size:12px;color:var(--text2);margin-bottom:16px}
-        .form-group{margin-bottom:12px}
-        .form-group label{display:block;font-size:11px;font-weight:600;margin-bottom:4px;color:var(--muted)}
-        .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:12px;outline:none;transition:all 0.2s;font-family:inherit;-webkit-appearance:none;appearance:none}
-        .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,0.08)}
-        .form-group textarea{resize:vertical;min-height:80px}
-        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-        .form-group input[type="file"]{padding:8px}
-        .form-group input[type="checkbox"]{width:auto;margin-right:6px;padding:0}
-        .form-group .checkbox-group{display:flex;align-items:center;gap:6px;padding-top:8px}
-        .error-msg{color:var(--red);font-size:11px;text-align:center;margin-top:4px}
-        @media(max-width:600px){.modal-box{padding:20px 16px}.form-row{grid-template-columns:1fr}}
-        .toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:8px;z-index:2000;transform:translateY(100px);opacity:0;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);box-shadow:0 20px 50px rgba(0,0,0,0.3);max-width:calc(100vw - 40px)}
-        .toast.show{transform:translateY(0);opacity:1}
-        .toast.success{border-color:rgba(34,197,94,0.2)}
-        .toast.error{border-color:rgba(239,68,68,0.2)}
-        .toast i{font-size:16px;flex-shrink:0}
-        .toast.success i{color:#22c55e}
-        .toast.error i{color:#ef4444}
-        .access-denied{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px}
-        .access-denied.active{display:flex}
-        .access-denied i{font-size:64px;color:var(--red);margin-bottom:20px}
-        .access-denied h1{font-size:24px;margin-bottom:8px}
-        .access-denied p{color:var(--text2);font-size:14px;margin-bottom:20px;max-width:400px}
-        .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(13,13,31,0.9);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:6px 0 10px;z-index:100}
-        .bottom-nav-item{flex:1;text-align:center;color:var(--text2);font-size:9px;cursor:pointer;padding:4px 0;transition:color 0.2s;text-decoration:none;border:none;background:transparent;font-family:inherit}
-        .bottom-nav-item i{font-size:18px;display:block;margin-bottom:2px}
-        .bottom-nav-item.active{color:var(--violet)}
-        .bottom-nav-item .center-btn{width:48px;height:48px;background:linear-gradient(135deg,#7c3aed,#6366f1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:-20px auto 2px;color:#fff;font-size:20px;box-shadow:0 4px 20px rgba(124,58,237,0.4)}
-        @media(max-width:900px){.bottom-nav{display:flex}.main{padding-bottom:60px}}
-        .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:250;opacity:0;pointer-events:none;transition:opacity 0.3s}
-        .sidebar-overlay.active{opacity:1;pointer-events:auto}
-        .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
-        .status-dot.online{background:var(--green)}
-        .status-dot.offline{background:var(--muted)}
-        .status-dot.pending{background:var(--orange)}
-        @media(max-width:600px){.topbar{margin:6px 0 14px;padding:8px 12px}.topbar .title{font-size:14px}}
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0a0a12; --bg-secondary: #111125; --bg-card: #18183a;
+            --bg-card-hover: #22224a; --bg-elevated: #2a2a5a;
+            --accent: #7c3aed; --accent-light: #a855f7; --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4; --accent-green: #22c55e; --accent-orange: #f59e0b;
+            --accent-red: #ef4444; --accent-pink: #ec4899;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border-color: rgba(148,163,184,0.08);
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 60px rgba(124,58,237,0.15);
+            --radius: 16px; --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+            --sidebar-width: 260px;
+        }
+        body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); min-height:100vh; }
+        ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.3);border-radius:10px}
+
+        .sidebar { position:fixed; left:0; top:0; width:var(--sidebar-width); height:100vh; background:var(--bg-secondary); border-right:1px solid var(--border-color); z-index:1000; display:flex; flex-direction:column; transition:transform 0.3s ease; }
+        .sidebar-brand { padding:24px 20px; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:12px; }
+        .sidebar-brand .logo { width:40px; height:40px; background:var(--accent); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:white; }
+        .sidebar-brand .brand-text { font-size:18px; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--accent-light)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .sidebar-brand .brand-sub { font-size:10px; color:var(--text-muted); display:block; -webkit-text-fill-color:var(--text-muted); }
+        .sidebar-nav { flex:1; padding:16px 12px; overflow-y:auto; }
+        .sidebar-nav .nav-section-title { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); padding:8px 12px; font-weight:600; }
+        .sidebar-nav .nav-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:var(--radius-sm); color:var(--text-secondary); cursor:pointer; transition:var(--transition); text-decoration:none; font-size:14px; font-weight:500; border:none; background:none; width:100%; text-align:left; }
+        .sidebar-nav .nav-item:hover { background:rgba(124,58,237,0.08); color:var(--text-primary); }
+        .sidebar-nav .nav-item.active { background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(124,58,237,0.05)); color:var(--accent-light); border:1px solid rgba(124,58,237,0.15); }
+        .sidebar-nav .nav-item i { width:20px; text-align:center; }
+        .sidebar-nav .nav-item .badge { margin-left:auto; background:var(--accent-red); color:white; font-size:10px; padding:2px 8px; border-radius:20px; font-weight:700; }
+        .sidebar-footer { padding:16px 20px; border-top:1px solid var(--border-color); }
+        .sidebar-footer .user-card { display:flex; align-items:center; gap:12px; padding:12px; background:var(--bg-card); border-radius:var(--radius-sm); }
+        .sidebar-footer .user-card img { width:36px; height:36px; border-radius:50%; object-fit:cover; }
+        .sidebar-footer .user-card .user-info { flex:1; }
+        .sidebar-footer .user-card .user-name { font-size:13px; font-weight:600; }
+        .sidebar-footer .user-card .user-role { font-size:10px; color:var(--accent-light); }
+        .sidebar-footer .logout-btn { width:32px; height:32px; border-radius:8px; background:rgba(239,68,68,0.1); border:none; color:var(--accent-red); cursor:pointer; transition:var(--transition); }
+        .sidebar-footer .logout-btn:hover { background:var(--accent-red); color:white; }
+        .mobile-menu-btn { display:none; }
+        @media (max-width:768px) { .sidebar { transform:translateX(-100%); } .sidebar.mobile-open { transform:translateX(0); } .mobile-menu-btn { display:flex !important; } }
+
+        .main-content { margin-left:var(--sidebar-width); min-height:100vh; }
+        @media (max-width:768px) { .main-content { margin-left:0; } }
+        .top-bar { position:sticky; top:0; z-index:100; background:var(--bg-secondary); border-bottom:1px solid var(--border-color); padding:16px 32px; display:flex; align-items:center; justify-content:space-between; backdrop-filter:blur(20px); }
+        .top-bar .page-title { font-size:20px; font-weight:700; background:linear-gradient(135deg,#fff,var(--accent-light)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .top-actions { display:flex; align-items:center; gap:12px; }
+        .icon-btn { width:40px; height:40px; border-radius:10px; background:var(--bg-card); border:1px solid var(--border-color); color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
+        .icon-btn:hover { background:var(--bg-card-hover); color:var(--text-primary); }
+        .content-area { padding:24px 32px 100px; }
+
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+        .stat-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:20px 24px; transition:var(--transition); }
+        .stat-card:hover { border-color:rgba(124,58,237,0.2); transform:translateY(-2px); box-shadow:var(--shadow-glow); }
+        .stat-card .stat-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:12px; }
+        .stat-card .stat-icon.purple { background:rgba(124,58,237,0.12); color:var(--accent-light); }
+        .stat-card .stat-icon.blue { background:rgba(59,130,246,0.12); color:var(--accent-blue); }
+        .stat-card .stat-icon.green { background:rgba(34,197,94,0.12); color:var(--accent-green); }
+        .stat-card .stat-icon.orange { background:rgba(245,158,11,0.12); color:var(--accent-orange); }
+        .stat-card .stat-icon.pink { background:rgba(236,72,153,0.12); color:var(--accent-pink); }
+        .stat-card .stat-icon.cyan { background:rgba(6,182,212,0.12); color:var(--accent-cyan); }
+        .stat-card .stat-value { font-size:28px; font-weight:800; letter-spacing:-0.5px; }
+        .stat-card .stat-label { font-size:13px; color:var(--text-secondary); }
+        .stat-card .stat-change { font-size:11px; font-weight:600; margin-top:4px; }
+        .stat-card .stat-change.up { color:var(--accent-green); }
+        .stat-card .stat-change.down { color:var(--accent-red); }
+
+        .card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:24px; margin-bottom:20px; transition:var(--transition); }
+        .card:hover { border-color:rgba(124,58,237,0.1); }
+        .card .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px; }
+        .card .card-header h3 { font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; }
+
+        .btn { padding:8px 18px; border-radius:var(--radius-sm); font-size:13px; font-weight:600; cursor:pointer; transition:var(--transition); border:none; font-family:inherit; display:inline-flex; align-items:center; gap:6px; }
+        .btn-primary { background:linear-gradient(135deg,var(--accent),#6366f1); color:white; }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 25px rgba(124,58,237,0.3); }
+        .btn-secondary { background:var(--bg-elevated); color:var(--text-secondary); border:1px solid var(--border-color); }
+        .btn-secondary:hover { background:var(--bg-card-hover); color:var(--text-primary); }
+        .btn-success { background:rgba(34,197,94,0.12); color:var(--accent-green); border:1px solid rgba(34,197,94,0.2); }
+        .btn-success:hover { background:var(--accent-green); color:white; }
+        .btn-danger { background:rgba(239,68,68,0.12); color:var(--accent-red); border:1px solid rgba(239,68,68,0.2); }
+        .btn-danger:hover { background:var(--accent-red); color:white; }
+        .btn-sm { padding:6px 12px; font-size:11px; }
+
+        .table-wrapper { overflow-x:auto; }
+        .data-table { width:100%; border-collapse:collapse; }
+        .data-table th { text-align:left; padding:12px 16px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); border-bottom:1px solid var(--border-color); font-weight:600; }
+        .data-table td { padding:12px 16px; font-size:13px; border-bottom:1px solid var(--border-color); color:var(--text-secondary); }
+        .data-table tr:hover td { background:rgba(124,58,237,0.03); }
+
+        .badge { display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; }
+        .badge-success { background:rgba(34,197,94,0.12); color:var(--accent-green); }
+        .badge-warning { background:rgba(245,158,11,0.12); color:var(--accent-orange); }
+        .badge-danger { background:rgba(239,68,68,0.12); color:var(--accent-red); }
+        .badge-info { background:rgba(59,130,246,0.12); color:var(--accent-blue); }
+        .badge-premium { background:rgba(124,58,237,0.12); color:var(--accent-light); }
+
+        .status-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; }
+        .status-pill.active { background:rgba(34,197,94,0.12); color:var(--accent-green); }
+        .status-pill.pending { background:rgba(245,158,11,0.12); color:var(--accent-orange); }
+        .status-pill.inactive { background:rgba(100,116,139,0.12); color:var(--text-muted); }
+        .status-pill.completed { background:rgba(34,197,94,0.12); color:var(--accent-green); }
+        .status-pill.in-progress { background:rgba(59,130,246,0.12); color:var(--accent-blue); }
+
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(12px); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
+        .modal-overlay.active { display:flex; }
+        .modal { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius); max-width:540px; width:100%; max-height:90vh; overflow-y:auto; padding:32px; animation:modalIn 0.3s ease; }
+        @keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+        .modal .modal-header h2 { font-size:20px; font-weight:700; }
+        .modal .modal-header .close-btn { width:32px; height:32px; border-radius:8px; border:1px solid var(--border-color); background:transparent; color:var(--text-secondary); cursor:pointer; transition:var(--transition); }
+        .modal .modal-header .close-btn:hover { background:var(--accent-red); color:white; border-color:var(--accent-red); }
+        .modal .form-group { margin-bottom:16px; }
+        .modal .form-group label { display:block; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:4px; }
+        .modal .form-group input,.modal .form-group select,.modal .form-group textarea { width:100%; padding:10px 14px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:13px; outline:none; transition:var(--transition); font-family:inherit; }
+        .modal .form-group input:focus,.modal .form-group select:focus,.modal .form-group textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,58,237,0.08); }
+        .modal .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .modal .btn { width:100%; justify-content:center; }
+
+        .toast-container { position:fixed; top:80px; right:24px; z-index:3000; display:flex; flex-direction:column; gap:8px; }
+        .toast { padding:14px 20px; border-radius:var(--radius-sm); color:white; font-size:13px; font-weight:500; transform:translateX(120%); opacity:0; transition:all 0.4s ease; max-width:340px; backdrop-filter:blur(10px); display:flex; align-items:center; gap:10px; box-shadow:var(--shadow); }
+        .toast.show { transform:translateX(0); opacity:1; }
+        .toast-success { background:rgba(34,197,94,0.95); }
+        .toast-error { background:rgba(239,68,68,0.95); }
+        .toast-warning { background:rgba(245,158,11,0.95); }
+        .toast-info { background:rgba(124,58,237,0.95); }
+
+        .loading-overlay { position:fixed; inset:0; background:var(--bg-primary); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s; }
+        .loading-overlay.hidden { opacity:0; pointer-events:none; }
+        .spinner { width:40px; height:40px; border:3px solid rgba(124,58,237,0.15); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .loading-overlay p { margin-top:12px; color:var(--text-muted); font-size:13px; }
+
+        .search-bar { display:flex; align-items:center; gap:8px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:8px 12px; margin-bottom:16px; }
+        .search-bar i { color:var(--text-muted); font-size:12px; }
+        .search-bar input { background:transparent; border:none; color:var(--text-primary); font-size:12px; outline:none; flex:1; font-family:inherit; }
+        .search-bar input::placeholder { color:var(--text-muted); }
+
+        .filter-bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+        .filter-bar select { padding:6px 12px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px; color:var(--text-primary); font-size:11px; outline:none; font-family:inherit; }
+
+        .empty-state { text-align:center; padding:40px 20px; }
+        .empty-state i { font-size:48px; color:var(--text-muted); margin-bottom:16px; opacity:0.3; }
+        .empty-state h3 { font-size:16px; margin-bottom:8px; }
+        .empty-state p { color:var(--text-muted); font-size:13px; }
+
+        @media (max-width:768px) { .content-area { padding:16px; } .top-bar { padding:12px 16px; } .top-bar .page-title { font-size:16px; } .stats-grid { grid-template-columns:1fr 1fr; } .modal .form-row { grid-template-columns:1fr; } }
+        @media (max-width:480px) { .stats-grid { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
-    <div class="loading" id="loadingScreen"><div class="spinner"></div><p>Loading Admin Dashboard...</p></div>
-    <div class="access-denied" id="accessDenied">
-        <i class="fas fa-shield-alt"></i>
-        <h1>Access Denied</h1>
-        <p>You do not have permission to access the admin panel. Please contact the administrator.</p>
-        <button class="btn btn-primary" onclick="location.href='index.html'"><i class="fas fa-home"></i> Go Home</button>
-    </div>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <div class="app" id="app" style="display:none">
-        <aside class="sidebar" id="sidebar">
-            <div class="logo">
-                <div class="icon">A</div>
-                <div><div class="text">Aurex</div><div class="sub">ADMIN</div></div>
-            </div>
-            <div class="admin-badge"><i class="fas fa-shield-alt"></i><span>Admin Panel</span></div>
-            <div class="nav-section">
-                <div class="nav-title">Dashboard</div>
-                <button class="nav-item active" data-section="overview" onclick="showSection('overview')"><i class="fas fa-chart-line"></i> Overview</button>
-                <button class="nav-item" data-section="users" onclick="showSection('users')"><i class="fas fa-users"></i> Users</button>
-                <button class="nav-item" data-section="courses" onclick="showSection('courses')"><i class="fas fa-graduation-cap"></i> Courses</button>
-                <button class="nav-item" data-section="classes" onclick="showSection('classes')"><i class="fas fa-calendar-alt"></i> Classes</button>
-                <button class="nav-item" data-section="enrollments" onclick="showSection('enrollments')"><i class="fas fa-book-open"></i> Enrollments</button>
-            </div>
-            <div class="divider"></div>
-            <div class="nav-section">
-                <div class="nav-title">Content</div>
-                <button class="nav-item" data-section="projects" onclick="showSection('projects')"><i class="fas fa-folder"></i> Projects</button>
-                <button class="nav-item" data-section="tools" onclick="showSection('tools')"><i class="fas fa-wrench"></i> Tools</button>
-                <button class="nav-item" data-section="resources" onclick="showSection('resources')"><i class="fas fa-file-alt"></i> Resources</button>
-            </div>
-            <div class="divider"></div>
-            <div class="nav-section">
-                <div class="nav-title">Finance</div>
-                <button class="nav-item" data-section="payments" onclick="showSection('payments')"><i class="fas fa-credit-card"></i> Payments</button>
-                <button class="nav-item" data-section="premium_requests" onclick="showSection('premium_requests')"><i class="fas fa-crown"></i> Premium Requests</button>
-            </div>
-            <div class="divider"></div>
-            <div class="nav-section">
-                <div class="nav-title">System</div>
-                <button class="nav-item" data-section="settings" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</button>
-                <button class="nav-item" data-section="activity" onclick="showSection('activity')"><i class="fas fa-history"></i> Activity Log</button>
-            </div>
-        </aside>
-        <main class="main">
-            <div class="topbar">
-                <div style="display:flex;align-items:center;gap:10px;flex:1">
-                    <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text2);display:none" id="menuBtn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                    <div class="title" id="pageTitle">Admin Overview</div>
-                </div>
-                <div class="actions">
-                    <button class="btn-icon" onclick="refreshAll()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
-                    <div class="user" onclick="location.href='profile.html'">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff&size=100" alt="Admin" id="userImg">
-                        <span class="name" id="userName">Admin</span>
-                    </div>
-                    <button class="btn btn-danger btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
-                </div>
-            </div>
-            <div class="quick-actions" id="quickActions">
-                <div class="quick" onclick="showSection('courses');openModal('courseModal')">
-                    <i class="fas fa-plus-circle" style="color:var(--purple)"></i>
-                    <div class="info"><div class="title">Add Course</div><div class="desc">Create new course</div></div>
-                </div>
-                <div class="quick" onclick="showSection('classes');openModal('classModal')">
-                    <i class="fas fa-calendar-plus" style="color:var(--cyan)"></i>
-                    <div class="info"><div class="title">Add Class</div><div class="desc">Schedule new class</div></div>
-                </div>
-                <div class="quick" onclick="showSection('projects');openModal('projectModal')">
-                    <i class="fas fa-folder-plus" style="color:var(--orange)"></i>
-                    <div class="info"><div class="title">Add Project</div><div class="desc">Create new project</div></div>
-                </div>
-                <div class="quick" onclick="showSection('premium_requests')">
-                    <i class="fas fa-crown" style="color:var(--orange)"></i>
-                    <div class="info"><div class="title">Premium Requests</div><div class="desc" id="pendingCount">0 pending</div></div>
-                </div>
-            </div>
-            <div class="section active" id="section-overview">
-                <div class="stats" id="statsGrid">
-                    <div class="stat"><div class="icon purple"><i class="fas fa-users"></i></div><div class="value" id="statUsers">0</div><div class="label">Total Users</div></div>
-                    <div class="stat"><div class="icon orange"><i class="fas fa-crown"></i></div><div class="value" id="statPremium">0</div><div class="label">Premium Users</div></div>
-                    <div class="stat"><div class="icon blue"><i class="fas fa-graduation-cap"></i></div><div class="value" id="statCourses">0</div><div class="label">Total Courses</div></div>
-                    <div class="stat"><div class="icon green"><i class="fas fa-naira-sign"></i></div><div class="value" id="statRevenue">₦0</div><div class="label">Total Revenue</div></div>
-                    <div class="stat"><div class="icon cyan"><i class="fas fa-folder"></i></div><div class="value" id="statProjects">0</div><div class="label">Projects</div></div>
-                    <div class="stat"><div class="icon red"><i class="fas fa-clock"></i></div><div class="value" id="statPending">0</div><div class="label">Pending Requests</div></div>
-                    <div class="stat"><div class="icon purple"><i class="fas fa-calendar-alt"></i></div><div class="value" id="statClasses">0</div><div class="label">Upcoming Classes</div></div>
-                    <div class="stat"><div class="icon blue"><i class="fas fa-book-open"></i></div><div class="value" id="statEnrollments">0</div><div class="label">Total Enrollments</div></div>
-                </div>
-                <div class="chart-row">
-                    <div class="chart-box"><h3><i class="fas fa-chart-bar" style="color:var(--violet);margin-right:8px"></i>User Growth</h3><canvas id="userChart"></canvas></div>
-                    <div class="chart-box"><h3><i class="fas fa-chart-pie" style="color:var(--orange);margin-right:8px"></i>Enrollment Status</h3><canvas id="enrollmentChart"></canvas></div>
-                </div>
-                <div class="section-header"><h2><i class="fas fa-history" style="color:var(--violet);margin-right:8px"></i>Recent Activity</h2></div>
-                <div class="table-wrap"><table><thead><tr><th>Action</th><th>Entity</th><th>User</th><th>Time</th></tr></thead><tbody id="recentActivity"></tbody></table></div>
-            </div>
-            <div class="section" id="section-users">
-                <div class="section-header"><h2><i class="fas fa-users" style="color:var(--violet);margin-right:8px"></i>All Users</h2><div class="section-actions"><div class="search"><i class="fas fa-search"></i><input type="text" id="userSearch" placeholder="Search users..." oninput="filterTable('usersTable',this.value)"></div></div></div>
-                <div class="table-wrap"><table><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Enrolled</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-courses">
-                <div class="section-header"><h2><i class="fas fa-graduation-cap" style="color:var(--violet);margin-right:8px"></i>Courses</h2><div class="section-actions"><div class="search"><i class="fas fa-search"></i><input type="text" id="courseSearch" placeholder="Search courses..." oninput="filterTable('coursesTable',this.value)"></div><button class="btn btn-primary btn-sm" onclick="openCourseModal()"><i class="fas fa-plus"></i> Add Course</button></div></div>
-                <div class="table-wrap"><table><thead><tr><th>Title</th><th>Category</th><th>Price</th><th>Status</th><th>Enrolled</th><th>Actions</th></tr></thead><tbody id="coursesTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-classes">
-                <div class="section-header"><h2><i class="fas fa-calendar-alt" style="color:var(--cyan);margin-right:8px"></i>Classes</h2><div class="section-actions"><button class="btn btn-primary btn-sm" onclick="openClassModal()"><i class="fas fa-plus"></i> Add Class</button></div></div>
-                <div class="table-wrap"><table><thead><tr><th>Title</th><th>Course</th><th>Date</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="classesTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-enrollments">
-                <div class="section-header"><h2><i class="fas fa-book-open" style="color:var(--violet);margin-right:8px"></i>Enrollments</h2><div class="section-actions"><div class="search"><i class="fas fa-search"></i><input type="text" id="enrollmentSearch" placeholder="Search..." oninput="filterTable('enrollmentsTable',this.value)"></div></div></div>
-                <div class="table-wrap"><table><thead><tr><th>Student</th><th>Course</th><th>Progress</th><th>Status</th><th>Enrolled</th><th>Actions</th></tr></thead><tbody id="enrollmentsTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-projects">
-                <div class="section-header"><h2><i class="fas fa-folder" style="color:var(--violet);margin-right:8px"></i>Projects</h2><div class="section-actions"><div class="search"><i class="fas fa-search"></i><input type="text" id="projectSearch" placeholder="Search projects..." oninput="filterTable('projectsTable',this.value)"></div><button class="btn btn-primary btn-sm" onclick="openProjectModal()"><i class="fas fa-plus"></i> Add Project</button></div></div>
-                <div class="table-wrap"><table><thead><tr><th>Title</th><th>Author</th><th>Status</th><th>Likes</th><th>Date</th><th>Actions</th></tr></thead><tbody id="projectsTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-tools">
-                <div class="section-header"><h2><i class="fas fa-wrench" style="color:var(--violet);margin-right:8px"></i>Tools</h2><div class="section-actions"><button class="btn btn-primary btn-sm" onclick="openToolModal()"><i class="fas fa-plus"></i> Add Tool</button></div></div>
-                <div class="table-wrap"><table><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody id="toolsTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-resources">
-                <div class="section-header"><h2><i class="fas fa-file-alt" style="color:var(--violet);margin-right:8px"></i>Resources</h2><div class="section-actions"><button class="btn btn-primary btn-sm" onclick="openResourceModal()"><i class="fas fa-plus"></i> Add Resource</button></div></div>
-                <div class="table-wrap"><table><thead><tr><th>Title</th><th>Type</th><th>Price</th><th>Downloads</th><th>Status</th><th>Actions</th></tr></thead><tbody id="resourcesTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-payments">
-                <div class="section-header"><h2><i class="fas fa-credit-card" style="color:var(--green);margin-right:8px"></i>Payments</h2></div>
-                <div class="table-wrap"><table><thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="paymentsTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-premium_requests">
-                <div class="section-header"><h2><i class="fas fa-crown" style="color:var(--orange);margin-right:8px"></i>Premium Requests</h2></div>
-                <div class="table-wrap"><table><thead><tr><th>User</th><th>Email</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="premiumRequestsTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-settings">
-                <div class="section-header"><h2><i class="fas fa-cog" style="color:var(--violet);margin-right:8px"></i>Site Settings</h2><div class="section-actions"><button class="btn btn-primary btn-sm" onclick="openSettingModal()"><i class="fas fa-plus"></i> Add Setting</button></div></div>
-                <div class="table-wrap"><table><thead><tr><th>Key</th><th>Value</th><th>Type</th><th>Public</th><th>Description</th><th>Actions</th></tr></thead><tbody id="settingsTable"></tbody></table></div>
-            </div>
-            <div class="section" id="section-activity">
-                <div class="section-header"><h2><i class="fas fa-history" style="color:var(--violet);margin-right:8px"></i>Activity Log</h2></div>
-                <div class="table-wrap"><table><thead><tr><th>Action</th><th>Entity</th><th>Details</th><th>Time</th></tr></thead><tbody id="activityTable"></tbody></table></div>
-            </div>
-        </main>
-    </div>
-    <nav class="bottom-nav" id="bottomNav">
-        <button class="bottom-nav-item" onclick="showSection('overview')"><i class="fas fa-chart-line"></i>Overview</button>
-        <button class="bottom-nav-item" onclick="showSection('users')"><i class="fas fa-users"></i>Users</button>
-        <button class="bottom-nav-item active" onclick="showSection('courses')"><div class="center-btn"><i class="fas fa-graduation-cap"></i></div>Courses</button>
-        <button class="bottom-nav-item" onclick="showSection('classes')"><i class="fas fa-calendar-alt"></i>Classes</button>
-        <button class="bottom-nav-item" onclick="showSection('projects')"><i class="fas fa-folder"></i>Projects</button>
-    </nav>
-    <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg">Success</span></div>
 
-    <!-- Course Modal -->
-    <div class="modal" id="courseModal">
-        <div class="modal-box">
-            <button class="close" onclick="closeModal('courseModal')"><i class="fas fa-times"></i></button>
-            <h2 id="courseModalTitle">Add Course</h2>
-            <p>Create a new course for the academy</p>
-            <form id="courseForm">
-                <input type="hidden" id="courseId">
-                <div class="form-group"><label>Title *</label><input type="text" id="courseTitle" required></div>
-                <div class="form-group"><label>Description</label><textarea id="courseDesc" rows="3"></textarea></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Category</label><input type="text" id="courseCategory" placeholder="UI/UX Design"></div>
-                    <div class="form-group"><label>Price (₦)</label><input type="number" id="coursePrice" value="0"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Instructor</label><input type="text" id="courseInstructor" placeholder="Instructor name"></div>
-                    <div class="form-group"><label>Duration</label><input type="text" id="courseDuration" placeholder="12h"></div>
-                </div>
-                <div class="form-group"><label>Course Image</label><input type="file" id="courseImageFile" accept="image/*" onchange="previewImage(this,'courseImagePreview')"></div>
-                <div class="form-group"><img id="courseImagePreview" class="preview-img"></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Badge</label><select id="courseBadge"><option value="">None</option><option value="bestseller">Bestseller</option><option value="popular">Popular</option><option value="trending">Trending</option><option value="new">New</option><option value="free">Free</option></select></div>
-                    <div class="form-group"><label>&nbsp;</label><div class="checkbox-group"><input type="checkbox" id="courseIsFree"><label for="courseIsFree">Free Course</label></div></div>
-                </div>
-                <div class="form-row">
-                    <div class="checkbox-group"><input type="checkbox" id="courseIsActive" checked><label for="courseIsActive">Active</label></div>
-                    <div class="checkbox-group"><input type="checkbox" id="courseIsFeatured"><label for="courseIsFeatured">Featured</label></div>
-                </div>
-                <div class="error-msg" id="courseError"></div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Course</button>
-            </form>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Loading Admin Panel...</p>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo">A</div>
+            <div>
+                <div class="brand-text">Aurex</div>
+                <span class="brand-sub">ADMIN PANEL</span>
+            </div>
         </div>
-    </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Overview</div>
+            <button class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </button>
+            <div class="nav-section-title">Management</div>
+            <button class="nav-item" data-section="users" onclick="showSection('users')">
+                <i class="fas fa-users"></i> Users <span class="badge" id="userBadge">0</span>
+            </button>
+            <button class="nav-item" data-section="projects" onclick="showSection('projects')">
+                <i class="fas fa-folder-open"></i> Projects
+            </button>
+            <button class="nav-item" data-section="courses" onclick="showSection('courses')">
+                <i class="fas fa-graduation-cap"></i> Courses
+            </button>
+            <button class="nav-item" data-section="premium" onclick="showSection('premium')">
+                <i class="fas fa-crown"></i> Premium <span class="badge" id="premiumBadge">0</span>
+            </button>
+            <button class="nav-item" data-section="payments" onclick="showSection('payments')">
+                <i class="fas fa-credit-card"></i> Payments
+            </button>
+            <div class="nav-section-title">System</div>
+            <button class="nav-item" onclick="window.location.href='index.html'">
+                <i class="fas fa-arrow-left"></i> Back to Site
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <img id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff" alt="Admin">
+                <div class="user-info">
+                    <div class="user-name" id="adminName">Admin</div>
+                    <div class="user-role">Super Admin</div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </aside>
 
-    <!-- Class Modal -->
-    <div class="modal" id="classModal">
-        <div class="modal-box">
-            <button class="close" onclick="closeModal('classModal')"><i class="fas fa-times"></i></button>
-            <h2 id="classModalTitle">Add Class</h2>
-            <p>Schedule a new class for students</p>
-            <form id="classForm">
-                <input type="hidden" id="classId">
-                <div class="form-group"><label>Title *</label><input type="text" id="classTitle" required></div>
-                <div class="form-group"><label>Course</label><select id="classCourseId"><option value="">Select course...</option></select></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Date & Time *</label><input type="datetime-local" id="classDate" required></div>
-                    <div class="form-group"><label>Duration (hours)</label><input type="number" id="classDuration" value="2"></div>
+    <main class="main-content">
+        <header class="top-bar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="btn btn-secondary mobile-menu-btn" onclick="toggleMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="page-title" id="pageTitle">Dashboard</div>
+            </div>
+            <div class="top-actions">
+                <button class="icon-btn" onclick="refreshData()" title="Refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="icon-btn" onclick="window.location.href='index.html'" title="View Site">
+                    <i class="fas fa-external-link-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- DASHBOARD -->
+            <div id="section-dashboard">
+                <div class="stats-grid" id="statsGrid"></div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clock" style="color:var(--accent-cyan);"></i> Recent Activity</h3>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-secondary" onclick="loadDashboard()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>User</th><th>Action</th><th>Time</th></tr></thead>
+                            <tbody id="activityBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Class Type</label><select id="classType"><option value="live">Live</option><option value="recorded">Recorded</option><option value="workshop">Workshop</option></select></div>
-                    <div class="form-group"><label>Requires Enrollment</label><select id="classRequiresEnrollment"><option value="true">Yes</option><option value="false">No</option></select></div>
+            </div>
+
+            <!-- USERS -->
+            <div id="section-users" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users" style="color:var(--accent-blue);"></i> All Users</h3>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-primary" onclick="openModal('userModal')">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                        </div>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers()">
+                    </div>
+                    <div class="filter-bar">
+                        <select id="userRoleFilter" onchange="filterUsers()">
+                            <option value="">All Roles</option>
+                            <option value="student">Student</option>
+                            <option value="instructor">Instructor</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <select id="userStatusFilter" onchange="filterUsers()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <select id="userPremiumFilter" onchange="filterUsers()">
+                            <option value="">All Users</option>
+                            <option value="true">Premium</option>
+                            <option value="false">Free</option>
+                        </select>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Premium</th><th>Actions</th></tr></thead>
+                            <tbody id="usersBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="form-group"><label>Description</label><textarea id="classDesc" rows="2"></textarea></div>
-                <div class="form-row">
-                    <div class="form-group"><label>WhatsApp Link</label><input type="text" id="classWhatsapp" placeholder="https://chat.whatsapp.com/..."></div>
-                    <div class="form-group"><label>Telegram Link</label><input type="text" id="classTelegram" placeholder="https://t.me/..."></div>
+            </div>
+
+            <!-- PROJECTS -->
+            <div id="section-projects" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-folder-open" style="color:var(--accent-orange);"></i> Projects</h3>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-primary" onclick="openModal('projectModal')">
+                                <i class="fas fa-plus"></i> Add Project
+                            </button>
+                        </div>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="projectSearch" placeholder="Search projects..." oninput="filterProjects()">
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Likes</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="projectsBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Meeting Link</label><input type="text" id="classZoom" placeholder="https://zoom.us/..."></div>
-                    <div class="form-group"><label>Recording URL</label><input type="text" id="classRecording" placeholder="https://..."></div>
+            </div>
+
+            <!-- COURSES -->
+            <div id="section-courses" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-graduation-cap" style="color:var(--accent-violet);"></i> Courses</h3>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-primary" onclick="openModal('courseModal')">
+                                <i class="fas fa-plus"></i> Add Course
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>Title</th><th>Instructor</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
+                            <tbody id="coursesBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <div class="checkbox-group"><input type="checkbox" id="classIsActive" checked><label for="classIsActive">Active</label></div>
-                    <div class="checkbox-group"><input type="checkbox" id="classIsRecorded"><label for="classIsRecorded">Recorded</label></div>
+            </div>
+
+            <!-- PREMIUM -->
+            <div id="section-premium" style="display:none;">
+                <div class="stats-grid" id="premiumStats"></div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-crown" style="color:var(--accent-orange);"></i> Premium Users</h3>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-secondary" onclick="loadPremium()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>User</th><th>Email</th><th>Started</th><th>Expires</th><th>Actions</th></tr></thead>
+                            <tbody id="premiumBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="error-msg" id="classError"></div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Class</button>
-            </form>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clock" style="color:var(--accent-orange);"></i> Pending Requests</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>User</th><th>Email</th><th>Amount</th><th>Requested</th><th>Actions</th></tr></thead>
+                            <tbody id="pendingBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAYMENTS -->
+            <div id="section-payments" style="display:none;">
+                <div class="stats-grid" id="paymentStats"></div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-credit-card" style="color:var(--accent-green);"></i> All Payments</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+                            <tbody id="paymentsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODALS -->
+
+    <!-- User Modal -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="userModalTitle">Add User</h2>
+                <button class="close-btn" onclick="closeModal('userModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="hidden" id="editUserId">
+            <div class="form-group"><label>Full Name</label><input type="text" id="userName" placeholder="John Doe"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="userEmail" placeholder="john@example.com"></div>
+            <div class="form-row">
+                <div class="form-group"><label>Role</label><select id="userRole"><option value="student">Student</option><option value="instructor">Instructor</option><option value="admin">Admin</option></select></div>
+                <div class="form-group"><label>Status</label><select id="userStatus"><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option></select></div>
+            </div>
+            <div class="form-group" id="passwordGroup"><label>Password</label><input type="password" id="userPassword" placeholder="••••••••"></div>
+            <button class="btn btn-primary" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
         </div>
     </div>
 
     <!-- Project Modal -->
-    <div class="modal" id="projectModal">
-        <div class="modal-box">
-            <button class="close" onclick="closeModal('projectModal')"><i class="fas fa-times"></i></button>
-            <h2 id="projectModalTitle">Add Project</h2>
-            <p>Create a new project for the portfolio</p>
-            <form id="projectForm">
-                <input type="hidden" id="projectId">
-                <div class="form-group"><label>Title *</label><input type="text" id="projectTitle" required></div>
-                <div class="form-group"><label>Description</label><textarea id="projectDesc" rows="3"></textarea></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Author Name *</label><input type="text" id="projectAuthor" required></div>
-                    <div class="form-group"><label>Author Email</label><input type="email" id="projectAuthorEmail"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Category</label><select id="projectCategory"><option value="design">Design</option><option value="development">Development</option><option value="branding">Branding</option><option value="ui/ux">UI/UX</option><option value="other">Other</option></select></div>
-                    <div class="form-group"><label>Status</label><select id="projectStatus"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select></div>
-                </div>
-                <div class="form-group"><label>Project Image</label><input type="file" id="projectImageFile" accept="image/*" onchange="previewImage(this,'projectImagePreview')"></div>
-                <div class="form-group"><img id="projectImagePreview" class="preview-img"></div>
-                <div class="form-group"><label>Demo Link</label><input type="text" id="projectDemoLink" placeholder="https://..."></div>
-                <div class="form-row">
-                    <div class="checkbox-group"><input type="checkbox" id="projectIsFeatured"><label for="projectIsFeatured">Featured</label></div>
-                    <div class="checkbox-group"><input type="checkbox" id="projectIsActive" checked><label for="projectIsActive">Active</label></div>
-                </div>
-                <div class="error-msg" id="projectError"></div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Project</button>
-            </form>
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Add Project</h2>
+                <button class="close-btn" onclick="closeModal('projectModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-group"><label>Title</label><input type="text" id="projectTitle" placeholder="Project name"></div>
+            <div class="form-group"><label>Description</label><textarea id="projectDesc" rows="2" placeholder="Description..."></textarea></div>
+            <div class="form-row">
+                <div class="form-group"><label>Category</label><select id="projectCategory"><option value="ui-ux">UI/UX</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion</option><option value="3d">3D</option></select></div>
+                <div class="form-group"><label>Status</label><select id="projectStatus"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select></div>
+            </div>
+            <div class="form-group"><label>Author Name</label><input type="text" id="projectAuthor" placeholder="Author name"></div>
+            <button class="btn btn-primary" onclick="saveProject()"><i class="fas fa-save"></i> Save Project</button>
         </div>
     </div>
 
-    <!-- Tool Modal -->
-    <div class="modal" id="toolModal">
-        <div class="modal-box">
-            <button class="close" onclick="closeModal('toolModal')"><i class="fas fa-times"></i></button>
-            <h2 id="toolModalTitle">Add Tool</h2>
-            <p>Add a new tool to the tools library</p>
-            <form id="toolForm">
-                <input type="hidden" id="toolId">
-                <div class="form-group"><label>Name *</label><input type="text" id="toolName" required></div>
-                <div class="form-group"><label>Description</label><textarea id="toolDesc" rows="2"></textarea></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Category</label><select id="toolCategory"><option value="design">Design</option><option value="development">Development</option><option value="ai">AI</option><option value="productivity">Productivity</option><option value="general">General</option></select></div>
-                    <div class="form-group"><label>Price (₦)</label><input type="number" id="toolPrice" value="0"></div>
-                </div>
-                <div class="form-group"><label>Tool Image</label><input type="file" id="toolImageFile" accept="image/*" onchange="previewImage(this,'toolImagePreview')"></div>
-                <div class="form-group"><img id="toolImagePreview" class="preview-img"></div>
-                <div class="form-group"><label>Tool Link</label><input type="text" id="toolLink" placeholder="https://..."></div>
-                <div class="form-row">
-                    <div class="checkbox-group"><input type="checkbox" id="toolIsFree" checked><label for="toolIsFree">Free</label></div>
-                    <div class="checkbox-group"><input type="checkbox" id="toolIsActive" checked><label for="toolIsActive">Active</label></div>
-                </div>
-                <div class="error-msg" id="toolError"></div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Tool</button>
-            </form>
+    <!-- Course Modal -->
+    <div class="modal-overlay" id="courseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Add Course</h2>
+                <button class="close-btn" onclick="closeModal('courseModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-group"><label>Title</label><input type="text" id="courseTitle" placeholder="Course name"></div>
+            <div class="form-group"><label>Instructor</label><input type="text" id="courseInstructor" placeholder="Instructor name"></div>
+            <div class="form-group"><label>Category</label><select id="courseCategory"><option value="ui-ux">UI/UX</option><option value="branding">Branding</option><option value="web">Web Design</option><option value="motion">Motion</option></select></div>
+            <div class="form-group"><label>Price (₦)</label><input type="number" id="coursePrice" value="0" placeholder="0 for free"></div>
+            <div class="form-group"><label>Duration (hours)</label><input type="number" id="courseDuration" value="10" placeholder="10"></div>
+            <button class="btn btn-primary" onclick="saveCourse()"><i class="fas fa-save"></i> Save Course</button>
         </div>
     </div>
 
-    <!-- Resource Modal -->
-    <div class="modal" id="resourceModal">
-        <div class="modal-box">
-            <button class="close" onclick="closeModal('resourceModal')"><i class="fas fa-times"></i></button>
-            <h2 id="resourceModalTitle">Add Resource</h2>
-            <p>Add a new resource for students</p>
-            <form id="resourceForm">
-                <input type="hidden" id="resourceId">
-                <div class="form-group"><label>Title *</label><input type="text" id="resourceTitle" required></div>
-                <div class="form-group"><label>Description</label><textarea id="resourceDesc" rows="2"></textarea></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Type</label><select id="resourceType"><option value="free">Free</option><option value="premium">Premium</option><option value="paid">Paid</option></select></div>
-                    <div class="form-group"><label>Price (₦)</label><input type="number" id="resourcePrice" value="0"></div>
-                </div>
-                <div class="form-group"><label>Resource File</label><input type="file" id="resourceFile" onchange="document.getElementById('resourceFileName').textContent=this.files[0]?.name||'No file selected'"></div>
-                <div class="form-group" id="resourceFileName" style="font-size:11px;color:var(--muted)">No file selected</div>
-                <div class="form-group"><label><input type="checkbox" id="resourceIsActive" checked> Active</label></div>
-                <div class="error-msg" id="resourceError"></div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Resource</button>
-            </form>
-        </div>
-    </div>
+    <script>
+        // ============================================================
+        // ADMIN APP - Same config as auth.html (COMPLETE)
+        // ============================================================
 
-    <!-- Setting Modal -->
-    <div class="modal" id="settingModal">
-        <div class="modal-box">
-            <button class="close" onclick="closeModal('settingModal')"><i class="fas fa-times"></i></button>
-            <h2 id="settingModalTitle">Add Setting</h2>
-            <p>Add a new site setting</p>
-            <form id="settingForm">
-                <input type="hidden" id="settingId">
-                <div class="form-group"><label>Key *</label><input type="text" id="settingKey" required></div>
-                <div class="form-group"><label>Value *</label><input type="text" id="settingValue" required></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Type</label><select id="settingType"><option value="text">Text</option><option value="number">Number</option><option value="boolean">Boolean</option><option value="json">JSON</option><option value="array">Array</option></select></div>
-                    <div class="form-group"><div class="checkbox-group"><input type="checkbox" id="settingIsPublic"><label for="settingIsPublic">Public</label></div></div>
-                </div>
-                <div class="form-group"><label>Description</label><input type="text" id="settingDescription"></div>
-                <div class="error-msg" id="settingError"></div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Setting</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- User Edit Modal -->
-    <div class="modal" id="userModal">
-        <div class="modal-box">
-            <button class="close" onclick="closeModal('userModal')"><i class="fas fa-times"></i></button>
-            <h2>Edit User</h2>
-            <p>Update user information and permissions</p>
-            <form id="userForm">
-                <input type="hidden" id="editUserId">
-                <div class="form-group"><label>Full Name *</label><input type="text" id="editUserName" required></div>
-                <div class="form-group"><label>Email</label><input type="email" id="editUserEmail" readonly style="opacity:0.6"></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Role</label><select id="editUserRole"><option value="student">Student</option><option value="instructor">Instructor</option><option value="admin">Admin</option></select></div>
-                    <div class="form-group"><label>Status</label><select id="editUserStatus"><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option><option value="banned">Banned</option></select></div>
-                </div>
-                <div class="form-row">
-                    <div class="checkbox-group"><input type="checkbox" id="editUserPremium"><label for="editUserPremium">Premium</label></div>
-                    <div class="checkbox-group"><input type="checkbox" id="editUserInstructor"><label for="editUserInstructor">Instructor</label></div>
-                </div>
-                <div class="error-msg" id="userError"></div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Update User</button>
-            </form>
-        </div>
-    </div>
-
-<script>
-// ============================================================
-// AUREX ADMIN DASHBOARD - COMPLETE FIXED SCRIPT
-// ============================================================
-
-(function() {
-    const CONFIG = {
-        supabase: {
-            url: 'https://brmoagghggdeumkfijmm.supabase.co',
-            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
-        },
-        adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com'],
-        bucket: 'aurex-assets'
-    };
-
-    let supabaseClient = null;
-    let currentUser = null;
-    let data = {};
-    let userChart = null;
-    let enrollmentChart = null;
-
-    function showToast(msg, type) {
-        type = type || 'success';
-        const t = document.getElementById('toast');
-        if (!t) return;
-        t.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i> <span>' + msg + '</span>';
-        t.className = 'toast ' + type + ' show';
-        clearTimeout(t._hide);
-        t._hide = setTimeout(function() { t.classList.remove('show'); }, 3500);
-    }
-
-    function formatDate(d) {
-        if (!d) return '—';
-        return new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
-    }
-
-    function formatCurrency(n) {
-        return '₦' + (n||0).toLocaleString();
-    }
-
-    window.openModal = function(id) {
-        document.getElementById(id).classList.add('open');
-        document.body.style.overflow = 'hidden';
-    };
-
-    window.closeModal = function(id) {
-        document.getElementById(id).classList.remove('open');
-        document.body.style.overflow = '';
-    };
-
-    window.previewImage = function(input, previewId) {
-        const preview = document.getElementById(previewId);
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
+        (function() {
+            // ============================================================
+            // CONFIG - Same as auth.html
+            // ============================================================
+            var CONFIG = {
+                supabase: {
+                    url: 'https://brmoagghggdeumkfijmm.supabase.co',
+                    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybW9hZ2doZ2dkZXVta2Zpam1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0ODg0NDEsImV4cCI6MjEwMjA2NDQ0MX0.RcD9wxFtMq8tnJS2pQnT6OmLpRchy6U4ZKG3Hyn27RM'
+                },
+                app: {
+                    name: 'Aurex Designs',
+                    url: 'https://aurex-design.vercel.app',
+                    storageBucket: 'aurex-assets'
+                },
+                premium: { price: '13500', duration: '6', discount: '45' },
+                adminEmails: ['supremealpha04@gmail.com', 'aurexdesigns5@gmail.com']
             };
-            reader.readAsDataURL(input.files[0]);
-        } else {
-            preview.style.display = 'none';
-        }
-    };
 
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('sidebarOverlay').classList.toggle('active');
-    }
-
-    window.showSection = function(name) {
-        document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
-        document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
-        document.querySelectorAll('.bottom-nav-item').forEach(function(n) { n.classList.remove('active'); });
-        document.getElementById('section-' + name).classList.add('active');
-        var navItem = document.querySelector('.nav-item[data-section="' + name + '"]');
-        if (navItem) navItem.classList.add('active');
-        var bottomItem = document.querySelector('.bottom-nav-item[onclick*="' + name + '"]');
-        if (bottomItem) bottomItem.classList.add('active');
-        var titles = {
-            overview:'Admin Overview', users:'Manage Users', courses:'Manage Courses',
-            classes:'Manage Classes', enrollments:'Manage Enrollments', projects:'Manage Projects',
-            tools:'Manage Tools', resources:'Manage Resources', payments:'Payments',
-            premium_requests:'Premium Requests', settings:'Site Settings', activity:'Activity Log'
-        };
-        document.getElementById('pageTitle').textContent = titles[name] || 'Admin';
-        if (window.innerWidth <= 900) {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
-        }
-    };
-
-    window.filterTable = function(tableId, value) {
-        var rows = document.getElementById(tableId).querySelectorAll('tr');
-        var term = value.toLowerCase();
-        rows.forEach(function(row) {
-            var text = row.textContent.toLowerCase();
-            row.style.display = text.indexOf(term) !== -1 ? '' : 'none';
-        });
-    };
-
-    async function uploadFile(file, folder) {
-        try {
-            var ext = file.name.split('.').pop();
-            var name = folder + '/' + Date.now() + '-' + Math.random().toString(36).substring(7) + '.' + ext;
-            var { error } = await supabaseClient.storage.from(CONFIG.bucket).upload(name, file);
-            if (error) throw error;
-            var { data: url } = supabaseClient.storage.from(CONFIG.bucket).getPublicUrl(name);
-            return url.publicUrl;
-        } catch(e) {
-            showToast('Upload failed: ' + e.message, 'error');
-            return null;
-        }
-    }
-
-    async function init() {
-        try {
-            supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
-        } catch(e) {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            showToast('Supabase connection failed', 'error');
-            return;
-        }
-
-        var { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) { window.location.href = 'auth.html'; return; }
-
-        currentUser = user;
-        document.getElementById('userName').textContent = user.email?.split('@')[0] || 'Admin';
-        document.getElementById('userImg').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.email||'Admin') + '&background=7c3aed&color=fff&size=100';
-
-        var { data: profile } = await supabaseClient.from('users').select('role').eq('id', user.id).single();
-        var isAdmin = profile?.role === 'admin' || CONFIG.adminEmails.indexOf(user.email) !== -1;
-
-        if (!isAdmin) {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('accessDenied').classList.add('active');
-            return;
-        }
-
-        document.getElementById('app').style.display = 'flex';
-        document.getElementById('loadingScreen').classList.add('hidden');
-        await refreshAll();
-    }
-
-    window.refreshAll = async function() {
-        await Promise.all([
-            loadStats(),
-            loadUsers(),
-            loadCourses(),
-            loadClasses(),
-            loadEnrollments(),
-            loadProjects(),
-            loadTools(),
-            loadResources(),
-            loadPayments(),
-            loadPremiumRequests(),
-            loadSettings(),
-            loadActivity()
-        ]);
-        await loadCourseOptions();
-        updateCharts();
-        updatePendingCount();
-    };
-
-    function updatePendingCount() {
-        var pending = (data.premiumRequests || []).filter(function(r) { return r.status === 'pending'; }).length || 0;
-        document.getElementById('pendingCount').textContent = pending + ' pending';
-    }
-
-    async function loadCourseOptions() {
-        var { data: courses } = await supabaseClient.from('courses').select('id,title').eq('is_active', true);
-        var select = document.getElementById('classCourseId');
-        if (!select) return;
-        select.innerHTML = '<option value="">Select course...</option>' +
-            (courses||[]).map(function(c) { return '<option value="' + c.id + '">' + c.title + '</option>'; }).join('');
-    }
-
-    async function loadStats() {
-        try {
-            var [{count:users}, {count:premium}, {count:courses}, {count:projects}, {count:tools}, {count:pending}, {count:classes}, {count:enrollments}] = await Promise.all([
-                supabaseClient.from('users').select('*', {count:'exact', head:true}),
-                supabaseClient.from('users').select('*', {count:'exact', head:true}).eq('is_premium', true),
-                supabaseClient.from('courses').select('*', {count:'exact', head:true}),
-                supabaseClient.from('projects').select('*', {count:'exact', head:true}),
-                supabaseClient.from('tools').select('*', {count:'exact', head:true}),
-                supabaseClient.from('premium_requests').select('*', {count:'exact', head:true}).eq('status', 'pending'),
-                supabaseClient.from('classes').select('*', {count:'exact', head:true}).gte('date', new Date().toISOString()),
-                supabaseClient.from('enrollments').select('*', {count:'exact', head:true})
-            ]);
-            document.getElementById('statUsers').textContent = users || 0;
-            document.getElementById('statPremium').textContent = premium || 0;
-            document.getElementById('statCourses').textContent = courses || 0;
-            document.getElementById('statProjects').textContent = projects || 0;
-            document.getElementById('statPending').textContent = pending || 0;
-            document.getElementById('statClasses').textContent = classes || 0;
-            document.getElementById('statEnrollments').textContent = enrollments || 0;
-
-            var { data: payments } = await supabaseClient.from('payments').select('amount').eq('status', 'completed');
-            var revenue = (payments||[]).reduce(function(a,b) { return a + (b.amount||0); }, 0);
-            document.getElementById('statRevenue').textContent = formatCurrency(revenue);
-        } catch(e) { console.error('Stats error', e); }
-    }
-
-    async function loadUsers() {
-        var { data: users } = await supabaseClient.from('users').select('*').order('created_at', {ascending:false});
-        data.users = users || [];
-        renderUsers(data.users);
-    }
-
-    function renderUsers(users) {
-        var tbody = document.getElementById('usersTable');
-        if (!users || !users.length) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty"><i class="fas fa-users"></i><h3>No users found</h3><p>Users will appear here once they register</p></td></tr>';
-            return;
-        }
-        tbody.innerHTML = users.map(function(u) {
-            var premiumBadge = u.is_premium ? '<span class="badge badge-premium"><i class="fas fa-crown"></i></span>' : '';
-            var roleBadge = u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : u.role === 'instructor' ? '<span class="badge badge-premium">Instructor</span>' : '<span class="badge badge-free">Student</span>';
-            var statusBadge = u.status === 'active' ? '<span class="badge badge-active">Active</span>' : u.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + u.status + '</span>';
-            return '<tr><td><span class="cell-title">' + (u.full_name || 'Unknown') + '</span> ' + premiumBadge + '</td><td>' + u.email + '</td><td>' + roleBadge + '</td><td>' + statusBadge + '</td><td>' + (u.enrollment_count || 0) + '</td><td class="cell-meta">' + formatDate(u.created_at) + '</td><td><div class="table-actions"><button onclick="editUser(\'' + u.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteUser(\'' + u.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.editUser = function(id) {
-        var u = data.users.find(function(x) { return x.id === id; });
-        if (!u) return;
-        document.getElementById('editUserId').value = u.id;
-        document.getElementById('editUserName').value = u.full_name || '';
-        document.getElementById('editUserEmail').value = u.email || '';
-        document.getElementById('editUserRole').value = u.role || 'student';
-        document.getElementById('editUserStatus').value = u.status || 'active';
-        document.getElementById('editUserPremium').checked = u.is_premium || false;
-        document.getElementById('editUserInstructor').checked = u.user_type === 'instructor';
-        openModal('userModal');
-    };
-
-    window.deleteUser = async function(id) {
-        if (!confirm('Delete this user? This action cannot be undone.')) return;
-        var { error } = await supabaseClient.from('users').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('User deleted successfully');
-        await loadUsers();
-        await loadStats();
-    };
-
-    document.getElementById('userForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        var id = document.getElementById('editUserId').value;
-        var payload = {
-            full_name: document.getElementById('editUserName').value,
-            role: document.getElementById('editUserRole').value,
-            status: document.getElementById('editUserStatus').value,
-            is_premium: document.getElementById('editUserPremium').checked,
-            user_type: document.getElementById('editUserInstructor').checked ? 'instructor' : 'student'
-        };
-        var { error } = await supabaseClient.from('users').update(payload).eq('id', id);
-        if (error) { document.getElementById('userError').textContent = error.message; return; }
-        showToast('User updated successfully');
-        closeModal('userModal');
-        await loadUsers();
-        await loadStats();
-    });
-
-    async function loadCourses() {
-        var { data: courses } = await supabaseClient.from('courses').select('*').order('created_at', {ascending:false});
-        data.courses = courses || [];
-        renderCourses(data.courses);
-    }
-
-    function renderCourses(courses) {
-        var tbody = document.getElementById('coursesTable');
-        if (!courses || !courses.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-graduation-cap"></i><h3>No courses found</h3><p>Create your first course using the Add Course button</p></td></tr>';
-            return;
-        }
-        tbody.innerHTML = courses.map(function(c) {
-            var priceDisplay = c.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(c.price);
-            var statusDisplay = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
-            return '<tr><td><span class="cell-title">' + c.title + '</span><div class="cell-meta">' + (c.instructor || 'No instructor') + '</div></td><td>' + (c.category || 'Uncategorized') + '</td><td>' + priceDisplay + '</td><td>' + statusDisplay + '</td><td>' + (c.enrollment_count || 0) + '</td><td><div class="table-actions"><button onclick="editCourse(\'' + c.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteCourse(\'' + c.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.openCourseModal = function() {
-        document.getElementById('courseModalTitle').textContent = 'Add Course';
-        document.getElementById('courseForm').reset();
-        document.getElementById('courseId').value = '';
-        document.getElementById('courseImagePreview').style.display = 'none';
-        document.getElementById('courseError').textContent = '';
-        openModal('courseModal');
-    };
-
-    window.editCourse = function(id) {
-        var c = data.courses.find(function(x) { return x.id === id; });
-        if (!c) return;
-        document.getElementById('courseModalTitle').textContent = 'Edit Course';
-        document.getElementById('courseId').value = c.id;
-        document.getElementById('courseTitle').value = c.title || '';
-        document.getElementById('courseDesc').value = c.description || '';
-        document.getElementById('courseCategory').value = c.category || '';
-        document.getElementById('coursePrice').value = c.price || 0;
-        document.getElementById('courseInstructor').value = c.instructor || '';
-        document.getElementById('courseDuration').value = c.duration || '';
-        document.getElementById('courseBadge').value = c.badge || '';
-        document.getElementById('courseIsFree').checked = c.is_free || false;
-        document.getElementById('courseIsActive').checked = c.is_active !== false;
-        document.getElementById('courseIsFeatured').checked = c.is_featured || false;
-        if (c.image) {
-            document.getElementById('courseImagePreview').src = c.image;
-            document.getElementById('courseImagePreview').style.display = 'block';
-        }
-        document.getElementById('courseError').textContent = '';
-        openModal('courseModal');
-    };
-
-    window.deleteCourse = async function(id) {
-        if (!confirm('Delete this course? This will remove all enrollments and related data.')) return;
-        var { error } = await supabaseClient.from('courses').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Course deleted successfully');
-        await loadCourses();
-        await loadStats();
-        await loadCourseOptions();
-    };
-
-    document.getElementById('courseForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        var id = document.getElementById('courseId').value;
-        var file = document.getElementById('courseImageFile').files[0];
-        var image = '';
-
-        if (file) {
-            var uploaded = await uploadFile(file, 'courses');
-            if (!uploaded) return;
-            image = uploaded;
-        }
-
-        var payload = {
-            title: document.getElementById('courseTitle').value,
-            description: document.getElementById('courseDesc').value,
-            category: document.getElementById('courseCategory').value,
-            price: parseInt(document.getElementById('coursePrice').value) || 0,
-            instructor: document.getElementById('courseInstructor').value,
-            duration: document.getElementById('courseDuration').value,
-            image: image,
-            badge: document.getElementById('courseBadge').value || null,
-            is_free: document.getElementById('courseIsFree').checked,
-            is_active: document.getElementById('courseIsActive').checked,
-            is_featured: document.getElementById('courseIsFeatured').checked
-        };
-
-        var error;
-        if (id) {
-            var res = await supabaseClient.from('courses').update(payload).eq('id', id);
-            error = res.error;
-        } else {
-            var res2 = await supabaseClient.from('courses').insert([payload]);
-            error = res2.error;
-        }
-        if (error) { document.getElementById('courseError').textContent = error.message; return; }
-        showToast(id ? 'Course updated successfully' : 'Course created successfully');
-        closeModal('courseModal');
-        document.getElementById('courseForm').reset();
-        document.getElementById('courseImagePreview').style.display = 'none';
-        await loadCourses();
-        await loadStats();
-        await loadCourseOptions();
-    });
-
-    async function loadClasses() {
-        var { data: classes } = await supabaseClient.from('classes').select('*').order('date', {ascending:true});
-        data.classes = classes || [];
-        renderClasses(data.classes);
-    }
-
-    function renderClasses(classes) {
-        var tbody = document.getElementById('classesTable');
-        if (!classes || !classes.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-calendar-alt"></i><h3>No classes found</h3><p>Schedule your first class using the Add Class button</p></td></tr>';
-            return;
-        }
-        tbody.innerHTML = classes.map(function(c) {
-            var enrollText = c.requires_enrollment !== false ? '🔒 Enrolled only' : '🌐 Everyone';
-            var typeBadge = c.class_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : c.class_type === 'paid' ? '<span class="badge badge-paid">Paid</span>' : '<span class="badge badge-free">Free</span>';
-            var statusBadge = c.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
-            return '<tr><td><span class="cell-title">' + c.title + '</span><div class="cell-meta">' + enrollText + '</div></td><td>' + (c.course || c.course_id || '—') + '</td><td class="cell-meta">' + formatDate(c.date) + '</td><td>' + typeBadge + '</td><td>' + statusBadge + '</td><td><div class="table-actions"><button onclick="editClass(\'' + c.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteClass(\'' + c.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.openClassModal = function() {
-        document.getElementById('classModalTitle').textContent = 'Add Class';
-        document.getElementById('classForm').reset();
-        document.getElementById('classId').value = '';
-        document.getElementById('classError').textContent = '';
-        openModal('classModal');
-    };
-
-    window.editClass = function(id) {
-        var c = data.classes.find(function(x) { return x.id === id; });
-        if (!c) return;
-        document.getElementById('classModalTitle').textContent = 'Edit Class';
-        document.getElementById('classId').value = c.id;
-        document.getElementById('classTitle').value = c.title || '';
-        document.getElementById('classCourseId').value = c.course_id || '';
-        document.getElementById('classDate').value = c.date ? new Date(c.date).toISOString().slice(0,16) : '';
-        document.getElementById('classDuration').value = c.duration || 2;
-        document.getElementById('classType').value = c.class_type || 'live';
-        document.getElementById('classRequiresEnrollment').value = c.requires_enrollment !== false ? 'true' : 'false';
-        document.getElementById('classDesc').value = c.description || '';
-        document.getElementById('classWhatsapp').value = c.whatsapp || '';
-        document.getElementById('classTelegram').value = c.telegram || '';
-        document.getElementById('classZoom').value = c.meeting_link || c.zoom_link || '';
-        document.getElementById('classRecording').value = c.recording_url || '';
-        document.getElementById('classIsActive').checked = c.is_active !== false;
-        document.getElementById('classIsRecorded').checked = c.is_recorded || false;
-        document.getElementById('classError').textContent = '';
-        openModal('classModal');
-    };
-
-    window.deleteClass = async function(id) {
-        if (!confirm('Delete this class?')) return;
-        var { error } = await supabaseClient.from('classes').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Class deleted successfully');
-        await loadClasses();
-        await loadStats();
-    };
-
-    document.getElementById('classForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        var id = document.getElementById('classId').value;
-        var courseId = document.getElementById('classCourseId').value;
-        var courseTitle = (data.courses || []).find(function(c) { return c.id === courseId; })?.title || '';
-
-        var payload = {
-            title: document.getElementById('classTitle').value,
-            course_id: courseId,
-            course: courseTitle,
-            date: document.getElementById('classDate').value ? new Date(document.getElementById('classDate').value).toISOString() : null,
-            duration: parseInt(document.getElementById('classDuration').value) || 2,
-            class_type: document.getElementById('classType').value,
-            requires_enrollment: document.getElementById('classRequiresEnrollment').value === 'true',
-            description: document.getElementById('classDesc').value,
-            whatsapp: document.getElementById('classWhatsapp').value,
-            telegram: document.getElementById('classTelegram').value,
-            meeting_link: document.getElementById('classZoom').value,
-            zoom_link: document.getElementById('classZoom').value,
-            recording_url: document.getElementById('classRecording').value,
-            is_active: document.getElementById('classIsActive').checked,
-            is_recorded: document.getElementById('classIsRecorded').checked
-        };
-
-        var error;
-        if (id) {
-            var res = await supabaseClient.from('classes').update(payload).eq('id', id);
-            error = res.error;
-        } else {
-            var res2 = await supabaseClient.from('classes').insert([payload]);
-            error = res2.error;
-        }
-        if (error) { document.getElementById('classError').textContent = error.message; return; }
-        showToast(id ? 'Class updated successfully' : 'Class created successfully');
-        closeModal('classModal');
-        document.getElementById('classForm').reset();
-        await loadClasses();
-        await loadStats();
-    });
-
-    async function loadEnrollments() {
-        var { data: enrollments } = await supabaseClient
-            .from('enrollments')
-            .select('*, users:user_id(id,full_name,email), courses:course_id(id,title)')
-            .order('enrolled_at', {ascending:false});
-        data.enrollments = enrollments || [];
-        renderEnrollments(data.enrollments);
-    }
-
-    function renderEnrollments(enrollments) {
-        var tbody = document.getElementById('enrollmentsTable');
-        if (!enrollments || !enrollments.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-book-open"></i><h3>No enrollments found</h3><p>Students will appear here once they enroll in courses</p></td></tr>';
-            return;
-        }
-        tbody.innerHTML = enrollments.map(function(e) {
-            var user = e.users || {};
-            var course = e.courses || {};
-            var progress = e.progress || 0;
-            var statusBadge = e.status === 'active' ? '<span class="badge badge-active">Active</span>' : e.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : '<span class="badge badge-inactive">' + e.status + '</span>';
-            return '<tr><td><span class="cell-title">' + (user.full_name || 'Unknown') + '</span><div class="cell-meta">' + (user.email || '') + '</div></td><td>' + (course.title || e.course_id || 'Unknown') + '</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar"><div class="fill" style="width:' + progress + '%"></div></div><span style="font-size:11px;font-weight:600;min-width:32px;">' + progress + '%</span></div></td><td>' + statusBadge + '</td><td class="cell-meta">' + formatDate(e.enrolled_at || e.created_at) + '</td><td><div class="table-actions"><button class="danger" onclick="deleteEnrollment(\'' + e.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.deleteEnrollment = async function(id) {
-        if (!confirm('Delete this enrollment?')) return;
-        var { error } = await supabaseClient.from('enrollments').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Enrollment deleted successfully');
-        await loadEnrollments();
-        await loadStats();
-    };
-
-    async function loadProjects() {
-        var { data: projects } = await supabaseClient.from('projects').select('*').order('created_at', {ascending:false});
-        data.projects = projects || [];
-        renderProjects(data.projects);
-    }
-
-    function renderProjects(projects) {
-        var tbody = document.getElementById('projectsTable');
-        if (!projects || !projects.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-folder"></i><h3>No projects found</h3><p>Create your first project using the Add Project button</p></td></tr>';
-            return;
-        }
-        tbody.innerHTML = projects.map(function(p) {
-            var featuredBadge = p.is_featured ? '<span class="badge badge-premium"><i class="fas fa-star"></i></span>' : '';
-            var statusBadge = p.status === 'completed' ? '<span class="badge badge-completed">Completed</span>' : p.status === 'in-progress' ? '<span class="badge badge-premium">In Progress</span>' : '<span class="badge badge-pending">Pending</span>';
-            return '<tr><td><span class="cell-title">' + p.title + '</span> ' + featuredBadge + '</td><td>' + (p.author_name || 'Unknown') + '</td><td>' + statusBadge + '</td><td>' + (p.likes || 0) + '</td><td class="cell-meta">' + formatDate(p.created_at) + '</td><td><div class="table-actions"><button onclick="editProject(\'' + p.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button onclick="toggleFeatured(\'' + p.id + '\', ' + (!p.is_featured) + ')" title="Toggle Featured"><i class="fas ' + (p.is_featured ? 'fa-star' : 'far fa-star') + '"></i></button><button class="danger" onclick="deleteProject(\'' + p.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.openProjectModal = function() {
-        document.getElementById('projectModalTitle').textContent = 'Add Project';
-        document.getElementById('projectForm').reset();
-        document.getElementById('projectId').value = '';
-        document.getElementById('projectImagePreview').style.display = 'none';
-        document.getElementById('projectError').textContent = '';
-        openModal('projectModal');
-    };
-
-    window.editProject = function(id) {
-        var p = data.projects.find(function(x) { return x.id === id; });
-        if (!p) return;
-        document.getElementById('projectModalTitle').textContent = 'Edit Project';
-        document.getElementById('projectId').value = p.id;
-        document.getElementById('projectTitle').value = p.title || '';
-        document.getElementById('projectDesc').value = p.description || '';
-        document.getElementById('projectAuthor').value = p.author_name || '';
-        document.getElementById('projectAuthorEmail').value = p.author_email || '';
-        document.getElementById('projectCategory').value = p.category || 'design';
-        document.getElementById('projectStatus').value = p.status || 'pending';
-        document.getElementById('projectDemoLink').value = p.demo_link || '';
-        document.getElementById('projectIsFeatured').checked = p.is_featured || false;
-        document.getElementById('projectIsActive').checked = p.is_active !== false;
-        if (p.image) {
-            document.getElementById('projectImagePreview').src = p.image;
-            document.getElementById('projectImagePreview').style.display = 'block';
-        }
-        document.getElementById('projectError').textContent = '';
-        openModal('projectModal');
-    };
-
-    window.deleteProject = async function(id) {
-        if (!confirm('Delete this project?')) return;
-        var { error } = await supabaseClient.from('projects').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Project deleted successfully');
-        await loadProjects();
-        await loadStats();
-    };
-
-    window.toggleFeatured = async function(id, featured) {
-        var { error } = await supabaseClient.from('projects').update({is_featured: featured}).eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast(featured ? 'Project featured' : 'Project unfeatured');
-        await loadProjects();
-    };
-
-    document.getElementById('projectForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        var id = document.getElementById('projectId').value;
-        var file = document.getElementById('projectImageFile').files[0];
-        var image = '';
-
-        if (file) {
-            var uploaded = await uploadFile(file, 'projects');
-            if (!uploaded) return;
-            image = uploaded;
-        }
-
-        var payload = {
-            title: document.getElementById('projectTitle').value,
-            description: document.getElementById('projectDesc').value,
-            author_name: document.getElementById('projectAuthor').value,
-            author_email: document.getElementById('projectAuthorEmail').value,
-            category: document.getElementById('projectCategory').value,
-            status: document.getElementById('projectStatus').value,
-            image: image,
-            demo_link: document.getElementById('projectDemoLink').value,
-            is_featured: document.getElementById('projectIsFeatured').checked,
-            is_active: document.getElementById('projectIsActive').checked
-        };
-
-        var error;
-        if (id) {
-            var res = await supabaseClient.from('projects').update(payload).eq('id', id);
-            error = res.error;
-        } else {
-            var res2 = await supabaseClient.from('projects').insert([payload]);
-            error = res2.error;
-        }
-        if (error) { document.getElementById('projectError').textContent = error.message; return; }
-        showToast(id ? 'Project updated successfully' : 'Project created successfully');
-        closeModal('projectModal');
-        document.getElementById('projectForm').reset();
-        document.getElementById('projectImagePreview').style.display = 'none';
-        await loadProjects();
-        await loadStats();
-    });
-
-    async function loadTools() {
-        var { data: tools } = await supabaseClient.from('tools').select('*').order('created_at', {ascending:false});
-        data.tools = tools || [];
-        renderTools(data.tools);
-    }
-
-    function renderTools(tools) {
-        var tbody = document.getElementById('toolsTable');
-        if (!tools || !tools.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="empty"><i class="fas fa-wrench"></i><h3>No tools found</h3><p>Add tools using the Add Tool button</p></td></tr>';
-            return;
-        }
-        tbody.innerHTML = tools.map(function(t) {
-            var priceDisplay = t.is_free ? '<span class="badge badge-active">Free</span>' : formatCurrency(t.price);
-            var statusDisplay = t.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
-            return '<tr><td><span class="cell-title">' + t.name + '</span></td><td>' + (t.category || 'General') + '</td><td>' + priceDisplay + '</td><td>' + statusDisplay + '</td><td><div class="table-actions"><button onclick="editTool(\'' + t.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteTool(\'' + t.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.openToolModal = function() {
-        document.getElementById('toolModalTitle').textContent = 'Add Tool';
-        document.getElementById('toolForm').reset();
-        document.getElementById('toolId').value = '';
-        document.getElementById('toolImagePreview').style.display = 'none';
-        document.getElementById('toolError').textContent = '';
-        openModal('toolModal');
-    };
-
-    window.editTool = function(id) {
-        var t = data.tools.find(function(x) { return x.id === id; });
-        if (!t) return;
-        document.getElementById('toolModalTitle').textContent = 'Edit Tool';
-        document.getElementById('toolId').value = t.id;
-        document.getElementById('toolName').value = t.name || '';
-        document.getElementById('toolDesc').value = t.description || '';
-        document.getElementById('toolCategory').value = t.category || 'design';
-        document.getElementById('toolPrice').value = t.price || 0;
-        document.getElementById('toolLink').value = t.link || '';
-        document.getElementById('toolIsFree').checked = t.is_free !== false;
-        document.getElementById('toolIsActive').checked = t.is_active !== false;
-        if (t.image) {
-            document.getElementById('toolImagePreview').src = t.image;
-            document.getElementById('toolImagePreview').style.display = 'block';
-        }
-        document.getElementById('toolError').textContent = '';
-        openModal('toolModal');
-    };
-
-    window.deleteTool = async function(id) {
-        if (!confirm('Delete this tool?')) return;
-        var { error } = await supabaseClient.from('tools').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Tool deleted successfully');
-        await loadTools();
-        await loadStats();
-    };
-
-    document.getElementById('toolForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        var id = document.getElementById('toolId').value;
-        var file = document.getElementById('toolImageFile').files[0];
-        var image = '';
-
-        if (file) {
-            var uploaded = await uploadFile(file, 'tools');
-            if (!uploaded) return;
-            image = uploaded;
-        }
-
-        var payload = {
-            name: document.getElementById('toolName').value,
-            description: document.getElementById('toolDesc').value,
-            category: document.getElementById('toolCategory').value,
-            price: parseInt(document.getElementById('toolPrice').value) || 0,
-            link: document.getElementById('toolLink').value,
-            image: image,
-            is_free: document.getElementById('toolIsFree').checked,
-            is_active: document.getElementById('toolIsActive').checked
-        };
-
-        var error;
-        if (id) {
-            var res = await supabaseClient.from('tools').update(payload).eq('id', id);
-            error = res.error;
-        } else {
-            var res2 = await supabaseClient.from('tools').insert([payload]);
-            error = res2.error;
-        }
-        if (error) { document.getElementById('toolError').textContent = error.message; return; }
-        showToast(id ? 'Tool updated successfully' : 'Tool created successfully');
-        closeModal('toolModal');
-        document.getElementById('toolForm').reset();
-        document.getElementById('toolImagePreview').style.display = 'none';
-        await loadTools();
-        await loadStats();
-    });
-
-    async function loadResources() {
-        var { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', {ascending:false});
-        data.resources = resources || [];
-        renderResources(data.resources);
-    }
-
-    function renderResources(resources) {
-        var tbody = document.getElementById('resourcesTable');
-        if (!resources || !resources.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-file-alt"></i><h3>No resources found</h3><p>Add resources using the Add Resource button</p></td></tr>';
-            return;
-        }
-        tbody.innerHTML = resources.map(function(r) {
-            var typeBadge = r.resource_type === 'premium' ? '<span class="badge badge-premium">Premium</span>' : r.resource_type === 'paid' ? '<span class="badge badge-paid">Paid</span>' : '<span class="badge badge-free">Free</span>';
-            var statusBadge = r.is_active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>';
-            return '<tr><td><span class="cell-title">' + r.title + '</span></td><td>' + typeBadge + '</td><td>' + (r.price ? formatCurrency(r.price) : 'Free') + '</td><td>' + (r.download_count || 0) + '</td><td>' + statusBadge + '</td><td><div class="table-actions"><button onclick="editResource(\'' + r.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteResource(\'' + r.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.openResourceModal = function() {
-        document.getElementById('resourceModalTitle').textContent = 'Add Resource';
-        document.getElementById('resourceForm').reset();
-        document.getElementById('resourceId').value = '';
-        document.getElementById('resourceFileName').textContent = 'No file selected';
-        document.getElementById('resourceError').textContent = '';
-        openModal('resourceModal');
-    };
-
-    window.editResource = function(id) {
-        var r = data.resources.find(function(x) { return x.id === id; });
-        if (!r) return;
-        document.getElementById('resourceModalTitle').textContent = 'Edit Resource';
-        document.getElementById('resourceId').value = r.id;
-        document.getElementById('resourceTitle').value = r.title || '';
-        document.getElementById('resourceDesc').value = r.description || '';
-        document.getElementById('resourceType').value = r.resource_type || 'free';
-        document.getElementById('resourcePrice').value = r.price || 0;
-        document.getElementById('resourceIsActive').checked = r.is_active !== false;
-        if (r.file_url) {
-            document.getElementById('resourceFileName').textContent = r.file_url.split('/').pop() || 'File attached';
-        }
-        document.getElementById('resourceError').textContent = '';
-        openModal('resourceModal');
-    };
-
-    window.deleteResource = async function(id) {
-        if (!confirm('Delete this resource?')) return;
-        var { error } = await supabaseClient.from('resources').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Resource deleted successfully');
-        await loadResources();
-        await loadStats();
-    };
-
-    document.getElementById('resourceForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        var id = document.getElementById('resourceId').value;
-        var file = document.getElementById('resourceFile').files[0];
-        var fileUrl = '';
-
-        if (file) {
-            var uploaded = await uploadFile(file, 'resources');
-            if (!uploaded) return;
-            fileUrl = uploaded;
-        }
-
-        var payload = {
-            title: document.getElementById('resourceTitle').value,
-            description: document.getElementById('resourceDesc').value,
-            resource_type: document.getElementById('resourceType').value,
-            price: parseInt(document.getElementById('resourcePrice').value) || 0,
-            file_url: fileUrl,
-            is_active: document.getElementById('resourceIsActive').checked
-        };
-
-        var error;
-        if (id) {
-            var res = await supabaseClient.from('resources').update(payload).eq('id', id);
-            error = res.error;
-        } else {
-            var res2 = await supabaseClient.from('resources').insert([payload]);
-            error = res2.error;
-        }
-        if (error) { document.getElementById('resourceError').textContent = error.message; return; }
-        showToast(id ? 'Resource updated successfully' : 'Resource created successfully');
-        closeModal('resourceModal');
-        document.getElementById('resourceForm').reset();
-        document.getElementById('resourceFileName').textContent = 'No file selected';
-        await loadResources();
-        await loadStats();
-    });
-
-    async function loadPayments() {
-        var { data: payments } = await supabaseClient.from('payments').select('*').order('created_at', {ascending:false});
-        data.payments = payments || [];
-        renderPayments(data.payments);
-    }
-
-    function renderPayments(payments) {
-        var tbody = document.getElementById('paymentsTable');
-        if (!payments || !payments.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-credit-card"></i><h3>No payments found</h3><p>Payments will appear here once processed</p></td></tr>';
-            return;
-        }
-        tbody.innerHTML = payments.map(function(p) {
-            var statusBadge = p.status === 'completed' ? '<span class="badge badge-active">Completed</span>' : p.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">' + p.status + '</span>';
-            var confirmBtn = p.status === 'pending' ? '<button class="success" onclick="confirmPayment(\'' + p.id + '\')" title="Confirm"><i class="fas fa-check"></i></button>' : '';
-            return '<tr><td>' + (p.user_email || 'Unknown') + '</td><td>' + formatCurrency(p.amount) + '</td><td>' + (p.payment_type || p.type || '—') + '</td><td>' + statusBadge + '</td><td class="cell-meta">' + formatDate(p.created_at) + '</td><td><div class="table-actions">' + confirmBtn + '<button class="danger" onclick="deletePayment(\'' + p.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.confirmPayment = async function(id) {
-        var { error } = await supabaseClient.from('payments').update({
-            status: 'completed',
-            confirmed_by: currentUser.id,
-            confirmed_at: new Date().toISOString()
-        }).eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Payment confirmed successfully');
-        await loadPayments();
-        await loadStats();
-    };
-
-    window.deletePayment = async function(id) {
-        if (!confirm('Delete this payment record?')) return;
-        var { error } = await supabaseClient.from('payments').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Payment deleted successfully');
-        await loadPayments();
-        await loadStats();
-    };
-
-    async function loadPremiumRequests() {
-        var { data: requests } = await supabaseClient.from('premium_requests').select('*').order('created_at', {ascending:false});
-        data.premiumRequests = requests || [];
-        renderPremiumRequests(data.premiumRequests);
-        updatePendingCount();
-    }
-
-    function renderPremiumRequests(requests) {
-        var tbody = document.getElementById('premiumRequestsTable');
-        if (!requests || !requests.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-crown"></i><h3>No premium requests</h3></td></tr>';
-            return;
-        }
-        tbody.innerHTML = requests.map(function(r) {
-            var statusBadge = r.status === 'confirmed' ? '<span class="badge badge-active">Confirmed</span>' : r.status === 'pending' ? '<span class="badge badge-pending">Pending</span>' : '<span class="badge badge-inactive">Rejected</span>';
-            var actionBtns = r.status === 'pending' ? '<button class="success" onclick="approveRequest(\'' + r.id + '\', \'' + r.user_id + '\')" title="Approve"><i class="fas fa-check"></i></button><button class="danger" onclick="rejectRequest(\'' + r.id + '\')" title="Reject"><i class="fas fa-times"></i></button>' : '';
-            return '<tr><td>' + (r.user_name || 'Unknown') + '</td><td>' + (r.user_email || '') + '</td><td>' + formatCurrency(r.amount || 13500) + '</td><td>' + statusBadge + '</td><td class="cell-meta">' + formatDate(r.created_at) + '</td><td><div class="table-actions">' + actionBtns + '<button class="danger" onclick="deleteRequest(\'' + r.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.approveRequest = async function(id, userId) {
-        var { error: reqErr } = await supabaseClient.from('premium_requests').update({
-            status: 'confirmed',
-            confirmed_by: currentUser.id,
-            confirmed_at: new Date().toISOString()
-        }).eq('id', id);
-        if (reqErr) { showToast(reqErr.message, 'error'); return; }
-
-        var { error: userErr } = await supabaseClient.from('users').update({
-            is_premium: true,
-            subscription_status: 'active',
-            premium_start: new Date().toISOString(),
-            premium_end: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()
-        }).eq('id', userId);
-        if (userErr) { showToast(userErr.message, 'error'); return; }
-
-        await supabaseClient.from('payments').insert({
-            user_id: userId,
-            user_email: (data.users || []).find(function(u) { return u.id === userId; })?.email || '',
-            amount: 13500,
-            payment_type: 'premium',
-            item: 'Premium Subscription (6 months)',
-            status: 'completed',
-            confirmed_by: currentUser.id,
-            confirmed_at: new Date().toISOString(),
-            created_at: new Date().toISOString()
-        });
-
-        showToast('Premium request approved! 🎉');
-        await loadPremiumRequests();
-        await loadStats();
-        await loadUsers();
-        await loadPayments();
-    };
-
-    window.rejectRequest = async function(id) {
-        var { error } = await supabaseClient.from('premium_requests').update({status: 'rejected'}).eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Premium request rejected');
-        await loadPremiumRequests();
-    };
-
-    window.deleteRequest = async function(id) {
-        if (!confirm('Delete this request?')) return;
-        var { error } = await supabaseClient.from('premium_requests').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Request deleted');
-        await loadPremiumRequests();
-    };
-
-    async function loadSettings() {
-        var { data: settings } = await supabaseClient.from('site_settings').select('*').order('key', {ascending:true});
-        data.settings = settings || [];
-        renderSettings(data.settings);
-    }
-
-    function renderSettings(settings) {
-        var tbody = document.getElementById('settingsTable');
-        if (!settings || !settings.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-cog"></i><h3>No settings found</h3></td></tr>';
-            return;
-        }
-        tbody.innerHTML = settings.map(function(s) {
-            var publicBadge = s.is_public ? '<span class="badge badge-active">Yes</span>' : '<span class="badge badge-inactive">No</span>';
-            return '<tr><td><span class="cell-title">' + s.key + '</span></td><td>' + s.value + '</td><td>' + (s.type || 'text') + '</td><td>' + publicBadge + '</td><td class="cell-meta">' + (s.description || '') + '</td><td><div class="table-actions"><button onclick="editSetting(\'' + s.id + '\')" title="Edit"><i class="fas fa-edit"></i></button><button class="danger" onclick="deleteSetting(\'' + s.id + '\')" title="Delete"><i class="fas fa-trash"></i></button></div></td></tr>';
-        }).join('');
-    }
-
-    window.openSettingModal = function() {
-        document.getElementById('settingModalTitle').textContent = 'Add Setting';
-        document.getElementById('settingForm').reset();
-        document.getElementById('settingId').value = '';
-        document.getElementById('settingError').textContent = '';
-        openModal('settingModal');
-    };
-
-    window.editSetting = function(id) {
-        var s = data.settings.find(function(x) { return x.id === id; });
-        if (!s) return;
-        document.getElementById('settingModalTitle').textContent = 'Edit Setting';
-        document.getElementById('settingId').value = s.id;
-        document.getElementById('settingKey').value = s.key || '';
-        document.getElementById('settingValue').value = s.value || '';
-        document.getElementById('settingType').value = s.type || 'text';
-        document.getElementById('settingIsPublic').checked = s.is_public || false;
-        document.getElementById('settingDescription').value = s.description || '';
-        document.getElementById('settingError').textContent = '';
-        openModal('settingModal');
-    };
-
-    window.deleteSetting = async function(id) {
-        if (!confirm('Delete this setting?')) return;
-        var { error } = await supabaseClient.from('site_settings').delete().eq('id', id);
-        if (error) { showToast(error.message, 'error'); return; }
-        showToast('Setting deleted');
-        await loadSettings();
-    };
-
-    document.getElementById('settingForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        var id = document.getElementById('settingId').value;
-        var payload = {
-            key: document.getElementById('settingKey').value,
-            value: document.getElementById('settingValue').value,
-            type: document.getElementById('settingType').value,
-            is_public: document.getElementById('settingIsPublic').checked,
-            description: document.getElementById('settingDescription').value
-        };
-
-        var error;
-        if (id) {
-            var res = await supabaseClient.from('site_settings').update(payload).eq('id', id);
-            error = res.error;
-        } else {
-            var res2 = await supabaseClient.from('site_settings').insert([payload]);
-            error = res2.error;
-        }
-        if (error) { document.getElementById('settingError').textContent = error.message; return; }
-        showToast(id ? 'Setting updated' : 'Setting created');
-        closeModal('settingModal');
-        document.getElementById('settingForm').reset();
-        await loadSettings();
-    });
-
-    async function loadActivity() {
-        var { data: activity } = await supabaseClient.from('activity_log').select('*').order('created_at', {ascending:false}).limit(50);
-        data.activity = activity || [];
-        renderActivity(data.activity);
-        renderRecentActivity(data.activity.slice(0, 10));
-    }
-
-    function renderActivity(activity) {
-        var tbody = document.getElementById('activityTable');
-        if (!activity || !activity.length) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty"><i class="fas fa-history"></i><h3>No activity found</h3></td></tr>';
-            return;
-        }
-        tbody.innerHTML = activity.map(function(a) {
-            var details = a.details ? JSON.stringify(a.details).slice(0,60) : '';
-            return '<tr><td><span class="cell-title">' + a.action + '</span></td><td>' + (a.entity_type || '') + '</td><td class="cell-meta">' + details + '</td><td class="cell-meta">' + formatDate(a.created_at) + '</td></tr>';
-        }).join('');
-    }
-
-    function renderRecentActivity(activity) {
-        var tbody = document.getElementById('recentActivity');
-        if (!activity || !activity.length) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty"><i class="fas fa-history"></i><h3>No recent activity</h3></td></tr>';
-            return;
-        }
-        tbody.innerHTML = activity.map(function(a) {
-            var userId = a.user_id ? a.user_id.slice(0,8) + '...' : 'System';
-            return '<tr><td><span class="cell-title">' + a.action + '</span></td><td>' + (a.entity_type || '') + '</td><td class="cell-meta">' + userId + '</td><td class="cell-meta">' + formatDate(a.created_at) + '</td></tr>';
-        }).join('');
-    }
-
-    function updateCharts() {
-        var ctx1 = document.getElementById('userChart');
-        if (ctx1) {
-            if (userChart) userChart.destroy();
-            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            var counts = months.map(function(_, i) {
-                var start = new Date(2026, i, 1);
-                var end = new Date(2026, i + 1, 1);
-                return (data.users || []).filter(function(u) {
-                    var d = new Date(u.created_at);
-                    return d >= start && d < end;
-                }).length || 0;
+            console.log('Admin page loaded. Config:', {
+                supabaseUrl: CONFIG.supabase.url ? 'Set' : 'Missing',
+                supabaseKey: CONFIG.supabase.anonKey ? 'Set' : 'Missing'
             });
-            userChart = new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [{
-                        label: 'New Users',
-                        data: counts,
-                        borderColor: '#7c3aed',
-                        backgroundColor: 'rgba(124,58,237,0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#7c3aed'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
-                    },
-                    scales: {
-                        x: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } },
-                        y: { grid: { color: 'rgba(148,163,184,0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } }
-                    }
-                }
-            });
-        }
 
-        var ctx2 = document.getElementById('enrollmentChart');
-        if (ctx2) {
-            if (enrollmentChart) enrollmentChart.destroy();
-            var total = (data.enrollments || []).length || 0;
-            var completed = (data.enrollments || []).filter(function(e) { return e.progress === 100; }).length || 0;
-            var active = (data.enrollments || []).filter(function(e) { return e.status === 'active' && e.progress < 100; }).length || 0;
-            var inactive = total - completed - active;
-            enrollmentChart = new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Completed', 'Active', 'Inactive'],
-                    datasets: [{
-                        data: [completed, active, inactive],
-                        backgroundColor: ['#22c55e', '#7c3aed', '#64748b'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } }
-                    },
-                    cutout: '60%'
-                }
-            });
-        }
-    }
+            // ============================================================
+            // SUPABASE INIT
+            // ============================================================
+            var supabaseClient = null;
+            var supabaseConfigured = false;
+            var ADMIN_EMAILS = CONFIG.adminEmails || [];
 
-    window.logout = async function() {
-        await supabaseClient.auth.signOut();
-        window.location.href = 'index.html';
-    };
-
-    document.getElementById('sidebarOverlay').addEventListener('click', function() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebarOverlay').classList.remove('active');
-    });
-
-    var menuBtn = document.getElementById('menuBtn');
-    if (menuBtn) {
-        menuBtn.style.display = window.innerWidth <= 900 ? 'inline-flex' : 'none';
-        window.addEventListener('resize', function() {
-            menuBtn.style.display = window.innerWidth <= 900 ? 'inline-flex' : 'none';
-            if (window.innerWidth > 900) {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('sidebarOverlay').classList.remove('active');
+            try {
+                var { createClient } = window.supabase;
+                supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+                supabaseConfigured = true;
+                console.log('✅ Supabase connected');
+            } catch (e) {
+                console.warn('❌ Supabase error:', e.message);
             }
-        });
-    }
 
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.modal').forEach(function(m) { m.classList.remove('open'); });
-            document.body.style.overflow = '';
-        }
-        if (e.key === 'r' && (e.metaKey || e.ctrlKey)) {
-            e.preventDefault();
-            refreshAll();
-            showToast('Refreshed!');
-        }
-    });
+            // ============================================================
+            // STATE
+            // ============================================================
+            var allUsers = [];
+            var allProjects = [];
+            var allCourses = [];
+            var allPayments = [];
+            var allPremiumUsers = [];
+            var allPendingRequests = [];
+            var currentUser = null;
 
-    document.addEventListener('DOMContentLoaded', init);
-})();
-</script>
+            // ============================================================
+            // HELPERS
+            // ============================================================
+            function showToast(msg, type) {
+                type = type || 'success';
+                var container = document.getElementById('toastContainer');
+                var toast = document.createElement('div');
+                toast.className = 'toast toast-' + type;
+                toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') +
+                    '"></i> ' + msg;
+                container.appendChild(toast);
+                requestAnimationFrame(function() { toast.classList.add('show'); });
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                    setTimeout(function() { toast.remove(); }, 400);
+                }, 3000);
+            }
+
+            function formatDate(date) {
+                if (!date) return '—';
+                return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            function formatCurrency(amount) {
+                if (!amount) return '₦0';
+                return '₦' + parseInt(amount).toLocaleString();
+            }
+
+            function openModal(id) {
+                document.getElementById(id).classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal(id) {
+                document.getElementById(id).classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // ============================================================
+            // AUTH
+            // ============================================================
+            function checkAuth() {
+                if (!supabaseConfigured) {
+                    showToast('⚠️ Supabase not configured.', 'error');
+                    return false;
+                }
+
+                supabaseClient.auth.getSession().then(function(result) {
+                    if (!result.data.session) {
+                        window.location.href = 'auth.html';
+                        return;
+                    }
+                    var userEmail = result.data.session.user.email;
+                    if (!ADMIN_EMAILS.includes(userEmail)) {
+                        showToast('❌ Access denied. Admin only.', 'error');
+                        setTimeout(function() { window.location.href = 'index.html'; }, 1500);
+                        return;
+                    }
+                    currentUser = result.data.session.user;
+                    document.getElementById('adminName').textContent = userEmail.split('@')[0];
+                    document.getElementById('adminAvatar').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(
+                        userEmail.split('@')[0]) + '&background=7c3aed&color=fff';
+                }).catch(function() {
+                    window.location.href = 'auth.html';
+                });
+                return true;
+            }
+
+            function handleLogout() {
+                if (supabaseConfigured) supabaseClient.auth.signOut();
+                showToast('Logged out', 'success');
+                setTimeout(function() { window.location.href = 'index.html'; }, 800);
+            }
+
+            // ============================================================
+            // NAVIGATION
+            // ============================================================
+            function toggleMobileSidebar() {
+                document.getElementById('sidebar').classList.toggle('mobile-open');
+            }
+
+            function showSection(section) {
+                document.querySelectorAll('[id^="section-"]').forEach(function(el) {
+                    el.style.display = 'none';
+                });
+                document.getElementById('section-' + section).style.display = 'block';
+
+                document.querySelectorAll('.nav-item').forEach(function(el) {
+                    el.classList.remove('active');
+                });
+                var navItem = document.querySelector('.nav-item[data-section="' + section + '"]');
+                if (navItem) navItem.classList.add('active');
+
+                var titles = {
+                    dashboard: 'Dashboard',
+                    users: 'Users',
+                    projects: 'Projects',
+                    courses: 'Courses',
+                    premium: 'Premium',
+                    payments: 'Payments'
+                };
+                document.getElementById('pageTitle').textContent = titles[section] || section;
+
+                document.getElementById('sidebar').classList.remove('mobile-open');
+
+                if (section === 'dashboard') loadDashboard();
+                if (section === 'users') loadUsers();
+                if (section === 'projects') loadProjects();
+                if (section === 'courses') loadCourses();
+                if (section === 'premium') loadPremium();
+                if (section === 'payments') loadPayments();
+            }
+
+            function refreshData() {
+                var active = document.querySelector('.nav-item.active');
+                var section = active ? active.dataset.section : 'dashboard';
+                if (section === 'dashboard') loadDashboard();
+                if (section === 'users') loadUsers();
+                if (section === 'projects') loadProjects();
+                if (section === 'courses') loadCourses();
+                if (section === 'premium') loadPremium();
+                if (section === 'payments') loadPayments();
+                showToast('Data refreshed', 'success');
+            }
+
+            // ============================================================
+            // DASHBOARD
+            // ============================================================
+            async function loadDashboard() {
+                if (!supabaseConfigured) {
+                    showToast('⚠️ Supabase not configured', 'error');
+                    return;
+                }
+
+                try {
+                    var [users, projects, courses, payments] = await Promise.all([
+                        supabaseClient.from('users').select('*'),
+                        supabaseClient.from('projects').select('*'),
+                        supabaseClient.from('courses').select('*'),
+                        supabaseClient.from('payments').select('*')
+                    ]);
+
+                    allUsers = users.data || [];
+                    allProjects = projects.data || [];
+                    allCourses = courses.data || [];
+                    allPayments = payments.data || [];
+
+                    var premiumCount = allUsers.filter(function(u) { return u.is_premium; }).length;
+                    var totalRevenue = allPayments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
+
+                    document.getElementById('statsGrid').innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+                            <div class="stat-value">${allUsers.length}</div>
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-change up">↑ Active</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange"><i class="fas fa-crown"></i></div>
+                            <div class="stat-value">${premiumCount}</div>
+                            <div class="stat-label">Premium Users</div>
+                            <div class="stat-change up">↑ ${premiumCount > 0 ? Math.round((premiumCount/allUsers.length)*100) : 0}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fas fa-folder-open"></i></div>
+                            <div class="stat-value">${allProjects.length}</div>
+                            <div class="stat-label">Total Projects</div>
+                            <div class="stat-change up">↑ Active</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="fas fa-graduation-cap"></i></div>
+                            <div class="stat-value">${allCourses.length}</div>
+                            <div class="stat-label">Total Courses</div>
+                            <div class="stat-change up">↑ Active</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon pink"><i class="fas fa-credit-card"></i></div>
+                            <div class="stat-value">${formatCurrency(totalRevenue)}</div>
+                            <div class="stat-label">Total Revenue</div>
+                            <div class="stat-change up">↑ ${allPayments.length} payments</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon cyan"><i class="fas fa-clock"></i></div>
+                            <div class="stat-value">${allPayments.filter(function(p){return p.status === 'pending';}).length}</div>
+                            <div class="stat-label">Pending Payments</div>
+                            <div class="stat-change ${allPayments.filter(function(p){return p.status === 'pending';}).length > 0 ? 'up' : 'down'}">
+                                ${allPayments.filter(function(p){return p.status === 'pending';}).length > 0 ? '⚠️ Action needed' : '✅ All clear'}
+                            </div>
+                        </div>
+                    `;
+
+                    document.getElementById('userBadge').textContent = allUsers.length;
+                    document.getElementById('premiumBadge').textContent = premiumCount;
+
+                    var activity = allUsers.slice(0, 5).map(function(u) {
+                        return '<tr><td>' + (u.full_name || 'User') + '</td><td>Signed up</td><td>' + formatDate(u
+                            .created_at) + '</td></tr>';
+                    }).join('');
+
+                    document.getElementById('activityBody').innerHTML = activity ||
+                        '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:20px;">No activity</td></tr>';
+
+                } catch (e) {
+                    console.error('Dashboard error:', e);
+                    showToast('Error loading dashboard', 'error');
+                }
+            }
+
+            // ============================================================
+            // USERS CRUD
+            // ============================================================
+            async function loadUsers() {
+                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+
+                try {
+                    var { data } = await supabaseClient.from('users').select('*').order('created_at', { ascending: false });
+                    allUsers = data || [];
+                    renderUsers(allUsers);
+                } catch (e) {
+                    showToast('Error loading users', 'error');
+                }
+            }
+
+            function renderUsers(users) {
+                var tbody = document.getElementById('usersBody');
+                if (!users || users.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No users found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = users.map(function(u) {
+                    var roleBadge = u.role === 'admin' ? 'badge-danger' : u.role === 'instructor' ? 'badge-info' :
+                        'badge-success';
+                    var statusBadge = u.status === 'active' ? 'status-pill active' : u.status === 'pending' ?
+                        'status-pill pending' : 'status-pill inactive';
+                    var premiumBadge = u.is_premium ?
+                        '<span class="badge badge-premium"><i class="fas fa-crown"></i> Premium</span>' :
+                        '<span class="badge badge-warning">Free</span>';
+
+                    return '<tr>' +
+                        '<td><strong style="color:var(--text-primary);">' + (u.full_name || 'Unknown') + '</strong></td>' +
+                        '<td>' + (u.email || '') + '</td>' +
+                        '<td><span class="badge ' + roleBadge + '">' + (u.role || 'student') + '</span></td>' +
+                        '<td><span class="' + statusBadge + '">' + (u.status || 'active') + '</span></td>' +
+                        '<td>' + premiumBadge + '</td>' +
+                        '<td>' +
+                        '<button class="btn btn-sm btn-secondary" onclick="togglePremium(\'' + u.id + '\')" title="Toggle Premium"><i class="fas fa-crown"></i></button> ' +
+                        '<button class="btn btn-sm btn-danger" onclick="deleteUser(\'' + u.id + '\')" title="Delete"><i class="fas fa-trash"></i></button>' +
+                        '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            function filterUsers() {
+                var query = document.getElementById('userSearch').value.toLowerCase();
+                var role = document.getElementById('userRoleFilter').value;
+                var status = document.getElementById('userStatusFilter').value;
+                var premium = document.getElementById('userPremiumFilter').value;
+
+                var filtered = allUsers.filter(function(u) {
+                    var matchName = (u.full_name || '').toLowerCase().includes(query);
+                    var matchEmail = (u.email || '').toLowerCase().includes(query);
+                    var matchRole = !role || u.role === role;
+                    var matchStatus = !status || u.status === status;
+                    var matchPremium = premium === '' || String(u.is_premium) === premium;
+                    return (matchName || matchEmail) && matchRole && matchStatus && matchPremium;
+                });
+
+                renderUsers(filtered);
+            }
+
+            async function saveUser() {
+                var id = document.getElementById('editUserId').value;
+                var name = document.getElementById('userName').value.trim();
+                var email = document.getElementById('userEmail').value.trim();
+                var role = document.getElementById('userRole').value;
+                var status = document.getElementById('userStatus').value;
+
+                if (!name || !email) {
+                    showToast('Please fill in all fields', 'error');
+                    return;
+                }
+
+                var payload = {
+                    full_name: name,
+                    email: email,
+                    role: role,
+                    status: status,
+                    updated_at: new Date().toISOString()
+                };
+
+                if (id) {
+                    var { error } = await supabaseClient.from('users').update(payload).eq('id', id);
+                    if (error) { showToast('Error updating user', 'error'); return; }
+                    showToast('User updated', 'success');
+                } else {
+                    var password = document.getElementById('userPassword').value;
+                    if (!password) { showToast('Please enter a password', 'error'); return; }
+                    payload.password = password;
+                    payload.is_premium = false;
+                    payload.created_at = new Date().toISOString();
+                    var { error } = await supabaseClient.from('users').insert(payload);
+                    if (error) { showToast('Error creating user', 'error'); return; }
+                    showToast('User created', 'success');
+                }
+
+                closeModal('userModal');
+                resetUserForm();
+                loadUsers();
+                loadDashboard();
+            }
+
+            function resetUserForm() {
+                document.getElementById('editUserId').value = '';
+                document.getElementById('userName').value = '';
+                document.getElementById('userEmail').value = '';
+                document.getElementById('userPassword').value = '';
+                document.getElementById('userModalTitle').textContent = 'Add User';
+                document.getElementById('passwordGroup').style.display = 'block';
+            }
+
+            async function togglePremium(id) {
+                var user = allUsers.find(function(u) { return u.id === id; });
+                if (!user) return;
+
+                var newStatus = !user.is_premium;
+                var { error } = await supabaseClient.from('users').update({
+                    is_premium: newStatus,
+                    premium_start: newStatus ? new Date().toISOString() : null,
+                    premium_end: newStatus ? new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString() : null
+                }).eq('id', id);
+
+                if (error) { showToast('Error updating premium', 'error'); return; }
+                showToast(user.full_name + ' is now ' + (newStatus ? 'Premium' : 'Free'), 'success');
+                loadUsers();
+                loadDashboard();
+                loadPremium();
+            }
+
+            async function deleteUser(id) {
+                if (!confirm('Delete this user?')) return;
+                var { error } = await supabaseClient.from('users').delete().eq('id', id);
+                if (error) { showToast('Error deleting user', 'error'); return; }
+                showToast('User deleted', 'success');
+                loadUsers();
+                loadDashboard();
+                loadPremium();
+            }
+
+            // ============================================================
+            // PROJECTS CRUD
+            // ============================================================
+            async function loadProjects() {
+                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+
+                try {
+                    var { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
+                    allProjects = data || [];
+                    renderProjects(allProjects);
+                } catch (e) {
+                    showToast('Error loading projects', 'error');
+                }
+            }
+
+            function renderProjects(projects) {
+                var tbody = document.getElementById('projectsBody');
+                if (!projects || projects.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No projects found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = projects.map(function(p) {
+                    var statusBadge = p.status === 'completed' ? 'status-pill completed' : p.status === 'in-progress' ?
+                        'status-pill in-progress' : 'status-pill pending';
+                    return '<tr>' +
+                        '<td><strong style="color:var(--text-primary);">' + (p.title || 'Untitled') + '</strong></td>' +
+                        '<td>' + (p.author_name || 'Anonymous') + '</td>' +
+                        '<td><span class="badge badge-info">' + (p.category || 'General') + '</span></td>' +
+                        '<td>❤️ ' + (p.likes || 0) + '</td>' +
+                        '<td><span class="' + statusBadge + '">' + (p.status || 'pending') + '</span></td>' +
+                        '<td>' +
+                        '<button class="btn btn-sm btn-danger" onclick="deleteProject(\'' + p.id + '\')"><i class="fas fa-trash"></i></button>' +
+                        '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            function filterProjects() {
+                var query = document.getElementById('projectSearch').value.toLowerCase();
+                var filtered = allProjects.filter(function(p) {
+                    return (p.title || '').toLowerCase().includes(query) ||
+                           (p.author_name || '').toLowerCase().includes(query);
+                });
+                renderProjects(filtered);
+            }
+
+            async function saveProject() {
+                var title = document.getElementById('projectTitle').value.trim();
+                var desc = document.getElementById('projectDesc').value.trim();
+                var category = document.getElementById('projectCategory').value;
+                var status = document.getElementById('projectStatus').value;
+                var author = document.getElementById('projectAuthor').value.trim() || 'Admin';
+
+                if (!title) { showToast('Please enter a title', 'error'); return; }
+
+                var { error } = await supabaseClient.from('projects').insert({
+                    title: title,
+                    description: desc || 'No description provided.',
+                    category: category,
+                    status: status,
+                    likes: 0,
+                    comments_count: 0,
+                    author_name: author,
+                    author_avatar: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(author) + '&background=7c3aed&color=fff&size=100',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                });
+
+                if (error) { 
+                    console.error('Error saving project:', error);
+                    showToast('Error creating project: ' + error.message, 'error'); 
+                    return; 
+                }
+                showToast('Project created', 'success');
+                closeModal('projectModal');
+                loadProjects();
+                loadDashboard();
+            }
+
+            async function deleteProject(id) {
+                if (!confirm('Delete this project?')) return;
+                var { error } = await supabaseClient.from('projects').delete().eq('id', id);
+                if (error) { showToast('Error deleting project', 'error'); return; }
+                showToast('Project deleted', 'success');
+                loadProjects();
+                loadDashboard();
+            }
+
+            // ============================================================
+            // COURSES CRUD
+            // ============================================================
+            async function loadCourses() {
+                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+
+                try {
+                    var { data } = await supabaseClient.from('courses').select('*').order('created_at', { ascending: false });
+                    allCourses = data || [];
+                    renderCourses(allCourses);
+                } catch (e) {
+                    showToast('Error loading courses', 'error');
+                }
+            }
+
+            function renderCourses(courses) {
+                var tbody = document.getElementById('coursesBody');
+                if (!courses || courses.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No courses found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = courses.map(function(c) {
+                    return '<tr>' +
+                        '<td><strong style="color:var(--text-primary);">' + (c.title || 'Untitled') + '</strong></td>' +
+                        '<td>' + (c.instructor || 'Unknown') + '</td>' +
+                        '<td><span class="badge badge-info">' + (c.category || 'General') + '</span></td>' +
+                        '<td>' + (c.is_free ? 'Free' : formatCurrency(c.price)) + '</td>' +
+                        '<td>' +
+                        '<button class="btn btn-sm btn-danger" onclick="deleteCourse(\'' + c.id + '\')"><i class="fas fa-trash"></i></button>' +
+                        '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            async function saveCourse() {
+                var title = document.getElementById('courseTitle').value.trim();
+                var instructor = document.getElementById('courseInstructor').value.trim();
+                var category = document.getElementById('courseCategory').value;
+                var price = parseInt(document.getElementById('coursePrice').value) || 0;
+                var duration = parseInt(document.getElementById('courseDuration').value) || 10;
+
+                if (!title) { showToast('Please enter a title', 'error'); return; }
+
+                var { error } = await supabaseClient.from('courses').insert({
+                    title: title,
+                    instructor: instructor || 'Admin',
+                    category: category,
+                    price: price,
+                    is_free: price === 0,
+                    duration_hours: duration,
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                });
+
+                if (error) { showToast('Error creating course', 'error'); return; }
+                showToast('Course created', 'success');
+                closeModal('courseModal');
+                loadCourses();
+                loadDashboard();
+            }
+
+            async function deleteCourse(id) {
+                if (!confirm('Delete this course?')) return;
+                var { error } = await supabaseClient.from('courses').delete().eq('id', id);
+                if (error) { showToast('Error deleting course', 'error'); return; }
+                showToast('Course deleted', 'success');
+                loadCourses();
+                loadDashboard();
+            }
+
+            // ============================================================
+            // PREMIUM MANAGEMENT
+            // ============================================================
+            async function loadPremium() {
+                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+
+                try {
+                    var [premiumUsers, pendingRequests] = await Promise.all([
+                        supabaseClient.from('users').select('*').eq('is_premium', true).order('premium_start', { ascending: false }),
+                        supabaseClient.from('premium_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false })
+                    ]);
+
+                    allPremiumUsers = premiumUsers.data || [];
+                    allPendingRequests = pendingRequests.data || [];
+
+                    document.getElementById('premiumStats').innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-icon orange"><i class="fas fa-crown"></i></div>
+                            <div class="stat-value">${allPremiumUsers.length}</div>
+                            <div class="stat-label">Active Premium Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+                            <div class="stat-value">${allUsers.filter(function(u){return u.is_premium;}).length}</div>
+                            <div class="stat-label">Total Premium</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="fas fa-clock"></i></div>
+                            <div class="stat-value">${allPendingRequests.length}</div>
+                            <div class="stat-label">Pending Requests</div>
+                        </div>
+                    `;
+
+                    renderPremium(allPremiumUsers);
+                    renderPending(allPendingRequests);
+
+                } catch (e) {
+                    showToast('Error loading premium', 'error');
+                }
+            }
+
+            function renderPremium(users) {
+                var tbody = document.getElementById('premiumBody');
+                if (!users || users.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No premium users</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = users.map(function(u) {
+                    return '<tr>' +
+                        '<td><strong style="color:var(--text-primary);">' + (u.full_name || 'Unknown') + '</strong></td>' +
+                        '<td>' + (u.email || '') + '</td>' +
+                        '<td>' + formatDate(u.premium_start) + '</td>' +
+                        '<td>' + formatDate(u.premium_end) + '</td>' +
+                        '<td><button class="btn btn-sm btn-danger" onclick="togglePremium(\'' + u.id + '\')"><i class="fas fa-crown"></i> Revoke</button></td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            function renderPending(requests) {
+                var tbody = document.getElementById('pendingBody');
+                if (!requests || requests.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No pending requests</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = requests.map(function(r) {
+                    return '<tr>' +
+                        '<td><strong style="color:var(--text-primary);">' + (r.user_name || 'Unknown') + '</strong></td>' +
+                        '<td>' + (r.user_email || '') + '</td>' +
+                        '<td>' + formatCurrency(r.amount || 13500) + '</td>' +
+                        '<td>' + formatDate(r.created_at) + '</td>' +
+                        '<td>' +
+                        '<button class="btn btn-sm btn-success" onclick="confirmPremium(\'' + r.id + '\', \'confirm\')"><i class="fas fa-check"></i></button> ' +
+                        '<button class="btn btn-sm btn-danger" onclick="confirmPremium(\'' + r.id + '\', \'reject\')"><i class="fas fa-times"></i></button>' +
+                        '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            async function confirmPremium(requestId, action) {
+                var request = allPendingRequests.find(function(r) { return r.id === requestId; });
+                if (!request) return;
+
+                if (action === 'confirm') {
+                    var { error: userError } = await supabaseClient.from('users').update({
+                        is_premium: true,
+                        premium_start: new Date().toISOString(),
+                        premium_end: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
+                        payment_status: 'confirmed'
+                    }).eq('id', request.user_id);
+
+                    if (userError) { showToast('Error updating user', 'error'); return; }
+
+                    await supabaseClient.from('premium_requests').update({
+                        status: 'confirmed',
+                        confirmed_by: currentUser?.id,
+                        confirmed_at: new Date().toISOString()
+                    }).eq('id', requestId);
+
+                    await supabaseClient.from('payments').insert({
+                        user_id: request.user_id,
+                        user_email: request.user_email,
+                        amount: request.amount || 13500,
+                        payment_type: 'premium',
+                        item: 'Premium Subscription',
+                        status: 'completed',
+                        created_at: new Date().toISOString()
+                    });
+
+                    showToast('Premium confirmed for ' + (request.user_name || 'user'), 'success');
+                    loadPremium();
+                    loadUsers();
+                    loadDashboard();
+
+                } else {
+                    await supabaseClient.from('premium_requests').update({
+                        status: 'rejected',
+                        confirmed_by: currentUser?.id,
+                        confirmed_at: new Date().toISOString()
+                    }).eq('id', requestId);
+
+                    showToast('Premium request rejected', 'warning');
+                    loadPremium();
+                }
+            }
+
+            // ============================================================
+            // PAYMENTS
+            // ============================================================
+            async function loadPayments() {
+                if (!supabaseConfigured) { showToast('⚠️ Supabase not configured', 'error'); return; }
+
+                try {
+                    var { data } = await supabaseClient.from('payments').select('*').order('created_at', { ascending: false });
+                    allPayments = data || [];
+
+                    var totalRevenue = allPayments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
+                    var completed = allPayments.filter(function(p) { return p.status === 'completed'; });
+                    var pending = allPayments.filter(function(p) { return p.status === 'pending'; });
+
+                    document.getElementById('paymentStats').innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fas fa-money-bill-wave"></i></div>
+                            <div class="stat-value">${formatCurrency(totalRevenue)}</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-value">${completed.length}</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+                            <div class="stat-value">${pending.length}</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                    `;
+
+                    renderPayments(allPayments);
+                } catch (e) {
+                    showToast('Error loading payments', 'error');
+                }
+            }
+
+            function renderPayments(payments) {
+                var tbody = document.getElementById('paymentsBody');
+                if (!payments || payments.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No payments found</td></tr>';
+                    return;
+                }
+
+                var typeMap = {
+                    'premium': '<span class="badge badge-premium"><i class="fas fa-crown"></i> Premium</span>',
+                    'course': '<span class="badge badge-info"><i class="fas fa-graduation-cap"></i> Course</span>',
+                    'tool': '<span class="badge badge-warning"><i class="fas fa-tools"></i> Tool</span>'
+                };
+
+                tbody.innerHTML = payments.map(function(p) {
+                    var statusBadge = p.status === 'completed' ? 'status-pill completed' : p.status === 'pending' ?
+                        'status-pill pending' : 'status-pill inactive';
+                    return '<tr>' +
+                        '<td>' + (p.user_email || 'Unknown') + '</td>' +
+                        '<td><strong style="color:var(--accent-green);">' + formatCurrency(p.amount) + '</strong></td>' +
+                        '<td>' + (typeMap[p.payment_type] || p.payment_type || '—') + '</td>' +
+                        '<td><span class="' + statusBadge + '">' + (p.status || 'pending') + '</span></td>' +
+                        '<td>' + formatDate(p.created_at) + '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            // ============================================================
+            // KEYBOARD SHORTCUTS
+            // ============================================================
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-overlay.active').forEach(function(el) {
+                        el.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                }
+            });
+
+            // ============================================================
+            // INIT
+            // ============================================================
+            function init() {
+                checkAuth();
+                loadDashboard();
+                loadUsers();
+                loadProjects();
+                loadCourses();
+                loadPremium();
+                loadPayments();
+
+                setTimeout(function() {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }, 800);
+            }
+
+            // Expose globally
+            window.showSection = showSection;
+            window.openModal = openModal;
+            window.closeModal = closeModal;
+            window.saveUser = saveUser;
+            window.togglePremium = togglePremium;
+            window.deleteUser = deleteUser;
+            window.saveProject = saveProject;
+            window.deleteProject = deleteProject;
+            window.saveCourse = saveCourse;
+            window.deleteCourse = deleteCourse;
+            window.confirmPremium = confirmPremium;
+            window.loadPremium = loadPremium;
+            window.toggleMobileSidebar = toggleMobileSidebar;
+            window.handleLogout = handleLogout;
+            window.refreshData = refreshData;
+            window.showToast = showToast;
+            window.filterUsers = filterUsers;
+            window.filterProjects = filterProjects;
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+        })();
+    </script>
+
 </body>
 </html>
