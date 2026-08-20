@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel | Aurex Designs</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -74,6 +75,11 @@
         .stat-card .stat-change.up { color:var(--accent-green); }
         .stat-card .stat-change.down { color:var(--accent-red); }
 
+        .chart-container { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:24px; margin-bottom:20px; }
+        .chart-container .chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px; }
+        .chart-container .chart-header h3 { font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; }
+        .chart-wrapper { height:280px; position:relative; }
+
         .card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:24px; margin-bottom:20px; transition:var(--transition); }
         .card:hover { border-color:rgba(124,58,237,0.1); }
         .card .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px; }
@@ -125,7 +131,7 @@
         .modal .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
         .modal .btn { width:100%; justify-content:center; }
         .file-upload-area { border:2px dashed var(--border-color); border-radius:12px; padding:20px; text-align:center; cursor:pointer; transition:all 0.3s; background:var(--bg-card); }
-        .file-upload-area:hover { border-color:var(--accent-purple); background:rgba(124,58,237,0.03); }
+        .file-upload-area:hover { border-color:var(--accent); background:rgba(124,58,237,0.03); }
         .file-upload-area i { font-size:28px; color:var(--text-muted); margin-bottom:8px; display:block; }
         .file-upload-area .file-name { font-size:11px; color:var(--accent-cyan); margin-top:4px; }
         .file-upload-area input[type="file"] { display:none; }
@@ -159,7 +165,7 @@
         .empty-state h3 { font-size:16px; margin-bottom:8px; }
         .empty-state p { color:var(--text-muted); font-size:13px; }
 
-        @media (max-width:768px) { .content-area { padding:16px; } .top-bar { padding:12px 16px; } .top-bar .page-title { font-size:16px; } .stats-grid { grid-template-columns:1fr 1fr; } .modal .form-row { grid-template-columns:1fr; } }
+        @media (max-width:768px) { .content-area { padding:16px; } .top-bar { padding:12px 16px; } .top-bar .page-title { font-size:16px; } .stats-grid { grid-template-columns:1fr 1fr; } .modal .form-row { grid-template-columns:1fr; } .chart-wrapper { height:200px; } }
         @media (max-width:480px) { .stats-grid { grid-template-columns:1fr; } }
     </style>
 </head>
@@ -240,6 +246,25 @@
             <!-- DASHBOARD -->
             <div id="section-dashboard">
                 <div class="stats-grid" id="statsGrid"></div>
+
+                <!-- Revenue Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-bar" style="color:var(--accent-green);"></i> Revenue Overview</h3>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-secondary" onclick="loadRevenueChart()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Visitors Stats -->
+                <div class="stats-grid" id="visitorStats"></div>
+
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-clock" style="color:var(--accent-cyan);"></i> Recent Activity</h3>
@@ -475,7 +500,7 @@
 
     <script>
         // ============================================================
-        // ADMIN APP - COMPLETE with Image Upload & Edit
+        // ADMIN APP - COMPLETE with Revenue Chart & Visitor Tracking
         // ============================================================
 
         // ============================================================
@@ -518,6 +543,7 @@
         var currentUser = null;
         var projectImageFile = null;
         var courseImageFile = null;
+        var revenueChart = null;
 
         // ============================================================
         // HELPERS
@@ -617,6 +643,173 @@
                     '" alt="Preview">';
             };
             reader.readAsDataURL(file);
+        }
+
+        // ============================================================
+        // VISITOR TRACKING
+        // ============================================================
+        function trackVisitor() {
+            var today = new Date().toDateString();
+            var visitors = JSON.parse(localStorage.getItem('site_visitors') || '{}');
+            
+            if (!visitors[today]) {
+                visitors[today] = 0;
+            }
+            visitors[today]++;
+            localStorage.setItem('site_visitors', JSON.stringify(visitors));
+            
+            // Also track unique visitors by device ID
+            var deviceId = localStorage.getItem('device_id');
+            if (!deviceId) {
+                deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('device_id', deviceId);
+            }
+            
+            var uniqueVisitors = JSON.parse(localStorage.getItem('unique_visitors') || '{}');
+            if (!uniqueVisitors[today]) {
+                uniqueVisitors[today] = [];
+            }
+            if (!uniqueVisitors[today].includes(deviceId)) {
+                uniqueVisitors[today].push(deviceId);
+                localStorage.setItem('unique_visitors', JSON.stringify(uniqueVisitors));
+            }
+        }
+
+        function getVisitorStats() {
+            var visitors = JSON.parse(localStorage.getItem('site_visitors') || '{}');
+            var uniqueVisitors = JSON.parse(localStorage.getItem('unique_visitors') || '{}');
+            
+            var today = new Date().toDateString();
+            var todayVisits = visitors[today] || 0;
+            var todayUnique = (uniqueVisitors[today] || []).length;
+            
+            // Calculate total
+            var totalVisits = Object.values(visitors).reduce(function(a, b) { return a + b; }, 0);
+            var totalUnique = Object.values(uniqueVisitors).reduce(function(a, b) { return a + b.length; }, 0);
+            
+            // Last 7 days
+            var last7Days = [];
+            for (var i = 6; i >= 0; i--) {
+                var d = new Date();
+                d.setDate(d.getDate() - i);
+                var key = d.toDateString();
+                last7Days.push({
+                    date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    visits: visitors[key] || 0,
+                    unique: (uniqueVisitors[key] || []).length
+                });
+            }
+            
+            return {
+                todayVisits: todayVisits,
+                todayUnique: todayUnique,
+                totalVisits: totalVisits,
+                totalUnique: totalUnique,
+                last7Days: last7Days
+            };
+        }
+
+        // ============================================================
+        // REVENUE CHART
+        // ============================================================
+        async function loadRevenueChart() {
+            if (!supabaseConfigured) {
+                showToast('⚠️ Supabase not configured', 'error');
+                return;
+            }
+
+            try {
+                var { data } = await supabaseClient
+                    .from('payments')
+                    .select('amount, created_at, status')
+                    .eq('status', 'completed')
+                    .order('created_at', { ascending: true });
+
+                var payments = data || [];
+
+                // Group by date
+                var dateMap = {};
+                payments.forEach(function(p) {
+                    var date = new Date(p.created_at).toDateString();
+                    if (!dateMap[date]) {
+                        dateMap[date] = 0;
+                    }
+                    dateMap[date] += p.amount || 0;
+                });
+
+                // Last 30 days
+                var labels = [];
+                var values = [];
+                var now = new Date();
+                for (var i = 29; i >= 0; i--) {
+                    var d = new Date();
+                    d.setDate(d.getDate() - i);
+                    var key = d.toDateString();
+                    var label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    labels.push(label);
+                    values.push(dateMap[key] || 0);
+                }
+
+                var ctx = document.getElementById('revenueChart').getContext('2d');
+
+                if (revenueChart) {
+                    revenueChart.destroy();
+                }
+
+                revenueChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Revenue (₦)',
+                            data: values,
+                            backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                            borderColor: '#7c3aed',
+                            borderWidth: 2,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#94a3b8',
+                                    font: { size: 12 }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#64748b',
+                                    callback: function(value) {
+                                        return '₦' + value.toLocaleString();
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(148, 163, 184, 0.05)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#64748b',
+                                    maxTicksLimit: 15
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (e) {
+                console.error('Revenue chart error:', e);
+                showToast('Error loading revenue chart', 'error');
+            }
         }
 
         // ============================================================
@@ -726,6 +919,10 @@
                 var totalRevenue = allPayments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
                 var totalStudents = allCourses.reduce(function(sum, c) { return sum + (c.students_enrolled || 0); }, 0);
 
+                // Track visitor
+                trackVisitor();
+                var visitorStats = getVisitorStats();
+
                 document.getElementById('statsGrid').innerHTML = `
                     <div class="stat-card">
                         <div class="stat-icon purple"><i class="fas fa-users"></i></div>
@@ -767,6 +964,22 @@
                     </div>
                 `;
 
+                // Visitor Stats
+                document.getElementById('visitorStats').innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-icon cyan"><i class="fas fa-eye"></i></div>
+                        <div class="stat-value">${visitorStats.totalVisits}</div>
+                        <div class="stat-label">Total Visits</div>
+                        <div class="stat-change up">↑ Today: ${visitorStats.todayVisits}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-user-check"></i></div>
+                        <div class="stat-value">${visitorStats.totalUnique}</div>
+                        <div class="stat-label">Unique Visitors</div>
+                        <div class="stat-change up">↑ Today: ${visitorStats.todayUnique}</div>
+                    </div>
+                `;
+
                 document.getElementById('userBadge').textContent = allUsers.length;
                 document.getElementById('premiumBadge').textContent = premiumCount;
                 document.getElementById('projectBadge').textContent = allProjects.length;
@@ -779,6 +992,9 @@
 
                 document.getElementById('activityBody').innerHTML = activity ||
                     '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:20px;">No activity</td></tr>';
+
+                // Load revenue chart
+                await loadRevenueChart();
 
             } catch (e) {
                 console.error('Dashboard error:', e);
@@ -1326,6 +1542,7 @@
             if (!request) return;
 
             if (action === 'confirm') {
+                // Update user to premium
                 var { error: userError } = await supabaseClient.from('users').update({
                     is_premium: true,
                     premium_start: new Date().toISOString(),
@@ -1335,28 +1552,39 @@
 
                 if (userError) { showToast('Error updating user', 'error'); return; }
 
+                // Update request status
                 await supabaseClient.from('premium_requests').update({
                     status: 'confirmed',
                     confirmed_by: currentUser?.id,
                     confirmed_at: new Date().toISOString()
                 }).eq('id', requestId);
 
-                await supabaseClient.from('payments').insert({
+                // Create payment record (THIS ADDS TO REVENUE)
+                var amount = request.amount || 13500;
+                var { error: paymentError } = await supabaseClient.from('payments').insert({
                     user_id: request.user_id,
                     user_email: request.user_email,
-                    amount: request.amount || 13500,
+                    amount: amount,
                     payment_type: 'premium',
-                    item: 'Premium Subscription',
+                    item: 'Premium Subscription (6 months)',
                     status: 'completed',
                     created_at: new Date().toISOString()
                 });
 
-                showToast('Premium confirmed for ' + (request.user_name || 'user'), 'success');
+                if (paymentError) {
+                    console.error('Payment record error:', paymentError);
+                    showToast('Premium confirmed but payment record failed: ' + paymentError.message, 'warning');
+                } else {
+                    showToast('✅ Premium confirmed! +' + formatCurrency(amount) + ' added to revenue', 'success');
+                }
+
                 loadPremium();
                 loadUsers();
                 loadDashboard();
+                loadRevenueChart();
 
             } else {
+                // Reject
                 await supabaseClient.from('premium_requests').update({
                     status: 'rejected',
                     confirmed_by: currentUser?.id,
@@ -1490,6 +1718,7 @@
         window.filterProjects = filterProjects;
         window.handleProjectImageUpload = handleProjectImageUpload;
         window.handleCourseImageUpload = handleCourseImageUpload;
+        window.loadRevenueChart = loadRevenueChart;
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
